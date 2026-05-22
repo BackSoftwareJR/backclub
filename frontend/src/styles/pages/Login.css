@@ -1,0 +1,272 @@
+/* Login Page Styles */
+
+.login-container {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-6);
+    overflow: hidden;
+}
+
+.login-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.login-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: var(--spacing-10);
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-8);
+}
+
+.login-title {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: var(--spacing-2);
+    letter-spacing: -0.02em;
+}
+
+.login-subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-tertiary);
+    font-weight: var(--font-weight-regular);
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+.login-error {
+    padding: var(--spacing-4);
+    background: rgba(255, 69, 58, 0.15);
+    border: 1px solid rgba(255, 69, 58, 0.3);
+    border-radius: var(--radius-lg);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+    text-align: center;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.form-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-4);
+    background: var(--glass-bg-light);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    transition: all var(--transition-base);
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: var(--color-text-quaternary);
+}
+
+.form-input:hover {
+    border-color: var(--color-border-hover);
+}
+
+.form-input:focus {
+    border-color: var(--color-accent-blue);
+    background: var(--glass-bg-medium);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1),
+        0 0 20px rgba(10, 132, 255, 0.2);
+}
+
+.form-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.login-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-2);
+    width: 100%;
+    padding: var(--spacing-4) var(--spacing-6);
+    background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-blue-dark) 100%);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: white;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    outline: none;
+    margin-top: var(--spacing-2);
+}
+
+.login-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(10, 132, 255, 0.4);
+}
+
+.login-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.login-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.login-footer {
+    margin-top: var(--spacing-8);
+    text-align: center;
+}
+
+.login-footer-text {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-quaternary);
+}
+
+/* Role Selection Modal */
+.role-selection-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--spacing-6);
+}
+
+.role-selection-content {
+    background: var(--glass-bg-medium);
+    border: 1px solid var(--color-border-secondary);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-8);
+    max-width: 480px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.role-selection-header {
+    text-align: center;
+    margin-bottom: var(--spacing-6);
+}
+
+.role-selection-header svg {
+    color: var(--color-accent-blue);
+    margin-bottom: var(--spacing-4);
+}
+
+.role-selection-header h2 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-2);
+}
+
+.role-selection-header p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.role-selection-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    margin-bottom: var(--spacing-6);
+}
+
+.role-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-4);
+    background: var(--glass-bg-light);
+    border: 2px solid var(--color-border-secondary);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-align: left;
+}
+
+.role-option:hover {
+    background: var(--glass-bg-medium);
+    border-color: var(--color-border-hover);
+}
+
+.role-option.selected {
+    background: rgba(10, 132, 255, 0.15);
+    border-color: var(--color-accent-blue);
+}
+
+.role-option-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.role-option-label {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+}
+
+.role-option-badge {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-tertiary);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    margin-left: var(--spacing-3);
+}
+
+.role-option-check {
+    color: var(--color-accent-blue);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+}
+
+.role-selection-actions {
+    display: flex;
+    gap: var(--spacing-3);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .login-card {
+        padding: var(--spacing-6);
+    }
+
+    .login-title {
+        font-size: var(--font-size-3xl);
+    }
+    
+    .role-selection-content {
+        padding: var(--spacing-6);
+    }
+}

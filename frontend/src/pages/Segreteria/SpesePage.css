@@ -1,0 +1,133 @@
+/* Spese Page Styles */
+
+.segreteria-spese-page {
+  min-height: 100%;
+}
+
+.segreteria-upload-area {
+  border: 2px dashed var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-12);
+  text-align: center;
+  background: var(--color-bg-tertiary);
+  transition: all var(--transition-base);
+  margin-bottom: var(--spacing-6);
+  cursor: pointer;
+}
+
+.segreteria-upload-area:hover {
+  border-color: var(--color-accent-blue);
+  background: var(--color-bg-elevated);
+}
+
+.segreteria-upload-area.dragging {
+  border-color: var(--color-accent-blue);
+  background: rgba(10, 132, 255, 0.1);
+  transform: scale(1.02);
+}
+
+.segreteria-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-3);
+  cursor: pointer;
+}
+
+.segreteria-upload-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.segreteria-upload-text strong {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.segreteria-upload-text span {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.segreteria-upload-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-top: var(--spacing-2);
+}
+
+.segreteria-uploaded-files {
+  margin-bottom: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-primary);
+}
+
+.segreteria-uploaded-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-3) 0;
+}
+
+.segreteria-files-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.segreteria-file-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-primary);
+}
+
+.segreteria-file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.segreteria-file-name {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.segreteria-file-size {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.segreteria-file-remove {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segreteria-file-remove:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.segreteria-no-doc {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+

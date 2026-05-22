@@ -1,0 +1,254 @@
+/* Seller Quote Commission Page - Dettaglio commissione stimata */
+
+.seller-quote-commission-page {
+  min-height: 100vh;
+  background: #000000;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+
+.seller-quote-commission-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  background: #1C1C1E;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.seller-quote-commission-back {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: transparent;
+  color: #f5f5f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.seller-quote-commission-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-quote-commission-back:active {
+  opacity: 0.8;
+}
+
+.seller-quote-commission-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #f5f5f7;
+}
+
+.seller-quote-commission-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.seller-quote-commission-empty {
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.seller-quote-commission-empty p {
+  margin: 0 0 16px;
+  color: #a0a0a0;
+  font-size: 0.9375rem;
+}
+
+.seller-quote-commission-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background: #0A84FF;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.seller-quote-commission-btn-primary:hover {
+  background: #0066CC;
+}
+
+.seller-quote-commission-btn-primary:active {
+  opacity: 0.9;
+}
+
+/* Skeleton loading */
+.seller-quote-commission-page .skeleton-line {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+}
+
+/* Cards */
+.seller-quote-commission-card {
+  background: #1C1C1E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.25rem;
+}
+
+.seller-quote-commission-card-hero {
+  text-align: center;
+}
+
+.seller-quote-commission-hero-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #a0a0a0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.seller-quote-commission-hero-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #f5f5f7;
+}
+
+.seller-quote-commission-hero-sub {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  margin-top: 4px;
+}
+
+.seller-quote-commission-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.seller-quote-commission-row-final {
+  padding-top: 12px;
+}
+
+.seller-quote-commission-label {
+  font-size: 0.9375rem;
+  color: #a0a0a0;
+}
+
+.seller-quote-commission-value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #f5f5f7;
+}
+
+.seller-quote-commission-value-final {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #30D158;
+}
+
+.seller-quote-commission-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 8px 0;
+}
+
+.seller-quote-commission-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  border-radius: 12px;
+}
+
+.seller-quote-commission-note-icon {
+  flex-shrink: 0;
+  color: #0A84FF;
+  margin-top: 2px;
+}
+
+.seller-quote-commission-note-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.seller-quote-commission-note-text p {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #a0a0a0;
+  line-height: 1.45;
+}
+
+.seller-quote-commission-note-text p + p {
+  margin-top: 10px;
+}
+
+/* Light theme */
+[data-theme="light"] .seller-quote-commission-page {
+  background: #F5F5F7;
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-quote-commission-header {
+  background: #ffffff;
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-quote-commission-back {
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-quote-commission-back:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .seller-quote-commission-title {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-quote-commission-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-quote-commission-hero-value,
+[data-theme="light"] .seller-quote-commission-value {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-quote-commission-label,
+[data-theme="light"] .seller-quote-commission-hero-sub,
+[data-theme="light"] .seller-quote-commission-note-text p {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-quote-commission-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-quote-commission-note {
+  background: rgba(10, 132, 255, 0.06);
+  border-color: rgba(10, 132, 255, 0.15);
+}
+
+[data-theme="light"] .seller-quote-commission-page .skeleton-line {
+  background: rgba(0, 0, 0, 0.06);
+}

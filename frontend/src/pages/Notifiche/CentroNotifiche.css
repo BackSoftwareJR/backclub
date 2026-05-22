@@ -1,0 +1,311 @@
+/* Centro Notifiche - iOS 18 Style */
+
+.centro-notifiche {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+/* Header */
+.centro-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.centro-title-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.centro-title-section h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.unread-count-badge {
+    padding: 4px 10px;
+    background: var(--color-accent-blue);
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+/* Controls */
+.centro-controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: 10px 14px;
+    background: var(--color-bg-secondary);
+    border-radius: 10px;
+}
+
+.search-box svg {
+    color: var(--color-text-quaternary);
+}
+
+.search-box input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.search-box input::placeholder {
+    color: var(--color-text-quaternary);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: var(--spacing-2);
+    overflow-x: auto;
+    padding: 4px;
+    scrollbar-width: none;
+}
+
+.filter-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-tab {
+    padding: 6px 14px;
+    background: var(--color-bg-secondary);
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.filter-tab:hover {
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+}
+
+.filter-tab.active {
+    background: var(--color-accent-blue);
+    color: white;
+}
+
+/* Swipeable Notifications List */
+.notifiche-list-swipe {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--color-border-secondary);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.notifica-swipe-wrapper {
+    position: relative;
+    background: var(--color-bg-primary);
+}
+
+.swipe-actions {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: stretch;
+    gap: 1px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.notifica-swipe-wrapper.swiped .swipe-actions {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.notifica-swipe-wrapper.swiped .notifica-card-swipe {
+    transform: translateX(-140px);
+}
+
+.swipe-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.swipe-action.read {
+    background: var(--color-success);
+}
+
+.swipe-action.archive {
+    background: var(--color-warning);
+}
+
+.swipe-action.delete {
+    background: var(--color-error);
+}
+
+.swipe-action:hover {
+    opacity: 0.9;
+}
+
+.swipe-action:active {
+    opacity: 0.7;
+}
+
+/* Notification Card */
+.notifica-card-swipe {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    touch-action: pan-y;
+}
+
+.notifica-card-swipe:hover {
+    background: var(--color-bg-secondary);
+}
+
+.notifica-card-swipe.unread {
+    background: rgba(10, 132, 255, 0.03);
+}
+
+.notifica-card-swipe.urgent {
+    background: rgba(255, 69, 58, 0.03);
+    border-left: 3px solid var(--color-error);
+}
+
+.notifica-card-swipe.archived {
+    opacity: 0.6;
+}
+
+.notifica-card-swipe.deleted {
+    opacity: 0.3;
+    text-decoration: line-through;
+}
+
+.notifica-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-accent-blue);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.notifica-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.notifica-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-2);
+}
+
+.notifica-titolo {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.notifica-tempo {
+    font-size: 12px;
+    color: var(--color-text-quaternary);
+    white-space: nowrap;
+}
+
+.notifica-messaggio {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.urgent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(255, 69, 58, 0.1);
+    color: var(--color-error);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    align-self: flex-start;
+}
+
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-accent-blue);
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+/* Empty State */
+.empty-notifiche {
+    padding: var(--spacing-12);
+    text-align: center;
+    color: var(--color-text-tertiary);
+}
+
+.empty-notifiche p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .centro-title-section {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .filter-tabs {
+        overflow-x: auto;
+    }
+
+    .notifica-swipe-wrapper.swiped .notifica-card-swipe {
+        transform: translateX(-120px);
+    }
+
+    .swipe-action {
+        width: 50px;
+    }
+}

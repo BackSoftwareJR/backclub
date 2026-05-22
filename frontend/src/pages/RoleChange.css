@@ -1,0 +1,455 @@
+/* Role Change Page - Apple Intelligence Style - Ultra Refined */
+
+.role-change-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #000000;
+  z-index: 9999;
+  perspective: 3000px;
+  perspective-origin: center center;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* City Scene - Ultra Refined 3D Background */
+.city-scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform-style: preserve-3d;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 10, 15, 0.8) 0%,
+    rgba(0, 0, 0, 1) 100%
+  );
+}
+
+.city-grid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateZ(-8000px) scale(1) rotateX(5deg);
+  transform-style: preserve-3d;
+  transition: transform 0.05s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  width: 150%;
+  height: 150%;
+  will-change: transform;
+}
+
+.building {
+  position: absolute;
+  width: 50px;
+  background: linear-gradient(180deg, 
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 30%,
+    rgba(0, 0, 0, 0.6) 70%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 
+    0 0 15px rgba(255, 255, 255, 0.02),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  animation: building-subtle-glow 4s ease-in-out infinite;
+  transform-origin: bottom center;
+  backdrop-filter: blur(0.5px);
+}
+
+.building::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 6px,
+    rgba(255, 255, 255, 0.02) 6px,
+    rgba(255, 255, 255, 0.02) 7px
+  );
+  opacity: 0.3;
+}
+
+.building::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 100%
+  );
+  opacity: 0.4;
+}
+
+@keyframes building-subtle-glow {
+  0%, 100% {
+    box-shadow: 
+      0 0 15px rgba(255, 255, 255, 0.02),
+      inset 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 
+      0 0 25px rgba(255, 255, 255, 0.03),
+      inset 0 0 40px rgba(0, 0, 0, 0.6);
+  }
+}
+
+.city-grid-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100px 100px;
+  transform: perspective(2000px) rotateX(75deg) translateZ(-2000px);
+  transform-origin: center center;
+  will-change: opacity;
+}
+
+/* Light Rays Effect */
+.light-rays {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% 0%,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* Overlay - Ultra Refined */
+.role-change-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(
+    ellipse 100% 100% at center,
+    rgba(0, 0, 0, 0.2) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+  z-index: 10;
+  transition: background 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(0px);
+}
+
+.role-change-overlay.phase-flying {
+  background: radial-gradient(
+    ellipse 100% 100% at center,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+  backdrop-filter: blur(0px);
+}
+
+.role-change-overlay.phase-zooming {
+  background: radial-gradient(
+    ellipse 100% 100% at center,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.5) 50%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  backdrop-filter: blur(1px);
+}
+
+.role-change-overlay.phase-revealing {
+  background: radial-gradient(
+    ellipse 100% 100% at center,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0.98) 100%
+  );
+  backdrop-filter: blur(2px);
+}
+
+.role-change-overlay.phase-complete {
+  background: rgba(0, 0, 0, 0.98);
+  backdrop-filter: blur(3px);
+}
+
+.role-change-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
+  z-index: 20;
+  max-width: 600px;
+}
+
+/* Role Display - Apple Intelligence Style */
+.role-display {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.role-display.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.role-label-wrapper {
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.role-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  font-feature-settings: 'ss01', 'ss02';
+}
+
+.role-title {
+  font-size: 5rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-feature-settings: 'ss01', 'ss02', 'liga';
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  will-change: clip-path;
+  transition: clip-path 0.1s linear;
+}
+
+.role-divider {
+  width: 60px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  margin: 2.5rem auto;
+  opacity: 0;
+  animation: divider-fade-in 1s ease-out 0.5s forwards;
+}
+
+@keyframes divider-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+.role-subtitle {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  font-feature-settings: 'liga';
+}
+
+.user-name {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Loading Indicator - Minimalist Apple Style */
+.loading-indicator {
+  margin-top: 2rem;
+  width: 100%;
+  max-width: 320px;
+  opacity: 1;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.loading-indicator.fade-out {
+  opacity: 0;
+}
+
+.loading-bar-wrapper {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 1.25rem;
+}
+
+.loading-progress {
+  height: 100%;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.5) 50%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
+  border-radius: 0.5px;
+  transition: width 0.1s linear;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+.loading-progress::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  animation: progress-shine 2s ease-in-out infinite;
+}
+
+@keyframes progress-shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.loading-text {
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  font-feature-settings: 'ss01';
+}
+
+/* Particles - Subtle and Refined */
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+  animation: particle-float 5s ease-in-out infinite;
+}
+
+@keyframes particle-float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.4;
+  }
+  90% {
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-80px) translateX(30px) scale(1.2);
+    opacity: 0.6;
+  }
+}
+
+/* Responsive - Refined */
+@media (max-width: 768px) {
+  .role-title {
+    font-size: 3rem;
+  }
+  
+  .role-subtitle {
+    font-size: 1.125rem;
+  }
+  
+  .role-label {
+    font-size: 0.75rem;
+  }
+  
+  .city-grid {
+    width: 200%;
+    height: 200%;
+  }
+  
+  .building {
+    width: 35px;
+  }
+  
+  .role-change-content {
+    gap: 3rem;
+    padding: 1.5rem;
+  }
+  
+  .role-divider {
+    margin: 2rem auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .role-title {
+    font-size: 2.5rem;
+  }
+  
+  .role-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* Performance optimizations */
+.role-change-container * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.city-grid,
+.building,
+.role-title,
+.loading-progress {
+  will-change: transform, opacity;
+}

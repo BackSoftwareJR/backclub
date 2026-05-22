@@ -1,0 +1,479 @@
+/* Contatti Page - Identical to Clienti Page */
+
+.clienti-page {
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.clienti-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.clienti-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 4px 0;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-export,
+.btn-new-client {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-export {
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-export:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-new-client {
+    background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+.btn-new-client:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(10, 132, 255, 0.4);
+}
+
+.clienti-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-card svg {
+    color: #0A84FF;
+    opacity: 0.8;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.clienti-filters {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.search-box:focus-within {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #0A84FF;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+.search-box svg {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.search-box input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-box input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 4px;
+}
+
+.filter-tabs button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-tabs button.active {
+    background: rgba(10, 132, 255, 0.2);
+    color: #0A84FF;
+}
+
+.filter-tabs button:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.clienti-table-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.clienti-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.clienti-table thead {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.clienti-table th {
+    padding: 16px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clienti-table tbody tr {
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.clienti-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.clienti-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.cliente-name {
+    font-weight: 600;
+}
+
+.name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.contact-type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.contact-type-badge.client {
+    background: rgba(10, 132, 255, 0.15);
+    color: #0A84FF;
+}
+
+.contact-type-badge.vendor {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+}
+
+.referente-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.referente-phone {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.contacts-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.contacts-cell a {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #0A84FF;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.contacts-cell a:hover {
+    text-decoration: underline;
+}
+
+.projects-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(10, 132, 255, 0.15);
+    border-radius: 6px;
+    width: fit-content;
+}
+
+.projects-badge svg {
+    color: #0A84FF;
+}
+
+.active-count {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.access-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.access-toggle.enabled {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+}
+
+.access-toggle.disabled {
+    background: rgba(255, 59, 48, 0.15);
+    color: #FF3B30;
+}
+
+.access-toggle:hover {
+    transform: scale(1.05);
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+}
+
+.status-badge.inactive {
+    background: rgba(142, 142, 147, 0.15);
+    color: #8E8E93;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 8px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-action:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-action.danger {
+    background: rgba(255, 59, 48, 0.15);
+    color: #FF3B30;
+}
+
+.btn-action.danger:hover {
+    background: rgba(255, 59, 48, 0.25);
+}
+
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.empty-state svg {
+    margin-bottom: 16px;
+    opacity: 0.3;
+}
+
+.empty-state p {
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+.btn-clear {
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-clear:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.loading-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #0A84FF;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.error-state svg {
+    color: #FF3B30;
+    margin-bottom: 16px;
+}
+
+.btn-retry {
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: #0A84FF;
+    border: none;
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-retry:hover {
+    background: #0070E0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .clienti-header {
+        flex-direction: column;
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .btn-export,
+    .btn-new-client {
+        flex: 1;
+    }
+
+    .clienti-filters {
+        flex-direction: column;
+    }
+
+    .search-box {
+        width: 100%;
+    }
+
+    .clienti-table-container {
+        overflow-x: auto;
+    }
+
+    .clienti-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -1,0 +1,133 @@
+/* Price List Detail Page - Desktop */
+
+.seller-price-list-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--spacing-6);
+}
+
+.detail-header {
+  margin-bottom: var(--spacing-6);
+}
+
+.detail-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-top: var(--spacing-4);
+}
+
+.detail-content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
+.detail-card {
+  background: var(--color-bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-4);
+}
+
+.description-content {
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.price-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.price-amount-large {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ios-system-blue);
+}
+
+.price-type-badge {
+  padding: 4px 12px;
+  border-radius: 8px;
+  background-color: rgba(10, 132, 255, 0.1);
+  color: var(--ios-system-blue);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-radius: var(--border-radius-md);
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.action-button-primary {
+  background-color: var(--ios-system-blue);
+  color: #FFFFFF;
+}
+
+.action-button-primary:hover {
+  background-color: #0071E3;
+}
+
+.action-button-secondary {
+  background-color: var(--ios-tertiary-system-grouped-background);
+  color: var(--ios-label);
+  border: 1px solid var(--ios-separator);
+}
+
+.action-button-secondary:hover {
+  background-color: var(--ios-quaternary-system-grouped-background);
+}
+
+.action-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.features-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.features-list li {
+  padding-left: var(--spacing-4);
+  position: relative;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.features-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--ios-system-blue);
+  font-weight: bold;
+}

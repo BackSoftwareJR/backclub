@@ -1,0 +1,134 @@
+/* Context Menu - Apple-style Design */
+
+.context-menu {
+  position: fixed;
+  z-index: 10000;
+  min-width: 200px;
+  max-width: 320px;
+  padding: var(--spacing-1);
+  background: var(--color-bg-elevated);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 12px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: contextMenuFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+@keyframes contextMenuFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  margin: var(--spacing-1) 0;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-regular);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  gap: var(--spacing-2);
+}
+
+.context-menu-item:hover:not(.disabled) {
+  background: var(--glass-bg-medium);
+  color: var(--color-text-primary);
+}
+
+.context-menu-item:active:not(.disabled) {
+  background: var(--glass-bg-heavy);
+  transform: scale(0.98);
+}
+
+.context-menu-item.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.context-menu-item.danger {
+  color: var(--color-accent-red);
+}
+
+.context-menu-item.danger:hover:not(.disabled) {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-accent-red);
+}
+
+.context-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.context-menu-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.context-menu-label {
+  flex: 1;
+  text-align: left;
+}
+
+.context-menu-shortcut {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-weight: var(--font-weight-medium);
+  margin-left: auto;
+  padding-left: var(--spacing-4);
+}
+
+.context-menu-divider {
+  height: 1px;
+  background: var(--color-border-secondary);
+  margin: var(--spacing-2) var(--spacing-2);
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .context-menu {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .context-menu-item {
+  color: var(--color-text-inverse);
+}
+
+[data-theme="light"] .context-menu-item:hover:not(.disabled) {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .context-menu-item:active:not(.disabled) {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .context-menu-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+

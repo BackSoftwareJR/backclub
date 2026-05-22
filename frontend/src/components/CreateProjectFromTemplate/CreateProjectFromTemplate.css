@@ -1,0 +1,332 @@
+/* Create Project From Template Wizard - Apple Style */
+
+.modal-template-wizard {
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header .template-name {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 4px 0 0 0;
+}
+
+/* Wizard Steps */
+.wizard-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 24px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.step.active {
+    background: rgba(10, 132, 255, 0.2);
+    color: #0A84FF;
+}
+
+.step.completed {
+    background: rgba(52, 199, 89, 0.15);
+    color: #34C759;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.step.active .step-number {
+    background: #0A84FF;
+    color: #FFFFFF;
+}
+
+.step.completed .step-number {
+    background: #34C759;
+    color: #FFFFFF;
+}
+
+/* Wizard Content */
+.wizard-content {
+    padding: 28px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.wizard-step h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0 0 8px 0;
+}
+
+.step-description {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 24px 0;
+    line-height: 1.5;
+}
+
+.info-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(52, 199, 89, 0.1);
+    border: 1px solid rgba(52, 199, 89, 0.2);
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+.info-box svg {
+    color: #34C759;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.info-box span {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+/* Role Assignment */
+.roles-assignment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.role-assignment-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.role-assignment-item .role-info {
+    flex: 1;
+}
+
+.role-assignment-item .role-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+}
+
+.required-star {
+    color: #FF3B30;
+    margin-left: 4px;
+}
+
+.role-assignment-item .role-code {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: 'Courier New', monospace;
+    margin-bottom: 4px;
+}
+
+.role-tasks-count {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.role-select {
+    min-width: 200px;
+}
+
+.role-select select {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.role-select select:focus {
+    outline: none;
+    border-color: #0A84FF;
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+/* Preview */
+.preview-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.preview-section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0 0 16px 0;
+}
+
+.preview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.preview-item label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.preview-item span {
+    font-size: 14px;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.preview-roles-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.preview-role-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.role-label {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+}
+
+.user-label {
+    font-size: 13px;
+    color: #0A84FF;
+    font-weight: 600;
+}
+
+.preview-role-item svg {
+    color: rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.preview-tasks-summary {
+    padding: 16px;
+    background: rgba(10, 132, 255, 0.1);
+    border: 1px solid rgba(10, 132, 255, 0.2);
+    border-radius: 10px;
+}
+
+.preview-tasks-summary p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 12px 0;
+}
+
+.preview-tasks-summary ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.preview-tasks-summary li {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.8;
+}
+
+/* Wizard Actions */
+.wizard-actions {
+    padding: 20px 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+}
+
+.field-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 4px 0 0 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-template-wizard {
+        width: 100%;
+        max-height: 95vh;
+    }
+
+    .wizard-steps {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .step span {
+        display: none;
+    }
+
+    .role-assignment-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .role-select {
+        width: 100%;
+    }
+
+    .preview-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

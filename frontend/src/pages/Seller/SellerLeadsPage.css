@@ -1,0 +1,797 @@
+/* Apple CRM Style - Contacts/Leads Page */
+
+.apple-crm-page {
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+/* Light Mode */
+.apple-crm-page.light {
+  background: #F5F5F7;
+  color: #1d1d1f;
+}
+
+/* Dark Mode */
+.apple-crm-page.dark {
+  background: #000000;
+  color: #ffffff;
+}
+
+/* Unified Toolbar */
+.apple-crm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid;
+}
+
+.apple-crm-page.light .apple-crm-toolbar {
+  border-bottom-color: #e5e5e5;
+  background: #F5F5F7;
+}
+
+.apple-crm-page.dark .apple-crm-toolbar {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+  background: #000000;
+}
+
+.apple-crm-search {
+  flex: 1;
+  position: relative;
+  max-width: 600px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.apple-crm-page.light .search-icon {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .search-icon {
+  color: #98989d;
+}
+
+.apple-crm-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+.apple-crm-page.light .apple-crm-search-input {
+  background: #ffffff;
+  border-color: #d1d1d6;
+  color: #1d1d1f;
+}
+
+.apple-crm-page.light .apple-crm-search-input:focus {
+  outline: none;
+  border-color: #0a84ff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.apple-crm-page.dark .apple-crm-search-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.apple-crm-page.dark .apple-crm-search-input:focus {
+  outline: none;
+  border-color: rgba(10, 132, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.apple-crm-page.dark .apple-crm-search-input::placeholder {
+  color: #636366;
+}
+
+.apple-crm-page.light .apple-crm-search-input::placeholder {
+  color: #86868b;
+}
+
+.apple-crm-filters {
+  display: flex;
+  gap: 8px;
+}
+
+.apple-crm-filter-pill {
+  padding: 8px 16px;
+  border: 1px solid;
+  border-radius: 20px;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.apple-crm-page.light .apple-crm-filter-pill {
+  background-color: #ffffff;
+  border-color: #d1d1d6;
+  color: #1d1d1f;
+}
+
+.apple-crm-page.light .apple-crm-filter-pill:hover {
+  background-color: #f5f5f7;
+  border-color: #86868b;
+}
+
+.apple-crm-page.dark .apple-crm-filter-pill {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.apple-crm-page.dark .apple-crm-filter-pill:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.apple-crm-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #0a84ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.apple-crm-primary-btn:hover {
+  background: #0066cc;
+}
+
+.apple-crm-primary-btn:active {
+  transform: scale(0.98);
+}
+
+/* Contact List */
+.apple-crm-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.apple-crm-row {
+  display: grid;
+  grid-template-columns: auto 2fr 1.8fr 1fr 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 24px;
+  border-bottom: 1px solid;
+  transition: background-color 0.15s;
+  cursor: pointer;
+}
+
+.apple-crm-page.light .apple-crm-row {
+  border-bottom-color: #e5e5e5;
+  background: transparent;
+}
+
+.apple-crm-page.light .apple-crm-row:hover {
+  background: #ffffff;
+}
+
+.apple-crm-page.dark .apple-crm-row {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+  background: transparent;
+}
+
+.apple-crm-page.dark .apple-crm-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Avatar Column */
+.apple-crm-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  flex-shrink: 0;
+}
+
+/* Column 1: Entity */
+.apple-crm-entity {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.entity-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.apple-crm-page.light .entity-name {
+  color: #1d1d1f;
+}
+
+.apple-crm-page.dark .entity-name {
+  color: #ffffff;
+}
+
+.entity-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  flex-wrap: wrap;
+}
+
+.entity-type {
+  font-weight: 500;
+}
+
+.apple-crm-page.light .entity-type {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .entity-type {
+  color: #98989d;
+}
+
+.entity-separator {
+  color: #86868b;
+  opacity: 0.5;
+}
+
+.apple-crm-page.dark .entity-separator {
+  color: #636366;
+}
+
+.entity-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.apple-crm-page.light .entity-location {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .entity-location {
+  color: #98989d;
+}
+
+/* Column 2: Contact Person */
+.apple-crm-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.contact-name {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.apple-crm-page.light .contact-name {
+  color: #1d1d1f;
+}
+
+.apple-crm-page.dark .contact-name {
+  color: #ffffff;
+}
+
+.contact-phone {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+.apple-crm-page.light .contact-phone {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .contact-phone {
+  color: #98989d;
+}
+
+/* Column 3: Priority */
+.apple-crm-priority {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.priority-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.priority-text {
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+/* Column 4: Smart Actions */
+.apple-crm-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* Phone Tooltip */
+.phone-tooltip-wrapper {
+  position: relative;
+}
+
+.phone-tooltip {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.apple-crm-page.light .phone-tooltip {
+  background: #ffffff;
+  border: 1px solid #d1d1d6;
+  color: #1d1d1f;
+}
+
+.apple-crm-page.dark .phone-tooltip {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Email Menu Dropdown */
+.email-menu-wrapper {
+  position: relative;
+}
+
+.email-menu-dropdown {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 8px;
+  min-width: 200px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.apple-crm-page.light .email-menu-dropdown {
+  background: #ffffff;
+  border: 1px solid #d1d1d6;
+}
+
+.apple-crm-page.dark .email-menu-dropdown {
+  background: #1c1c1e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.email-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.apple-crm-page.light .email-menu-item {
+  color: #1d1d1f;
+}
+
+.apple-crm-page.light .email-menu-item:hover {
+  background: #f5f5f7;
+}
+
+.apple-crm-page.dark .email-menu-item {
+  color: #ffffff;
+}
+
+.apple-crm-page.dark .email-menu-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.email-menu-item:not(:last-child) {
+  border-bottom: 1px solid;
+}
+
+.apple-crm-page.light .email-menu-item:not(:last-child) {
+  border-bottom-color: #e5e5e5;
+}
+
+.apple-crm-page.dark .email-menu-item:not(:last-child) {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.action-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.apple-crm-page.light .action-icon-btn {
+  color: #86868b;
+}
+
+.apple-crm-page.light .action-icon-btn:hover {
+  background: #e5e5e5;
+  color: #1d1d1f;
+}
+
+.apple-crm-page.dark .action-icon-btn {
+  color: #98989d;
+}
+
+.apple-crm-page.dark .action-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.action-icon-btn-danger {
+  opacity: 0.6;
+}
+
+.action-icon-btn-danger:hover {
+  opacity: 1;
+}
+
+.apple-crm-page.light .action-icon-btn-danger {
+  color: #ff3b30;
+}
+
+.apple-crm-page.light .action-icon-btn-danger:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.apple-crm-page.dark .action-icon-btn-danger {
+  color: #ff453a;
+}
+
+.apple-crm-page.dark .action-icon-btn-danger:hover {
+  background: rgba(255, 69, 58, 0.2);
+  color: #ff453a;
+}
+
+/* Empty State */
+.apple-crm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.empty-state-icon {
+  margin-bottom: 24px;
+  opacity: 0.5;
+}
+
+.apple-crm-page.light .empty-state-icon {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .empty-state-icon {
+  color: #636366;
+}
+
+.apple-crm-empty-state h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.apple-crm-page.light .apple-crm-empty-state h3 {
+  color: #1d1d1f;
+}
+
+.apple-crm-page.dark .apple-crm-empty-state h3 {
+  color: #ffffff;
+}
+
+.apple-crm-empty-state p {
+  font-size: 15px;
+  margin: 0 0 32px 0;
+}
+
+.apple-crm-page.light .apple-crm-empty-state p {
+  color: #86868b;
+}
+
+.apple-crm-page.dark .apple-crm-empty-state p {
+  color: #98989d;
+}
+
+/* Modal Styles (keeping existing modal styles) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-4);
+}
+
+.modal-content {
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--color-text-primary);
+}
+
+.modal-body {
+  padding: var(--spacing-4);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-4);
+}
+
+.form-label {
+  display: block;
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-background);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-4);
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: var(--spacing-2) var(--spacing-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.btn-primary {
+  background: var(--color-accent-blue);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-accent-blue-dark);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: var(--color-background-tertiary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .apple-crm-row {
+    grid-template-columns: auto 2fr 1.5fr 1fr 1fr;
+    gap: 12px;
+  }
+  
+  .contact-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .apple-crm-toolbar {
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .apple-crm-search {
+    width: 100%;
+    max-width: 100%;
+    order: 1;
+  }
+
+  .apple-crm-filters {
+    order: 2;
+    flex: 1;
+  }
+
+  .apple-crm-primary-btn {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .apple-crm-row {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
+    padding: 12px 16px;
+  }
+
+  .apple-crm-entity {
+    grid-column: 2;
+  }
+
+  .apple-crm-contact,
+  .apple-crm-priority {
+    display: none;
+  }
+
+  .apple-crm-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+  
+  .contact-avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}

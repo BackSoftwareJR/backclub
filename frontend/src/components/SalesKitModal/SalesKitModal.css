@@ -1,0 +1,361 @@
+/* Sales Kit Modal – video, guide, risorse */
+
+.sales-kit-modal-overlay {
+  z-index: 1000;
+}
+
+.sales-kit-modal-content {
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sales-kit-modal-header .sales-kit-modal-icon {
+  color: #2563EB;
+}
+
+.sales-kit-modal-body {
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.sales-kit-intro {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  color: #4B5563;
+}
+
+.seller-support-page.theme-dark .sales-kit-intro,
+[data-theme="dark"] .sales-kit-intro {
+  color: #98989D;
+}
+
+.sales-kit-section {
+  margin-bottom: 28px;
+}
+
+.sales-kit-section-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 14px 0;
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .sales-kit-section-title,
+[data-theme="dark"] .sales-kit-section-title {
+  color: #FFFFFF;
+}
+
+.sales-kit-section-title svg {
+  color: #2563EB;
+  flex-shrink: 0;
+}
+
+/* Video list */
+.sales-kit-video-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sales-kit-video-item {
+  margin: 0;
+}
+
+.sales-kit-video-card {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(37, 99, 235, 0.15);
+  background: rgba(37, 99, 235, 0.04);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sales-kit-video-card:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.sales-kit-video-card:disabled {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.seller-support-page.theme-dark .sales-kit-video-card,
+[data-theme="dark"] .sales-kit-video-card {
+  border-color: rgba(59, 130, 246, 0.2);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.seller-support-page.theme-dark .sales-kit-video-card:hover:not(:disabled),
+[data-theme="dark"] .sales-kit-video-card:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.14);
+}
+
+.sales-kit-video-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sales-kit-video-title {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 4px;
+}
+
+.seller-support-page.theme-dark .sales-kit-video-title,
+[data-theme="dark"] .sales-kit-video-title {
+  color: #FFFFFF;
+}
+
+.sales-kit-video-desc {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #6B7280;
+  margin-bottom: 8px;
+}
+
+.seller-support-page.theme-dark .sales-kit-video-desc,
+[data-theme="dark"] .sales-kit-video-desc {
+  color: #98989D;
+}
+
+.sales-kit-video-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sales-kit-video-duration {
+  font-size: 0.75rem;
+  color: #9CA3AF;
+}
+
+.sales-kit-video-type {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.sales-kit-video-type.type-formazione {
+  background: rgba(37, 99, 235, 0.15);
+  color: #2563EB;
+}
+
+.sales-kit-video-type.type-prodotto {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16A34A;
+}
+
+.sales-kit-video-type.type-vendita {
+  background: rgba(168, 85, 247, 0.15);
+  color: #9333EA;
+}
+
+.sales-kit-video-link-icon {
+  flex-shrink: 0;
+  color: #2563EB;
+}
+
+/* Guide list (expandable) */
+.sales-kit-guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sales-kit-guide-item {
+  border-radius: 10px;
+  overflow: hidden;
+  background: #F5F5F7;
+}
+
+.seller-support-page.theme-dark .sales-kit-guide-item,
+[data-theme="dark"] .sales-kit-guide-item {
+  background: #2C2C2E;
+}
+
+.sales-kit-guide-title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-align: left;
+  font-family: inherit;
+  color: #1D1D1F;
+  transition: background 0.2s ease;
+}
+
+.sales-kit-guide-title:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.seller-support-page.theme-dark .sales-kit-guide-title,
+[data-theme="dark"] .sales-kit-guide-title {
+  color: #FFFFFF;
+}
+
+.seller-support-page.theme-dark .sales-kit-guide-title:hover,
+[data-theme="dark"] .sales-kit-guide-title:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sales-kit-guide-content {
+  padding: 0 16px 16px 16px;
+  animation: salesKitSlideDown 0.25s ease;
+}
+
+.sales-kit-guide-content p {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  margin: 0;
+  color: #4B5563;
+}
+
+.seller-support-page.theme-dark .sales-kit-guide-content p,
+[data-theme="dark"] .sales-kit-guide-content p {
+  color: #98989D;
+}
+
+@keyframes salesKitSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Resource list */
+.sales-kit-resource-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sales-kit-resource-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: #F9FAFB;
+}
+
+.seller-support-page.theme-dark .sales-kit-resource-item,
+[data-theme="dark"] .sales-kit-resource-item {
+  background: #2C2C2E;
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.sales-kit-resource-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sales-kit-resource-title {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1D1D1F;
+  margin-bottom: 2px;
+}
+
+.seller-support-page.theme-dark .sales-kit-resource-title,
+[data-theme="dark"] .sales-kit-resource-title {
+  color: #FFFFFF;
+}
+
+.sales-kit-resource-desc {
+  display: block;
+  font-size: 0.8125rem;
+  color: #6B7280;
+}
+
+.seller-support-page.theme-dark .sales-kit-resource-desc,
+[data-theme="dark"] .sales-kit-resource-desc {
+  color: #98989D;
+}
+
+.sales-kit-resource-btn {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sales-kit-resource-btn:hover {
+  background: #1D4ED8;
+}
+
+/* CTA */
+.sales-kit-cta {
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-dark .sales-kit-cta,
+[data-theme="dark"] .sales-kit-cta {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.sales-kit-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: none;
+  background: #2563EB;
+  color: #FFFFFF;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.sales-kit-cta-btn:hover {
+  background: #1D4ED8;
+}

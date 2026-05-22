@@ -1,0 +1,299 @@
+/* Dashboard Mobile - Apple Health Style */
+
+.dashboard-mobile-health {
+  background-color: var(--ios-system-grouped-background);
+  /* Usa --vh (calcolato da JavaScript) per iOS, fallback a dvh/vh */
+  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100dvh; /* Fallback per browser moderni */
+  min-height: 100vh; /* Fallback per browser vecchi */
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  /* Assicura che il contenuto possa scrollare correttamente */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-header {
+  padding: 16px 16px 8px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--ios-system-grouped-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  /* Assicura che l'header non esca in altezza su iOS */
+  max-height: 20vh;
+  overflow: visible;
+  /* Previene problemi di layout su iOS */
+  flex-shrink: 0;
+}
+
+.dashboard-content {
+  padding: 0 16px;
+}
+
+/* Loading skeleton - same layout as real content, theme-aware */
+.dashboard-skeleton {
+  width: 100%;
+}
+
+.dashboard-skeleton .skeleton-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 12px !important;
+  margin-bottom: 24px;
+  width: 100%;
+}
+
+.dashboard-skeleton .skeleton-stats-grid > * {
+  display: block !important;
+  min-width: 0;
+}
+
+.dashboard-skeleton .skeleton-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 0;
+  margin-bottom: 32px;
+}
+
+/* Statistics Grid - Bento Layout (2x2) - FORCED GRID */
+.dashboard-content .stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  grid-auto-rows: auto !important;
+  gap: 12px !important;
+  margin-bottom: 24px;
+  width: 100%;
+  /* Force grid layout */
+  grid-auto-flow: row !important;
+}
+
+.dashboard-content .stats-grid > * {
+  /* Force all direct children to be grid items */
+  display: block !important;
+}
+
+.dashboard-content .stats-grid .stat-card {
+  background-color: var(--ios-secondary-system-grouped-background) !important;
+  border-radius: 16px;
+  padding: 16px !important; /* p-4 = 16px */
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1.4 / 1 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important; /* Allineamento a sinistra */
+  box-sizing: border-box;
+  /* Remove any block-level display that might break grid */
+  float: none !important;
+  clear: none !important;
+}
+
+.stat-card:active {
+  opacity: 0.6;
+}
+
+.dashboard-content .stats-grid .stat-card .stat-card-content {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  width: 100% !important;
+  gap: 8px !important;
+  align-items: flex-start !important;
+  text-align: left !important;
+}
+
+/* Riga superiore: Icona + Numero affiancati */
+.dashboard-content .stats-grid .stat-card .stat-card-top-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+}
+
+.dashboard-content .stats-grid .stat-card .stat-card-content svg {
+  width: 20px !important;
+  height: 20px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  align-self: center !important;
+}
+
+.dashboard-content .stats-grid .stat-card .stat-value {
+  font-family: var(--ios-font-family) !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+  color: var(--ios-label) !important;
+  margin: 0 !important;
+  text-align: left !important;
+  flex-shrink: 0 !important;
+}
+
+/* Etichetta sotto il numero */
+.dashboard-content .stats-grid .stat-card .stat-label {
+  font-family: var(--ios-font-family) !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  color: var(--ios-secondary-label) !important;
+  margin: 0 !important;
+  margin-top: 2px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2px !important;
+  text-align: left !important;
+  align-self: flex-start !important;
+}
+
+/* Quick Actions - Wide Buttons */
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+  margin-bottom: 32px;
+}
+
+.action-button {
+  width: 100%;
+  height: 50px;
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  border: none;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.action-button:active {
+  opacity: 0.6;
+}
+
+.action-button-text {
+  flex: 1;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label);
+  text-align: left;
+}
+
+/* Recent Quotes - Clean List */
+.recent-quotes {
+  margin-bottom: 32px;
+}
+
+.section-header {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--ios-secondary-label);
+  text-transform: uppercase;
+  padding-left: 16px;
+  margin-bottom: 8px;
+}
+
+.quotes-list {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.quote-item {
+  width: 100%;
+  padding: 12px 16px !important; /* Padding ridotto per compattezza */
+  background: none;
+  border: none;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  cursor: pointer;
+  transition: opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+  border-bottom: 0.5px solid var(--ios-opaque-separator) !important;
+}
+
+.quote-item:active {
+  opacity: 0.6;
+}
+
+.quote-item-last {
+  border-bottom: none !important;
+}
+
+/* Colonna Sinistra: Info Cliente */
+.quote-content-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.quote-client {
+  font-family: var(--ios-font-family) !important;
+  font-size: 16px !important;
+  font-weight: 600 !important; /* Semibold */
+  line-height: 20px !important;
+  color: var(--ios-label) !important;
+  margin: 0;
+}
+
+.quote-meta {
+  font-family: var(--ios-font-family) !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 18px !important;
+  color: var(--ios-secondary-label) !important;
+  margin: 0;
+}
+
+/* Colonna Destra: Valore e Stato */
+.quote-content-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.quote-amount {
+  font-family: var(--ios-font-family) !important;
+  font-size: 16px !important;
+  font-weight: 700 !important; /* Bold */
+  line-height: 20px !important;
+  color: var(--ios-label) !important;
+  margin: 0;
+  text-align: right;
+}
+
+.quote-status-pill {
+  padding: 2px 8px !important; /* Padding ridotto per pill minuscola */
+  border-radius: 999px !important; /* Full rounded */
+  font-family: var(--ios-font-family) !important;
+  font-size: 11px !important; /* Molto piccolo */
+  font-weight: 600 !important;
+  line-height: 14px !important;
+  text-transform: uppercase !important;
+  margin: 0 !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}

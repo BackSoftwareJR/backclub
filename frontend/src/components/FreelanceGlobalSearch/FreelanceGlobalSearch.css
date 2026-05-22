@@ -1,0 +1,248 @@
+/* Freelance Global Search - dropdown and list */
+
+.freelance-global-search {
+  position: relative;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.freelance-global-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: text;
+  transition: all 0.2s ease;
+}
+
+.freelance-global-search-bar:focus-within {
+  outline: none;
+}
+
+.header-main.theme-dark .freelance-global-search-bar,
+[data-theme="dark"] .freelance-global-search-bar {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-main.theme-dark .freelance-global-search-bar:hover,
+[data-theme="dark"] .freelance-global-search-bar:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-main.theme-dark .freelance-global-search-bar:focus-within,
+[data-theme="dark"] .freelance-global-search-bar:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.header-main.theme-light .freelance-global-search-bar,
+[data-theme="light"] .freelance-global-search-bar {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-main.theme-light .freelance-global-search-bar:hover,
+[data-theme="light"] .freelance-global-search-bar:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.header-main.theme-light .freelance-global-search-bar:focus-within,
+[data-theme="light"] .freelance-global-search-bar:focus-within {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.freelance-global-search-icon {
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.header-main.theme-dark .freelance-global-search-icon,
+[data-theme="dark"] .freelance-global-search-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.header-main.theme-light .freelance-global-search-icon,
+[data-theme="light"] .freelance-global-search-icon {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.freelance-global-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  outline: none;
+}
+
+.header-main.theme-dark .freelance-global-search-input,
+[data-theme="dark"] .freelance-global-search-input {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-main.theme-dark .freelance-global-search-input::placeholder,
+[data-theme="dark"] .freelance-global-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.header-main.theme-light .freelance-global-search-input,
+[data-theme="light"] .freelance-global-search-input {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.header-main.theme-light .freelance-global-search-input::placeholder,
+[data-theme="light"] .freelance-global-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Dropdown */
+.freelance-global-search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.header-main.theme-dark .freelance-global-search-dropdown,
+[data-theme="dark"] .freelance-global-search-dropdown {
+  background: rgba(28, 28, 30, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+}
+
+.header-main.theme-light .freelance-global-search-dropdown,
+[data-theme="light"] .freelance-global-search-dropdown {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.freelance-global-search-loading,
+.freelance-global-search-empty {
+  padding: 16px 20px;
+  font-size: 14px;
+}
+
+.header-main.theme-dark .freelance-global-search-loading,
+.header-main.theme-dark .freelance-global-search-empty,
+[data-theme="dark"] .freelance-global-search-loading,
+[data-theme="dark"] .freelance-global-search-empty {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.header-main.theme-light .freelance-global-search-loading,
+.header-main.theme-light .freelance-global-search-empty,
+[data-theme="light"] .freelance-global-search-loading,
+[data-theme="light"] .freelance-global-search-empty {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.freelance-global-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.freelance-global-search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.freelance-global-search-item:hover,
+.freelance-global-search-item.highlighted {
+  outline: none;
+}
+
+.header-main.theme-dark .freelance-global-search-item:hover,
+.header-main.theme-dark .freelance-global-search-item.highlighted,
+[data-theme="dark"] .freelance-global-search-item:hover,
+[data-theme="dark"] .freelance-global-search-item.highlighted {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.header-main.theme-light .freelance-global-search-item:hover,
+.header-main.theme-light .freelance-global-search-item.highlighted,
+[data-theme="light"] .freelance-global-search-item:hover,
+[data-theme="light"] .freelance-global-search-item.highlighted {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.freelance-global-search-item-icon {
+  flex-shrink: 0;
+}
+
+.header-main.theme-dark .freelance-global-search-item-icon,
+[data-theme="dark"] .freelance-global-search-item-icon {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.header-main.theme-light .freelance-global-search-item-icon,
+[data-theme="light"] .freelance-global-search-item-icon {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.freelance-global-search-item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.freelance-global-search-item-label {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.freelance-global-search-item-subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.freelance-global-search-item-meta {
+  font-size: 12px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.freelance-global-search-item-chevron {
+  flex-shrink: 0;
+  opacity: 0.4;
+}
+
+.freelance-global-search-item-page .freelance-global-search-item-label {
+  font-weight: 600;
+}
+
+.freelance-global-search-item-page .freelance-global-search-item-meta {
+  margin-left: auto;
+}

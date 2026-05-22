@@ -1,0 +1,295 @@
+/* Seller Clients Mobile - iOS Style (Apple Contacts) */
+
+.seller-clients-mobile-ios {
+  background-color: var(--ios-system-grouped-background);
+  min-height: 100vh;
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Header */
+.seller-clients-header {
+  padding: 16px var(--ios-inset-grouped-padding) 12px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--ios-system-grouped-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.seller-clients-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.seller-clients-add-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  color: var(--ios-system-blue);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.15s ease;
+  padding: 0;
+}
+
+.seller-clients-add-btn:active {
+  opacity: 0.6;
+}
+
+.seller-clients-subtitle {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+  margin: 0 0 12px 0;
+}
+
+/* Search Bar */
+.seller-clients-search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.seller-clients-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--ios-secondary-label);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.seller-clients-search-input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  background-color: var(--ios-secondary-system-grouped-background);
+  border: none;
+  border-radius: 12px;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ios-label);
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+}
+
+.seller-clients-search-input::placeholder {
+  color: var(--ios-secondary-label);
+}
+
+.seller-clients-search-input:focus {
+  background-color: var(--ios-tertiary-system-grouped-background);
+}
+
+/* Content */
+.seller-clients-content {
+  padding: 0 var(--ios-inset-grouped-padding);
+}
+
+/* Clients List */
+.seller-clients-list {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.seller-clients-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 16px;
+  background: none;
+  border: none;
+  border-bottom: 0.5px solid var(--ios-separator);
+  cursor: pointer;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.1s ease;
+}
+
+.seller-clients-item:active {
+  background-color: var(--ios-quaternary-system-grouped-background);
+}
+
+.seller-clients-item-last {
+  border-bottom: none;
+}
+
+/* Avatar */
+.seller-clients-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label);
+  background-color: var(--ios-tertiary-system-grouped-background);
+  flex-shrink: 0;
+}
+
+/* Item Content */
+.seller-clients-item-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seller-clients-item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.seller-clients-item-name {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ios-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.seller-clients-status-badge {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--ios-system-blue);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--ios-system-blue) 15%, transparent);
+  flex-shrink: 0;
+}
+
+.seller-clients-item-detail {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Chevron */
+.seller-clients-chevron {
+  color: var(--ios-tertiary-label);
+  flex-shrink: 0;
+}
+
+/* Empty State */
+.seller-clients-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.seller-clients-empty-icon {
+  color: var(--ios-secondary-label);
+  margin-bottom: 16px;
+}
+
+.seller-clients-empty-title {
+  font-family: var(--ios-font-family);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--ios-label);
+  margin: 0 0 8px 0;
+}
+
+/* Light Mode Overrides */
+[data-theme="light"] .seller-clients-mobile-ios {
+  background-color: #F2F2F7;
+}
+
+[data-theme="light"] .seller-clients-header {
+  background-color: #F2F2F7;
+}
+
+[data-theme="light"] .seller-clients-list {
+  background-color: #FFFFFF;
+}
+
+[data-theme="light"] .seller-clients-item {
+  border-bottom-color: #C6C6C8;
+}
+
+[data-theme="light"] .seller-clients-item:active {
+  background-color: #F2F2F7;
+}
+
+[data-theme="light"] .seller-clients-avatar {
+  background-color: #E5E5EA;
+  color: #000000;
+}
+
+[data-theme="light"] .seller-clients-search-input {
+  background-color: #E5E5EA;
+}
+
+[data-theme="light"] .seller-clients-search-input:focus {
+  background-color: #D1D1D6;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .seller-clients-mobile-ios {
+  background-color: #000000;
+}
+
+[data-theme="dark"] .seller-clients-header {
+  background-color: #000000;
+}
+
+[data-theme="dark"] .seller-clients-list {
+  background-color: #1C1C1E;
+}
+
+[data-theme="dark"] .seller-clients-item {
+  border-bottom-color: #38383A;
+}
+
+[data-theme="dark"] .seller-clients-item:active {
+  background-color: #2C2C2E;
+}
+
+[data-theme="dark"] .seller-clients-avatar {
+  background-color: #38383A;
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .seller-clients-search-input {
+  background-color: #1C1C1E;
+}
+
+[data-theme="dark"] .seller-clients-search-input:focus {
+  background-color: #2C2C2E;
+}

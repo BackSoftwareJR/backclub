@@ -1,0 +1,417 @@
+/* Uscite Cocchi Page */
+
+.uscite-cocchi-page {
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+/* Header */
+.uscite-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.uscite-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 4px 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: var(--spacing-2);
+}
+
+.btn-export {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-export:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.btn-new-uscita {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #FF453A 0%, #FF6B60 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(255, 69, 58, 0.3);
+}
+
+/* Stats */
+.uscite-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--spacing-3);
+}
+
+.stat-card-uscite {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.stat-card-uscite.total {
+    border-left-color: #FF453A;
+}
+
+.stat-card-uscite.pending {
+    border-left-color: #FF9F0A;
+}
+
+.stat-card-uscite.month {
+    border-left-color: #BF5AF2;
+}
+
+.stat-card-uscite svg {
+    color: currentColor;
+}
+
+.stat-card-uscite.total svg {
+    color: #FF453A;
+}
+
+.stat-card-uscite.pending svg {
+    color: #FF9F0A;
+}
+
+.stat-card-uscite.month svg {
+    color: #BF5AF2;
+}
+
+/* Filters */
+.uscite-filters {
+    display: flex;
+    gap: var(--spacing-2);
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+}
+
+.category-select {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+/* Tabs */
+.uscite-tabs {
+    display: flex;
+    gap: var(--spacing-2);
+    overflow-x: auto;
+}
+
+.uscite-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.uscite-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.uscite-tab.active {
+    background: linear-gradient(135deg, #FF453A 0%, #FF6B60 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 69, 58, 0.3);
+}
+
+.tab-count {
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Table */
+.uscite-table-container {
+    padding: var(--spacing-5);
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.6) 0%, rgba(20, 20, 25, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    overflow-x: auto;
+}
+
+.uscite-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.uscite-table th {
+    padding: 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.uscite-table td {
+    padding: 14px 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.uscite-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.recipient-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.amount-cell {
+    font-weight: 700;
+    color: #FF453A;
+    font-size: 15px;
+}
+
+.notes-cell {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.category-badge.freelance-payment {
+    background: rgba(10, 132, 255, 0.2);
+    color: #0A84FF;
+    border: 1px solid rgba(10, 132, 255, 0.3);
+}
+
+.category-badge.infrastructure {
+    background: rgba(142, 142, 147, 0.2);
+    color: #8E8E93;
+    border: 1px solid rgba(142, 142, 147, 0.3);
+}
+
+.category-badge.marketing {
+    background: rgba(191, 90, 242, 0.2);
+    color: #BF5AF2;
+    border: 1px solid rgba(191, 90, 242, 0.3);
+}
+
+.category-badge.software {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.category-badge.office {
+    background: rgba(255, 159, 10, 0.2);
+    color: #FF9F0A;
+    border: 1px solid rgba(255, 159, 10, 0.3);
+}
+
+.status-badge-uscite {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status-badge-uscite.approved {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.status-badge-uscite.pending {
+    background: rgba(255, 159, 10, 0.2);
+    color: #FF9F0A;
+    border: 1px solid rgba(255, 159, 10, 0.3);
+}
+
+.status-badge-uscite.rejected {
+    background: rgba(255, 69, 58, 0.2);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.action-btns-uscite {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-approve,
+.btn-reject {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-approve {
+    background: rgba(52, 199, 89, 0.1);
+    color: #34C759;
+    border-color: rgba(52, 199, 89, 0.3);
+}
+
+.btn-approve:hover {
+    background: rgba(52, 199, 89, 0.2);
+}
+
+.btn-reject {
+    background: rgba(255, 69, 58, 0.1);
+    color: #FF453A;
+    border-color: rgba(255, 69, 58, 0.3);
+}
+
+.btn-reject:hover {
+    background: rgba(255, 69, 58, 0.2);
+}
+
+/* Category Analytics */
+.category-analytics {
+    padding: var(--spacing-5);
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.6) 0%, rgba(20, 20, 25, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+}
+
+.category-analytics h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 var(--spacing-4) 0;
+}
+
+.category-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+.category-bar-row {
+    display: grid;
+    grid-template-columns: 180px 1fr 120px;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.category-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.category-bar-container {
+    height: 32px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF453A 0%, #FF6B60 100%);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.category-amount {
+    font-size: 16px;
+    font-weight: 700;
+    color: #FF453A;
+    text-align: right;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .uscite-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+    }
+
+    .uscite-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .uscite-tabs {
+        flex-wrap: wrap;
+    }
+
+    .category-bar-row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}

@@ -1,0 +1,98 @@
+.configurazione-listini-page {
+  max-width: 1400px;
+}
+
+.item-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-1);
+}
+
+.item-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.department-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.price-cell {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.price-type-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.price-type-badge.fisso {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.price-type-badge.variabile {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.price-type-badge.personalizzato {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-info);
+}
+
+.link-external {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  color: var(--color-accent-blue);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  transition: color var(--transition-base);
+}
+
+.link-external:hover {
+  color: var(--color-accent-blue-dark);
+  text-decoration: underline;
+}
+
+.listini-table-wrapper {
+  overflow-x: auto;
+}
+
+.venditori-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-5);
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  padding: var(--spacing-3) var(--spacing-4);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: inherit;
+  min-width: 180px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+  background: var(--color-bg-elevated);
+}

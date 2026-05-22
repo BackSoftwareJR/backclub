@@ -1,0 +1,562 @@
+/* Guide Tour Styles - Custom Implementation */
+
+.guide-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9998;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: fadeIn 0.2s ease-out;
+  /* Il clip-path creerà un buco trasparente dove c'è lo spotlight */
+  /* Performance optimizations */
+  will-change: clip-path, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.guide-overlay.theme-dark {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.guide-overlay.theme-light {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.guide-spotlight {
+  position: fixed;
+  z-index: 9999;
+  border-radius: 12px;
+  border: 2px solid #6366F1;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  pointer-events: none;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  animation: spotlightPulse 2s ease-in-out infinite;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  /* L'area evidenziata è completamente trasparente - il blur viene rimosso dal clip-path dell'overlay */
+  mix-blend-mode: normal;
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes spotlightPulse {
+  0%, 100% {
+    border-color: #6366F1;
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    border-color: #8B5CF6;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.7);
+  }
+}
+
+/* Dialog di conferma */
+.guide-confirm-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10001;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.guide-confirm-dialog {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideIn 0.3s ease-out;
+}
+
+.guide-confirm-dialog.theme-dark {
+  background: #1F2937;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.guide-confirm-dialog.theme-light {
+  background: #FFFFFF;
+  color: #1F2937;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.guide-confirm-dialog h3 {
+  margin: 0 0 12px 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.guide-confirm-dialog p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.guide-confirm-dialog-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.guide-btn-secondary {
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.guide-confirm-dialog.theme-dark .guide-btn-secondary {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.guide-confirm-dialog.theme-light .guide-btn-secondary {
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #1F2937;
+}
+
+.guide-btn-secondary:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.guide-confirm-dialog.theme-dark .guide-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.guide-btn-danger {
+  background: #EF4444;
+  color: #FFFFFF;
+  border: none;
+}
+
+.guide-btn-danger:hover {
+  background: #DC2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.guide-tooltip {
+  position: fixed;
+  z-index: 10000;
+  max-width: 400px;
+  min-width: 300px;
+  border-radius: 12px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideIn 0.3s ease-out;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.guide-tooltip.theme-dark {
+  background: #1F2937;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.guide-tooltip.theme-light {
+  background: #FFFFFF;
+  color: #1F2937;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.guide-tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid transparent;
+}
+
+.guide-tooltip.theme-dark .guide-tooltip-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.guide-tooltip.theme-light .guide-tooltip-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.guide-progress {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.guide-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.guide-close-btn:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.guide-tooltip.theme-dark .guide-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.guide-tooltip-content {
+  padding: 20px;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.guide-tooltip-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.guide-tooltip-content p {
+  margin: 0 0 12px 0;
+}
+
+.guide-tooltip-content p:last-child {
+  margin-bottom: 0;
+}
+
+.guide-tooltip-content ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.guide-tooltip-content li {
+  margin-bottom: 4px;
+}
+
+.guide-tooltip-content strong {
+  font-weight: 600;
+}
+
+.guide-tooltip-footer {
+  padding: 12px 20px 16px;
+  border-top: 1px solid transparent;
+}
+
+.guide-tooltip.theme-dark .guide-tooltip-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.guide-tooltip.theme-light .guide-tooltip-footer {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.guide-tooltip-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.guide-btn-group {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.guide-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.guide-btn-primary {
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+}
+
+.guide-btn-primary:hover {
+  background: linear-gradient(135deg, #5855EB 0%, #7C3AED 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.guide-btn-back {
+  background: transparent;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.guide-tooltip.theme-dark .guide-btn-back {
+  color: #FFFFFF;
+}
+
+.guide-tooltip.theme-light .guide-btn-back {
+  color: #1F2937;
+}
+
+.guide-btn-back:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.guide-tooltip.theme-dark .guide-btn-back:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.guide-btn-skip {
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  font-weight: 500;
+}
+
+.guide-tooltip.theme-dark .guide-btn-skip {
+  color: #FFFFFF;
+}
+
+.guide-tooltip.theme-light .guide-btn-skip {
+  color: #1F2937;
+}
+
+.guide-btn-skip:hover {
+  opacity: 1;
+}
+
+/* Responsive - Mobile iOS Style */
+@media (max-width: 768px) {
+  /* Tooltip - Adaptive positioning for mobile */
+  .guide-tooltip {
+    max-width: 100vw;
+    min-width: auto;
+    width: 100%;
+    left: 0 !important;
+    right: 0;
+    /* Position will be set dynamically by JS, but default to bottom */
+    bottom: auto !important;
+    transform: translateX(0) !important;
+    border-radius: 20px;
+    margin: 0;
+    /* Safe area bottom inset for iPhone */
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    box-shadow: 
+      0 -4px 20px rgba(0, 0, 0, 0.15),
+      0 -2px 8px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    /* Ensure tooltip doesn't cover target element */
+    z-index: 10001;
+  }
+  
+  /* When tooltip is at bottom (bottom-sheet style) */
+  .guide-tooltip[style*="bottom"] {
+    border-radius: 20px 20px 0 0;
+  }
+  
+  /* When tooltip is positioned above target */
+  .guide-tooltip:not([style*="bottom"]) {
+    border-radius: 20px;
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.15),
+      0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Header - More compact on mobile */
+  .guide-tooltip-header {
+    padding: 16px 20px 12px;
+  }
+
+  /* Content - Better spacing on mobile */
+  .guide-tooltip-content {
+    padding: 16px 20px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .guide-tooltip-content h3 {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* Footer - Stack buttons vertically */
+  .guide-tooltip-footer {
+    padding: 12px 20px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .guide-tooltip-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .guide-btn-group {
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    gap: 8px;
+  }
+
+  .guide-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 14px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    /* iOS button style */
+    -webkit-tap-highlight-color: transparent;
+    /* Performance optimizations */
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .guide-btn-primary {
+    /* iOS primary button style */
+    background: var(--ios-system-blue, linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%));
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+  }
+
+  .guide-btn-primary:active {
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(10, 132, 255, 0.2);
+  }
+
+  .guide-btn-back:active,
+  .guide-btn-skip:active {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+
+  /* Skip button - Full width on mobile */
+  .guide-btn-skip {
+    width: 100%;
+    text-align: center;
+    padding: 12px 20px;
+  }
+
+  /* Progress indicator - More visible on mobile */
+  .guide-progress {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  /* Overlay - More blur on mobile for better focus */
+  .guide-overlay {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+
+  .guide-overlay.theme-dark {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .guide-overlay.theme-light {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  /* Spotlight - Thicker border on mobile */
+  .guide-spotlight {
+    border-width: 3px;
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+  }
+
+  /* Confirm dialog - Better on mobile */
+  .guide-confirm-dialog {
+    max-width: calc(100vw - 40px);
+    width: calc(100vw - 40px);
+    margin: 20px;
+    border-radius: 20px;
+  }
+
+  .guide-confirm-dialog-actions {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .guide-confirm-dialog-actions .guide-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Extra small devices (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .guide-tooltip-content {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+
+  .guide-tooltip-content h3 {
+    font-size: 16px;
+  }
+
+  .guide-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}

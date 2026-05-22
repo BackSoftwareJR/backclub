@@ -1,0 +1,172 @@
+.seller-settings-mobile {
+  min-height: 100vh;
+  background: var(--ios-secondary-system-grouped-background);
+}
+
+/* iOS Header */
+.ios-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--ios-secondary-system-grouped-background);
+  border-bottom: 0.5px solid var(--ios-separator);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.ios-header-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--ios-label);
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background-color 0.2s;
+}
+
+.ios-header-back:active {
+  background: var(--ios-tertiary-system-fill);
+}
+
+.ios-large-title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.37px;
+  color: var(--ios-label);
+  margin: 0;
+}
+
+/* Toast Notification */
+.ios-toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background: var(--ios-system-background);
+  color: var(--ios-label);
+  padding: 12px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  font-size: 15px;
+  font-weight: 500;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Section Header */
+.ios-section-header {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ios-secondary-label);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* iOS Switch */
+.ios-switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+}
+
+.ios-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ios-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ios-tertiary-system-fill);
+  transition: 0.3s;
+  border-radius: 31px;
+}
+
+.ios-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ios-switch input:checked + .ios-switch-slider {
+  background-color: #34C759;
+}
+
+.ios-switch input:checked + .ios-switch-slider:before {
+  transform: translateX(20px);
+}
+
+.ios-switch input:focus + .ios-switch-slider {
+  box-shadow: 0 0 1px #34C759;
+}
+
+/* Checkmark */
+.ios-checkmark {
+  color: #0A84FF;
+}
+
+/* Last cell in group - remove bottom border */
+.ios-inset-grouped-cell-last::after {
+  display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+  .ios-large-title {
+    font-size: 28px;
+  }
+}
+
+/* Desktop adjustments */
+@media (min-width: 768px) {
+  .seller-settings-mobile {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  
+  .ios-header {
+    position: relative;
+    padding: 24px 0 16px;
+    border-bottom: none;
+  }
+  
+  .ios-header-back {
+    display: none; /* Hide back button on desktop */
+  }
+  
+  .ios-large-title {
+    font-size: 40px;
+    text-align: center;
+    width: 100%;
+  }
+  
+  main {
+    padding-top: 2rem !important;
+  }
+}

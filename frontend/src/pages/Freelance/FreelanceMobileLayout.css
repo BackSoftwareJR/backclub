@@ -1,0 +1,435 @@
+/* Safe Area Support for iOS - Freelance Mobile */
+.freelance-mobile-layout {
+  min-height: calc(var(--vh, 1vh) * 100);
+  min-height: 100dvh;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.freelance-mobile-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-top: env(safe-area-inset-top, 0px);
+  width: 100%;
+  position: relative;
+  height: 0;
+  min-height: 0;
+  min-height: calc(var(--vh, 1vh) * 100 - 5rem - env(safe-area-inset-top, 0px));
+  min-height: calc(100dvh - 5rem - env(safe-area-inset-top, 0px));
+  min-height: calc(100vh - 5rem - env(safe-area-inset-top, 0px));
+}
+
+/* Contenuto scrollabile del menu Altro: padding in basso per vedere bene Logout */
+.freelance-more-sheet-content {
+  padding-bottom: max(24px, env(safe-area-inset-bottom, 0px));
+}
+
+/* Margine sotto il gruppo Richieste/Chat/Supporto/Notifiche/Cambia ruolo nel menu Altro */
+.freelance-more-actions-group {
+  margin-bottom: 1.5rem;
+}
+
+/* ============================================
+   Overlay ricerca: pillola larga come il menu, X + cerca tutta larga, risultati dall'alto in box moderni
+   ============================================ */
+
+/* Altezza e posizione da JS (visual viewport) quando la tastiera è aperta: risultati restano visibili sopra */
+.freelance-mobile-search-overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  pointer-events: auto;
+  padding: 0 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+}
+
+/* Risultati sopra la barra: con tastiera aperta usano l’altezza del visual viewport (--vvp-* da JS) */
+.freelance-mobile-search-results-at-top {
+  position: fixed;
+  top: var(--vvp-top, 0);
+  left: 0;
+  right: 0;
+  z-index: 1;
+  max-height: calc(var(--vvp-height, 100vh) - 100px - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0));
+  overflow: visible;
+  pointer-events: none;
+}
+
+.freelance-mobile-search-results-at-top > * {
+  pointer-events: auto;
+}
+
+/* Dropdown portato in cima: occupa tutta la larghezza in alto (classica barra di ricerca) */
+.freelance-mobile-search-results-at-top .freelance-global-search-dropdown--top-portal {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  max-height: calc(var(--vvp-height, 100vh) - 100px - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0)) !important;
+  margin: 0 !important;
+  border-radius: 0 0 20px 20px !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 20px 24px !important;
+  padding-top: calc(env(safe-area-inset-top, 0) + 16px) !important;
+  background: rgba(28, 28, 30, 0.75) !important;
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border: none !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2) !important;
+  animation: freelance-search-dropdown-from-top 0.3s ease-out;
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-results-at-top .freelance-global-search-dropdown--top-portal {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Lista e item risultati quando in cima (portal) */
+.freelance-mobile-search-results-at-top .freelance-global-search-list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  max-width: 100%;
+}
+
+.freelance-mobile-search-results-at-top .freelance-global-search-item {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s, transform 0.15s;
+  animation: freelance-search-item-from-top 0.4s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+}
+
+.freelance-mobile-search-results-at-top .freelance-global-search-item:active,
+.freelance-mobile-search-results-at-top .freelance-global-search-item.highlighted {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(1) { animation-delay: 0.03s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(2) { animation-delay: 0.06s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(3) { animation-delay: 0.09s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(4) { animation-delay: 0.12s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(5) { animation-delay: 0.15s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(6) { animation-delay: 0.18s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(7) { animation-delay: 0.21s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(8) { animation-delay: 0.24s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(9) { animation-delay: 0.27s; }
+.freelance-mobile-search-results-at-top .freelance-global-search-list .freelance-global-search-item:nth-child(n+10) { animation-delay: 0.30s; }
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-results-at-top .freelance-global-search-item {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .freelance-mobile-search-results-at-top .freelance-global-search-item:active,
+  .freelance-mobile-search-results-at-top .freelance-global-search-item.highlighted {
+    background: rgba(255, 255, 255, 0.85);
+  }
+}
+
+.freelance-mobile-search-results-at-top .freelance-global-search-loading,
+.freelance-mobile-search-results-at-top .freelance-global-search-empty {
+  padding: 20px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  animation: freelance-search-dropdown-from-top 0.3s ease-out;
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-results-at-top .freelance-global-search-loading,
+  .freelance-mobile-search-results-at-top .freelance-global-search-empty {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.freelance-mobile-search-overlay-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: freelance-search-backdrop-in 0.3s ease-out;
+}
+
+@keyframes freelance-search-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Barra in basso: solo sfondo nero e testo, niente grigio né bordo blu quando si digita (stile App Store) */
+.freelance-mobile-search-overlay-bar {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px 8px 8px;
+  min-height: 64px;
+  border-radius: 9999px;
+  background: #000000;
+  border: none;
+  box-shadow: none;
+  transform-origin: 100% 50%;
+  animation: freelance-search-bar-expand 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+@keyframes freelance-search-bar-expand {
+  from {
+    transform: scale(0.2);
+    opacity: 0.85;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-overlay-bar {
+    background: #1c1c1e;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+.freelance-mobile-search-overlay-close {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-primary, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.freelance-mobile-search-overlay-close:hover,
+.freelance-mobile-search-overlay-close:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.freelance-mobile-search-overlay-input-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search,
+.freelance-mobile-search-inline.freelance-global-search {
+  max-width: none;
+}
+
+/* Input: solo testo su sfondo nero, niente grigio né bordo blu in focus */
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-bar {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0;
+  padding: 10px 12px 10px 0;
+  height: 48px;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-bar:hover,
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-bar:focus-within {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-input:focus,
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-input:focus-visible {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-icon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-input {
+  font-size: 17px;
+  color: #ffffff;
+}
+
+.freelance-mobile-search-overlay-input-wrap .freelance-global-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-overlay-input-wrap .freelance-global-search-input {
+    color: #ffffff;
+  }
+  .freelance-mobile-search-overlay-input-wrap .freelance-global-search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Risultati in cima: con tastiera aperta restano nell’area visibile (--vvp-height) */
+.freelance-mobile-search-overlay-bar .freelance-global-search-dropdown {
+  position: fixed !important;
+  top: var(--vvp-top, env(safe-area-inset-top, 0)) !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  bottom: auto !important;
+  height: auto !important;
+  max-height: calc(var(--vvp-height, 100vh) - 100px - env(safe-area-inset-top, 0) - env(safe-area-inset-bottom, 0)) !important;
+  margin: 0 !important;
+  border-radius: 0 0 20px 20px !important;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  animation: freelance-search-dropdown-from-top 0.3s ease-out;
+  background: rgba(28, 28, 30, 0.75) !important;
+  backdrop-filter: blur(40px) saturate(150%);
+  -webkit-backdrop-filter: blur(40px) saturate(150%);
+  border: none !important;
+  border-top: none !important;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2) !important;
+  padding: 16px 20px 24px !important;
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-overlay-bar .freelance-global-search-dropdown {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(40px) saturate(150%);
+    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+@keyframes freelance-search-dropdown-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Lista risultati in cima: layout classico a tutta larghezza */
+.freelance-mobile-search-overlay-bar .freelance-global-search-list {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  max-width: 100%;
+}
+
+.freelance-mobile-search-overlay-bar .freelance-global-search-item {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.2s, transform 0.15s;
+  animation: freelance-search-item-from-top 0.4s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+}
+
+.freelance-mobile-search-overlay-bar .freelance-global-search-item:active,
+.freelance-mobile-search-overlay-bar .freelance-global-search-item.highlighted {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(1) { animation-delay: 0.03s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(2) { animation-delay: 0.06s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(3) { animation-delay: 0.09s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(4) { animation-delay: 0.12s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(5) { animation-delay: 0.15s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(6) { animation-delay: 0.18s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(7) { animation-delay: 0.21s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(8) { animation-delay: 0.24s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(9) { animation-delay: 0.27s; }
+.freelance-mobile-search-overlay-bar .freelance-global-search-list .freelance-global-search-item:nth-child(n+10) { animation-delay: 0.30s; }
+
+@keyframes freelance-search-item-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-overlay-bar .freelance-global-search-item {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .freelance-mobile-search-overlay-bar .freelance-global-search-item:active,
+  .freelance-mobile-search-overlay-bar .freelance-global-search-item.highlighted {
+    background: rgba(255, 255, 255, 0.85);
+  }
+}
+
+/* Loading/empty in cima, vetro satinato */
+.freelance-mobile-search-overlay-bar .freelance-global-search-loading,
+.freelance-mobile-search-overlay-bar .freelance-global-search-empty {
+  padding: 20px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.08);
+  animation: freelance-search-dropdown-from-top 0.3s ease-out;
+}
+
+@media (prefers-color-scheme: light) {
+  .freelance-mobile-search-overlay-bar .freelance-global-search-loading,
+  .freelance-mobile-search-overlay-bar .freelance-global-search-empty {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.06);
+  }
+}
+
+@media (max-width: 768px) {
+  .freelance-mobile-main::-webkit-scrollbar {
+    display: none;
+  }
+
+  .freelance-mobile-main {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

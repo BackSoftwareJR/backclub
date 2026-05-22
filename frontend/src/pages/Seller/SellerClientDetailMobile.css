@@ -1,0 +1,689 @@
+/* ==================== Seller Client Detail Mobile - iOS Style ==================== */
+
+.seller-client-detail-mobile {
+  min-height: 100vh;
+  background: #F5F5F7;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+[data-theme="dark"] .seller-client-detail-mobile {
+  background: #000000;
+}
+
+/* ==================== Navigation Bar ==================== */
+.mobile-client-nav {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0px));
+  background: transparent;
+}
+
+.mobile-nav-back {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  color: #0A84FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.mobile-nav-back:active {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+[data-theme="dark"] .mobile-nav-back {
+  color: #5AC8FA;
+}
+
+/* ==================== Header Section ==================== */
+.mobile-client-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 20px 32px;
+  text-align: center;
+}
+
+.mobile-client-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 52px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(10, 132, 255, 0.3);
+}
+
+.mobile-client-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1D1D1F;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .mobile-client-name {
+  color: #FFFFFF;
+}
+
+.mobile-client-subtitle {
+  font-size: 17px;
+  color: #86868B;
+  margin: 0 0 24px 0;
+}
+
+[data-theme="dark"] .mobile-client-subtitle {
+  color: #98989D;
+}
+
+/* Action Bar - 4 Circular Buttons */
+.mobile-client-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.mobile-action-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #E5E5EA;
+  border: none;
+  color: #0A84FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-action-btn:active {
+  transform: scale(0.95);
+  background: #D1D1D6;
+}
+
+[data-theme="dark"] .mobile-action-btn {
+  background: #2C2C2E;
+  color: #5AC8FA;
+}
+
+[data-theme="dark"] .mobile-action-btn:active {
+  background: #3A3A3C;
+}
+
+/* ==================== Highlights Bento Grid ==================== */
+.mobile-highlights-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0 16px 20px;
+}
+
+.mobile-highlight-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+[data-theme="dark"] .mobile-highlight-card {
+  background: #1C1C1E;
+}
+
+.highlight-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #86868B;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+[data-theme="dark"] .highlight-label {
+  color: #98989D;
+}
+
+.highlight-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1D1D1F;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+[data-theme="dark"] .highlight-value {
+  color: #FFFFFF;
+}
+
+.highlight-value.highlight-red {
+  color: #FF3B30;
+}
+
+[data-theme="dark"] .highlight-value.highlight-red {
+  color: #FF453A;
+}
+
+.highlight-subtitle {
+  font-size: 12px;
+  color: #86868B;
+  margin-top: 2px;
+}
+
+[data-theme="dark"] .highlight-subtitle {
+  color: #98989D;
+}
+
+/* ==================== Inset Grouped List ==================== */
+.mobile-inset-group {
+  background: #FFFFFF;
+  border-radius: 16px;
+  margin: 0 16px 20px;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .mobile-inset-group {
+  background: #1C1C1E;
+}
+
+.inset-group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 0.5px solid #E5E5EA;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-theme="dark"] .inset-group-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.inset-group-item:last-child {
+  border-bottom: none;
+}
+
+.inset-group-item:active {
+  background: #F5F5F7;
+}
+
+[data-theme="dark"] .inset-group-item:active {
+  background: #2C2C2E;
+}
+
+.inset-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.inset-item-icon {
+  color: #0A84FF;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .inset-item-icon {
+  color: #5AC8FA;
+}
+
+.inset-item-text {
+  font-size: 17px;
+  font-weight: 400;
+  color: #1D1D1F;
+}
+
+[data-theme="dark"] .inset-item-text {
+  color: #FFFFFF;
+}
+
+.inset-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inset-item-badge {
+  background: #0A84FF;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 12px;
+  min-width: 24px;
+  text-align: center;
+}
+
+[data-theme="dark"] .inset-item-badge {
+  background: #5AC8FA;
+  color: #000000;
+}
+
+.inset-item-chevron {
+  color: #C7C7CC;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .inset-item-chevron {
+  color: #636366;
+}
+
+/* ==================== Bottom Sheet Content ==================== */
+.mobile-sheet-content {
+  padding: 16px;
+}
+
+.mobile-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  color: #86868B;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .empty-icon {
+  color: #636366;
+}
+
+.empty-text {
+  font-size: 17px;
+  color: #86868B;
+  margin: 0;
+}
+
+[data-theme="dark"] .empty-text {
+  color: #98989D;
+}
+
+/* ==================== Mobile List Items ==================== */
+.mobile-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 0.5px solid #E5E5EA;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-theme="dark"] .mobile-list-item {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-list-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-list-item:active {
+  background: #F5F5F7;
+}
+
+[data-theme="dark"] .mobile-list-item:active {
+  background: #2C2C2E;
+}
+
+.mobile-list-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-list-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: #1D1D1F;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .mobile-list-title {
+  color: #FFFFFF;
+}
+
+.mobile-list-subtitle {
+  font-size: 15px;
+  color: #86868B;
+  margin-bottom: 4px;
+}
+
+[data-theme="dark"] .mobile-list-subtitle {
+  color: #98989D;
+}
+
+.mobile-list-meta {
+  font-size: 13px;
+  color: #86868B;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+[data-theme="dark"] .mobile-list-meta {
+  color: #98989D;
+}
+
+.mobile-list-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  margin-left: 12px;
+}
+
+.mobile-status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.mobile-status-badge.status-success {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34C759;
+}
+
+.mobile-status-badge.status-warning {
+  background: rgba(255, 159, 10, 0.15);
+  color: #FF9F0A;
+}
+
+.mobile-status-badge.status-danger {
+  background: rgba(255, 69, 58, 0.15);
+  color: #FF453A;
+}
+
+.mobile-status-badge.status-info {
+  background: rgba(10, 132, 255, 0.15);
+  color: #0A84FF;
+}
+
+.mobile-status-badge.status-secondary {
+  background: rgba(142, 142, 147, 0.15);
+  color: #8E8E93;
+}
+
+[data-theme="dark"] .mobile-status-badge.status-success {
+  background: rgba(52, 199, 89, 0.25);
+  color: #30D158;
+}
+
+[data-theme="dark"] .mobile-status-badge.status-warning {
+  background: rgba(255, 159, 10, 0.25);
+  color: #FF9F0A;
+}
+
+[data-theme="dark"] .mobile-status-badge.status-danger {
+  background: rgba(255, 69, 58, 0.25);
+  color: #FF6B9D;
+}
+
+[data-theme="dark"] .mobile-status-badge.status-info {
+  background: rgba(10, 132, 255, 0.25);
+  color: #5AC8FA;
+}
+
+[data-theme="dark"] .mobile-status-badge.status-secondary {
+  background: rgba(142, 142, 147, 0.25);
+  color: #98989D;
+}
+
+.mobile-chevron {
+  color: #C7C7CC;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .mobile-chevron {
+  color: #636366;
+}
+
+/* ==================== Payment Timeline ==================== */
+.mobile-payment-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-payment-item {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 3px solid transparent;
+}
+
+[data-theme="dark"] .mobile-payment-item {
+  background: #1C1C1E;
+}
+
+.mobile-payment-item.today {
+  border-left-color: #0A84FF;
+  background: rgba(10, 132, 255, 0.05);
+}
+
+[data-theme="dark"] .mobile-payment-item.today {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.mobile-payment-item.overdue {
+  border-left-color: #FF3B30;
+  background: rgba(255, 59, 48, 0.05);
+}
+
+[data-theme="dark"] .mobile-payment-item.overdue {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+.mobile-payment-item.paid {
+  opacity: 0.7;
+}
+
+.mobile-payment-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #86868B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .mobile-payment-date {
+  color: #98989D;
+}
+
+.mobile-payment-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mobile-payment-desc {
+  font-size: 17px;
+  font-weight: 500;
+  color: #1D1D1F;
+}
+
+[data-theme="dark"] .mobile-payment-desc {
+  color: #FFFFFF;
+}
+
+.mobile-payment-service {
+  font-size: 15px;
+  color: #86868B;
+  font-style: italic;
+}
+
+[data-theme="dark"] .mobile-payment-service {
+  color: #98989D;
+}
+
+.mobile-payment-amount {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1D1D1F;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+
+[data-theme="dark"] .mobile-payment-amount {
+  color: #FFFFFF;
+}
+
+.mobile-payment-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.mobile-payment-status .status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.mobile-payment-status.today .status-dot {
+  background: #0A84FF;
+}
+
+.mobile-payment-status.overdue .status-dot {
+  background: #FF3B30;
+}
+
+.mobile-payment-status.paid .status-dot {
+  background: #34C759;
+}
+
+.mobile-payment-status.future .status-dot {
+  background: #8E8E93;
+}
+
+.mobile-payment-status.today {
+  color: #0A84FF;
+}
+
+.mobile-payment-status.overdue {
+  color: #FF3B30;
+}
+
+.mobile-payment-status.paid {
+  color: #34C759;
+}
+
+.mobile-payment-status.future {
+  color: #8E8E93;
+}
+
+[data-theme="dark"] .mobile-payment-status.today {
+  color: #5AC8FA;
+}
+
+[data-theme="dark"] .mobile-payment-status.overdue {
+  color: #FF6B9D;
+}
+
+[data-theme="dark"] .mobile-payment-status.paid {
+  color: #30D158;
+}
+
+[data-theme="dark"] .mobile-payment-status.future {
+  color: #98989D;
+}
+
+/* ==================== Info Groups ==================== */
+.mobile-info-group {
+  margin-bottom: 24px;
+}
+
+.info-group-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #86868B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0 16px 8px;
+}
+
+[data-theme="dark"] .info-group-title {
+  color: #98989D;
+}
+
+.mobile-info-list {
+  background: #FFFFFF;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+[data-theme="dark"] .mobile-info-list {
+  background: #1C1C1E;
+}
+
+.mobile-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 0.5px solid #E5E5EA;
+}
+
+[data-theme="dark"] .mobile-info-row {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 15px;
+  font-weight: 400;
+  color: #86868B;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .info-label {
+  color: #98989D;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 400;
+  color: #1D1D1F;
+  text-align: right;
+  flex: 1;
+  margin-left: 16px;
+}
+
+[data-theme="dark"] .info-value {
+  color: #FFFFFF;
+}

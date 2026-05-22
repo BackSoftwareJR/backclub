@@ -1,0 +1,1581 @@
+/* ============================================================
+   SELLER SUPPORT PAGE - Apple Support Style
+   ============================================================ */
+
+.seller-support-page {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
+}
+
+/* Page background - light / dark (come altre pagine seller) */
+.seller-support-page.theme-light,
+[data-theme="light"] .seller-support-page {
+  background: #F5F5F7;
+}
+
+.seller-support-page.theme-dark,
+[data-theme="dark"] .seller-support-page {
+  background: #000000;
+}
+
+.support-ticket-success-banner {
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-align: center;
+  background: rgba(52, 199, 89, 0.15);
+  color: #34C759;
+}
+
+.seller-support-page.theme-dark .support-ticket-success-banner,
+[data-theme="dark"] .support-ticket-success-banner {
+  background: rgba(52, 199, 89, 0.2);
+  color: #30D158;
+}
+
+/* ============================================================
+   MOBILE WRAPPER - visible only on mobile (max-width: 767px)
+   ============================================================ */
+
+.support-mobile-wrap {
+  display: none;
+}
+
+.support-desktop-wrap {
+  display: block;
+}
+
+@media (max-width: 767px) {
+  .support-mobile-wrap {
+    display: block;
+    min-height: 100vh;
+    padding-bottom: 24px;
+  }
+
+  .support-desktop-wrap {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .support-mobile-wrap {
+    display: none;
+  }
+
+  .support-desktop-wrap {
+    display: block;
+  }
+}
+
+/* ============================================================
+   MOBILE - Page background
+   ============================================================ */
+
+@media (max-width: 767px) {
+  .seller-support-page.theme-light .support-mobile-wrap,
+  [data-theme="light"] .support-mobile-wrap {
+    background: #F9FAFB; /* gray-50 - leggermente più chiaro del page bg per contrasto */
+  }
+
+  .seller-support-page.theme-dark .support-mobile-wrap,
+  [data-theme="dark"] .support-mobile-wrap {
+    background: #000000;
+  }
+}
+
+/* ============================================================
+   MOBILE - Header & Search (Large Title + Search Bar)
+   ============================================================ */
+
+.support-mobile-header {
+  padding: 16px 16px 20px;
+}
+
+.support-mobile-title {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 0 16px 0;
+  text-align: left;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-mobile-title,
+[data-theme="light"] .support-mobile-title {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-mobile-title,
+[data-theme="dark"] .support-mobile-title {
+  color: #FFFFFF;
+}
+
+.support-mobile-search-container {
+  position: relative;
+  width: 100%;
+}
+
+.support-mobile-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-mobile-search-icon,
+[data-theme="light"] .support-mobile-search-icon {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-mobile-search-icon,
+[data-theme="dark"] .support-mobile-search-icon {
+  color: #98989D;
+}
+
+.support-mobile-search-input {
+  width: 100%;
+  height: 40px;
+  padding: 0 16px 0 40px;
+  font-size: 0.9375rem;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.seller-support-page.theme-light .support-mobile-search-input,
+[data-theme="light"] .support-mobile-search-input {
+  background: #F3F4F6; /* gray-100 */
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-light .support-mobile-search-input::placeholder,
+[data-theme="light"] .support-mobile-search-input::placeholder {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-mobile-search-input,
+[data-theme="dark"] .support-mobile-search-input {
+  background: #1C1C1E;
+  color: #FFFFFF;
+}
+
+.seller-support-page.theme-dark .support-mobile-search-input::placeholder,
+[data-theme="dark"] .support-mobile-search-input::placeholder {
+  color: #98989D;
+}
+
+/* ============================================================
+   MOBILE - Search results (reuse + overrides)
+   ============================================================ */
+
+.support-mobile-search-results {
+  margin: 0 16px 16px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.support-mobile-no-results {
+  margin: 0 16px 16px;
+}
+
+/* ============================================================
+   MOBILE - Argomenti (2x2 Grid, Apple "My Devices" style)
+   ============================================================ */
+
+.support-topics-section {
+  padding: 0 16px 24px;
+}
+
+.support-topics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.support-topic-card {
+  aspect-ratio: 1.5 / 1;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.seller-support-page.theme-light .support-topic-card,
+[data-theme="light"] .support-topic-card {
+  background: #FFFFFF;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-dark .support-topic-card,
+[data-theme="dark"] .support-topic-card {
+  background: #1C1C1E;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.support-topic-card:active {
+  opacity: 0.9;
+}
+
+.support-topic-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.support-topic-card-icon.icon-purple {
+  background: #F3E8FF;
+  color: #9333EA;
+}
+
+.support-topic-card-icon.icon-blue {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.support-topic-card-icon.icon-indigo {
+  background: #E0E7FF;
+  color: #4F46E5;
+}
+
+.support-topic-card-icon.icon-orange {
+  background: #FFEDD5;
+  color: #EA580C;
+}
+
+.support-topic-card-icon.icon-emerald {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+[data-theme="dark"] .support-topic-card-icon.icon-purple {
+  background: rgba(147, 51, 234, 0.2);
+  color: #A78BFA;
+}
+
+[data-theme="dark"] .support-topic-card-icon.icon-blue {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+}
+
+[data-theme="dark"] .support-topic-card-icon.icon-indigo {
+  background: rgba(79, 70, 229, 0.2);
+  color: #818CF8;
+}
+
+[data-theme="dark"] .support-topic-card-icon.icon-orange {
+  background: rgba(234, 88, 12, 0.2);
+  color: #FB923C;
+}
+
+[data-theme="dark"] .support-topic-card-icon.icon-emerald {
+  background: rgba(5, 150, 105, 0.2);
+  color: #34D399;
+}
+
+.support-topic-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-topic-card-title,
+[data-theme="light"] .support-topic-card-title {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-topic-card-title,
+[data-theme="dark"] .support-topic-card-title {
+  color: #FFFFFF;
+}
+
+/* ============================================================
+   MOBILE - Contattaci (Inset Grouped List, iOS style)
+   ============================================================ */
+
+.support-contact-inset {
+  padding: 0 16px 24px;
+}
+
+.support-inset-header {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0 0 8px 12px;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-inset-header,
+[data-theme="light"] .support-inset-header {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-inset-header,
+[data-theme="dark"] .support-inset-header {
+  color: #98989D;
+}
+
+.support-inset-group {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.seller-support-page.theme-light .support-inset-group,
+[data-theme="light"] .support-inset-group {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-dark .support-inset-group,
+[data-theme="dark"] .support-inset-group {
+  background: #1C1C1E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.support-inset-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+a.support-inset-row {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.support-inset-row:last-child {
+  border-bottom: none;
+}
+
+.seller-support-page.theme-light .support-inset-row,
+[data-theme="light"] .support-inset-row {
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+.seller-support-page.theme-dark .support-inset-row,
+[data-theme="dark"] .support-inset-row {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.seller-support-page.theme-light .support-inset-row:active,
+[data-theme="light"] .support-inset-row:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.seller-support-page.theme-dark .support-inset-row:active,
+[data-theme="dark"] .support-inset-row:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.support-inset-icon {
+  flex-shrink: 0;
+}
+
+.support-inset-icon-green {
+  color: #34C759;
+}
+
+.support-inset-icon-blue {
+  color: #007AFF;
+}
+
+.support-inset-icon-gray {
+  color: #8E8E93;
+}
+
+.seller-support-page.theme-dark .support-inset-icon-gray,
+[data-theme="dark"] .support-inset-icon-gray {
+  color: #98989D;
+}
+
+.support-inset-label {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-inset-label,
+[data-theme="light"] .support-inset-label {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-inset-label,
+[data-theme="dark"] .support-inset-label {
+  color: #FFFFFF;
+}
+
+.support-inset-detail {
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-inset-detail,
+[data-theme="light"] .support-inset-detail {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-inset-detail,
+[data-theme="dark"] .support-inset-detail {
+  color: #98989D;
+}
+
+.support-inset-chevron {
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-inset-chevron,
+[data-theme="light"] .support-inset-chevron {
+  color: #C7C7CC;
+}
+
+.seller-support-page.theme-dark .support-inset-chevron,
+[data-theme="dark"] .support-inset-chevron {
+  color: #636366;
+}
+
+/* ============================================================
+   MOBILE - Articoli Consigliati (simple list with dividers)
+   ============================================================ */
+
+.support-articles-section {
+  padding: 0 16px 32px;
+}
+
+.support-articles-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0 0 8px 12px;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-articles-title,
+[data-theme="light"] .support-articles-title {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-articles-title,
+[data-theme="dark"] .support-articles-title {
+  color: #98989D;
+}
+
+.support-articles-list {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-light .support-articles-list,
+[data-theme="light"] .support-articles-list {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.seller-support-page.theme-dark .support-articles-list,
+[data-theme="dark"] .support-articles-list {
+  background: #1C1C1E;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.support-article-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: background-color 0.2s ease;
+}
+
+.seller-support-page.theme-light .support-article-row:active,
+[data-theme="light"] .support-article-row:active {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.seller-support-page.theme-dark .support-article-row:active,
+[data-theme="dark"] .support-article-row:active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.support-article-title {
+  font-size: 1rem;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-article-title,
+[data-theme="light"] .support-article-title {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-article-title,
+[data-theme="dark"] .support-article-title {
+  color: #FFFFFF;
+}
+
+.support-article-chevron {
+  flex-shrink: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-article-chevron,
+[data-theme="light"] .support-article-chevron {
+  color: #C7C7CC;
+}
+
+.seller-support-page.theme-dark .support-article-chevron,
+[data-theme="dark"] .support-article-chevron {
+  color: #636366;
+}
+
+.support-article-divider {
+  height: 1px;
+  margin: 0 16px;
+  transition: background-color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-article-divider,
+[data-theme="light"] .support-article-divider {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.seller-support-page.theme-dark .support-article-divider,
+[data-theme="dark"] .support-article-divider {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+
+.support-hero {
+  padding: 80px 24px 60px;
+  transition: background-color 0.3s ease;
+}
+
+/* Light Mode Hero */
+.seller-support-page.theme-light .support-hero,
+[data-theme="light"] .support-hero {
+  background: #F5F5F7;
+}
+
+/* Dark Mode Hero */
+.seller-support-page.theme-dark .support-hero,
+[data-theme="dark"] .support-hero {
+  background: #000000;
+}
+
+.support-hero-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.support-hero-greeting {
+  font-size: 2.25rem; /* text-4xl */
+  font-weight: 700; /* font-bold */
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0 0 32px 0;
+  transition: color 0.3s ease;
+}
+
+/* Light Mode Greeting */
+.seller-support-page.theme-light .support-hero-greeting,
+[data-theme="light"] .support-hero-greeting {
+  color: #1D1D1F;
+}
+
+/* Dark Mode Greeting */
+.seller-support-page.theme-dark .support-hero-greeting,
+[data-theme="dark"] .support-hero-greeting {
+  color: #FFFFFF;
+}
+
+/* Search Container */
+.support-search-container {
+  position: relative;
+  max-width: 672px; /* max-w-2xl */
+  margin: 0 auto;
+}
+
+.support-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: color 0.3s ease;
+}
+
+/* Light Mode Search Icon */
+.seller-support-page.theme-light .support-search-icon,
+[data-theme="light"] .support-search-icon {
+  color: #86868B;
+}
+
+/* Dark Mode Search Icon */
+.seller-support-page.theme-dark .support-search-icon,
+[data-theme="dark"] .support-search-icon {
+  color: #98989D;
+}
+
+.support-search-input {
+  width: 100%;
+  padding: 16px 16px 16px 48px;
+  font-size: 1rem;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+/* Light Mode Search Input */
+.seller-support-page.theme-light .support-search-input,
+[data-theme="light"] .support-search-input {
+  background: #FFFFFF;
+  color: #1D1D1F;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-light .support-search-input:focus,
+[data-theme="light"] .support-search-input:focus {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark Mode Search Input */
+.seller-support-page.theme-dark .support-search-input,
+[data-theme="dark"] .support-search-input {
+  background: #1C1C1E;
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.seller-support-page.theme-dark .support-search-input:focus,
+[data-theme="dark"] .support-search-input:focus {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Search Results */
+.support-search-results {
+  max-width: 672px;
+  margin: 24px auto 0;
+  border-radius: 12px;
+  overflow: hidden;
+  animation: fadeIn 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+/* Light Mode Search Results */
+.seller-support-page.theme-light .support-search-results,
+[data-theme="light"] .support-search-results {
+  background: #FFFFFF;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark Mode Search Results */
+.seller-support-page.theme-dark .support-search-results,
+[data-theme="dark"] .support-search-results {
+  background: #1C1C1E;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+.support-search-results-header {
+  padding: 12px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-bottom: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-search-results-header,
+[data-theme="light"] .support-search-results-header {
+  color: #86868B;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.seller-support-page.theme-dark .support-search-results-header,
+[data-theme="dark"] .support-search-results-header {
+  color: #98989D;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.support-search-results-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.support-search-result-item {
+  padding: 16px;
+  border-bottom: 1px solid;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.support-search-result-item:last-child {
+  border-bottom: none;
+}
+
+.support-search-result-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="dark"] .support-search-result-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.seller-support-page.theme-light .support-search-result-item,
+[data-theme="light"] .support-search-result-item {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.seller-support-page.theme-dark .support-search-result-item,
+[data-theme="dark"] .support-search-result-item {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.support-search-result-item h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-search-result-item h3,
+[data-theme="light"] .support-search-result-item h3 {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-search-result-item h3,
+[data-theme="dark"] .support-search-result-item h3 {
+  color: #FFFFFF;
+}
+
+.support-search-result-item p {
+  font-size: 0.875rem;
+  margin: 0 0 8px 0;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-search-result-item p,
+[data-theme="light"] .support-search-result-item p {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-search-result-item p,
+[data-theme="dark"] .support-search-result-item p {
+  color: #98989D;
+}
+
+.support-search-result-category {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-search-result-category,
+[data-theme="light"] .support-search-result-category {
+  background: #F5F5F7;
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-search-result-category,
+[data-theme="dark"] .support-search-result-category {
+  background: #2C2C2E;
+  color: #98989D;
+}
+
+.support-search-no-results {
+  max-width: 672px;
+  margin: 24px auto 0;
+  padding: 24px;
+  text-align: center;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-search-no-results,
+[data-theme="light"] .support-search-no-results {
+  background: #FFFFFF;
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-search-no-results,
+[data-theme="dark"] .support-search-no-results {
+  background: #1C1C1E;
+  color: #98989D;
+}
+
+/* ============================================================
+   CATEGORIES GRID
+   ============================================================ */
+
+.support-categories-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.support-categories-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .support-categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .support-categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.support-category-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+/* Light Mode Category Card */
+.seller-support-page.theme-light .support-category-card,
+[data-theme="light"] .support-category-card {
+  background: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-page.theme-light .support-category-card:hover,
+[data-theme="light"] .support-category-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Dark Mode Category Card */
+.seller-support-page.theme-dark .support-category-card,
+[data-theme="dark"] .support-category-card {
+  background: #1C1C1E;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.seller-support-page.theme-dark .support-category-card:hover,
+[data-theme="dark"] .support-category-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.support-category-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Icon Color Variants */
+.support-category-icon.icon-purple {
+  background: #F3E8FF;
+  color: #9333EA;
+}
+
+.support-category-icon.icon-blue {
+  background: #DBEAFE;
+  color: #2563EB;
+}
+
+.support-category-icon.icon-indigo {
+  background: #E0E7FF;
+  color: #4F46E5;
+}
+
+.support-category-icon.icon-orange {
+  background: #FFEDD5;
+  color: #EA580C;
+}
+
+.support-category-icon.icon-emerald {
+  background: #D1FAE5;
+  color: #059669;
+}
+
+/* Dark Mode Icon Colors */
+[data-theme="dark"] .support-category-icon.icon-purple {
+  background: rgba(147, 51, 234, 0.2);
+  color: #A78BFA;
+}
+
+[data-theme="dark"] .support-category-icon.icon-blue {
+  background: rgba(37, 99, 235, 0.2);
+  color: #60A5FA;
+}
+
+[data-theme="dark"] .support-category-icon.icon-indigo {
+  background: rgba(79, 70, 229, 0.2);
+  color: #818CF8;
+}
+
+[data-theme="dark"] .support-category-icon.icon-orange {
+  background: rgba(234, 88, 12, 0.2);
+  color: #FB923C;
+}
+
+[data-theme="dark"] .support-category-icon.icon-emerald {
+  background: rgba(5, 150, 105, 0.2);
+  color: #34D399;
+}
+
+.support-category-content {
+  flex: 1;
+}
+
+.support-category-title {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 600; /* font-semibold */
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  transition: color 0.3s ease;
+}
+
+/* Light Mode Category Title */
+.seller-support-page.theme-light .support-category-title,
+[data-theme="light"] .support-category-title {
+  color: #1D1D1F;
+}
+
+/* Dark Mode Category Title */
+.seller-support-page.theme-dark .support-category-title,
+[data-theme="dark"] .support-category-title {
+  color: #FFFFFF;
+}
+
+.support-category-description {
+  font-size: 0.9375rem; /* text-base */
+  line-height: 1.5;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* Light Mode Category Description */
+.seller-support-page.theme-light .support-category-description,
+[data-theme="light"] .support-category-description {
+  color: #86868B;
+}
+
+/* Dark Mode Category Description */
+.seller-support-page.theme-dark .support-category-description,
+[data-theme="dark"] .support-category-description {
+  color: #98989D;
+}
+
+/* ============================================================
+   CONTACT STRIP
+   ============================================================ */
+
+.support-contact-strip {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px 80px;
+}
+
+.support-contact-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.support-contact-header h2 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 700;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-contact-header h2,
+[data-theme="light"] .support-contact-header h2 {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-contact-header h2,
+[data-theme="dark"] .support-contact-header h2 {
+  color: #FFFFFF;
+}
+
+.support-contact-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .support-contact-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.support-contact-card {
+  padding: 32px 24px;
+  border-radius: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+a.support-contact-card {
+  display: block;
+}
+
+.support-contact-card h3 {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600;
+  margin: 16px 0 8px 0;
+  transition: color 0.3s ease;
+}
+
+.support-contact-card p {
+  font-size: 0.875rem;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.support-contact-icon {
+  margin: 0 auto;
+  transition: transform 0.3s ease;
+}
+
+.support-contact-card:hover .support-contact-icon {
+  transform: scale(1.1);
+}
+
+/* WhatsApp Card */
+.support-contact-whatsapp {
+  background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+  color: #FFFFFF;
+}
+
+.support-contact-whatsapp:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
+}
+
+/* Ticket Card */
+.support-contact-ticket {
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: #FFFFFF;
+}
+
+.support-contact-ticket:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
+}
+
+/* Phone Card */
+.support-contact-phone {
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-contact-phone,
+[data-theme="light"] .support-contact-phone {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.seller-support-page.theme-light .support-contact-phone h3,
+[data-theme="light"] .support-contact-phone h3 {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-light .support-contact-phone p,
+[data-theme="light"] .support-contact-phone p {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-contact-phone,
+[data-theme="dark"] .support-contact-phone {
+  background: #1C1C1E;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seller-support-page.theme-dark .support-contact-phone h3,
+[data-theme="dark"] .support-contact-phone h3 {
+  color: #FFFFFF;
+}
+
+.seller-support-page.theme-dark .support-contact-phone p,
+[data-theme="dark"] .support-contact-phone p {
+  color: #98989D;
+}
+
+.seller-support-page.theme-light .support-contact-phone:hover,
+[data-theme="light"] .support-contact-phone:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.seller-support-page.theme-dark .support-contact-phone:hover,
+[data-theme="dark"] .support-contact-phone:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  transform: translateY(-4px);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================================
+   SECURITY MODAL
+   ============================================================ */
+
+.support-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  animation: fadeIn 0.3s ease;
+}
+
+.support-modal-content {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 20px;
+  animation: slideUp 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+/* Light Mode Modal */
+.seller-support-page.theme-light .support-modal-content,
+[data-theme="light"] .support-modal-content {
+  background: #FFFFFF;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Modal */
+.seller-support-page.theme-dark .support-modal-content,
+[data-theme="dark"] .support-modal-content {
+  background: #1C1C1E;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8);
+}
+
+.support-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  border-bottom: 1px solid;
+  transition: border-color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-modal-header,
+[data-theme="light"] .support-modal-header {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.seller-support-page.theme-dark .support-modal-header,
+[data-theme="dark"] .support-modal-header {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.support-modal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.support-modal-icon {
+  color: #34C759; /* emerald-600 */
+}
+
+.support-modal-title-section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-modal-title-section h2,
+[data-theme="light"] .support-modal-title-section h2 {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-modal-title-section h2,
+[data-theme="dark"] .support-modal-title-section h2 {
+  color: #FFFFFF;
+}
+
+.support-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.3s ease, background-color 0.2s ease;
+}
+
+.seller-support-page.theme-light .support-modal-close,
+[data-theme="light"] .support-modal-close {
+  color: #86868B;
+}
+
+.seller-support-page.theme-light .support-modal-close:hover,
+[data-theme="light"] .support-modal-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-modal-close,
+[data-theme="dark"] .support-modal-close {
+  color: #98989D;
+}
+
+.seller-support-page.theme-dark .support-modal-close:hover,
+[data-theme="dark"] .support-modal-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+.support-modal-body {
+  padding: 24px;
+}
+
+.support-modal-section {
+  margin-bottom: 32px;
+}
+
+.support-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.support-modal-section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-modal-section-title,
+[data-theme="light"] .support-modal-section-title {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-modal-section-title,
+[data-theme="dark"] .support-modal-section-title {
+  color: #FFFFFF;
+}
+
+/* Documents List */
+.support-documents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support-document-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-document-item,
+[data-theme="light"] .support-document-item {
+  background: #F5F5F7;
+}
+
+.seller-support-page.theme-dark .support-document-item,
+[data-theme="dark"] .support-document-item {
+  background: #2C2C2E;
+}
+
+.support-document-info {
+  flex: 1;
+}
+
+.support-document-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-document-info h4,
+[data-theme="light"] .support-document-info h4 {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-document-info h4,
+[data-theme="dark"] .support-document-info h4 {
+  color: #FFFFFF;
+}
+
+.support-document-info p {
+  font-size: 0.875rem;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-document-info p,
+[data-theme="light"] .support-document-info p {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-document-info p,
+[data-theme="dark"] .support-document-info p {
+  color: #98989D;
+}
+
+.support-document-download {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.seller-support-page.theme-light .support-document-download,
+[data-theme="light"] .support-document-download {
+  background: #007AFF;
+  color: #FFFFFF;
+}
+
+.seller-support-page.theme-light .support-document-download:hover,
+[data-theme="light"] .support-document-download:hover {
+  background: #0051D5;
+}
+
+.seller-support-page.theme-dark .support-document-download,
+[data-theme="dark"] .support-document-download {
+  background: #0A84FF;
+  color: #FFFFFF;
+}
+
+.seller-support-page.theme-dark .support-document-download:hover,
+[data-theme="dark"] .support-document-download:hover {
+  background: #0970E0;
+}
+
+/* FAQ List */
+.support-faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support-faq-item {
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-faq-item,
+[data-theme="light"] .support-faq-item {
+  background: #F5F5F7;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.seller-support-page.theme-dark .support-faq-item,
+[data-theme="dark"] .support-faq-item {
+  background: #2C2C2E;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.support-faq-question {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.seller-support-page.theme-light .support-faq-question,
+[data-theme="light"] .support-faq-question {
+  color: #1D1D1F;
+}
+
+.seller-support-page.theme-dark .support-faq-question,
+[data-theme="dark"] .support-faq-question {
+  color: #FFFFFF;
+}
+
+.support-faq-question:hover {
+  opacity: 0.8;
+}
+
+.support-faq-answer {
+  padding: 0 16px 16px 16px;
+  animation: slideDown 0.3s ease;
+}
+
+.support-faq-answer p {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+.seller-support-page.theme-light .support-faq-answer p,
+[data-theme="light"] .support-faq-answer p {
+  color: #86868B;
+}
+
+.seller-support-page.theme-dark .support-faq-answer p,
+[data-theme="dark"] .support-faq-answer p {
+  color: #98989D;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 500px;
+  }
+}
+
+/* ============================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 767px) {
+  .support-hero {
+    padding: 60px 16px 40px;
+  }
+
+  .support-hero-greeting {
+    font-size: 1.75rem;
+  }
+
+  .support-categories-container {
+    padding: 40px 16px;
+  }
+
+  .support-contact-strip {
+    padding: 40px 16px 60px;
+  }
+
+  .support-modal-content {
+    max-height: 95vh;
+    border-radius: 16px;
+  }
+
+  .support-modal-header {
+    padding: 20px;
+  }
+
+  .support-modal-body {
+    padding: 20px;
+  }
+}

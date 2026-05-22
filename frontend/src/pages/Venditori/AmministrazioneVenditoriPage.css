@@ -1,0 +1,189 @@
+.amministrazione-venditori-page {
+  max-width: 1400px;
+}
+
+.venditori-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-8);
+  gap: var(--spacing-5);
+}
+
+.sellers-table-wrapper {
+  overflow-x: auto;
+}
+
+.seller-name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.seller-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-blue-dark) 100%);
+  color: var(--color-text-inverse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  flex-shrink: 0;
+}
+
+.seller-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.seller-phone {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin-top: 2px;
+}
+
+.territory-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.territory-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-3);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.territory-tag-more {
+  padding: var(--spacing-1) var(--spacing-3);
+  background: rgba(10, 132, 255, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-blue);
+  font-weight: var(--font-weight-medium);
+}
+
+.contract-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.contract-status {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.contract-status.active {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.contract-status.expiring {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.contract-status.expired {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error);
+}
+
+.contract-status.no-contract {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-tertiary);
+}
+
+.btn-link-small {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color var(--transition-base);
+}
+
+.btn-link-small:hover {
+  color: var(--color-accent-blue-dark);
+}
+
+.seller-stats {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-xs);
+}
+
+.stat-label {
+  color: var(--color-text-tertiary);
+}
+
+.stat-value {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-primary);
+  background: var(--color-bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-base);
+}
+
+.btn-icon:hover {
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+.btn-icon-danger {
+  color: var(--color-error);
+}
+
+.btn-icon-danger:hover {
+  background: rgba(255, 69, 58, 0.15);
+  border-color: var(--color-error);
+}
+
+@media (max-width: 1024px) {
+  .seller-stats {
+    min-width: 120px;
+  }
+}

@@ -1,0 +1,167 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Quote;
+use App\Models\QuoteCostAnalysis;
+use App\Models\CrmProject;
+use App\Models\QuoteItem;
+use Illuminate\Http\Request;
+
+class QuoteCostAnalysisController extends Controller
+{
+    /**
+     * Ottieni analisi costi per progetto
+     */
+    public function index($projectId)
+    {
+        $project = CrmProject::findOrFail($projectId);
+        
+        $costAnalysis = QuoteCostAnalysis::where('crm_project_id', $projectId)
+            ->with(['quote', 'quoteItem', 'quoteItem.priceListItem'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($costAnalysis);
+    }
+
+    /**
+     * Genera analisi costi automatica da preventivo
+     */
+    public function generateFromQuote(Request $request, $quoteId)
+    {
+        $quote = Quote::with(['items.answers.answer.conditions', 'contract.crmProject'])->findOrFail($quoteId);
+        
+        // Trova il progetto collegato (dal contratto o dal quote stesso)
+        $projectId = null;
+        if ($quote->contract && $quote->contract->crm_project_id) {
+            $projectId = $quote->contract->crm_project_id;
+        }
+
+        if (!$projectId) {
+            return response()->json(['error' => 'Nessun progetto collegato al preventivo'], 400);
+        }
+
+        $generated = [];
+
+        foreach ($quote->items as $item) {
+            // Calcola aggiustamenti prezzo
+            $item->calculatePriceAdjustments();
+
+            // Genera voci analisi costi per ogni risposta con condizioni
+            foreach ($item->answers as $answer) {
+                if ($answer->answer_id) {
+                    $conditions = $answer->answer->conditions ?? collect();
+                    
+                    foreach ($conditions as $condition) {
+                        if ($condition->cost_amount > 0 || $condition->work_description) {
+                            // Crea voce analisi costi
+                            $costAnalysis = QuoteCostAnalysis::create([
+                                'quote_id' => $quote->id,
+                                'crm_project_id' => $projectId,
+                                'quote_item_id' => $item->id,
+                                'description' => $condition->cost_description ?? $answer->question->question_text,
+                                'cost_amount' => $condition->cost_amount ?? 0,
+                                'work_description' => $condition->work_description,
+                                'is_auto_generated' => true,
+                            ]);
+
+                            $generated[] = $costAnalysis;
+                        }
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'message' => 'Analisi costi generata con successo',
+            'generated' => $generated,
+        ], 201);
+    }
+
+    /**
+     * Crea/modifica voce analisi costi manuale
+     */
+    public function store(Request $request, $projectId)
+    {
+        $project = CrmProject::findOrFail($projectId);
+
+        $validated = $request->validate([
+            'quote_id' => 'nullable|exists:quotes,id',
+            'quote_item_id' => 'nullable|exists:quote_items,id',
+            'description' => 'required|string',
+            'cost_amount' => 'required|numeric|min:0',
+            'work_description' => 'nullable|string',
+        ]);
+
+        $validated['crm_project_id'] = $projectId;
+        $validated['is_auto_generated'] = false;
+
+        $costAnalysis = QuoteCostAnalysis::create($validated);
+        $costAnalysis->load(['quote', 'quoteItem']);
+
+        return response()->json($costAnalysis, 201);
+    }
+
+    /**
+     * Modifica voce analisi costi
+     */
+    public function update(Request $request, $id)
+    {
+        $costAnalysis = QuoteCostAnalysis::findOrFail($id);
+
+        $validated = $request->validate([
+            'description' => 'sometimes|required|string',
+            'cost_amount' => 'sometimes|required|numeric|min:0',
+            'work_description' => 'nullable|string',
+        ]);
+
+        $costAnalysis->update($validated);
+        $costAnalysis->load(['quote', 'quoteItem']);
+
+        return response()->json($costAnalysis);
+    }
+
+    /**
+     * Elimina voce analisi costi
+     */
+    public function destroy($id)
+    {
+        $costAnalysis = QuoteCostAnalysis::findOrFail($id);
+        
+        // Non permettere eliminazione di costi auto-generati (o solo se admin)
+        // Per ora permettiamo eliminazione di tutti
+        $costAnalysis->delete();
+
+        return response()->json(['message' => 'Voce analisi costi eliminata con successo']);
+    }
+
+    /**
+     * Ottieni statistiche analisi costi per progetto
+     */
+    public function stats($projectId)
+    {
+        $project = CrmProject::findOrFail($projectId);
+
+        $totalCost = QuoteCostAnalysis::where('crm_project_id', $projectId)
+            ->sum('cost_amount');
+
+        $autoGenerated = QuoteCostAnalysis::where('crm_project_id', $projectId)
+            ->where('is_auto_generated', true)
+            ->sum('cost_amount');
+
+        $manual = QuoteCostAnalysis::where('crm_project_id', $projectId)
+            ->where('is_auto_generated', false)
+            ->sum('cost_amount');
+
+        $count = QuoteCostAnalysis::where('crm_project_id', $projectId)->count();
+
+        return response()->json([
+            'total_cost' => $totalCost,
+            'auto_generated_cost' => $autoGenerated,
+            'manual_cost' => $manual,
+            'items_count' => $count,
+        ]);
+    }
+}
+

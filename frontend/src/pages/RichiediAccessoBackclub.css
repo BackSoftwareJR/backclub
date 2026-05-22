@@ -1,0 +1,53 @@
+/* Richiedi accesso BackClub - estensioni alla Login */
+
+.richiedi-accesso-card {
+  max-width: 440px;
+}
+
+.richiedi-accesso-privacy {
+  margin-top: 0;
+}
+
+.richiedi-accesso-checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-3);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.richiedi-accesso-checkbox {
+  margin-top: 4px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-accent-blue, #0A84FF);
+}
+
+.richiedi-accesso-link {
+  color: var(--color-accent-blue, #0A84FF);
+  text-decoration: underline;
+}
+
+.richiedi-accesso-link:hover {
+  text-decoration: none;
+}
+
+.richiedi-accesso-success {
+  text-align: center;
+  padding: var(--spacing-4) 0;
+}
+
+.richiedi-accesso-success-icon {
+  color: var(--color-success, #34C759);
+  margin-bottom: var(--spacing-4);
+}
+
+.richiedi-accesso-success-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: var(--spacing-4) 0 0;
+}

@@ -1,0 +1,739 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Plus, Settings, ArrowRightLeft, Check, X, History, Loader, Edit2, Trash2, Info } from 'lucide-react';
+import QuickActionsBar from '../../components/QuickActionsBar/QuickActionsBar.tsx';
+import serbatoiApi, { type Serbatoio, type SerbatoioTransaction, type SerbatoiStats } from '../../api/serbatoi';
+import './Serbatoi.css';
+import './SerbatoiModal.css';
+
+const Serbatoi: React.FC = () => {
+    const navigate = useNavigate();
+
+    // State for data
+    const [serbatoi, setSerbatoi] = useState<Serbatoio[]>([]);
+    const [transactions, setTransactions] = useState<SerbatoioTransaction[]>([]);
+    const [stats, setStats] = useState<SerbatoiStats | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Modal states
+    const [showTransferModal, setShowTransferModal] = useState(false);
+    const [showAutomationModal, setShowAutomationModal] = useState(false);
+    const [showNewReservoirModal, setShowNewReservoirModal] = useState(false);
+
+    // Transfer modal state
+    const [transferFrom, setTransferFrom] = useState('');
+    const [transferTo, setTransferTo] = useState('');
+    const [transferAmount, setTransferAmount] = useState('');
+    const [transferReason, setTransferReason] = useState('');
+    const [transferLoading, setTransferLoading] = useState(false);
+
+    // New reservoir state
+    const [newReservoirName, setNewReservoirName] = useState('');
+    const [newReservoirColor, setNewReservoirColor] = useState('#0A84FF');
+    const [newReservoirAutoEnabled, setNewReservoirAutoEnabled] = useState(false);
+    const [newReservoirAutoPercentage, setNewReservoirAutoPercentage] = useState(0);
+    const [newReservoirDescription, setNewReservoirDescription] = useState('');
+    const [createLoading, setCreateLoading] = useState(false);
+
+    // Automation modal state
+    const [selectedSerbatoio, setSelectedSerbatoio] = useState<Serbatoio | null>(null);
+    const [automationLoading, setAutomationLoading] = useState(false);
+
+    // Edit modal state
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingSerbatoio, setEditingSerbatoio] = useState<Serbatoio | null>(null);
+    const [editName, setEditName] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+    const [editColor, setEditColor] = useState('#0A84FF');
+    const [editAutoEnabled, setEditAutoEnabled] = useState(false);
+    const [editAutoPercentage, setEditAutoPercentage] = useState(0);
+    const [editLoading, setEditLoading] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    // Load data on mount
+    useEffect(() => {
+        loadData();
+    }, []);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Load serbatoi
+            const serbatoiResponse = await serbatoiApi.getAll({ active_only: true });
+            setSerbatoi(serbatoiResponse.data);
+            setStats(serbatoiResponse.stats);
+
+            // Load recent transactions
+            const transactionsResponse = await serbatoiApi.getTransactions({ per_page: 10 });
+            setTransactions(transactionsResponse.data.data);
+        } catch (err: any) {
+            console.error('Error loading data:', err);
+            setError(err?.response?.data?.message || 'Errore nel caricamento dei dati');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleTransfer = async () => {
+        if (!transferFrom || !transferTo || !transferAmount || !transferReason) {
+            alert('Compila tutti i campi');
+            return;
+        }
+
+        try {
+            setTransferLoading(true);
+            await serbatoiApi.transfer({
+                from_serbatoio_id: parseInt(transferFrom),
+                to_serbatoio_id: parseInt(transferTo),
+                amount: parseFloat(transferAmount),
+                reason: transferReason,
+            });
+
+            // Reset form and reload data
+            setShowTransferModal(false);
+            setTransferFrom('');
+            setTransferTo('');
+            setTransferAmount('');
+            setTransferReason('');
+            await loadData();
+
+            alert('Trasferimento completato con successo!');
+        } catch (err: any) {
+            console.error('Transfer error:', err);
+            alert(err?.response?.data?.message || 'Errore durante il trasferimento');
+        } finally {
+            setTransferLoading(false);
+        }
+    };
+
+    const handleCreateReservoir = async () => {
+        if (!newReservoirName) {
+            alert('Inserisci un nome per il serbatoio');
+            return;
+        }
+
+        try {
+            setCreateLoading(true);
+            await serbatoiApi.create({
+                name: newReservoirName,
+                description: newReservoirDescription,
+                color: newReservoirColor,
+                auto_distribution_enabled: newReservoirAutoEnabled,
+                auto_distribution_percentage: newReservoirAutoPercentage,
+                balance: 0,
+            });
+
+            // Reset form and reload
+            setShowNewReservoirModal(false);
+            setNewReservoirName('');
+            setNewReservoirDescription('');
+            setNewReservoirColor('#0A84FF');
+            setNewReservoirAutoEnabled(false);
+            setNewReservoirAutoPercentage(0);
+            await loadData();
+
+            alert('Serbatoio creato con successo!');
+        } catch (err: any) {
+            console.error('Create error:', err);
+            alert(err?.response?.data?.message || 'Errore durante la creazione');
+        } finally {
+            setCreateLoading(false);
+        }
+    };
+
+    const openEditModal = (serbatoio: Serbatoio) => {
+        setEditingSerbatoio(serbatoio);
+        setEditName(serbatoio.name);
+        setEditDescription(serbatoio.description || '');
+        setEditColor(serbatoio.color);
+        setEditAutoEnabled(serbatoio.auto_distribution_enabled);
+        setEditAutoPercentage(serbatoio.auto_distribution_percentage);
+        setShowEditModal(true);
+        setShowDeleteConfirm(false);
+    };
+
+    const handleUpdateAutomation = async () => {
+        if (!selectedSerbatoio) return;
+
+        try {
+            setAutomationLoading(true);
+            await serbatoiApi.updateAutomation(selectedSerbatoio.id, {
+                auto_distribution_enabled: selectedSerbatoio.auto_distribution_enabled,
+                auto_distribution_percentage: selectedSerbatoio.auto_distribution_percentage,
+            });
+
+            setShowAutomationModal(false);
+            await loadData();
+
+            alert('Automazione aggiornata con successo!');
+        } catch (err: any) {
+            console.error('Automation error:', err);
+            alert(err?.response?.data?.message || 'Errore durante l\'aggiornamento');
+        } finally {
+            setAutomationLoading(false);
+        }
+    };
+
+    setEditAutoPercentage(serbatoio.auto_distribution_percentage);
+    setShowEditModal(true);
+    setShowDeleteConfirm(false);
+};
+
+const handleSaveEdit = async () => {
+    if (!editingSerbatoio || !editName.trim()) {
+        alert('Il nome del serbatoio è obbligatorio');
+        return;
+    }
+
+    try {
+        setEditLoading(true);
+        await serbatoiApi.update(editingSerbatoio.id, {
+            name: editName.trim(),
+            description: editDescription.trim(),
+            color: editColor,
+            auto_distribution_enabled: editAutoEnabled,
+            auto_distribution_percentage: editAutoPercentage,
+        });
+
+        setShowEditModal(false);
+        await loadData();
+        alert('Serbatoio aggiornato con successo!');
+    } catch (err: any) {
+        console.error('Edit error:', err);
+        alert(err?.response?.data?.message || 'Errore durante l\'aggiornamento');
+    } finally {
+        setEditLoading(false);
+    }
+};
+
+const handleDelete = async () => {
+    if (!editingSerbatoio) return;
+
+    try {
+        setDeleteLoading(true);
+        await serbatoiApi.delete(editingSerbatoio.id);
+
+        setShowEditModal(false);
+        setShowDeleteConfirm(false);
+        await loadData();
+        alert('Serbatoio eliminato con successo');
+    } catch (err: any) {
+        console.error('Delete error:', err);
+        alert(err?.response?.data?.message || 'Errore durante l\'eliminazione');
+    } finally {
+        setDeleteLoading(false);
+    }
+};
+
+if (loading) {
+    return (
+        <div className="serbatoi-page">
+            <QuickActionsBar />
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                <Loader className="spinner" size={32} />
+                <span style={{ marginLeft: '1rem' }}>Caricamento in corso...</span>
+            </div>
+        </div>
+    );
+}
+
+if (error) {
+    return (
+        <div className="serbatoi-page">
+            <QuickActionsBar />
+            <div className="error-message" style={{ padding: '2rem', textAlign: 'center' }}>
+                <p style={{ color: 'red', marginBottom: '1rem' }}>⚠️ {error}</p>
+                <button onClick={loadData} className="btn-serbatoio-action primary">
+                    Riprova
+                </button>
+            </div>
+        </div>
+    );
+}
+
+return (
+    <div className="serbatoi-page">
+        <QuickActionsBar />
+
+        {/* Header */}
+        <div className="serbatoi-header">
+            <button className="btn-back-serbatoi" onClick={() => navigate('/spese')}>
+                <ArrowLeft size={18} />
+                Torna a Spese
+            </button>
+            <h1>Gestione Serbatoi Cocchi</h1>
+            <p className="subtitle">Configura riserve e automazioni distribuzione</p>
+        </div>
+
+        {/* Stats & Actions */}
+        <div className="serbatoi-top-bar">
+            <div className="serbatoi-stats-mini">
+                <div className="stat-mini-item">
+                    <span className="stat-mini-label">Totale Riserve Cocchi:</span>
+                    <span className="stat-mini-value">¢ {stats?.total_balance.toLocaleString('it-IT') || 0}</span>
+                </div>
+                <div className="stat-mini-item">
+                    <span className="stat-mini-label">Automazioni Attive:</span>
+                    <span className="stat-mini-value">{stats?.auto_enabled || 0}/{stats?.total_serbatoi || 0}</span>
+                </div>
+                <div className="stat-mini-item">
+                    <span className="stat-mini-label">% Totale Auto:</span>
+                    <span className="stat-mini-value">{stats?.total_auto_percentage || 0}%</span>
+                </div>
+            </div>
+            <div className="serbatoi-actions-bar">
+                <button className="btn-serbatoio-action primary" onClick={() => setShowTransferModal(true)}>
+                    <ArrowRightLeft size={16} />
+                    Trasferimento
+                </button>
+                <button className="btn-serbatoio-action secondary" onClick={() => setShowAutomationModal(true)}>
+                    <Settings size={16} />
+                    Automazioni
+                </button>
+                <button className="btn-serbatoio-action tertiary" onClick={() => setShowNewReservoirModal(true)}>
+                    <Plus size={16} />
+                    Nuovo Serbatoio
+                </button>
+            </div>
+        </div>
+
+        {/* Reservoirs Grid */}
+        <div className="serbatoi-grid">
+            {serbatoi.map(serbatoio => (
+                <div key={serbatoio.id} className="serbatoio-card" style={{ borderTopColor: serbatoio.color }}>
+                    <div className="serbatoio-header">
+                        <div className="serbatoio-color-dot" style={{ backgroundColor: serbatoio.color }}></div>
+                        <h3>{serbatoio.name}</h3>
+                    </div>
+                    <div className="serbatoio-balance">{serbatoio.formatted_balance}</div>
+                    <div className="serbatoio-automation">
+                        {serbatoio.auto_distribution_enabled ? (
+                            <>
+                                <Check size={14} className="auto-icon enabled" />
+                                <span>Auto: {serbatoio.auto_distribution_percentage}%</span>
+                            </>
+                        ) : (
+                            <>
+                                <X size={14} className="auto-icon disabled" />
+                                <span>Manuale</span>
+                            </>
+                        )}
+                    </div>
+                    <div className="serbatoio-actions">
+                        <button className="btn-serbatoio-edit" onClick={() => openEditModal(serbatoio)}>
+                            <Edit2 size={14} />
+                            Modifica
+                        </button>
+                    </div>
+                </div>
+            ))}
+        </div>
+
+        {/* Transaction History */}
+        <div className="serbatoi-history-section">
+            <h2>
+                <History size={20} />
+                Storico Transazioni Recenti
+            </h2>
+            <div className="serbatoi-transactions-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data/Ora</th>
+                            <th>Serbatoio</th>
+                            <th>Tipo</th>
+                            <th>Importo</th>
+                            <th>Saldo Prima</th>
+                            <th>Saldo Dopo</th>
+                            <th>Motivo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {transactions.map(tx => (
+                            <tr key={tx.id}>
+                                <td className="tx-date">{new Date(tx.created_at).toLocaleString('it-IT')}</td>
+                                <td className="tx-reservoir">{tx.serbatoio?.name || '-'}</td>
+                                <td>
+                                    <span className={`tx-type-badge ${tx.type}`}>
+                                        {tx.type_label}
+                                    </span>
+                                </td>
+                                <td className={`tx-amount ${tx.is_positive ? 'positive' : 'negative'}`}>
+                                    {tx.formatted_amount}
+                                </td>
+                                <td className="tx-balance">¢ {tx.balance_before.toLocaleString('it-IT')}</td>
+                                <td className="tx-balance">¢ {tx.balance_after.toLocaleString('it-IT')}</td>
+                                <td className="tx-reason">{tx.reason || '-'}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {/* Transfer Modal */}
+        {showTransferModal && (
+            <div className="modal-overlay" onClick={() => !transferLoading && setShowTransferModal(false)}>
+                <div className="modal-serbatoio" onClick={(e) => e.stopPropagation()}>
+                    <h2><ArrowRightLeft size={20} /> Trasferimento tra Serbatoi</h2>
+                    <div className="modal-form">
+                        <div className="form-group">
+                            <label>Da Serbatoio:</label>
+                            <select value={transferFrom} onChange={(e) => setTransferFrom(e.target.value)} disabled={transferLoading}>
+                                <option value="">Seleziona serbatoio</option>
+                                {serbatoi.map(s => (
+                                    <option key={s.id} value={s.id}>{s.name} (¢ {s.balance.toLocaleString('it-IT')})</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label>A Serbatoio:</label>
+                            <select value={transferTo} onChange={(e) => setTransferTo(e.target.value)} disabled={transferLoading}>
+                                <option value="">Seleziona serbatoio</option>
+                                {serbatoi.filter(s => s.id.toString() !== transferFrom).map(s => (
+                                    <option key={s.id} value={s.id}>{s.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label>Importo (¢):</label>
+                            <input type="number" value={transferAmount} onChange={(e) => setTransferAmount(e.target.value)} placeholder="0" disabled={transferLoading} />
+                        </div>
+                        <div className="form-group">
+                            <label>Motivo:</label>
+                            <textarea value={transferReason} onChange={(e) => setTransferReason(e.target.value)} placeholder="Descrivi il motivo del trasferimento" disabled={transferLoading} />
+                        </div>
+                    </div>
+                    <div className="modal-actions">
+                        <button onClick={() => setShowTransferModal(false)} className="btn-cancel" disabled={transferLoading}>Annulla</button>
+                        <button onClick={handleTransfer} className="btn-confirm" disabled={transferLoading}>
+                            {transferLoading ? <><Loader className="spinner" size={14} /> Trasferimento...</> : <>Conferma Trasferimento</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* New Reservoir Modal */}
+        {showNewReservoirModal && (
+            <div className="modal-overlay" onClick={() => !createLoading && setShowNewReservoirModal(false)}>
+                <div className="modal-serbatoio" onClick={(e) => e.stopPropagation()}>
+                    <h2><Plus size={20} /> Crea Nuovo Serbatoio</h2>
+                    <div className="modal-form">
+                        <div className="form-group">
+                            <label>Nome Serbatoio:</label>
+                            <input type="text" value={newReservoirName} onChange={(e) => setNewReservoirName(e.target.value)} placeholder="Es: Riserva Marketing" disabled={createLoading} />
+                        </div>
+                        <div className="form-group">
+                            <label>Descrizione (opzionale):</label>
+                            <textarea value={newReservoirDescription} onChange={(e) => setNewReservoirDescription(e.target.value)} placeholder="Descrizione..." disabled={createLoading} />
+                        </div>
+                        <div className="form-group">
+                            <label>Colore:</label>
+                            <input type="color" value={newReservoirColor} onChange={(e) => setNewReservoirColor(e.target.value)} disabled={createLoading} />
+                        </div>
+                        <div className="form-group checkbox-group">
+                            <label>
+                                <input type="checkbox" checked={newReservoirAutoEnabled} onChange={(e) => setNewReservoirAutoEnabled(e.target.checked)} disabled={createLoading} />
+                                Abilita Auto-Distribuzione
+                            </label>
+                        </div>
+                        {newReservoirAutoEnabled && (
+                            <div className="form-group">
+                                <label>Percentuale Auto (%):</label>
+                                <input type="number" min="0" max="100" value={newReservoirAutoPercentage} onChange={(e) => setNewReservoirAutoPercentage(parseFloat(e.target.value))} disabled={createLoading} />
+                            </div>
+                        )}
+                    </div>
+                    <div className="modal-actions">
+                        <button onClick={() => setShowNewReservoirModal(false)} className="btn-cancel" disabled={createLoading}>Annulla</button>
+                        <button onClick={handleCreateReservoir} className="btn-confirm" disabled={createLoading}>
+                            {createLoading ? <><Loader className="spinner" size={14} /> Creazione...</> : <>Crea Serbatoio</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Automation Modal */}
+        {showAutomationModal && selectedSerbatoio && (
+            <div className="modal-overlay" onClick={() => !automationLoading && setShowAutomationModal(false)}>
+                <div className="modal-serbatoio" onClick={(e) => e.stopPropagation()}>
+                    <h2><Settings size={20} /> Configurazione Automazione - {selectedSerbatoio.name}</h2>
+                    <div className="modal-form">
+                        <div className="form-group checkbox-group">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedSerbatoio.auto_distribution_enabled}
+                                    onChange={(e) => setSelectedSerbatoio({ ...selectedSerbatoio, auto_distribution_enabled: e.target.checked })}
+                                    disabled={automationLoading}
+                                />
+                                Abilita Auto-Distribuzione
+                            </label>
+                        </div>
+                        {selectedSerbatoio.auto_distribution_enabled && (
+                            <div className="form-group">
+                                <label>Percentuale Auto (%):</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={selectedSerbatoio.auto_distribution_percentage}
+                                    onChange={(e) => setSelectedSerbatoio({ ...selectedSerbatoio, auto_distribution_percentage: parseFloat(e.target.value) })}
+                                    disabled={automationLoading}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className="modal-actions">
+                        <button onClick={() => setShowAutomationModal(false)} className="btn-cancel" disabled={automationLoading}>Annulla</button>
+                        <button onClick={handleUpdateAutomation} className="btn-confirm" disabled={automationLoading}>
+                            {automationLoading ? <><Loader className="spinner" size={14} /> Salvataggio...</> : <>Salva Modifiche</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Edit Modal - Apple Style */}
+        {showEditModal && editingSerbatoio && (
+            <div className="modal-overlay-apple" onClick={() => !editLoading && !deleteLoading && setShowEditModal(false)}>
+                <div className="modal-apple" onClick={(e) => e.stopPropagation()}>
+                    {/* Header */}
+                    <div className="modal-apple-header">
+                        <h2 className="modal-apple-title">
+                            <Edit2 size={20} />
+                            Modifica Serbatoio
+                        </h2>
+                        <p className="modal-apple-subtitle">{editingSerbatoio.name}</p>
+                    </div>
+
+                    {/* Body */}
+                    <div className="modal-apple-body">
+                        {/* Nome */}
+                        <div className="form-group-apple">
+                            <label className="form-label-apple required">Nome Serbatoio</label>
+                            <input
+                                type="text"
+                                className="form-input-apple"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                placeholder="Es: Riserva Marketing"
+                                disabled={editLoading || deleteLoading}
+                            />
+                        </div>
+
+                        {/* Descrizione */}
+                        <div className="form-group-apple">
+                            <label className="form-label-apple">Descrizione</label>
+                            <textarea
+                                className="form-textarea-apple"
+                                value={editDescription}
+                                onChange={(e) => setEditDescription(e.target.value)}
+                                placeholder="Descrizione opzionale del serbatoio..."
+                                disabled={editLoading || deleteLoading}
+                            />
+                        </div>
+
+                        {/* Color Picker */}
+                        <div className="form-group-apple">
+                            <label className="form-label-apple">Colore</label>
+                            <div className="color-picker-group-apple">
+                                <div className="color-picker-preview" style={{ backgroundColor: editColor }}>
+                                    <input
+                                        type="color"
+                                        className="color-picker-input"
+                                        value={editColor}
+                                        onChange={(e) => setEditColor(e.target.value)}
+                                        disabled={editLoading || deleteLoading}
+                                    />
+                                </div>
+                                <div className="color-picker-details">
+                                    <div className="color-picker-hex">{editColor}</div>
+                                    <div className="color-picker-hint">Tocca il quadrato per cambiare</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="divider-apple"></div>
+
+                        {/* Auto Distribution Toggle */}
+                        <div className="form-group-apple">
+                            <div className="toggle-container-apple">
+                                <label className="toggle-label-apple">Auto-Distribuzione</label>
+                                <label className="toggle-switch-apple">
+                                    <input
+                                        type="checkbox"
+                                        checked={editAutoEnabled}
+                                        onChange={(e) => setEditAutoEnabled(e.target.checked)}
+                                        disabled={editLoading || deleteLoading}
+                                    />
+                                    <span className="toggle-slider-apple"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Percentage (only if auto-distribution is enabled) */}
+                        {editAutoEnabled && (
+                            <div className="form-group-apple">
+                                <label className="form-label-apple">Percentuale Auto-Distribuzione</label>
+                                <div className="number-input-container-apple">
+                                    <input
+                                        type="number"
+                                        className="number-input-apple"
+                                        value={editAutoPercentage}
+                                        onChange={(e) => setEditAutoPercentage(parseFloat(e.target.value) || 0)}
+                                        min="0"
+                                        max="100"
+                                        step="0.1"
+                                        disabled={editLoading || deleteLoading}
+                                    />
+                                    <span className="number-suffix">%</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Info Box */}
+                        {editAutoEnabled && (
+                            <div className="info-box-apple">
+                                <Info size={18} className="info-box-icon" />
+                                <div className="info-box-text">
+                                    Quando ricevi un'entrata, il {editAutoPercentage}% verrà distribuito automaticamente a questo serbatoio.
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Delete Confirmation */}
+                        {showDeleteConfirm && (
+                            <>
+                                <div className="divider-apple"></div>
+                                <div className="info-box-apple" style={{ borderColor: 'rgba(255, 69, 58, 0.3)', background: 'rgba(255, 69, 58, 0.1)' }}>
+                                    <Info size={18} style={{ color: '#FF453A' }} />
+                                    <div className="info-box-text">
+                                        <strong style={{ color: '#FF453A' }}>Attenzione!</strong><br />
+                                        Sei sicuro di voler eliminare questo serbatoio? Questa azione non può essere annullata.
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Footer */}
+                    <div className="modal-apple-footer">
+                        {!showDeleteConfirm ? (
+                            <>
+                                <button
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="btn-apple btn-apple-danger"
+                                    disabled={editLoading || deleteLoading}
+                                >
+                                    <Trash2 size={16} />
+                                    Elimina
+                                </button>
+                                <div style={{ flex: 1 }}></div>
+                                <button
+                                    onClick={() => setShowEditModal(false)}
+                                    className="btn-apple btn-apple-secondary"
+                                    disabled={editLoading || deleteLoading}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    onClick={handleSaveEdit}
+                                    className="btn-apple btn-apple-primary"
+                                    disabled={editLoading || deleteLoading}
+                                >
+                                    {editLoading ? (
+                                        <>
+                                            <Loader className="spinner-apple" size={16} />
+                                            Salvataggio...
+                                        </>
+                                    ) : (
+                                        <>Salva Modifiche</>
+                                    )}
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    className="btn-apple btn-apple-secondary"
+                                    disabled={deleteLoading}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="btn-apple btn-apple-danger"
+                                    disabled={deleteLoading}
+                                    style={{ flex: 1 }}
+                                >
+                                    {deleteLoading ? (
+                                        <>
+                                            <Loader className="spinner-apple" size={16} />
+                                            Eliminazione...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Trash2 size={16} />
+                                            Conferma Eliminazione
+                                        </>
+                                    )}
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* Automation Modal */}
+        {showAutomationModal && selectedSerbatoio && (
+            <div className="modal-overlay" onClick={() => !automationLoading && setShowAutomationModal(false)}>
+                <div className="modal-serbatoio" onClick={(e) => e.stopPropagation()}>
+                    <h2><Settings size={20} /> Configurazione Automazione - {selectedSerbatoio.name}</h2>
+                    <div className="modal-form">
+                        <div className="form-group checkbox-group">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedSerbatoio.auto_distribution_enabled}
+                                    onChange={(e) => setSelectedSerbatoio({ ...selectedSerbatoio, auto_distribution_enabled: e.target.checked })}
+                                    disabled={automationLoading}
+                                />
+                                Abilita Auto-Distribuzione
+                            </label>
+                        </div>
+                        {selectedSerbatoio.auto_distribution_enabled && (
+                            <div className="form-group">
+                                <label>Percentuale Auto (%):</label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    value={selectedSerbatoio.auto_distribution_percentage}
+                                    onChange={(e) => setSelectedSerbatoio({ ...selectedSerbatoio, auto_distribution_percentage: parseFloat(e.target.value) })}
+                                    disabled={automationLoading}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className="modal-actions">
+                        <button onClick={() => setShowAutomationModal(false)} className="btn-cancel" disabled={automationLoading}>Annulla</button>
+                        <button onClick={handleUpdateAutomation} className="btn-confirm" disabled={automationLoading}>
+                            {automationLoading ? <><Loader className="spinner" size={14} /> Salvataggio...</> : <>Salva Modifiche</>}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+    </div>
+);
+};
+
+export default Serbatoi;

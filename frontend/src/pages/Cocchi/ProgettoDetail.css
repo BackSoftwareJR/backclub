@@ -1,0 +1,276 @@
+/* Progetto Detail Styles */
+
+.progetto-detail {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+}
+
+/* Back Button */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    color: var(--color-accent-blue);
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    align-self: flex-start;
+}
+
+.btn-back:hover {
+    background: var(--color-bg-secondary);
+}
+
+/* Header */
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.detail-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.detail-subtitle {
+    font-size: 14px;
+    color: var(--color-text-tertiary);
+    margin: 0;
+}
+
+.detail-dates {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 6px 12px;
+    background: var(--color-bg-secondary);
+    border-radius: 6px;
+}
+
+/* Financial Summary */
+.financial-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-4);
+}
+
+.financial-card {
+    padding: var(--spacing-5);
+    background: var(--color-bg-secondary);
+    border-radius: 10px;
+}
+
+.financial-label {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    margin-bottom: var(--spacing-2);
+}
+
+.financial-value {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.financial-value.positive {
+    color: var(--color-success);
+}
+
+.financial-value.negative {
+    color: var(--color-error);
+}
+
+/* Section Boxes */
+.section-box {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.box-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+/* Rate da Incassare */
+.rate-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--color-border-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.rata-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rata-item:hover {
+    background: var(--color-bg-secondary);
+}
+
+.rata-left {
+    flex: 1;
+}
+
+.rata-desc {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.rata-meta {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.rata-importo {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--color-success);
+}
+
+/* Team Grid */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-3);
+}
+
+.member-card {
+    padding: var(--spacing-4);
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+}
+
+.member-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+}
+
+.member-role {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: var(--spacing-3);
+}
+
+.member-stats {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.member-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-label-tiny {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stat-value-tiny {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* Transactions Detail */
+.transactions-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--color-border-secondary);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.transaction-detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--color-bg-primary);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.transaction-detail-row:hover {
+    background: var(--color-bg-secondary);
+}
+
+.transaction-detail-left {
+    flex: 1;
+}
+
+.transaction-detail-desc {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 4px;
+}
+
+.transaction-detail-meta {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.transaction-detail-amount {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.transaction-detail-amount.entrata {
+    color: var(--color-success);
+}
+
+.transaction-detail-amount.uscita {
+    color: var(--color-error);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .financial-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,13 @@
+.progetti-venditori-page {
+  max-width: 1400px;
+}
+
+.project-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+}
+
+.projects-table-wrapper {
+  overflow-x: auto;
+}

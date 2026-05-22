@@ -1,0 +1,319 @@
+.freelance-requests {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--color-bg-primary);
+}
+
+[data-theme="dark"] .freelance-requests {
+  background: #000000;
+}
+
+[data-theme="light"] .freelance-requests {
+  background: #F5F5F7;
+}
+
+.freelance-requests-header {
+  margin-bottom: 32px;
+}
+
+.freelance-requests-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--color-text-primary);
+}
+
+.freelance-requests-subtitle {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.freelance-requests-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.freelance-requests-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-bg-tertiary);
+  flex: 1;
+  max-width: 400px;
+}
+
+.freelance-requests-search svg {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.freelance-requests-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.freelance-requests-search-input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.freelance-requests-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--color-bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--color-bg-tertiary);
+}
+
+.freelance-requests-filter svg {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.freelance-requests-filter-select {
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+.freelance-requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.freelance-request-card {
+  background: var(--color-bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-bg-tertiary);
+  transition: all 0.2s;
+}
+
+[data-theme="dark"] .freelance-request-card {
+  background: #1C1C1E;
+  border-color: #2C2C2E;
+}
+
+[data-theme="light"] .freelance-request-card {
+  background: #FFFFFF;
+  border-color: #E5E5EA;
+}
+
+.freelance-request-card:hover {
+  border-color: var(--color-accent-blue);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.freelance-request-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.freelance-request-type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.freelance-request-status {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.freelance-request-content {
+  margin-bottom: 16px;
+}
+
+.freelance-request-task-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.freelance-request-task-title:hover {
+  color: var(--color-accent-blue);
+}
+
+.freelance-request-project {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+
+.freelance-request-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.freelance-request-detail-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.freelance-request-detail-label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.freelance-request-detail-value {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+
+.freelance-request-reason {
+  padding: 12px;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+.freelance-request-reason strong {
+  color: var(--color-text-primary);
+  margin-right: 8px;
+}
+
+.freelance-request-review {
+  margin-top: 16px;
+  padding: 16px;
+  background: var(--color-bg-tertiary);
+  border-radius: 8px;
+  border-left: 3px solid var(--color-accent-blue);
+}
+
+.freelance-request-review-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  margin-bottom: 8px;
+}
+
+.freelance-request-review-date {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.freelance-request-review-notes {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  line-height: 1.6;
+  margin-top: 8px;
+}
+
+.freelance-request-review-notes strong {
+  color: var(--color-text-primary);
+  margin-right: 8px;
+}
+
+.freelance-request-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-bg-tertiary);
+}
+
+.freelance-request-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.freelance-requests-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.freelance-requests-empty svg {
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.freelance-requests-empty p {
+  font-size: 16px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .freelance-requests {
+    padding: 16px;
+  }
+
+  .freelance-requests-title {
+    font-size: 24px;
+  }
+
+  .freelance-requests-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .freelance-requests-search {
+    max-width: 100%;
+  }
+
+  .freelance-request-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .freelance-request-detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .freelance-request-detail-label {
+    min-width: auto;
+  }
+}

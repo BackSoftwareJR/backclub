@@ -1,0 +1,604 @@
+/* Quote Detail Mobile - iOS Style (Apple Mail/Wallet) */
+
+.quote-detail-mobile-ios {
+  background-color: var(--ios-system-grouped-background);
+  min-height: 100vh;
+  padding-bottom: calc(8rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Header */
+.quote-detail-header {
+  padding: 16px 16px 12px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--ios-system-grouped-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.quote-detail-header-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.quote-detail-back-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quote-detail-back-button:active {
+  opacity: 0.6;
+}
+
+.quote-detail-action-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quote-detail-action-button:active {
+  opacity: 0.6;
+}
+
+.quote-detail-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.quote-detail-id {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-status-pill {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: var(--ios-font-family);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* Section */
+.quote-detail-section {
+  margin-bottom: 24px;
+}
+
+.quote-detail-section-header {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--ios-secondary-label);
+  text-transform: uppercase;
+  padding: 0 16px;
+  margin-bottom: 8px;
+}
+
+/* Client Card */
+.quote-detail-client-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 16px;
+}
+
+.quote-detail-client-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.quote-detail-client-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--ios-system-blue) 0%, var(--ios-system-indigo) 100%);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.quote-detail-client-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.quote-detail-client-name {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ios-label);
+  margin-bottom: 4px;
+}
+
+.quote-detail-client-email {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-client-link {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.quote-detail-client-link:active {
+  opacity: 0.6;
+}
+
+/* Items Card */
+.quote-detail-items-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  margin: 0 16px;
+  overflow: hidden;
+}
+
+.quote-detail-item-row {
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.quote-detail-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.quote-detail-item-name {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 22px;
+  color: var(--ios-label);
+  margin-bottom: 4px;
+}
+
+.quote-detail-item-notes-wrap {
+  margin-top: 4px;
+}
+
+.quote-detail-item-notes {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-item-notes-more {
+  margin-top: 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-system-blue);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+}
+
+.quote-detail-item-notes-more:active {
+  opacity: 0.7;
+}
+
+.quote-detail-item-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.quote-detail-item-qty {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-item-price {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ios-label);
+}
+
+.quote-detail-item-divider {
+  height: 0.5px;
+  background-color: var(--ios-opaque-separator);
+  margin: 0 16px;
+}
+
+/* Totals Card */
+.quote-detail-totals-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 16px;
+}
+
+.quote-detail-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.quote-detail-total-row:last-child {
+  margin-bottom: 0;
+}
+
+.quote-detail-total-label {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-total-value {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ios-label);
+  text-align: right;
+}
+
+.quote-detail-total-discount {
+  color: var(--ios-system-red);
+}
+
+.quote-detail-total-divider {
+  height: 0.5px;
+  background-color: var(--ios-opaque-separator);
+  margin: 16px 0;
+}
+
+.quote-detail-total-final {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 0.5px solid var(--ios-opaque-separator);
+}
+
+.quote-detail-total-label-final {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ios-label);
+}
+
+.quote-detail-total-value-final {
+  font-family: var(--ios-font-family);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 34px;
+  color: var(--ios-label);
+  text-align: right;
+}
+
+/* Info Card */
+.quote-detail-info-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  margin: 0 16px;
+  overflow: hidden;
+}
+
+.quote-detail-info-row {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quote-detail-info-label {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 18px;
+  color: var(--ios-secondary-label);
+  text-transform: uppercase;
+}
+
+.quote-detail-info-value {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ios-label);
+}
+
+.quote-detail-info-divider {
+  height: 0.5px;
+  background-color: var(--ios-opaque-separator);
+  margin: 0 16px;
+}
+
+/* Notes Card */
+.quote-detail-notes-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 0 16px;
+}
+
+.quote-detail-notes-content {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ios-label);
+  white-space: pre-wrap;
+}
+
+/* Commission card (tap → dettaglio commissione) */
+.quote-detail-commission-card {
+  width: 100%;
+  text-align: left;
+  background-color: var(--ios-secondary-system-grouped-background);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quote-detail-commission-card:active {
+  opacity: 0.8;
+}
+
+.quote-detail-commission-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quote-detail-commission-label {
+  flex: 1;
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-label);
+}
+
+.quote-detail-commission-amount {
+  font-family: var(--ios-font-family);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ios-label);
+}
+
+.quote-detail-commission-meta {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ios-secondary-label);
+}
+
+.quote-detail-commission-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-family: var(--ios-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ios-tertiary-label);
+  line-height: 16px;
+}
+
+.quote-detail-commission-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.quote-detail-action-btn-contract {
+  color: #30D158 !important;
+}
+
+/* Richiedi contratto - in alto (mobile) */
+.quote-detail-request-contract-strip {
+  padding: 0 16px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.quote-detail-request-contract-btn-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background-color: rgba(48, 209, 88, 0.15);
+  border: 1px solid rgba(48, 209, 88, 0.35);
+  border-radius: 12px;
+  color: #30D158;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+}
+
+.quote-detail-request-contract-btn-top:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+.quote-detail-request-contract-btn-top:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Action Buttons - Fixed Bottom */
+.quote-detail-actions {
+  position: fixed;
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background-color: var(--ios-system-grouped-background);
+  border-top: 0.5px solid var(--ios-opaque-separator);
+  display: flex;
+  gap: 12px;
+  z-index: 50;
+}
+
+.quote-detail-action-btn-primary {
+  flex: 1;
+  height: 50px;
+  background-color: var(--ios-system-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+}
+
+.quote-detail-action-btn-primary:active {
+  opacity: 0.6;
+}
+
+.quote-detail-action-btn-secondary {
+  flex: 1;
+  height: 50px;
+  background-color: var(--ios-secondary-system-grouped-background);
+  color: var(--ios-system-blue);
+  border: none;
+  border-radius: 12px;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+}
+
+.quote-detail-action-btn-secondary:active {
+  opacity: 0.6;
+}
+
+/* Loading & Empty States */
+.quote-detail-loading {
+  padding: 16px;
+}
+
+.quote-detail-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.quote-detail-empty-icon {
+  color: var(--ios-secondary-label);
+  margin-bottom: 16px;
+}
+
+.quote-detail-empty-title {
+  font-family: var(--ios-font-family);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--ios-label);
+  margin: 0 0 8px 0;
+}
+
+/* Email Input in Bottom Sheet */
+.quote-detail-email-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 10px;
+  border: none;
+  color: var(--ios-label) !important;
+  font-size: 17px;
+  font-family: var(--ios-font-family);
+  outline: none;
+}
+
+.quote-detail-email-input::placeholder {
+  color: var(--ios-secondary-label) !important;
+  opacity: 1;
+}
+
+.quote-detail-email-input:-webkit-autofill,
+.quote-detail-email-input:-webkit-autofill:hover,
+.quote-detail-email-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ios-label) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--ios-secondary-system-grouped-background) inset !important;
+  box-shadow: 0 0 0px 1000px var(--ios-secondary-system-grouped-background) inset !important;
+}

@@ -1,0 +1,209 @@
+/* Fatture Page Styles */
+
+.segreteria-fatture-page {
+  min-height: 100%;
+}
+
+/* KPI Grid */
+.fatture-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+  padding: 0 var(--spacing-6);
+}
+
+.fatture-kpi-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-background);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.fatture-kpi-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.fatture-kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fatture-kpi-warning .fatture-kpi-icon {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.fatture-kpi-success .fatture-kpi-icon {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.fatture-kpi-info .fatture-kpi-icon {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-primary);
+}
+
+.fatture-kpi-neutral .fatture-kpi-icon {
+  background: rgba(142, 142, 147, 0.15);
+  color: var(--color-text-secondary);
+}
+
+.fatture-kpi-content {
+  min-width: 0;
+}
+
+.fatture-kpi-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-1);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.fatture-kpi-value {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.fatture-kpi-sub {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary, var(--color-text-secondary));
+  margin-top: var(--spacing-1);
+}
+
+/* Tabs Navigation */
+.fatture-tabs-navigation {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-4) var(--spacing-6);
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--spacing-4);
+}
+
+.fatture-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fatture-tab-btn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-background-hover);
+}
+
+.fatture-tab-btn.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: transparent;
+}
+
+.fatture-tab-content {
+  padding: 0 var(--spacing-6);
+}
+
+/* Invoice Styles */
+.segreteria-invoice-number {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.segreteria-invoice-overdue {
+  background: rgba(255, 69, 58, 0.05);
+}
+
+.segreteria-date-overdue {
+  color: var(--color-error);
+  font-weight: var(--font-weight-semibold);
+}
+
+.segreteria-sdi-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.segreteria-sdi-badge.sent {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.segreteria-sdi-badge.not-sent {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+/* Box Styles for List Tab */
+.fatture-list-box {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.fatture-list-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.fatture-list-box-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.fatture-list-box-count {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  margin-left: var(--spacing-2);
+}
+
+/* Calendar Event Styles */
+.calendar-event {
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 3px solid;
+}
+
+.calendar-event:hover {
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

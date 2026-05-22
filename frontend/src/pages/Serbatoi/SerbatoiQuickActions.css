@@ -1,0 +1,57 @@
+/* Quick Action Buttons +/- - ULTRA MINIMAL */
+.serbatoio-quick-actions {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.btn-quick-add,
+.btn-quick-remove {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 6px;
+    border: 1.5px solid;
+    background: transparent;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-quick-add {
+    border-color: #34C759;
+    color: #34C759;
+}
+
+.btn-quick-add:hover {
+    background: rgba(52, 199, 89, 0.1);
+    transform: scale(1.05);
+}
+
+.btn-quick-remove {
+    border-color: #FF453A;
+    color: #FF453A;
+}
+
+.btn-quick-remove:hover {
+    background: rgba(255, 69, 58, 0.1);
+    transform: scale(1.05);
+}
+
+.btn-quick-add:active,
+.btn-quick-remove:active {
+    transform: scale(0.95);
+}
+
+.serbatoio-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-serbatoio-edit {
+    width: 100%;
+}

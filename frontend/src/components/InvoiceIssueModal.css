@@ -1,0 +1,507 @@
+/* Overlay – Apple-style backdrop */
+.invoice-issue-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+  animation: invoiceIssueOverlayIn 0.25s ease-out;
+}
+
+@keyframes invoiceIssueOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal container – fixed height, flex column, scroll only in body */
+.invoice-issue-modal {
+  background: rgba(28, 28, 30, 0.98);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  animation: invoiceIssueModalIn 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes invoiceIssueModalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Header – fixed, no scroll */
+.invoice-issue-modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.invoice-issue-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.invoice-issue-modal-close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.invoice-issue-modal-close:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* Error banner */
+.invoice-issue-modal-error {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: rgba(255, 59, 48, 0.12);
+  border-bottom: 1px solid rgba(255, 59, 48, 0.2);
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
+/* Form – column layout */
+.invoice-issue-modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Scrollable body – only this area scrolls */
+.invoice-issue-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Scrollbar – thin, Apple-like */
+.invoice-issue-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.invoice-issue-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.invoice-issue-modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.invoice-issue-modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Sections */
+.invoice-issue-modal-body .form-section {
+  margin-bottom: 28px;
+}
+
+.invoice-issue-modal-body .form-section:last-child {
+  margin-bottom: 0;
+}
+
+.invoice-issue-modal-body .form-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+}
+
+/* Client info box */
+.client-info-box {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.info-row:first-child {
+  padding-top: 0;
+}
+
+.info-label {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.info-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Form groups */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 15px;
+  transition: border-color 0.2s, background 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.form-group input:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: rgba(10, 132, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Bollo calculation */
+.bollo-calculation {
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-top: 16px;
+}
+
+.calculation-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.calculation-row.total {
+  margin-top: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(10, 132, 255, 0.2);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+}
+
+.calculation-value {
+  font-weight: 500;
+}
+
+/* Reserve allocations */
+.reserve-allocations {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.reserve-allocation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+}
+
+.reserve-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reserve-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+}
+
+.reserve-auto {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.reserve-input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reserve-input-group input {
+  width: 100px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 14px;
+  text-align: right;
+}
+
+.reserve-percentage {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  min-width: 44px;
+  text-align: right;
+}
+
+.allocation-summary {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.summary-row .success {
+  color: #34c759;
+  font-weight: 500;
+}
+
+.summary-row .error {
+  color: #ff3b30;
+  font-weight: 500;
+}
+
+/* Footer – fixed at bottom */
+.invoice-issue-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.invoice-issue-btn-primary,
+.invoice-issue-btn-secondary {
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.2s, background 0.2s;
+  border: none;
+}
+
+.invoice-issue-btn-primary:active,
+.invoice-issue-btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.invoice-issue-btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.invoice-issue-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.invoice-issue-btn-primary {
+  background: #0a84ff;
+  color: #fff;
+}
+
+.invoice-issue-btn-primary:hover:not(:disabled) {
+  background: #409cff;
+}
+
+.invoice-issue-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========== Legacy classes per CreateInvoiceModal (usa stesso CSS) ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.modal-invoice-issue {
+  background: rgba(28, 28, 30, 0.98);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.btn-close-modal {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+.btn-close-modal:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.modal-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  background: rgba(255, 59, 48, 0.12);
+  color: #ff6b6b;
+  font-size: 14px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.modal-actions {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.modal-actions .btn-primary,
+.modal-actions .btn-secondary {
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.modal-actions .btn-secondary {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.modal-actions .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.modal-actions .btn-primary {
+  background: #0a84ff;
+  color: #fff;
+}
+
+.modal-actions .btn-primary:hover:not(:disabled) {
+  background: #409cff;
+}

@@ -1,0 +1,289 @@
+/* Skeleton loader - theme-aware via --ios-* (data-theme light/dark) */
+
+@keyframes skeleton-shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.skeleton-pulse-fill {
+  background-color: var(--ios-tertiary-system-fill) !important;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-bg {
+  background-color: var(--ios-secondary-system-grouped-background) !important;
+}
+
+/* Card */
+.skeleton-card {
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-text-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-line {
+  height: 14px;
+}
+
+.skeleton-line.short {
+  height: 12px;
+}
+
+/* List */
+.skeleton-list {
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-list-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-list-inner .skeleton-line {
+  height: 14px;
+}
+
+/* Tile */
+.skeleton-tile {
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-tile-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-block {
+  height: 16px;
+}
+
+.skeleton-block.tall {
+  height: 20px;
+}
+
+.skeleton-block.value {
+  height: 28px;
+}
+
+.skeleton-block.short {
+  height: 12px;
+}
+
+/* KPI tile - matches dashboard stat-card (icon + value + label) */
+.skeleton-kpi-tile {
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+  aspect-ratio: 1.4 / 1;
+  box-sizing: border-box;
+}
+
+.skeleton-kpi-top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.skeleton-kpi-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.skeleton-kpi-value {
+  height: 28px;
+  width: 64px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.skeleton-kpi-label {
+  height: 11px;
+  width: 70%;
+  max-width: 100px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* Action row - matches quick action button (icon + text + chevron) */
+.skeleton-action-row {
+  width: 100%;
+  height: 50px;
+  border-radius: 12px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.skeleton-action-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.skeleton-action-text {
+  flex: 1;
+  height: 17px;
+  max-width: 180px;
+  border-radius: 4px;
+}
+
+.skeleton-action-chevron {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Group (multiple items) */
+.skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.skeleton-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-text-wrap .skeleton-line {
+  height: 14px;
+}
+
+/* Width utilities for skeleton bars (theme uses these class names) */
+.skeleton-pulse-fill.w-full { width: 100% !important; }
+.skeleton-pulse-fill.w-5/6 { width: 83.333333% !important; }
+.skeleton-pulse-fill.w-4/6 { width: 66.666667% !important; }
+.skeleton-pulse-fill.w-3/4 { width: 75% !important; }
+.skeleton-pulse-fill.w-1/2 { width: 50% !important; }
+.skeleton-pulse-fill.w-1/3 { width: 33.333333% !important; }
+.skeleton-pulse-fill.w-1/4 { width: 25% !important; }
+.skeleton-pulse-fill.w-2/3 { width: 66.666667% !important; }
+
+/* Hide button on page-header when not needed */
+.skeleton-page-header.skeleton-header-no-btn .skeleton-page-header-btn {
+  display: none;
+}
+
+/* Page header - desktop (title + subtitle + button) */
+.skeleton-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.skeleton-page-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-page-header-left .skeleton-line.title {
+  height: 28px;
+  max-width: 280px;
+}
+
+.skeleton-page-header-left .skeleton-line.short {
+  height: 16px;
+}
+
+.skeleton-page-header-btn {
+  width: 140px;
+  height: 40px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* Toolbar - desktop (search + pills) */
+.skeleton-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.skeleton-toolbar-search {
+  flex: 1;
+  min-width: 200px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.skeleton-toolbar-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.skeleton-pill {
+  width: 100px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Chart block - desktop dashboard */
+.skeleton-chart-block {
+  border-radius: 16px;
+  padding: 20px;
+  width: 100%;
+}
+
+.skeleton-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.skeleton-chart-header .skeleton-line {
+  height: 16px;
+}
+
+.skeleton-chart-area {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+}

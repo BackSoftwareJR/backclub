@@ -1,0 +1,157 @@
+/* Quote Wizard Mobile - iOS Native Style */
+
+.quote-wizard-page {
+  position: relative;
+}
+
+/* Mobile Header */
+.quote-wizard-header-mobile {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  background-color: var(--ios-system-grouped-background);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 0.5px solid var(--ios-separator);
+}
+
+.quote-wizard-cancel-btn {
+  background: none;
+  border: none;
+  padding: 8px;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-system-blue);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  flex-shrink: 0;
+}
+
+.quote-wizard-cancel-btn:active {
+  opacity: 0.6;
+}
+
+.quote-wizard-header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.quote-wizard-title-mobile {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ios-label);
+  margin: 0;
+  line-height: 22px;
+}
+
+.quote-wizard-subtitle-mobile {
+  font-family: var(--ios-font-family);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ios-secondary-label);
+  margin: 0;
+  line-height: 18px;
+}
+
+/* Progress Bar */
+.quote-wizard-progress-bar-container {
+  height: 2px;
+  background-color: var(--ios-opaque-separator);
+  position: relative;
+  margin: 0;
+}
+
+.quote-wizard-progress-bar {
+  height: 100%;
+  background-color: var(--ios-system-blue);
+  transition: width 0.3s ease;
+}
+
+/* Mobile Content */
+.quote-wizard-content-mobile {
+  width: 100%;
+  min-height: calc(100vh - 120px);
+  background-color: var(--ios-system-grouped-background);
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); /* Space for navigation + bottom nav */
+}
+
+/* Ensure step content has proper padding on mobile */
+.quote-wizard-content-mobile .quote-step-content {
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Mobile Navigation */
+.quote-wizard-navigation-mobile {
+  position: fixed;
+  bottom: calc(5rem + env(safe-area-inset-bottom, 0px)); /* Above bottom nav bar */
+  left: 0;
+  right: 0;
+  background: color-mix(in srgb, var(--ios-system-grouped-background) 95%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 0.5px solid var(--ios-separator);
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  z-index: 101; /* Above bottom nav bar (z-index 50) */
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-nav-mobile {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-nav-secondary-mobile {
+  background-color: var(--ios-secondary-system-grouped-background);
+  color: var(--ios-label);
+}
+
+.btn-nav-secondary-mobile:active {
+  opacity: 0.6;
+}
+
+.btn-nav-secondary-mobile:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.btn-nav-primary-mobile {
+  background-color: var(--ios-system-blue);
+  color: #FFFFFF;
+  flex: 1;
+  justify-content: center;
+}
+
+.btn-nav-primary-mobile:active {
+  opacity: 0.6;
+}
+
+.btn-nav-primary-mobile:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

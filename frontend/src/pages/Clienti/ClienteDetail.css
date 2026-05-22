@@ -1,0 +1,997 @@
+.cliente-venditori-detail-page {
+  max-width: 1400px;
+}
+
+.detail-header-section {
+  background: var(--color-bg-secondary, #ffffff);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 24px;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary, #86868b);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  margin-bottom: 24px;
+}
+
+.btn-back:hover {
+  background: var(--color-bg-tertiary, #f5f5f7);
+  color: var(--color-text-primary, #1d1d1f);
+}
+
+.cliente-header-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.cliente-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cliente-avatar-large {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 32px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+.cliente-header-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.cliente-header-details h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.azienda-name {
+  font-size: 16px;
+  color: var(--color-text-secondary, #86868b);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.quick-stats-horizontal {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.quick-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--color-bg-tertiary, #f5f5f7);
+  border-radius: 12px;
+  border: none;
+  transition: all 0.25s ease;
+  min-width: 120px;
+}
+
+.quick-stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon.progetti {
+  background: rgba(10, 132, 255, 0.15);
+  color: #0A84FF;
+}
+
+.stat-icon.contratti {
+  background: rgba(52, 199, 89, 0.15);
+  color: #34C759;
+}
+
+.stat-icon.preventivi {
+  background: rgba(255, 159, 10, 0.15);
+  color: #FF9F0A;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-secondary, #86868b);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tabs-navigation {
+  display: flex;
+  gap: var(--spacing-2);
+  border-bottom: 1px solid var(--color-border-primary);
+  margin-bottom: var(--spacing-6);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
+}
+
+.tab-btn.active {
+  color: var(--color-accent-blue);
+  border-bottom-color: var(--color-accent-blue);
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+.anagrafica-section h2,
+.progetti-section h2,
+.contratti-section h2,
+.preventivi-section h2,
+.pagamenti-section h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-5);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary);
+}
+
+.info-item p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.progetti-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.progetto-card-detail {
+  padding: var(--spacing-5);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.progetto-card-detail:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+
+.progetto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-3);
+}
+
+.progetto-header h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.progetto-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-4);
+  line-height: 1.5;
+}
+
+.progetto-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-3);
+  margin-bottom: var(--spacing-4);
+  padding-top: var(--spacing-4);
+  border-top: 1px solid var(--color-border-primary);
+}
+
+.progetto-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.progetto-stat .label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.progetto-stat .value {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.contratti-list,
+.preventivi-list,
+.payment-plans-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.contratto-card,
+.preventivo-card,
+.payment-plan-card {
+  padding: var(--spacing-5);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+}
+
+.contratto-card:hover,
+.preventivo-card:hover,
+.payment-plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-border-hover);
+}
+
+.contratto-header,
+.preventivo-header,
+.payment-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.contratto-header h3,
+.preventivo-header h3,
+.payment-plan-header h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+}
+
+.contratto-number,
+.preventivo-number {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.contratto-body,
+.preventivo-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-4);
+}
+
+.contratto-value,
+.preventivo-value,
+.payment-plan-total {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.contratto-date,
+.preventivo-date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.contratto-payment {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.payment-plan-total {
+  font-size: var(--font-size-xl);
+}
+
+.payment-schedule {
+  margin-top: var(--spacing-4);
+}
+
+.payment-schedule h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-3);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.schedule-date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 120px;
+}
+
+.schedule-amount {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  flex: 1;
+}
+
+.schedule-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.payment-plan-no-schedule {
+  padding: var(--spacing-4);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  text-align: center;
+  margin-top: var(--spacing-4);
+}
+
+/* Pagamenti Section */
+.pagamenti-section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.pagamenti-header {
+  margin-bottom: 8px;
+}
+
+.payment-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.payment-summary-card {
+  background: var(--color-bg-tertiary, #f5f5f7);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+.payment-summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.summary-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: var(--color-text-secondary, #86868b);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.summary-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+/* Calendario Rate */
+.payment-calendar-section {
+  background: var(--color-bg-tertiary, #f5f5f7);
+  border-radius: 16px;
+  padding: 28px;
+  border: none;
+  margin-bottom: 32px;
+}
+
+.section-subtitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  margin: 0 0 24px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.3px;
+}
+
+.payment-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.payment-calendar-item {
+  background: var(--color-bg-secondary, #ffffff);
+  border-radius: 12px;
+  padding: 20px;
+  border: none;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.payment-calendar-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.payment-calendar-item.past {
+  opacity: 0.7;
+}
+
+.payment-calendar-item.today {
+  border-left: 4px solid #0A84FF;
+  background: rgba(10, 132, 255, 0.05);
+}
+
+.payment-calendar-item.overdue {
+  border-left: 4px solid #FF2D55;
+  background: rgba(255, 45, 85, 0.05);
+}
+
+.calendar-item-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.date-day {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1d1d1f);
+}
+
+.date-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-left: 8px;
+}
+
+.today-badge {
+  background: rgba(10, 132, 255, 0.15);
+  color: #0A84FF;
+}
+
+.overdue-badge {
+  background: rgba(255, 45, 85, 0.15);
+  color: #FF2D55;
+}
+
+.calendar-item-amount {
+  margin-bottom: 12px;
+}
+
+.amount-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+.amount-commission {
+  font-size: 12px;
+  color: var(--color-text-secondary, #86868b);
+  margin-top: 4px;
+}
+
+.calendar-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-description {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary, #1d1d1f);
+}
+
+.detail-plan {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-secondary, #86868b);
+}
+
+/* Payment Plans Detail */
+.payment-plans-detail-section {
+  margin-top: 8px;
+}
+
+.payment-plan-card {
+  background: var(--color-bg-tertiary, #f5f5f7);
+  border-radius: 16px;
+  padding: 28px;
+  border: none;
+  margin-bottom: 24px;
+  transition: all 0.25s ease;
+}
+
+.payment-plan-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.payment-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+  gap: 20px;
+}
+
+.plan-header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+}
+
+.plan-header-left h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  margin: 0 0 6px 0;
+  letter-spacing: -0.3px;
+}
+
+.plan-number {
+  font-size: 13px;
+  color: var(--color-text-secondary, #86868b);
+  margin: 0;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.plan-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.payment-plan-total {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}
+
+.payment-schedule h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1d1d1f);
+  margin: 0 0 20px 0;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-bg-secondary, #ffffff);
+  border-radius: 12px;
+  border: none;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.schedule-item:last-child {
+  margin-bottom: 0;
+}
+
+.schedule-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.schedule-item.past {
+  opacity: 0.6;
+}
+
+.schedule-item.today {
+  border-left: 4px solid #0A84FF;
+  background: rgba(10, 132, 255, 0.05);
+}
+
+.schedule-date {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1d1d1f);
+}
+
+.schedule-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin-left: 8px;
+}
+
+.schedule-badge.today {
+  background: rgba(10, 132, 255, 0.15);
+  color: #0A84FF;
+}
+
+.schedule-badge.past {
+  background: rgba(255, 45, 85, 0.15);
+  color: #FF2D55;
+}
+
+.schedule-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary, #1d1d1f);
+  font-variant-numeric: tabular-nums;
+  min-width: 120px;
+  text-align: right;
+}
+
+.schedule-description {
+  flex: 1;
+  font-size: 14px;
+  color: var(--color-text-secondary, #86868b);
+  font-weight: 500;
+}
+
+.schedule-service {
+  font-size: 12px;
+  color: var(--color-text-tertiary, #86868b);
+  font-style: italic;
+}
+
+.empty-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-10);
+  color: var(--color-text-tertiary);
+  gap: var(--spacing-3);
+}
+
+.empty-section p {
+  font-size: var(--font-size-base);
+  margin: 0;
+}
+
+.btn-link-small {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  background: transparent;
+  border: none;
+  color: var(--color-accent-blue);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  padding: 0;
+  transition: all var(--transition-base);
+}
+
+.btn-link-small:hover {
+  color: var(--color-accent-blue-dark);
+  text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .cliente-header-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  
+  .quick-stats-horizontal {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+  
+  .quick-stat-item {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-header-section {
+    padding: 20px;
+  }
+  
+  .cliente-header-left {
+    width: 100%;
+  }
+  
+  .cliente-avatar-large {
+    width: 64px;
+    height: 64px;
+    font-size: 28px;
+  }
+  
+  .cliente-header-details h1 {
+    font-size: 28px;
+  }
+  
+  .quick-stats-horizontal {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+  
+  .quick-stat-item {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+/* Venditori badge styles */
+.venditori-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.venditori-badge-success {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success, #34C759);
+}
+
+.venditori-badge-warning {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning, #FF9F0A);
+}
+
+.venditori-badge-danger {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error, #FF453A);
+}
+
+.venditori-badge-info {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-info, #0A84FF);
+}
+
+.venditori-badge-secondary {
+  background: rgba(142, 142, 147, 0.15);
+  color: var(--color-text-tertiary, #8E8E93);
+}
+
+/* Loading and empty states */
+.venditori-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.venditori-empty-state {
+  text-align: center;
+  padding: var(--spacing-20, 80px) var(--spacing-5, 20px);
+}
+
+.venditori-empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto var(--spacing-4, 16px);
+  opacity: 0.3;
+  color: var(--color-text-tertiary);
+}
+
+.venditori-empty-state h3 {
+  font-size: var(--font-size-xl, 20px);
+  font-weight: var(--font-weight-semibold, 600);
+  color: var(--color-text-primary, #1d1d1f);
+  margin: 0 0 var(--spacing-2, 8px) 0;
+}
+
+.venditori-empty-state p {
+  font-size: var(--font-size-base, 16px);
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--spacing-6, 24px) 0;
+}
+
+.venditori-btn {
+  padding: var(--spacing-3, 12px) var(--spacing-5, 20px);
+  border: none;
+  border-radius: var(--radius-sm, 8px);
+  font-size: var(--font-size-base, 16px);
+  font-weight: var(--font-weight-medium, 500);
+  cursor: pointer;
+  transition: all var(--transition-base, 0.2s ease);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2, 8px);
+  font-family: inherit;
+}
+
+.venditori-btn-primary {
+  background: var(--color-accent-blue, #0A84FF);
+  color: var(--color-text-inverse, #ffffff);
+}
+
+.venditori-btn-primary:hover {
+  background: var(--color-accent-blue-dark, #0071E3);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.venditori-btn-primary:active {
+  transform: translateY(0);
+}

@@ -1,0 +1,586 @@
+/* Digital Receipt Design - Apple Style - Split View */
+
+.quote-step-content.summary-split-view {
+  background: #f5f5f7;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+}
+
+@media (min-width: 1024px) {
+  .summary-grid {
+    grid-template-columns: 8fr 4fr;
+  }
+}
+
+/* Left Column - Services List (The Receipt) */
+.summary-left-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-services-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 8rem);
+  max-height: 900px;
+  overflow: hidden;
+}
+
+.summary-services-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 1);
+  flex-shrink: 0;
+}
+
+.summary-services-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Document Header - Title & Date (Top Priority) */
+.summary-document-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 1);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .summary-document-header {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+
+.summary-input-group-title {
+  flex: 1;
+}
+
+.summary-input-group-date {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .summary-input-group-date {
+    width: auto;
+    min-width: 200px;
+  }
+}
+
+.summary-input-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+.summary-input-error {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px #dc2626, 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.summary-input-error-message {
+  display: block;
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.summary-services-list-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem 2rem;
+  min-height: 0;
+}
+
+.summary-service-row-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+}
+
+.summary-service-info-compact {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-service-name-compact {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 0.125rem;
+}
+
+.summary-service-category-compact {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-service-price-compact {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.summary-divider-compact {
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent 8px,
+    rgba(229, 231, 235, 1) 8px,
+    rgba(229, 231, 235, 1) 16px
+  );
+  margin: 0.25rem 0;
+}
+
+.summary-services-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid rgba(229, 231, 235, 1);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.summary-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-input-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.summary-input {
+  height: 2.5rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(209, 213, 219, 1);
+  border-radius: 0.75rem;
+  font-size: 0.9375rem;
+  color: #1d1d1f;
+  background: #FFFFFF;
+  transition: all 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+.summary-input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.summary-input::placeholder {
+  color: #9ca3af;
+}
+
+/* Right Column - Deal Closer (Sticky) */
+.summary-right-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-deal-closer {
+  position: sticky;
+  top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Header */
+.receipt-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(229, 231, 235, 1);
+}
+
+.receipt-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.receipt-validity {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Services List - Compact */
+.receipt-services-list {
+  margin-bottom: 2rem;
+}
+
+.receipt-service-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1rem 0;
+}
+
+.receipt-service-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.receipt-service-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin-bottom: 0.25rem;
+}
+
+.receipt-service-category {
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.receipt-service-price {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1d1d1f;
+  white-space: nowrap;
+  margin-left: 1rem;
+}
+
+.receipt-divider {
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent 8px,
+    rgba(229, 231, 235, 1) 8px,
+    rgba(229, 231, 235, 1) 16px
+  );
+  margin: 0.5rem 0;
+}
+
+/* Commission Hero Section - Compact */
+.summary-commission-hero {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.summary-commission-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.summary-commission-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #047857;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.summary-commission-hint {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+/* Margin/Discount Controls - Compact */
+.summary-controls-compact {
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(229, 231, 235, 1);
+}
+
+.summary-control-row-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.summary-control-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+.summary-control-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.summary-control-btn-discount {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.summary-control-btn-discount:hover:not(:disabled) {
+  background: #fecaca;
+}
+
+.summary-control-btn-margin {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.summary-control-btn-margin:hover:not(:disabled) {
+  background: #bbf7d0;
+}
+
+.summary-control-display-compact {
+  min-width: 4rem;
+  text-align: center;
+}
+
+.summary-control-value {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+}
+
+.summary-control-value.discount {
+  color: #dc2626;
+}
+
+.summary-control-value.margin {
+  color: #16a34a;
+}
+
+.summary-control-value.neutral {
+  color: #6b7280;
+}
+
+/* Totals Section - Compact */
+.summary-total-section {
+  background: #FFFFFF;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.summary-total-row-compact {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+}
+
+.summary-total-label-compact {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.summary-total-value-compact {
+  font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.summary-total-final-compact {
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid rgba(229, 231, 235, 1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-total-label-final-compact {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.summary-total-value-final-compact {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.03em;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+
+/* Dark Mode Support */
+[data-theme="dark"] .quote-step-content.summary-split-view {
+  background: #000000;
+}
+
+[data-theme="dark"] .summary-services-card {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-services-title {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-services-validity {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .summary-services-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-service-name-compact {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-service-price-compact {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-divider-compact {
+  background: repeating-linear-gradient(
+    to right,
+    transparent,
+    transparent 8px,
+    rgba(255, 255, 255, 0.1) 8px,
+    rgba(255, 255, 255, 0.1) 16px
+  );
+}
+
+[data-theme="dark"] .summary-services-footer {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-input {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-input:focus {
+  border-color: #5ac8fa;
+  box-shadow: 0 0 0 3px rgba(90, 200, 250, 0.1);
+}
+
+[data-theme="dark"] .summary-commission-hero {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .summary-commission-label {
+  color: #10b981;
+}
+
+[data-theme="dark"] .summary-commission-value {
+  color: #10b981;
+}
+
+[data-theme="dark"] .summary-controls-compact {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-total-section {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-total-label-compact {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .summary-total-value-compact {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-total-label-final-compact {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-total-value-final-compact {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .summary-total-final-compact {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-document-header {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .summary-input-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 1px #ef4444, 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
+}
+
+[data-theme="dark"] .summary-input-error-message {
+  color: #fca5a5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .summary-receipt-card {
+    padding: 1.5rem;
+  }
+
+  .receipt-total-value-final {
+    font-size: 2rem;
+  }
+
+  .commission-hero-value {
+    font-size: 1.5rem;
+  }
+
+  .receipt-control-row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .receipt-control-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

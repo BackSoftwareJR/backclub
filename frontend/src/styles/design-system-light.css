@@ -1,0 +1,75 @@
+/* Light Mode Design System */
+
+[data-theme="light"] {
+    /* === COLORS === */
+
+    /* Backgrounds */
+    --color-bg-primary: #FFFFFF;
+    --color-bg-secondary: #F5F5F7;
+    --color-bg-tertiary: #E5E5EA;
+    --color-bg-elevated: #FFFFFF;
+    --color-bg-overlay: rgba(0, 0, 0, 0.05);
+
+    /* Glass effect backgrounds for light mode */
+    --glass-bg-light: rgba(0, 0, 0, 0.02);
+    --glass-bg-medium: rgba(0, 0, 0, 0.04);
+    --glass-bg-heavy: rgba(0, 0, 0, 0.08);
+
+    /* Text colors */
+    --color-text-primary: #1C1C1E;
+    --color-text-secondary: #3A3A3C;
+    --color-text-tertiary: #6E6E73;
+    --color-text-quaternary: #8E8E93;
+    --color-text-inverse: #FFFFFF;
+
+    /* Accent colors remain the same */
+    --color-accent-emerald: #34C759;
+    --color-accent-emerald-dark: #2FB64E;
+    --color-accent-blue: #007AFF;
+    --color-accent-blue-dark: #0051D5;
+    --color-accent-purple: #AF52DE;
+    --color-accent-orange: #FF9500;
+    --color-accent-red: #FF3B30;
+
+    /* Semantic colors */
+    --color-success: #34C759;
+    --color-warning: #FF9500;
+    --color-error: #FF3B30;
+    --color-info: #007AFF;
+
+    /* Borders */
+    --color-border-primary: rgba(0, 0, 0, 0.12);
+    --color-border-secondary: rgba(0, 0, 0, 0.08);
+    --color-border-hover: rgba(0, 0, 0, 0.20);
+    --color-border-focus: var(--color-accent-blue);
+
+    /* Shadows for light mode */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.20);
+
+    /* Glass shadow for light mode */
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.08),
+        inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Light mode specific utilities */
+[data-theme="light"] .gradient-animated {
+    background: linear-gradient(-45deg,
+            #F5F5F7,
+            #E5E5EA,
+            #FFFFFF,
+            #F5F5F7);
+    background-size: 400% 400%;
+    animation: gradientShift 15s ease infinite;
+}
+
+[data-theme="light"] .text-gradient {
+    background: linear-gradient(135deg,
+            var(--color-accent-blue) 0%,
+            var(--color-accent-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

@@ -1,0 +1,414 @@
+/* Email Compose Page - Apple Style */
+
+.email-compose-page {
+  width: 100%;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.email-compose-page.light {
+  background: #F5F5F7;
+  color: #1d1d1f;
+}
+
+.email-compose-page.dark {
+  background: #000000;
+  color: #ffffff;
+}
+
+.email-compose-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #0a84ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.email-compose-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.email-compose-page.light .email-compose-header {
+  background: #ffffff;
+  border-bottom-color: #e5e5e5;
+}
+
+.email-compose-page.dark .email-compose-header {
+  background: #1c1c1e;
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.email-compose-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.email-compose-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: #0a84ff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  width: fit-content;
+}
+
+.email-compose-back-btn:hover {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.email-compose-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.email-compose-history-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #0a84ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.email-compose-history-btn:hover {
+  background: #0051D5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
+}
+
+.email-compose-page.light .email-compose-title {
+  color: #1d1d1f;
+}
+
+.email-compose-page.dark .email-compose-title {
+  color: #ffffff;
+}
+
+.email-compose-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.email-compose-form {
+  background: var(--color-background);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.email-compose-page.light .email-compose-form {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.email-compose-page.dark .email-compose-form {
+  background: #1c1c1e;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.email-form-group {
+  margin-bottom: 20px;
+}
+
+.email-form-group-body {
+  margin-bottom: 24px;
+}
+
+.email-form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.email-compose-page.light .email-form-label {
+  color: #1d1d1f;
+}
+
+.email-compose-page.dark .email-form-label {
+  color: #ffffff;
+}
+
+.email-form-hint {
+  font-size: 12px;
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.email-compose-page.light .email-form-hint {
+  color: #86868b;
+}
+
+.email-compose-page.dark .email-form-hint {
+  color: #98989d;
+}
+
+.email-form-input,
+.email-form-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.email-compose-page.light .email-form-input,
+.email-compose-page.light .email-form-textarea {
+  background: #ffffff;
+  border-color: #d1d1d6;
+  color: #1d1d1f;
+}
+
+.email-compose-page.light .email-form-input:focus,
+.email-compose-page.light .email-form-textarea:focus {
+  outline: none;
+  border-color: #0a84ff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.email-compose-page.dark .email-form-input,
+.email-compose-page.dark .email-form-textarea {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.email-compose-page.dark .email-form-input:focus,
+.email-compose-page.dark .email-form-textarea:focus {
+  outline: none;
+  border-color: rgba(10, 132, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.email-form-textarea {
+  resize: vertical;
+  min-height: 300px;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.email-attachments {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.email-attach-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px dashed;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.email-compose-page.light .email-attach-btn {
+  border-color: #d1d1d6;
+  color: #1d1d1f;
+}
+
+.email-compose-page.light .email-attach-btn:hover {
+  background: #f5f5f7;
+  border-color: #0a84ff;
+  color: #0a84ff;
+}
+
+.email-compose-page.dark .email-attach-btn {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.email-compose-page.dark .email-attach-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(10, 132, 255, 0.5);
+  color: #0a84ff;
+}
+
+.email-attachments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.email-attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(10, 132, 255, 0.1);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.email-compose-page.light .email-attachment-item {
+  background: rgba(10, 132, 255, 0.1);
+  color: #1d1d1f;
+}
+
+.email-compose-page.dark .email-attachment-item {
+  background: rgba(10, 132, 255, 0.2);
+  color: #ffffff;
+}
+
+.email-attachment-item span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.email-attachment-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.email-compose-page.light .email-attachment-remove {
+  color: #86868b;
+}
+
+.email-compose-page.light .email-attachment-remove:hover {
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.email-compose-page.dark .email-attachment-remove {
+  color: #98989d;
+}
+
+.email-compose-page.dark .email-attachment-remove:hover {
+  background: rgba(255, 69, 58, 0.2);
+  color: #ff453a;
+}
+
+.email-compose-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid;
+}
+
+.email-compose-page.light .email-compose-actions {
+  border-top-color: #e5e5e5;
+}
+
+.email-compose-page.dark .email-compose-actions {
+  border-top-color: rgba(255, 255, 255, 0.05);
+}
+
+.email-compose-cancel-btn {
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.email-compose-page.light .email-compose-cancel-btn {
+  border-color: #d1d1d6;
+  color: #1d1d1f;
+}
+
+.email-compose-page.light .email-compose-cancel-btn:hover {
+  background: #f5f5f7;
+}
+
+.email-compose-page.dark .email-compose-cancel-btn {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.email-compose-page.dark .email-compose-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.email-compose-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #0a84ff;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.email-compose-send-btn:hover:not(:disabled) {
+  background: #0066cc;
+}
+
+.email-compose-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.loading-spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}

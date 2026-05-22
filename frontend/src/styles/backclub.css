@@ -1,0 +1,520 @@
+/* Backclub - Stile Organico-Tecnologico */
+/* Palette Colori */
+:root {
+  --backclub-bg: #F8F5E6; /* Carta avorio/panna caldo */
+  --backclub-bg-alt: #FAF8F0;
+  --backclub-text: #4A4A4A; /* Grigio scuro/marrone bruciato */
+  --backclub-text-dark: #333333;
+  --backclub-accent: #2C5F5D; /* Blu Petrolio profondo */
+  --backclub-accent-light: #3A7A77;
+  --backclub-accent-dark: #1F4A48;
+  --backclub-gold: #C9A961; /* Tocchi dorati/ocra */
+  --backclub-gold-light: #D4B876;
+  --backclub-shadow: rgba(44, 95, 93, 0.08);
+  --backclub-shadow-soft: rgba(44, 95, 93, 0.12);
+}
+
+/* Texture di sfondo carta */
+.backclub-container {
+  background-color: var(--backclub-bg);
+  background-image: 
+    radial-gradient(circle at 1px 1px, rgba(0,0,0,0.02) 1px, transparent 0);
+  background-size: 20px 20px;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Tipografia */
+.backclub-serif {
+  font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.backclub-sans {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 
+               'Segoe UI', 'Roboto', sans-serif;
+  font-weight: 400;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Titoli */
+.backclub-h1 {
+  font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--backclub-text-dark);
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+.backclub-h2 {
+  font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--backclub-text-dark);
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.backclub-h3 {
+  font-family: 'Georgia', 'Times New Roman', 'Palatino', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--backclub-text-dark);
+  margin-bottom: 1rem;
+}
+
+/* Testo corpo */
+.backclub-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
+  line-height: 1.8;
+  color: var(--backclub-text);
+  max-width: 65ch;
+}
+
+.backclub-text-large {
+  font-size: clamp(1.125rem, 1.5vw, 1.25rem);
+  line-height: 1.9;
+}
+
+/* Link */
+.backclub-link {
+  color: var(--backclub-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.backclub-link:hover {
+  color: var(--backclub-accent-dark);
+  border-bottom-color: var(--backclub-accent);
+}
+
+/* Pulsanti */
+.backclub-button {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 1rem 2.5rem;
+  background-color: transparent;
+  color: var(--backclub-accent);
+  border: 2px solid var(--backclub-accent);
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.backclub-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--backclub-accent);
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.backclub-button:hover {
+  color: var(--backclub-bg);
+  border-color: var(--backclub-accent);
+}
+
+.backclub-button:hover::before {
+  left: 0;
+}
+
+.backclub-button:active {
+  transform: translateY(1px);
+}
+
+/* Ombre morbide */
+.backclub-shadow {
+  box-shadow: 0 4px 20px var(--backclub-shadow),
+              0 1px 3px var(--backclub-shadow-soft);
+}
+
+.backclub-shadow-strong {
+  box-shadow: 0 8px 30px var(--backclub-shadow),
+              0 2px 6px var(--backclub-shadow-soft);
+}
+
+/* Placeholder illustrazioni */
+.backclub-illustration {
+  width: 100%;
+  height: auto;
+  opacity: 0.9;
+  filter: sepia(5%) saturate(90%);
+  transition: all 0.6s ease;
+}
+
+.backclub-illustration:hover {
+  opacity: 1;
+  filter: sepia(0%) saturate(100%);
+}
+
+/* Sezioni */
+.backclub-section {
+  padding: 6rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .backclub-section {
+    padding: 8rem 3rem;
+  }
+}
+
+/* Hero Section */
+.backclub-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+/* Navbar */
+.backclub-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: rgba(248, 245, 230, 0.85);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(44, 95, 93, 0.1);
+  padding: 1.5rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.backclub-nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.backclub-nav-logo {
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--backclub-text-dark);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  z-index: 1001;
+}
+
+/* Hamburger Menu Toggle */
+.backclub-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.backclub-nav-toggle-icon {
+  width: 30px;
+  height: 2px;
+  background-color: var(--backclub-text-dark);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.backclub-nav-toggle-icon::before,
+.backclub-nav-toggle-icon::after {
+  content: '';
+  position: absolute;
+  width: 30px;
+  height: 2px;
+  background-color: var(--backclub-text-dark);
+  transition: all 0.3s ease;
+}
+
+.backclub-nav-toggle-icon::before {
+  top: -10px;
+}
+
+.backclub-nav-toggle-icon::after {
+  bottom: -10px;
+}
+
+.backclub-nav-toggle-icon.open {
+  background-color: transparent;
+}
+
+.backclub-nav-toggle-icon.open::before {
+  top: 0;
+  transform: rotate(45deg);
+}
+
+.backclub-nav-toggle-icon.open::after {
+  bottom: 0;
+  transform: rotate(-45deg);
+}
+
+.backclub-nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.backclub-nav-link {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--backclub-text);
+  text-decoration: none;
+  text-transform: lowercase;
+  letter-spacing: 0.05em;
+  transition: color 0.4s ease;
+  position: relative;
+}
+
+.backclub-nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background-color: var(--backclub-accent);
+  transition: width 0.4s ease;
+}
+
+.backclub-nav-link:hover {
+  color: var(--backclub-accent);
+}
+
+.backclub-nav-link:hover::after {
+  width: 100%;
+}
+
+.backclub-nav-link.active {
+  color: var(--backclub-accent);
+}
+
+.backclub-nav-link.active::after {
+  width: 100%;
+}
+
+.backclub-nav-link-accent {
+  margin-left: 1rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(44, 95, 93, 0.2);
+}
+
+/* Responsive Navbar */
+@media (max-width: 768px) {
+  .backclub-nav {
+    padding: 1rem 1.5rem;
+  }
+
+  .backclub-nav-toggle {
+    display: flex;
+  }
+
+  .backclub-nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: 280px;
+    background-color: rgba(248, 245, 230, 0.98);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 5rem 2rem 2rem;
+    gap: 0;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+    border-left: 1px solid rgba(44, 95, 93, 0.1);
+  }
+
+  .backclub-nav-links.open {
+    transform: translateX(0);
+  }
+
+  .backclub-nav-links li {
+    width: 100%;
+    border-bottom: 1px solid rgba(44, 95, 93, 0.1);
+  }
+
+  .backclub-nav-links li:last-child {
+    border-bottom: none;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(44, 95, 93, 0.1);
+  }
+
+  .backclub-nav-link {
+    display: block;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+  }
+
+  .backclub-nav-link-accent {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: none;
+    font-weight: 600;
+    color: var(--backclub-accent);
+  }
+
+  .backclub-nav-link-accent::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .backclub-nav {
+    padding: 0.75rem 1rem;
+  }
+
+  .backclub-nav-logo {
+    font-size: 1.25rem;
+  }
+
+  .backclub-nav-links {
+    width: 100%;
+    right: 0;
+  }
+}
+
+/* Form */
+.backclub-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.backclub-form-group {
+  margin-bottom: 2rem;
+}
+
+.backclub-form-label {
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--backclub-text-dark);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.backclub-form-input,
+.backclub-form-textarea,
+.backclub-form-select {
+  width: 100%;
+  padding: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--backclub-text-dark);
+  background-color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(44, 95, 93, 0.2);
+  border-radius: 0;
+  transition: all 0.4s ease;
+  outline: none;
+}
+
+.backclub-form-input:focus,
+.backclub-form-textarea:focus,
+.backclub-form-select:focus {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-color: var(--backclub-accent);
+  box-shadow: 0 0 0 3px rgba(44, 95, 93, 0.1);
+}
+
+.backclub-form-textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+/* Footer */
+.backclub-footer {
+  padding: 3rem 2rem;
+  text-align: center;
+  border-top: 1px solid rgba(44, 95, 93, 0.1);
+  margin-top: 6rem;
+}
+
+.backclub-footer-text {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', sans-serif;
+  font-size: 0.875rem;
+  color: var(--backclub-text);
+  opacity: 0.7;
+}
+
+/* Animazioni fade-in */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.backclub-fade-in {
+  animation: fadeInUp 1s ease-out forwards;
+}
+
+/* Utility classes */
+.backclub-container-center {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.backclub-mt-large {
+  margin-top: 4rem;
+}
+
+.backclub-mb-large {
+  margin-bottom: 4rem;
+}
+
+/* Email Link */
+.backclub-email-link {
+  color: var(--backclub-accent);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.backclub-email-link:hover {
+  color: var(--backclub-accent-dark);
+  border-bottom-color: var(--backclub-accent);
+}

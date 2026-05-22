@@ -1,0 +1,471 @@
+/* Impostazioni Page - Kali Linux Terminal Style */
+
+.impostazioni-page {
+    max-width: 1800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+/* Header */
+.impostazioni-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 4px 0;
+}
+
+/* Tabs */
+.settings-tabs {
+    display: flex;
+    gap: var(--spacing-2);
+    overflow-x: auto;
+}
+
+.settings-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.settings-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.settings-tab.active {
+    background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+    color: white;
+    border-color: rgba(10, 132, 255, 0.3);
+    box-shadow: 0 2px 8px rgba(10, 132, 255, 0.3);
+}
+
+/* Content */
+.settings-content {
+    padding: var(--spacing-5);
+    background: linear-gradient(135deg, rgba(30, 30, 35, 0.6) 0%, rgba(20, 20, 25, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    min-height: 600px;
+}
+
+/* Section Card */
+.section-card {
+    padding: var(--spacing-5);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    margin-bottom: var(--spacing-4);
+}
+
+.section-card h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 var(--spacing-4) 0;
+}
+
+/* Access Logs Table */
+.access-logs-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.access-logs-table th {
+    padding: 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.access-logs-table td {
+    padding: 14px 12px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.access-logs-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.user-cell {
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.ip-cell {
+    font-family: 'Courier New', monospace;
+    color: #0A84FF;
+}
+
+.access-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.access-status.success {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.access-status.failed {
+    background: rgba(255, 69, 58, 0.2);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+/* Security Settings Grid */
+.security-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.setting-card {
+    padding: var(--spacing-4);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+}
+
+.setting-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin: 0 0 6px 0;
+}
+
+.setting-card p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 var(--spacing-3) 0;
+}
+
+/* Toggle Switch */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.setting-select {
+    width: 100%;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* API Endpoints */
+.endpoints-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--spacing-3);
+}
+
+.endpoint-card {
+    padding: var(--spacing-4);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    transition: all 0.2s;
+}
+
+.endpoint-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(10, 132, 255, 0.3);
+}
+
+.endpoint-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-2);
+}
+
+.method-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.method-badge.get {
+    background: rgba(52, 199, 89, 0.2);
+    color: #34C759;
+    border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.method-badge.post {
+    background: rgba(10, 132, 255, 0.2);
+    color: #0A84FF;
+    border: 1px solid rgba(10, 132, 255, 0.3);
+}
+
+.status-indicator {
+    font-size: 16px;
+}
+
+.endpoint-path {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #FFFFFF;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.endpoint-meta {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: var(--spacing-3);
+}
+
+.btn-test-endpoint {
+    width: 100%;
+    padding: 8px;
+    background: rgba(10, 132, 255, 0.2);
+    border: 1px solid rgba(10, 132, 255, 0.3);
+    border-radius: 6px;
+    color: #0A84FF;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-test-endpoint:hover {
+    background: rgba(10, 132, 255, 0.3);
+}
+
+/* Terminal Section - Kali Linux Style */
+.terminal-section {
+    background: #0C0C0C;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    border: 1px solid #1a1a1a;
+}
+
+.terminal-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    border-bottom: 1px solid #333;
+}
+
+.terminal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #00FF00;
+    font-weight: 700;
+}
+
+.terminal-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.terminal-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.terminal-dot.red {
+    background: #FF5F56;
+}
+
+.terminal-dot.yellow {
+    background: #FFBD2E;
+}
+
+.terminal-dot.green {
+    background: #27C93F;
+}
+
+.terminal-body {
+    padding: 16px;
+    background: #0C0C0C;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #00FF00;
+    height: 600px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+.terminal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-body::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.terminal-body::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.terminal-body::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+.terminal-line {
+    margin-bottom: 4px;
+    color: #00FF00;
+}
+
+.terminal-line.prompt {
+    color: #00D9FF;
+    font-weight: 700;
+}
+
+.prompt-symbol {
+    color: #00FF00;
+    font-weight: 700;
+}
+
+.terminal-separator {
+    color: #333;
+    margin: 8px 0;
+}
+
+.log-timestamp {
+    color: #888;
+    font-weight: 600;
+}
+
+.terminal-line.log-success {
+    color: #00FF00;
+}
+
+.terminal-line.log-info {
+    color: #00D9FF;
+}
+
+.terminal-line.log-warning {
+    color: #FFD700;
+}
+
+.terminal-line.log-error {
+    color: #FF4444;
+}
+
+.terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: #00FF00;
+    animation: blink 1s infinite;
+    margin-left: 2px;
+}
+
+@keyframes blink {
+
+    0%,
+    49% {
+        opacity: 1;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+
+    .security-settings-grid,
+    .endpoints-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .terminal-body {
+        height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+    .settings-tabs {
+        flex-wrap: wrap;
+    }
+
+    .terminal-body {
+        font-size: 11px;
+        height: 300px;
+    }
+}

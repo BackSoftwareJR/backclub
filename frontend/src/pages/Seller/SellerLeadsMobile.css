@@ -1,0 +1,87 @@
+.seller-leads-mobile {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+/* Smooth transitions */
+.seller-leads-mobile button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Active state feedback */
+.seller-leads-mobile button:active {
+  transform: scale(0.98);
+}
+
+/* Lead Form Inputs - iOS Style */
+.lead-form-input,
+.lead-form-select {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 10px;
+  border: none;
+  color: var(--ios-label);
+  font-size: 17px;
+  font-family: var(--ios-font-family);
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  box-sizing: border-box;
+}
+
+.lead-form-input::placeholder {
+  color: var(--ios-secondary-label);
+  opacity: 1;
+}
+
+.lead-form-input:-webkit-autofill,
+.lead-form-input:-webkit-autofill:hover,
+.lead-form-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--ios-label) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--ios-secondary-system-grouped-background) inset !important;
+  box-shadow: 0 0 0px 1000px var(--ios-secondary-system-grouped-background) inset !important;
+}
+
+.lead-form-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238E8E93' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.lead-form-select option {
+  background-color: var(--ios-secondary-system-grouped-background);
+  color: var(--ios-label);
+  padding: 12px;
+}
+
+/* Contact Card - Data-First Design */
+.contact-card {
+  cursor: pointer;
+  transition: opacity 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.contact-card:active {
+  opacity: 0.6;
+}
+
+.contact-data-row {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.contact-data-row:active {
+  opacity: 0.7;
+}
+
+/* Light mode support for contact data rows */
+[data-theme="light"] .contact-data-row {
+  color: rgba(60, 60, 67, 0.6) !important;
+}
+
+[data-theme="light"] .contact-data-row:hover,
+[data-theme="light"] .contact-data-row:active {
+  color: var(--ios-label) !important;
+}

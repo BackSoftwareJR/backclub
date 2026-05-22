@@ -1,0 +1,234 @@
+.invoice-list-tab {
+  width: 100%;
+}
+
+.invoice-list-tab-actions {
+  margin-bottom: var(--spacing-4);
+}
+
+.fatture-btn-create {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+.fatture-list-box-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: var(--spacing-1) 0 0;
+  font-weight: normal;
+}
+
+.fatture-btn-icon-danger:hover {
+  background: rgba(255, 69, 58, 0.15);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.fatture-table-wrapper {
+  overflow-x: auto;
+}
+
+.fatture-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fatture-table thead {
+  background: var(--color-background-hover);
+}
+
+.fatture-table th {
+  padding: var(--spacing-3);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.fatture-table td {
+  padding: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.fatture-table tbody tr:hover {
+  background: var(--color-background-hover);
+}
+
+.fatture-client-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.fatture-client-details {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+.fatture-amount {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.fatture-invoice-number {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.fatture-actions {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.fatture-btn {
+  padding: var(--spacing-2) var(--spacing-3);
+  border-radius: var(--radius-md);
+  border: none;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fatture-btn-primary {
+  background: var(--color-primary);
+  color: white;
+}
+
+.fatture-btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+.fatture-btn-success {
+  background: var(--color-success);
+  color: white;
+}
+
+.fatture-btn-success:hover {
+  background: var(--color-success-dark);
+}
+
+.fatture-btn-secondary {
+  background: var(--color-background-hover);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+
+.fatture-btn-secondary:hover {
+  background: var(--color-border);
+}
+
+.fatture-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fatture-btn-icon:hover {
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+}
+
+.fatture-status-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.fatture-status-draft {
+  background: rgba(142, 142, 147, 0.15);
+  color: var(--color-text-secondary);
+}
+
+.fatture-status-sent {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-primary);
+}
+
+.fatture-status-paid {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.fatture-status-overdue {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error);
+}
+
+.fatture-status-cancelled {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error);
+}
+
+.fatture-type-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.fatture-type-badge.invoice {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-primary);
+}
+
+.fatture-type-badge.credit-note {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.fatture-filters {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.fatture-search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.fatture-search-input {
+  padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  width: 250px;
+}
+
+.fatture-search-wrapper .search-icon {
+  position: absolute;
+  left: var(--spacing-3);
+  color: var(--color-text-secondary);
+}
+
+.fatture-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+  color: var(--color-text-secondary);
+}
+
+.fatture-empty-state svg {
+  margin-bottom: var(--spacing-2);
+  opacity: 0.5;
+}
+

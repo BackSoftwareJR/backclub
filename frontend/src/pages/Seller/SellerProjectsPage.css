@@ -1,0 +1,19 @@
+/* Seller Projects Page - Stile Venditori */
+@import '../Venditori/VenditoriLayout.css';
+
+.progetti-venditori-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-6);
+}
+
+.projects-table-wrapper {
+  overflow-x: auto;
+}
+
+.project-name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+

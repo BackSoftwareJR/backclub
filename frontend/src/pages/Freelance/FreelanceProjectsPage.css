@@ -1,0 +1,733 @@
+/* ============================================================
+   FREELANCE PROJECTS - Apple Style
+   ============================================================ */
+
+.freelance-projects {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.freelance-projects-header {
+  margin-bottom: var(--spacing-8);
+}
+
+.freelance-projects-title {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--spacing-2) 0;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-projects-title {
+  color: #F5F5F7;
+}
+
+[data-theme="light"] .freelance-projects-title {
+  color: #1D1D1F;
+}
+
+.freelance-projects-subtitle {
+  font-size: var(--font-size-base);
+  margin: 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-projects-subtitle {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-projects-subtitle {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+/* Projects Grid */
+.freelance-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-5);
+}
+
+/* Card button (clickable card) */
+.freelance-project-card-btn {
+  width: 100%;
+  text-align: left;
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  background: var(--color-bg-elevated, #1c1c1e);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+[data-theme="light"] .freelance-project-card-btn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.freelance-project-card-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="light"] .freelance-project-card-btn:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Cover area (image or placeholder) */
+.freelance-project-card-cover {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  flex-shrink: 0;
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.freelance-project-card-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.freelance-project-card-cover-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(10, 132, 255, 0.7);
+}
+
+.freelance-project-card-cover-icon-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+/* Badge PM: verde, ben visibile, solo se l'utente loggato è il Project Manager */
+.freelance-project-card-pm-badge-cover {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #22C55E;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);
+  backdrop-filter: blur(8px);
+}
+
+/* Card body */
+.freelance-project-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.freelance-project-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.freelance-project-card-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+  color: var(--color-text-primary, #f5f5f7);
+  flex: 1;
+  min-width: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+[data-theme="light"] .freelance-project-card-title {
+  color: #1d1d1f;
+}
+
+.freelance-project-card-pm-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(10, 132, 255, 0.2);
+  color: #0a84ff;
+  flex-shrink: 0;
+}
+
+.freelance-project-card-deadline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-tertiary, #8e8e93);
+}
+
+.freelance-project-card-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.freelance-project-card-progress-track {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-card-progress-track {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.freelance-project-card-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #0a84ff;
+  transition: width 0.3s ease;
+}
+
+.freelance-project-card-progress-pct {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-tertiary, #8e8e93);
+  min-width: 32px;
+  text-align: right;
+}
+
+.freelance-project-card-footer {
+  padding-top: 10px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .freelance-project-card-footer {
+  border-top-color: rgba(0, 0, 0, 0.06);
+}
+
+.freelance-project-card-tasks-count {
+  font-size: 12px;
+  color: var(--color-text-quaternary, #8e8e93);
+}
+
+.freelance-project-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-6);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: 1px solid;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+[data-theme="dark"] .freelance-project-card {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-card {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .freelance-project-card:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .freelance-project-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.freelance-project-card-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 132, 255, 0.1);
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-card-icon {
+  color: #0A84FF;
+}
+
+[data-theme="light"] .freelance-project-card-icon {
+  color: #0A84FF;
+}
+
+.freelance-project-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.freelance-project-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.freelance-project-card-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  transition: color var(--transition-base);
+  flex: 1;
+  min-width: 0;
+}
+
+[data-theme="dark"] .freelance-project-card-title {
+  color: #F5F5F7;
+}
+
+[data-theme="light"] .freelance-project-card-title {
+  color: #1D1D1F;
+}
+
+.freelance-project-card-pm-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  background: rgba(10, 132, 255, 0.15);
+  color: #0A84FF;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.freelance-project-card-deadline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-card-deadline {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-card-deadline {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+.freelance-project-card-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.freelance-project-card-progress-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-card-progress-bar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-card-progress-fill {
+  height: 100%;
+  background: var(--color-accent-blue);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.freelance-project-card-progress-text {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  min-width: 40px;
+  text-align: right;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-card-progress-text {
+  color: rgba(245, 245, 247, 0.8);
+}
+
+[data-theme="light"] .freelance-project-card-progress-text {
+  color: rgba(29, 29, 31, 0.8);
+}
+
+.freelance-project-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  margin-top: auto;
+  padding-top: var(--spacing-3);
+  border-top: 1px solid;
+}
+
+[data-theme="dark"] .freelance-project-card-footer {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-card-footer {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-card-status {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.freelance-project-card-tasks {
+  font-size: var(--font-size-xs);
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-card-tasks {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-card-tasks {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+/* Project Detail Sheet */
+.freelance-project-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: freelance-fade-in var(--transition-base);
+}
+
+@media (min-width: 768px) {
+  .freelance-project-sheet-overlay {
+    align-items: center;
+  }
+}
+
+.freelance-project-sheet {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: freelance-slide-up var(--transition-base);
+  overflow: hidden;
+  border: 1px solid;
+}
+
+@media (min-width: 768px) {
+  .freelance-project-sheet {
+    border-radius: var(--radius-2xl);
+    max-height: 80vh;
+  }
+}
+
+[data-theme="dark"] .freelance-project-sheet {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-sheet {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes freelance-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.freelance-project-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--spacing-6);
+  border-bottom: 1px solid;
+}
+
+[data-theme="dark"] .freelance-project-sheet-header {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-sheet-header {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-sheet-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  margin: 0 0 var(--spacing-2) 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-title {
+  color: #F5F5F7;
+}
+
+[data-theme="light"] .freelance-project-sheet-title {
+  color: #1D1D1F;
+}
+
+.freelance-project-sheet-description {
+  font-size: var(--font-size-base);
+  margin: 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-description {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-sheet-description {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+.freelance-project-sheet-close {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .freelance-project-sheet-close {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-sheet-close {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+.freelance-project-sheet-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-sheet-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.freelance-project-sheet-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-6);
+}
+
+.freelance-project-sheet-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.freelance-project-sheet-section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-section-title {
+  color: #F5F5F7;
+}
+
+[data-theme="light"] .freelance-project-sheet-section-title {
+  color: #1D1D1F;
+}
+
+.freelance-project-sheet-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.freelance-project-sheet-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-3) var(--spacing-4);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: all var(--transition-base);
+  border: 1px solid transparent;
+}
+
+[data-theme="dark"] .freelance-project-sheet-link {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--color-accent-blue);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-sheet-link {
+  background: rgba(0, 0, 0, 0.02);
+  color: #0A84FF;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-sheet-link:hover {
+  background: rgba(10, 132, 255, 0.1);
+  border-color: rgba(10, 132, 255, 0.2);
+}
+
+.freelance-project-sheet-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.freelance-project-sheet-task {
+  padding: var(--spacing-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid;
+  transition: all var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-task {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-project-sheet-task {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.freelance-project-sheet-task-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.freelance-project-sheet-task-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  margin: 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-task-title {
+  color: #F5F5F7;
+}
+
+[data-theme="light"] .freelance-project-sheet-task-title {
+  color: #1D1D1F;
+}
+
+.freelance-project-sheet-task-description {
+  font-size: var(--font-size-sm);
+  margin: 0;
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-task-description {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-sheet-task-description {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+.freelance-project-sheet-task-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  margin-top: var(--spacing-2);
+}
+
+.freelance-project-sheet-task-date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  transition: color var(--transition-base);
+}
+
+[data-theme="dark"] .freelance-project-sheet-task-date {
+  color: rgba(245, 245, 247, 0.6);
+}
+
+[data-theme="light"] .freelance-project-sheet-task-date {
+  color: rgba(29, 29, 31, 0.6);
+}
+
+.freelance-project-sheet-task-status {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+/* Responsive - Mobile margini per evitare contenuto attaccato ai bordi */
+@media (max-width: 768px) {
+  .freelance-projects {
+    padding: 20px 20px 28px;
+    padding-bottom: max(28px, env(safe-area-inset-bottom, 20px));
+  }
+
+  .freelance-projects-header {
+    margin-bottom: var(--spacing-6);
+  }
+
+  .freelance-projects-grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-4);
+  }
+
+  .freelance-project-sheet {
+    max-height: 85vh;
+  }
+}

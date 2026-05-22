@@ -1,0 +1,693 @@
+/* Minimalist Configuration Step Styles */
+
+.configuration-list-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.config-card-minimal {
+  background: #FFFFFF;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.config-card-minimal:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.config-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.config-service-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.config-service-price {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0066cc;
+}
+
+.config-card-separator {
+  height: 1px;
+  background: rgba(229, 231, 235, 1);
+  margin: 1.5rem 0;
+}
+
+/* Payment Method Section */
+.payment-method-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-method-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+/* Radio Button List (iOS Style) */
+.payment-options-radio-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background-color: var(--ios-secondary-system-grouped-background, #F2F2F7);
+  border-radius: 12px;
+  padding: 8px;
+}
+
+[data-theme="dark"] .payment-options-radio-list {
+  background-color: var(--ios-secondary-system-grouped-background, #1C1C1E);
+}
+
+.payment-option-radio-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--ios-system-grouped-background, #FFFFFF);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-theme="dark"] .payment-option-radio-item {
+  background-color: var(--ios-secondary-system-grouped-background, #2C2C2E);
+}
+
+.payment-option-radio-item:active {
+  opacity: 0.6;
+}
+
+.payment-option-radio-item.selected {
+  background-color: var(--ios-secondary-system-grouped-background, #F2F2F7);
+  border: 1px solid var(--ios-system-blue, #0A84FF);
+}
+
+[data-theme="dark"] .payment-option-radio-item.selected {
+  background-color: rgba(10, 132, 255, 0.1);
+  border-color: var(--ios-system-blue, #0A84FF);
+}
+
+.payment-option-radio-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.payment-option-radio-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.payment-option-radio-label {
+  font-family: var(--ios-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ios-label, #000000);
+  line-height: 22px;
+}
+
+[data-theme="dark"] .payment-option-radio-label {
+  color: var(--ios-label, #FFFFFF);
+}
+
+.payment-option-radio-description {
+  font-family: var(--ios-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--ios-secondary-label, #8E8E93);
+  line-height: 20px;
+}
+
+.payment-option-radio-button {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--ios-opaque-separator, #C7C7CC);
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .payment-option-radio-button {
+  border-color: var(--ios-opaque-separator, #38383A);
+}
+
+.payment-option-radio-button.checked {
+  border-color: var(--ios-system-blue, #0A84FF);
+  background-color: var(--ios-system-blue, #0A84FF);
+}
+
+.payment-option-radio-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #FFFFFF;
+}
+
+/* Payment Breakdown for 30/40/30 */
+.payment-breakdown {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(243, 244, 246, 1);
+}
+
+.payment-breakdown-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f9fafb;
+  border: 1px solid rgba(243, 244, 246, 1);
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.payment-breakdown-item:hover {
+  background: #f3f4f6;
+  border-color: rgba(229, 231, 235, 1);
+}
+
+.payment-breakdown-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.payment-breakdown-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+}
+
+/* Installments Stepper Section */
+.installments-stepper-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(229, 231, 235, 1);
+}
+
+.stepper-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stepper-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.stepper-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  width: fit-content;
+}
+
+.stepper-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.375rem;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stepper-button:hover:not(:disabled) {
+  background: #f5f5f7;
+}
+
+.stepper-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stepper-input {
+  width: 4rem;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+.stepper-input:focus {
+  outline: none;
+}
+
+.stepper-input::-webkit-inner-spin-button,
+.stepper-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.stepper-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.installment-amount-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(229, 231, 235, 1);
+}
+
+.installment-amount-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.installment-amount-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0066cc;
+  letter-spacing: -0.01em;
+}
+
+.installment-warning {
+  display: block;
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
+/* Renewal Section Minimal */
+.renewal-section-minimal {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(229, 231, 235, 1);
+}
+
+.renewal-label-minimal {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.75rem;
+}
+
+.renewal-label-minimal svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.renewal-display-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.renewal-info-minimal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(229, 231, 235, 1);
+}
+
+.renewal-info-minimal span:first-child {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+.renewal-price-minimal {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #0066cc;
+}
+
+.renewal-select-minimal {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: #ffffff;
+  color: #1d1d1f;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+}
+
+.renewal-select-minimal:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.renewal-multi-list-minimal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.renewal-multi-checkbox-minimal {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border: 1px solid rgba(229, 231, 235, 1);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.renewal-multi-checkbox-minimal:hover {
+  background: #ffffff;
+  border-color: #0066cc;
+}
+
+.renewal-multi-checkbox-minimal.selected {
+  background: rgba(0, 102, 204, 0.05);
+  border-color: #0066cc;
+}
+
+.renewal-multi-checkbox-minimal input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  cursor: pointer;
+  accent-color: #0066cc;
+}
+
+.renewal-multi-checkbox-minimal span:first-of-type {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+/* Multi-Rinnovo Info Box */
+.renewal-info-box {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  background-color: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  border-radius: 12px;
+  border-left: 4px solid var(--ios-system-blue, #0A84FF);
+}
+
+[data-theme="dark"] .renewal-info-box {
+  background-color: rgba(10, 132, 255, 0.15);
+  border-color: rgba(10, 132, 255, 0.3);
+}
+
+.renewal-info-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.renewal-info-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.renewal-info-title {
+  font-family: var(--ios-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ios-label, #000000);
+  line-height: 20px;
+}
+
+[data-theme="dark"] .renewal-info-title {
+  color: var(--ios-label, #FFFFFF);
+}
+
+.renewal-info-text {
+  font-family: var(--ios-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ios-label, #000000);
+  line-height: 20px;
+}
+
+[data-theme="dark"] .renewal-info-text {
+  color: var(--ios-secondary-label, #EBEBF5);
+}
+
+.renewal-info-note {
+  font-family: var(--ios-font-family, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ios-secondary-label, #8E8E93);
+  line-height: 18px;
+  margin-top: 4px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(10, 132, 255, 0.2);
+}
+
+[data-theme="dark"] .renewal-info-note {
+  color: var(--ios-secondary-label, #8E8E93);
+  border-top-color: rgba(10, 132, 255, 0.3);
+}
+
+.renewal-info-note strong {
+  font-weight: 600;
+  color: var(--ios-label, #000000);
+}
+
+[data-theme="dark"] .renewal-info-note strong {
+  color: var(--ios-label, #FFFFFF);
+}
+
+/* Dark Mode Support */
+[data-theme="dark"] .config-card-minimal {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .config-service-name {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .config-service-price {
+  color: #5ac8fa;
+}
+
+[data-theme="dark"] .config-card-separator {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .payment-method-label {
+  color: #9ca3af;
+}
+
+
+[data-theme="dark"] .payment-breakdown {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .payment-breakdown-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .payment-breakdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .payment-breakdown-label {
+  color: #9ca3af;
+}
+
+[data-theme="dark"] .payment-breakdown-amount {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .installments-stepper-section {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .stepper-control {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .stepper-button {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .stepper-button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .stepper-input {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .installment-amount-display {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .installment-amount-value {
+  color: #5ac8fa;
+}
+
+[data-theme="dark"] .renewal-info-minimal {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .renewal-info-minimal span:first-child {
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .renewal-price-minimal {
+  color: #5ac8fa;
+}
+
+[data-theme="dark"] .renewal-select-minimal {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f5f5f7;
+}
+
+[data-theme="dark"] .renewal-multi-checkbox-minimal {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .renewal-multi-checkbox-minimal:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .renewal-multi-checkbox-minimal.selected {
+  background: rgba(90, 200, 250, 0.1);
+  border-color: #5ac8fa;
+}
+
+[data-theme="dark"] .renewal-multi-checkbox-minimal span:first-of-type {
+  color: #f5f5f7;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .config-card-minimal {
+    padding: 1.25rem;
+  }
+  
+  .payment-options-radio-list {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .payment-option-radio-item {
+    padding: 18px 16px;
+  }
+
+  .payment-option-radio-label {
+    font-size: 16px;
+  }
+
+  .payment-option-radio-description {
+    font-size: 14px;
+  }
+
+  .payment-option-radio-button {
+    width: 26px;
+    height: 26px;
+  }
+
+  .payment-option-radio-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .renewal-info-box {
+    padding: 14px;
+    margin-top: 16px;
+    margin-bottom: 20px;
+  }
+
+  .renewal-info-title {
+    font-size: 16px;
+  }
+
+  .renewal-info-text {
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  .renewal-info-note {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  
+  .installment-amount-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+

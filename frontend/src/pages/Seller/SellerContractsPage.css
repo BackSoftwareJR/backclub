@@ -1,0 +1,711 @@
+/* Seller Contracts Page - Finder-Style List Design */
+
+.seller-contracts-page {
+  min-height: 100vh;
+  background: #000000;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Loading */
+.seller-contracts-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Header */
+.seller-contracts-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.seller-contracts-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+/* Unified Toolbar */
+.seller-contracts-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.seller-contracts-search {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.seller-contracts-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #a0a0a0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.seller-contracts-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #f5f5f7;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.seller-contracts-search-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-contracts-search-input::placeholder {
+  color: #a0a0a0;
+}
+
+.seller-contracts-filter-pill {
+  flex-shrink: 0;
+}
+
+.seller-contracts-filter-select {
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  color: #f5f5f7;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23a0a0a0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+.seller-contracts-filter-select:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-contracts-filter-select:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-contracts-filter-select option {
+  background: #1C1C1E;
+  color: #f5f5f7;
+}
+
+/* View Toggle - iOS Segmented Control */
+.seller-contracts-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+}
+
+.seller-contracts-view-btn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: #a0a0a0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-contracts-view-btn:hover {
+  color: #f5f5f7;
+}
+
+.seller-contracts-view-btn.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* List Container - Finder Style (No Heavy Block) */
+.seller-contracts-list {
+  background: transparent;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Row Design - Smart Row */
+.seller-contracts-row {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1.2fr 1.2fr 1.5fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+  min-height: 80px;
+}
+
+.seller-contracts-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.seller-contracts-row:last-child {
+  border-bottom: none;
+}
+
+/* Column 1: Identity (Primary) */
+.seller-contracts-col-identity {
+  min-width: 0;
+}
+
+.seller-contracts-row-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-contracts-row-number {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+  font-family: 'Monaco', 'Menlo', monospace;
+}
+
+/* Column 2: Client */
+.seller-contracts-col-client {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.seller-contracts-client-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.seller-contracts-client-name {
+  font-size: 0.875rem;
+  color: #f5f5f7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Column 3: Value */
+.seller-contracts-col-value {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #ffffff;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Column 4: Status */
+.seller-contracts-col-status {
+  display: flex;
+  align-items: center;
+}
+
+.seller-contracts-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Status Badge Colors - Dark Mode */
+.seller-contracts-status-badge-draft {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+.seller-contracts-status-badge-requested {
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.seller-contracts-status-badge-pending-signature {
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.seller-contracts-status-badge-active {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.seller-contracts-status-badge-suspended {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.seller-contracts-status-badge-completed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.seller-contracts-status-badge-terminated {
+  background: rgba(107, 114, 128, 0.1);
+  color: #9ca3af;
+  border-color: rgba(107, 114, 128, 0.2);
+}
+
+.seller-contracts-status-badge-default {
+  background: rgba(156, 163, 175, 0.1);
+  color: #9ca3af;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+/* Column 5: Dates */
+.seller-contracts-col-dates {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.seller-contracts-date-range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+/* Column 6: Actions - Horizontal Layout */
+.seller-contracts-col-actions {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.seller-contracts-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.seller-contracts-action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 0.375rem;
+  color: #a0a0a0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.seller-contracts-action-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Empty State */
+.seller-contracts-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.seller-contracts-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.seller-contracts-empty-state p {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  margin: 0;
+}
+
+/* Card Grid View */
+.seller-contracts-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.seller-contracts-card {
+  background: rgba(28, 28, 30, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.seller-contracts-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-contracts-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.seller-contracts-card-number {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 0.875rem;
+  color: #818cf8;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.seller-contracts-card-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.seller-contracts-card-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.seller-contracts-card-body {
+  margin-bottom: 1rem;
+}
+
+.seller-contracts-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.seller-contracts-card-info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.seller-contracts-card-info-label {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+}
+
+.seller-contracts-card-info-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.seller-contracts-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.seller-contracts-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  color: #f5f5f7;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-contracts-card-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Light Mode Support */
+[data-theme="light"] .seller-contracts-page {
+  background: #F5F5F7;
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-title {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-search-input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-search-input:focus {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .seller-contracts-search-input::placeholder {
+  color: #86868B;
+}
+
+[data-theme="light"] .seller-contracts-search-icon {
+  color: #86868B;
+}
+
+[data-theme="light"] .seller-contracts-filter-select {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-filter-select:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .seller-contracts-filter-select option {
+  background: #ffffff;
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-view-toggle {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .seller-contracts-view-btn {
+  color: #86868B;
+}
+
+[data-theme="light"] .seller-contracts-view-btn:hover {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-view-btn.active {
+  background: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-list {
+  background: transparent;
+}
+
+[data-theme="light"] .seller-contracts-row {
+  border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .seller-contracts-row:hover {
+  background: #ffffff;
+}
+
+[data-theme="light"] .seller-contracts-row-title,
+[data-theme="light"] .seller-contracts-client-name {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-row-number,
+[data-theme="light"] .seller-contracts-col-dates {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-contracts-col-value {
+  color: #111827;
+  font-weight: 600;
+}
+
+[data-theme="light"] .seller-contracts-action-btn {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-contracts-action-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-empty-state h3 {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-empty-state p {
+  color: #6b7280;
+}
+
+/* Status Badges - Light Mode */
+[data-theme="light"] .seller-contracts-status-badge-draft {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-requested {
+  background: #dbeafe;
+  color: #1e40af;
+  border-color: #93c5fd;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-pending-signature {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-active {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-completed {
+  background: #d1fae5;
+  color: #065f46;
+  border-color: #6ee7b7;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-terminated {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+[data-theme="light"] .seller-contracts-status-badge-default {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+
+/* Card View - Light Mode */
+[data-theme="light"] .seller-contracts-card {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-contracts-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-contracts-card-header {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-contracts-card-number {
+  color: #6366f1;
+}
+
+[data-theme="light"] .seller-contracts-card-title {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-card-info-label {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-contracts-card-info-value {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-card-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-contracts-card-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .seller-contracts-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .seller-contracts-col-identity,
+  .seller-contracts-col-client,
+  .seller-contracts-col-value,
+  .seller-contracts-col-status,
+  .seller-contracts-col-dates {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.5rem;
+  }
+
+  [data-theme="light"] .seller-contracts-col-identity,
+  [data-theme="light"] .seller-contracts-col-client,
+  [data-theme="light"] .seller-contracts-col-value,
+  [data-theme="light"] .seller-contracts-col-status,
+  [data-theme="light"] .seller-contracts-col-dates {
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+  }
+
+  .seller-contracts-col-actions {
+    justify-content: flex-start;
+    padding-top: 0.5rem;
+  }
+}

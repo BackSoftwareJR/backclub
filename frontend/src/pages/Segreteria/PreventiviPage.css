@@ -1,0 +1,23 @@
+/* Preventivi Page Styles */
+
+.segreteria-preventivi-page {
+  min-height: 100%;
+}
+
+.quotes-table-wrapper {
+  overflow-x: auto;
+  margin-top: var(--spacing-4);
+}
+
+.quote-number {
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: var(--font-size-sm);
+  color: var(--color-accent-blue);
+  font-weight: var(--font-weight-semibold);
+}
+
+.total-cell {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+

@@ -1,0 +1,282 @@
+/* SellerSupportNewTicketPage - Apri Segnalazione */
+
+.seller-support-new-ticket-page {
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease;
+}
+
+/* Page background - light / dark (come altre pagine seller) */
+.seller-support-new-ticket-page.theme-light,
+[data-theme="light"] .seller-support-new-ticket-page {
+  background: #F9FAFB;
+}
+
+.seller-support-new-ticket-page.theme-dark,
+[data-theme="dark"] .seller-support-new-ticket-page {
+  background: #000000;
+}
+
+.support-new-ticket-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-header,
+[data-theme="light"] .support-new-ticket-header {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-header,
+[data-theme="dark"] .support-new-ticket-header {
+  background: #1C1C1E;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.support-new-ticket-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-back,
+[data-theme="light"] .support-new-ticket-back {
+  color: #007AFF;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-back:hover,
+[data-theme="light"] .support-new-ticket-back:hover {
+  background: rgba(0, 122, 255, 0.1);
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-back,
+[data-theme="dark"] .support-new-ticket-back {
+  color: #0A84FF;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-back:hover,
+[data-theme="dark"] .support-new-ticket-back:hover {
+  background: rgba(10, 132, 255, 0.2);
+}
+
+.support-new-ticket-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  transition: color 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-title,
+[data-theme="light"] .support-new-ticket-title {
+  color: #1D1D1F;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-title,
+[data-theme="dark"] .support-new-ticket-title {
+  color: #FFFFFF;
+}
+
+.support-new-ticket-main {
+  padding: 24px 16px;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.support-new-ticket-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.support-new-ticket-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.support-new-ticket-label {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-label,
+[data-theme="light"] .support-new-ticket-label {
+  color: #1D1D1F;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-label,
+[data-theme="dark"] .support-new-ticket-label {
+  color: #FFFFFF;
+}
+
+.support-new-ticket-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.support-new-ticket-radio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-radio,
+[data-theme="light"] .support-new-ticket-radio {
+  background: #F3F4F6;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-radio:has(input:checked),
+[data-theme="light"] .support-new-ticket-radio:has(input:checked) {
+  border-color: #007AFF;
+  background: rgba(0, 122, 255, 0.08);
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-radio,
+[data-theme="dark"] .support-new-ticket-radio {
+  background: #2C2C2E;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-radio:has(input:checked),
+[data-theme="dark"] .support-new-ticket-radio:has(input:checked) {
+  border-color: #0A84FF;
+  background: rgba(10, 132, 255, 0.15);
+}
+
+.support-new-ticket-radio input {
+  width: 20px;
+  height: 20px;
+  accent-color: #007AFF;
+}
+
+[data-theme="dark"] .support-new-ticket-radio input {
+  accent-color: #0A84FF;
+}
+
+.support-new-ticket-radio-label {
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-radio-label,
+[data-theme="light"] .support-new-ticket-radio-label {
+  color: #1D1D1F;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-radio-label,
+[data-theme="dark"] .support-new-ticket-radio-label {
+  color: #FFFFFF;
+}
+
+.support-new-ticket-textarea {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 12px;
+  border: 1px solid;
+  outline: none;
+  resize: vertical;
+  min-height: 140px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-textarea,
+[data-theme="light"] .support-new-ticket-textarea {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #1D1D1F;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-textarea::placeholder,
+[data-theme="light"] .support-new-ticket-textarea::placeholder {
+  color: #86868B;
+}
+
+.seller-support-new-ticket-page.theme-light .support-new-ticket-textarea:focus,
+[data-theme="light"] .support-new-ticket-textarea:focus {
+  border-color: #007AFF;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-textarea,
+[data-theme="dark"] .support-new-ticket-textarea {
+  background: #2C2C2E;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-textarea::placeholder,
+[data-theme="dark"] .support-new-ticket-textarea::placeholder {
+  color: #98989D;
+}
+
+.seller-support-new-ticket-page.theme-dark .support-new-ticket-textarea:focus,
+[data-theme="dark"] .support-new-ticket-textarea:focus {
+  border-color: #0A84FF;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+}
+
+.support-new-ticket-error {
+  padding: 12px 16px;
+  font-size: 0.9375rem;
+  border-radius: 10px;
+  background: rgba(255, 59, 48, 0.15);
+  color: #FF3B30;
+}
+
+.support-new-ticket-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #007AFF;
+  color: #FFFFFF;
+  font-family: inherit;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.support-new-ticket-submit:hover:not(:disabled) {
+  background: #0051D5;
+}
+
+.support-new-ticket-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] .support-new-ticket-submit {
+  background: #0A84FF;
+}
+
+[data-theme="dark"] .support-new-ticket-submit:hover:not(:disabled) {
+  background: #0970E0;
+}

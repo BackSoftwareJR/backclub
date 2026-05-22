@@ -1,0 +1,509 @@
+/* Modal Apple-Style - Enhanced */
+
+/* Base Modal Overlay */
+.modal-overlay-apple {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal Container */
+.modal-apple {
+    background: rgba(30, 30, 35, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    max-width: 560px;
+    width: 92%;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 1px rgba(255, 255, 255, 0.1) inset;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Modal Header */
+.modal-apple-header {
+    padding: 24px 24px 20px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background: linear-gradient(180deg, rgba(40, 40, 45, 0.5) 0%, transparent 100%);
+}
+
+.modal-apple-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.modal-apple-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 6px 0 0 0;
+    font-weight: 400;
+}
+
+/* Modal Body */
+.modal-apple-body {
+    padding: 28px 24px;
+    max-height: calc(85vh - 200px);
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar */
+.modal-apple-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-apple-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-apple-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+
+.modal-apple-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Form Groups */
+.form-group-apple {
+    margin-bottom: 24px;
+}
+
+.form-group-apple:last-child {
+    margin-bottom: 0;
+}
+
+.form-label-apple {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+}
+
+.form-label-apple.required::after {
+    content: ' *';
+    color: #FF453A;
+}
+
+/* Text Input */
+.form-input-apple {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+}
+
+.form-input-apple::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.form-input-apple:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-input-apple:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #0A84FF;
+    box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
+}
+
+/* Textarea */
+.form-textarea-apple {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 400;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+    max-height: 200px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-textarea-apple::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.form-textarea-apple:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-textarea-apple:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #0A84FF;
+    box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
+}
+
+/* Color Picker Group */
+.color-picker-group-apple {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.color-picker-preview {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.color-picker-preview:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.color-picker-preview:active {
+    transform: scale(0.98);
+}
+
+.color-picker-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.color-picker-details {
+    flex: 1;
+}
+
+.color-picker-hex {
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.color-picker-hint {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+}
+
+/* Toggle Switch iOS-Style */
+.toggle-container-apple {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    transition: background 0.2s;
+}
+
+.toggle-container-apple:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.toggle-label-apple {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.toggle-switch-apple {
+    position: relative;
+    width: 51px;
+    height: 31px;
+    flex-shrink: 0;
+}
+
+.toggle-switch-apple input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.toggle-slider-apple {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(120, 120, 128, 0.32);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 31px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-slider-apple:before {
+    position: absolute;
+    content: "";
+    height: 27px;
+    width: 27px;
+    left: 2px;
+    bottom: 2px;
+    background: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16);
+}
+
+.toggle-switch-apple input:checked+.toggle-slider-apple {
+    background: #34C759;
+    box-shadow: inset 0 0 0 2px rgba(52, 199, 89, 0.5);
+}
+
+.toggle-switch-apple input:checked+.toggle-slider-apple:before {
+    transform: translateX(20px);
+}
+
+/* Number Input with Stepper */
+.number-input-container-apple {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.number-input-apple {
+    flex: 1;
+    max-width: 120px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 17px;
+    font-weight: 600;
+    text-align: center;
+    outline: none;
+    font-variant-numeric: tabular-nums;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.number-input-apple:focus {
+    border-color: #0A84FF;
+    box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.15);
+}
+
+.number-suffix {
+    font-size: 17px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Info Box */
+.info-box-apple {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: rgba(10, 132, 255, 0.08);
+    border: 1px solid rgba(10, 132, 255, 0.2);
+    border-radius: 12px;
+    margin-top: 20px;
+}
+
+.info-box-icon {
+    color: #0A84FF;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.info-box-text {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Modal Footer */
+.modal-apple-footer {
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    background: linear-gradient(0deg, rgba(20, 20, 25, 0.5) 0%, transparent 100%);
+}
+
+/* Buttons */
+.btn-apple {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.btn-apple:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-apple-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.btn-apple-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+}
+
+.btn-apple-secondary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-apple-primary {
+    background: linear-gradient(180deg, #0A84FF 0%, #0066CC 100%);
+    color: white;
+    box-shadow:
+        0 4px 12px rgba(10, 132, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-apple-primary:hover:not(:disabled) {
+    background: linear-gradient(180deg, #0096FF 0%, #0077DD 100%);
+    box-shadow:
+        0 6px 16px rgba(10, 132, 255, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.btn-apple-primary:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow:
+        0 2px 8px rgba(10, 132, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.btn-apple-danger {
+    background: rgba(255, 69, 58, 0.15);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.3);
+}
+
+.btn-apple-danger:hover:not(:disabled) {
+    background: rgba(255, 69, 58, 0.25);
+    border-color: rgba(255, 69, 58, 0.5);
+}
+
+/* Loading Spinner */
+.spinner-apple {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Divider */
+.divider-apple {
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    margin: 24px 0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .modal-apple {
+        width: 96%;
+        border-radius: 16px;
+    }
+
+    .modal-apple-header {
+        padding: 20px 18px 16px 18px;
+    }
+
+    .modal-apple-title {
+        font-size: 20px;
+    }
+
+    .modal-apple-body {
+        padding: 24px 18px;
+    }
+
+    .modal-apple-footer {
+        padding: 16px 18px;
+        flex-direction: column-reverse;
+    }
+
+    .btn-apple {
+        width: 100%;
+        justify-content: center;
+    }
+}

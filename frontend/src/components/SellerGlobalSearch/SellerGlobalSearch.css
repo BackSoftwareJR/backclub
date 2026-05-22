@@ -1,0 +1,248 @@
+/* Seller Global Search - dropdown and list */
+
+.seller-global-search {
+  position: relative;
+  flex: 1;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.seller-global-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: text;
+  transition: all 0.2s ease;
+}
+
+.seller-global-search-bar:focus-within {
+  outline: none;
+}
+
+.header-main.theme-dark .seller-global-search-bar,
+[data-theme="dark"] .seller-global-search-bar {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-main.theme-dark .seller-global-search-bar:hover,
+[data-theme="dark"] .seller-global-search-bar:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.header-main.theme-dark .seller-global-search-bar:focus-within,
+[data-theme="dark"] .seller-global-search-bar:focus-within {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.header-main.theme-light .seller-global-search-bar,
+[data-theme="light"] .seller-global-search-bar {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.header-main.theme-light .seller-global-search-bar:hover,
+[data-theme="light"] .seller-global-search-bar:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.header-main.theme-light .seller-global-search-bar:focus-within,
+[data-theme="light"] .seller-global-search-bar:focus-within {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 122, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.seller-global-search-icon {
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.header-main.theme-dark .seller-global-search-icon,
+[data-theme="dark"] .seller-global-search-icon {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.header-main.theme-light .seller-global-search-icon,
+[data-theme="light"] .seller-global-search-icon {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.seller-global-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  outline: none;
+}
+
+.header-main.theme-dark .seller-global-search-input,
+[data-theme="dark"] .seller-global-search-input {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.header-main.theme-dark .seller-global-search-input::placeholder,
+[data-theme="dark"] .seller-global-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.header-main.theme-light .seller-global-search-input,
+[data-theme="light"] .seller-global-search-input {
+  color: rgba(0, 0, 0, 0.9);
+}
+
+.header-main.theme-light .seller-global-search-input::placeholder,
+[data-theme="light"] .seller-global-search-input::placeholder {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+/* Dropdown */
+.seller-global-search-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.header-main.theme-dark .seller-global-search-dropdown,
+[data-theme="dark"] .seller-global-search-dropdown {
+  background: rgba(28, 28, 30, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(24px);
+}
+
+.header-main.theme-light .seller-global-search-dropdown,
+[data-theme="light"] .seller-global-search-dropdown {
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.seller-global-search-loading,
+.seller-global-search-empty {
+  padding: 16px 20px;
+  font-size: 14px;
+}
+
+.header-main.theme-dark .seller-global-search-loading,
+.header-main.theme-dark .seller-global-search-empty,
+[data-theme="dark"] .seller-global-search-loading,
+[data-theme="dark"] .seller-global-search-empty {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.header-main.theme-light .seller-global-search-loading,
+.header-main.theme-light .seller-global-search-empty,
+[data-theme="light"] .seller-global-search-loading,
+[data-theme="light"] .seller-global-search-empty {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.seller-global-search-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0;
+}
+
+.seller-global-search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.seller-global-search-item:hover,
+.seller-global-search-item.highlighted {
+  outline: none;
+}
+
+.header-main.theme-dark .seller-global-search-item:hover,
+.header-main.theme-dark .seller-global-search-item.highlighted,
+[data-theme="dark"] .seller-global-search-item:hover,
+[data-theme="dark"] .seller-global-search-item.highlighted {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.header-main.theme-light .seller-global-search-item:hover,
+.header-main.theme-light .seller-global-search-item.highlighted,
+[data-theme="light"] .seller-global-search-item:hover,
+[data-theme="light"] .seller-global-search-item.highlighted {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.seller-global-search-item-icon {
+  flex-shrink: 0;
+}
+
+.header-main.theme-dark .seller-global-search-item-icon,
+[data-theme="dark"] .seller-global-search-item-icon {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.header-main.theme-light .seller-global-search-item-icon,
+[data-theme="light"] .seller-global-search-item-icon {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.seller-global-search-item-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.seller-global-search-item-label {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seller-global-search-item-subtitle {
+  font-size: 12px;
+  opacity: 0.7;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seller-global-search-item-meta {
+  font-size: 12px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.seller-global-search-item-chevron {
+  flex-shrink: 0;
+  opacity: 0.4;
+}
+
+.seller-global-search-item-page .seller-global-search-item-label {
+  font-weight: 600;
+}
+
+.seller-global-search-item-page .seller-global-search-item-meta {
+  margin-left: auto;
+}

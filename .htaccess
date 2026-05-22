@@ -1,0 +1,116 @@
+# =========================================================
+# Main .htaccess for backclub.it
+# Gestisce routing tra Backend API e Frontend SPA
+# =========================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # =========================================================
+    # 1. BACKEND API - Pass through to Laravel
+    # =========================================================
+    # Tutte le richieste a /backend vanno al backend Laravel
+    RewriteCond %{REQUEST_URI} ^/backend
+    RewriteRule ^(.*)$ - [L]
+    
+    # =========================================================
+    # 2. FRONTEND STATIC FILES - Serve from /frontend/dist/
+    # =========================================================
+    # Rewrite /assets/* to /frontend/dist/assets/*
+    RewriteRule ^assets/(.*)$ /frontend/dist/assets/$1 [L]
+    
+    # Rewrite /vite.svg to /frontend/dist/vite.svg
+    RewriteRule ^vite\.svg$ /frontend/dist/vite.svg [L]
+    
+    # Se il file esiste fisicamente, servilo direttamente
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)$ - [L]
+    
+    # Se la directory esiste fisicamente, servila direttamente
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^(.*)$ - [L]
+    
+    # =========================================================
+    # 3. FRONTEND SPA - Redirect everything else to React app
+    # =========================================================
+    # Tutte le altre richieste vanno al frontend React
+    RewriteCond %{REQUEST_URI} !^/backend
+    RewriteCond %{REQUEST_URI} !^/frontend/dist/
+    RewriteRule ^(.*)$ /frontend/dist/index.html [L,QSA]
+</IfModule>
+
+# =========================================================
+# Error Documents (Optional)
+# =========================================================
+# ErrorDocument 404 /frontend/dist/index.html
+# ErrorDocument 403 /frontend/dist/index.html
+
+# =========================================================
+# Cache Control
+# =========================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # HTML (no cache)
+    ExpiresByType text/html "access plus 0 seconds"
+    
+    # CSS and JavaScript (1 year)
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType application/x-javascript "access plus 1 year"
+    
+    # Images (1 month)
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/svg+xml "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # Fonts (1 year)
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+</IfModule>
+
+# =========================================================
+# Security Headers
+# =========================================================
+<IfModule mod_headers.c>
+    # Disable caching for HTML
+    <FilesMatch "\.(html)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+    
+    # Cache CSS and JS with versioning
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "max-age=31536000, public, immutable"
+    </FilesMatch>
+    
+    # Security headers
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# =========================================================
+# CORS (if needed for API)
+# =========================================================
+# <IfModule mod_headers.c>
+#     Header always set Access-Control-Allow-Origin "*"
+#     Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+#     Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+# </IfModule>
+
+# =========================================================
+# Compression
+# =========================================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+

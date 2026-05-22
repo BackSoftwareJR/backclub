@@ -1,0 +1,43 @@
+/* Safe Area Support for iOS devices with notch/home indicator */
+
+/* Add padding to body to account for safe areas */
+body {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Utility classes for safe area padding */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right, 0px);
+}
+
+/* Safe area for fixed elements */
+.safe-area-inset-top {
+  top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-inset-bottom {
+  bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-inset-left {
+  left: env(safe-area-inset-left, 0px);
+}
+
+.safe-area-inset-right {
+  right: env(safe-area-inset-right, 0px);
+}

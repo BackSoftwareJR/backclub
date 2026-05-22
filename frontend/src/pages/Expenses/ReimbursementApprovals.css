@@ -1,0 +1,368 @@
+/* Reimbursement Approvals */
+.reimbursement-approvals {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.approvals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+
+.approvals-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.approvals-header p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+}
+
+.header-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.stat-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 20px;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+}
+
+.badge-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+}
+
+.badge-label {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Approvals List */
+.approvals-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.approval-card {
+    background: var(--color-bg-secondary);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid transparent;
+    transition: all 0.3s;
+}
+
+.approval-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.approval-card.urgency-overdue {
+    border-left-color: #FF453A;
+    background: linear-gradient(to right, rgba(255, 69, 58, 0.03), transparent);
+}
+
+.approval-card.urgency-urgent {
+    border-left-color: #FF9F0A;
+}
+
+.approval-card.urgency-normal {
+    border-left-color: #0A84FF;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.user-info h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 4px 0;
+}
+
+.user-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.card-amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-accent-blue);
+}
+
+.card-body {
+    margin-bottom: 16px;
+}
+
+.description {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    padding: 6px 12px;
+    background: var(--color-bg-tertiary);
+    border-radius: 8px;
+}
+
+.meta-item.category {
+    background: rgba(10, 132, 255, 0.1);
+    color: var(--color-accent-blue);
+    font-weight: 600;
+}
+
+.meta-item.crm {
+    background: rgba(52, 199, 89, 0.1);
+    color: #34C759;
+    font-weight: 600;
+}
+
+.meta-item.pending-time {
+    background: rgba(255, 159, 10, 0.1);
+    color: #FF9F0A;
+    font-weight: 600;
+}
+
+.receipt-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--color-bg-tertiary);
+    border-radius: 8px;
+    color: var(--color-accent-blue);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.receipt-link:hover {
+    background: rgba(10, 132, 255, 0.1);
+}
+
+.card-actions {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+}
+
+.btn-approve,
+.btn-reject {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-approve {
+    background: #34C759;
+    color: #fff;
+}
+
+.btn-approve:hover:not(:disabled) {
+    background: #30D158;
+    transform: translateY(-1px);
+}
+
+.btn-reject {
+    background: #FF453A;
+    color: #fff;
+}
+
+.btn-reject:hover:not(:disabled) {
+    background: #FF2D55;
+    transform: translateY(-1px);
+}
+
+.btn-approve:disabled,
+.btn-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.empty-state h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-top: 16px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background: var(--color-bg-secondary);
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 500px;
+    width: 90%;
+    border: 1px solid var(--color-border);
+}
+
+.modal-content h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.modal-content p {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-bottom: 16px;
+}
+
+.modal-content textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    resize: vertical;
+    margin-bottom: 24px;
+}
+
+.modal-content textarea:focus {
+    outline: none;
+    border-color: var(--color-accent-blue);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-secondary {
+    flex: 1;
+    padding: 12px 20px;
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background: var(--color-bg-primary);
+}
+
+@media (max-width: 768px) {
+    .reimbursement-approvals {
+        padding: 16px;
+    }
+
+    .approvals-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .header-stats {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+}
+

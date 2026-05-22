@@ -1,0 +1,8 @@
+.seller-contracts-mobile {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.seller-contracts-mobile button {
+  -webkit-tap-highlight-color: transparent;
+}

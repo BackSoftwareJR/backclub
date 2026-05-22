@@ -1,0 +1,312 @@
+/* Quotes Mobile - iOS Style (Apple Mail/Wallet) */
+
+.quotes-mobile-ios {
+  background-color: var(--ios-system-grouped-background);
+  min-height: 100vh;
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* Header */
+.quotes-header {
+  padding: 16px 16px 8px;
+  padding-top: max(16px, env(safe-area-inset-top, 0px));
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: var(--ios-system-grouped-background);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.quotes-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.quotes-add-button {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quotes-add-button:active {
+  opacity: 0.6;
+}
+
+.quotes-subtitle {
+  font-family: var(--ios-font-family);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+  margin: 0;
+}
+
+/* Search Bar - iOS Style */
+.quotes-search-container {
+  padding: 0 16px 16px;
+}
+
+.quotes-search-bar {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 10px;
+  height: 36px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.quotes-search-icon {
+  color: var(--ios-secondary-label);
+  flex-shrink: 0;
+}
+
+.quotes-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--ios-label);
+  padding: 0;
+}
+
+.quotes-search-input::placeholder {
+  color: var(--ios-secondary-label);
+}
+
+.quotes-filter-badge {
+  background-color: var(--ios-system-blue);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 12px;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--ios-font-family);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s ease;
+  flex-shrink: 0;
+}
+
+.quotes-filter-badge:active {
+  opacity: 0.6;
+}
+
+/* Quotes List Container */
+.quotes-list-container {
+  padding: 0 16px 16px;
+}
+
+/* Quote Card - Compact iOS Style */
+.quote-card {
+  background-color: var(--ios-secondary-system-grouped-background);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 16px;
+  position: relative;
+  transition: opacity 0.1s ease;
+}
+
+.quote-card-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Left Side - Info */
+.quote-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quote-client-name {
+  font-family: var(--ios-font-family);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--ios-label);
+  margin: 0;
+}
+
+.quote-title {
+  font-family: var(--ios-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: var(--ios-secondary-label);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quote-meta {
+  font-family: var(--ios-font-family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  color: var(--ios-secondary-label);
+  margin: 0;
+}
+
+/* Right Side - Value & Status */
+.quote-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.quote-amount {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 22px;
+  color: var(--ios-label);
+  margin: 0;
+  text-align: right;
+}
+
+.quote-status-pill {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-family: var(--ios-font-family);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+/* Action Buttons Row */
+.quote-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 0.5px solid var(--ios-separator);
+}
+
+.quote-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: var(--ios-font-family);
+  -webkit-tap-highlight-color: transparent;
+  min-height: 40px;
+}
+
+.quote-action-btn-primary {
+  background-color: var(--ios-system-blue);
+  color: #FFFFFF;
+}
+
+.quote-action-btn-primary:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+.quote-action-btn-secondary {
+  background-color: var(--ios-tertiary-system-grouped-background);
+  color: var(--ios-label);
+}
+
+.quote-action-btn-secondary:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+}
+
+.quote-action-btn-danger {
+  background-color: rgba(255, 69, 58, 0.15);
+  color: #FF453A;
+}
+
+.quote-action-btn-danger:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+  background-color: rgba(255, 69, 58, 0.25);
+}
+
+.quote-action-btn-commission {
+  background-color: rgba(94, 92, 230, 0.15);
+  color: #5E5CE6;
+}
+
+.quote-action-btn-commission:active {
+  opacity: 0.7;
+  transform: scale(0.98);
+  background-color: rgba(94, 92, 230, 0.25);
+}
+
+/* Empty State */
+.quotes-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.quotes-empty-icon {
+  color: var(--ios-secondary-label);
+  margin-bottom: 16px;
+}
+
+.quotes-empty-title {
+  font-family: var(--ios-font-family);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 28px;
+  color: var(--ios-label);
+  margin: 0 0 8px 0;
+}
+
+.quotes-empty-subtitle {
+  font-family: var(--ios-font-family);
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 22px;
+  color: var(--ios-secondary-label);
+  margin: 0;
+}
+
+/* Actions Sheet Animation */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

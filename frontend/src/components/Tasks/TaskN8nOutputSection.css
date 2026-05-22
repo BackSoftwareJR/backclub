@@ -1,0 +1,81 @@
+.task-n8n-output {
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(10, 132, 255, 0.08);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+}
+
+.task-n8n-output--error {
+  background: rgba(255, 59, 48, 0.08);
+  border-color: rgba(255, 59, 48, 0.25);
+}
+
+.task-n8n-output-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: #0a84ff;
+}
+
+.task-n8n-output-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.task-n8n-output-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.task-n8n-output-badge--completed {
+  color: #34c759;
+}
+
+.task-n8n-output-badge--failed {
+  color: #ff3b30;
+}
+
+.task-n8n-output-badge--processing {
+  color: #ff9f0a;
+}
+
+.task-n8n-output-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: rgba(255, 59, 48, 0.12);
+  color: #ff6b6b;
+  font-size: 13px;
+}
+
+.task-n8n-output-body {
+  margin: 0;
+  padding: 14px;
+  max-height: 320px;
+  overflow: auto;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.task-n8n-output-meta {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+}

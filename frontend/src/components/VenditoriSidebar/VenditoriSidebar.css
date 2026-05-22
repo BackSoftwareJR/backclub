@@ -1,0 +1,190 @@
+/* Venditori Sidebar Standalone - Per uso in MainLayout */
+
+.venditori-sidebar-standalone {
+  width: 280px;
+  background: var(--color-bg-secondary);
+  border-left: 1px solid var(--color-border-primary);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: 0;
+  top: 85px;
+  bottom: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  transition: width var(--transition-base);
+  overflow: hidden;
+}
+
+.venditori-sidebar-standalone.collapsed {
+  width: 80px;
+}
+
+.venditori-sidebar-header {
+  padding: var(--spacing-6) var(--spacing-5);
+  border-bottom: 1px solid var(--color-border-primary);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  position: relative;
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-sidebar-header {
+  align-items: center;
+  padding: var(--spacing-6) var(--spacing-2);
+}
+
+.venditori-sidebar-header h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: var(--spacing-8) 0 0 0;
+  white-space: nowrap;
+}
+
+.venditori-sidebar-header p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-sidebar-header h2 {
+  margin: 0;
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-sidebar-header h2,
+.venditori-sidebar-standalone.collapsed .venditori-sidebar-header p {
+  display: none;
+}
+
+.venditori-collapse-button {
+  position: absolute;
+  top: var(--spacing-4);
+  left: var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--glass-bg-light);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-collapse-button {
+  position: static;
+  margin: 0 auto;
+}
+
+.venditori-collapse-button:hover {
+  background: var(--glass-bg-medium);
+  border-color: var(--color-border-hover);
+  color: var(--color-text-primary);
+}
+
+.venditori-sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-3) 0;
+}
+
+.venditori-sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.venditori-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.venditori-sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--color-border-primary);
+  border-radius: 3px;
+}
+
+.venditori-sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+.venditori-nav-item {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-3) var(--spacing-5);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  transition: all var(--transition-base);
+  border-left: 3px solid transparent;
+  margin: 0 var(--spacing-2);
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-nav-item {
+  justify-content: center;
+  padding: var(--spacing-3);
+  margin: 0 var(--spacing-1);
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-nav-item span {
+  display: none;
+}
+
+.venditori-nav-item:hover {
+  background: var(--glass-bg-light);
+  color: var(--color-text-primary);
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-nav-item:hover {
+  transform: scale(1.1);
+}
+
+.venditori-nav-item.active {
+  background: var(--glass-bg-medium);
+  color: var(--color-accent-blue);
+  border-left-color: var(--color-accent-blue);
+}
+
+.venditori-sidebar-standalone.collapsed .venditori-nav-item.active {
+  border-left: none;
+  border-radius: var(--radius-md);
+}
+
+.venditori-nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-3);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.venditori-nav-item.active .venditori-nav-icon {
+  opacity: 1;
+}
+
+@media (max-width: 1024px) {
+  .venditori-sidebar-standalone {
+    width: 240px;
+  }
+  
+  .venditori-sidebar-standalone.collapsed {
+    width: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .venditori-sidebar-standalone {
+    transform: translateX(100%);
+    transition: transform var(--transition-base);
+  }
+  
+  .venditori-sidebar-standalone.open {
+    transform: translateX(0);
+  }
+}
+

@@ -1,0 +1,849 @@
+/* ============================================================
+   FREELANCE DASHBOARD - Refined UI/UX with Typography Hierarchy
+   Scannable, digestible, and inviting interface
+   ============================================================ */
+
+.freelance-dashboard-cockpit {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+}
+
+/* LIGHT MODE - Airy & Crisp */
+[data-theme="light"] .freelance-dashboard-cockpit {
+  background: #F5F5F7;
+}
+
+/* DARK MODE - Deep & Layered */
+[data-theme="dark"] .freelance-dashboard-cockpit {
+  background: #000000;
+}
+
+/* Loading State */
+.freelance-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.freelance-spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #0A84FF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+[data-theme="light"] .freelance-spinner {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-top-color: #0A84FF;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header - Light Touch */
+.freelance-dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 1.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.freelance-dashboard-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.freelance-dashboard-greeting {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+}
+
+[data-theme="dark"] .freelance-dashboard-greeting {
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .freelance-dashboard-greeting {
+  color: #1D1D1F;
+}
+
+.freelance-dashboard-date {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+[data-theme="dark"] .freelance-dashboard-date {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-dashboard-date {
+  color: #86868B;
+}
+
+.freelance-dashboard-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* KPI Stats - Clean Text with Icons */
+.freelance-kpi-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+[data-theme="dark"] .freelance-kpi-stat {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .freelance-kpi-stat {
+  color: #86868B;
+}
+
+.freelance-kpi-stat:hover {
+  opacity: 0.8;
+}
+
+.freelance-kpi-stat svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.freelance-kpi-separator {
+  font-size: 0.875rem;
+  font-weight: 300;
+}
+
+[data-theme="dark"] .freelance-kpi-separator {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .freelance-kpi-separator {
+  color: #D2D2D7;
+}
+
+/* Main Workspace - 12 Column Grid */
+.freelance-workspace {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* LEFT PANEL - Task List (9 cols) */
+.freelance-workspace-left {
+  grid-column: span 9;
+}
+
+.freelance-task-section {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .freelance-task-section {
+  background: #1C1C1E;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Tabs */
+.freelance-task-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid;
+}
+
+[data-theme="dark"] .freelance-task-tabs {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .freelance-task-tabs {
+  border-bottom-color: #E5E5EA;
+}
+
+.freelance-task-tab {
+  background: transparent;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+[data-theme="dark"] .freelance-task-tab {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .freelance-task-tab {
+  color: #86868B;
+}
+
+.freelance-task-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .freelance-task-tab:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.freelance-task-tab.active {
+  font-weight: 600;
+}
+
+[data-theme="dark"] .freelance-task-tab.active {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .freelance-task-tab.active {
+  color: #1D1D1F;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.freelance-task-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  margin-left: 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  background: #0A84FF;
+  color: white;
+  line-height: 1;
+}
+
+.freelance-task-tab-badge-orange {
+  background: #FF9500;
+  color: white;
+}
+
+.freelance-task-tab-badge-red {
+  background: #FF453A;
+  color: white;
+}
+
+/* Messaggio task scadute (vista Oggi) */
+.freelance-scaduti-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 69, 58, 0.3);
+  border-radius: 8px;
+  background: rgba(255, 69, 58, 0.1);
+  color: #FF453A;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.freelance-scaduti-banner:hover {
+  background: rgba(255, 69, 58, 0.18);
+  border-color: rgba(255, 69, 58, 0.5);
+}
+
+[data-theme="light"] .freelance-scaduti-banner {
+  background: rgba(255, 69, 58, 0.08);
+  color: #D70015;
+}
+
+[data-theme="light"] .freelance-scaduti-banner:hover {
+  background: rgba(255, 69, 58, 0.14);
+}
+
+.freelance-scaduti-banner svg {
+  flex-shrink: 0;
+}
+
+/* Task List - Scannable Rows */
+.freelance-task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.freelance-task-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  min-height: 4rem;
+}
+
+[data-theme="dark"] .freelance-task-row {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .freelance-task-row {
+  border-bottom-color: #E5E5EA;
+}
+
+.freelance-task-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="light"] .freelance-task-row:hover {
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.freelance-task-row:last-child {
+  border-bottom: none;
+}
+
+/* Scaduti: riga urgente in rosso */
+.freelance-task-row-overdue {
+  background: rgba(255, 69, 58, 0.08);
+  border-left: 3px solid #FF453A;
+}
+
+[data-theme="light"] .freelance-task-row-overdue {
+  background: rgba(255, 69, 58, 0.06);
+}
+
+.freelance-task-row-overdue:hover {
+  background: rgba(255, 69, 58, 0.12);
+}
+
+[data-theme="light"] .freelance-task-row-overdue:hover {
+  background: rgba(255, 69, 58, 0.1);
+}
+
+.freelance-task-row-overdue .freelance-task-title {
+  font-weight: 600;
+  color: #FF453A;
+}
+
+[data-theme="light"] .freelance-task-row-overdue .freelance-task-title {
+  color: #D70015;
+}
+
+/* Task Checkbox */
+.freelance-task-checkbox {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.freelance-task-checkbox-unchecked {
+  color: rgba(255, 255, 255, 0.3);
+  stroke-width: 2;
+}
+
+[data-theme="light"] .freelance-task-checkbox-unchecked {
+  color: #C7C7CC;
+}
+
+.freelance-task-checkbox:hover .freelance-task-checkbox-unchecked {
+  color: #0A84FF;
+}
+
+.freelance-task-checkbox-checked {
+  color: #0A84FF;
+}
+
+/* Task Content - Typography Hierarchy */
+.freelance-task-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Hero: Task Title */
+.freelance-task-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+[data-theme="dark"] .freelance-task-title {
+  color: #FFFFFF;
+}
+
+[data-theme="light"] .freelance-task-title {
+  color: #1D1D1F;
+}
+
+/* Context: Project & Subtitle */
+.freelance-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+[data-theme="dark"] .freelance-task-meta {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-task-meta {
+  color: #86868B;
+}
+
+.freelance-task-project {
+  font-weight: 500;
+}
+
+.freelance-task-meta-separator {
+  opacity: 0.5;
+}
+
+.freelance-task-subtitle {
+  font-weight: 400;
+}
+
+/* Date Badge */
+.freelance-task-date-badge {
+  flex-shrink: 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid;
+}
+
+[data-theme="dark"] .freelance-task-date-badge {
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="light"] .freelance-task-date-badge {
+  color: #86868B;
+  background: rgba(0, 0, 0, 0.03);
+  border-color: #E5E5EA;
+}
+
+.freelance-task-date-badge.overdue {
+  color: #FF453A;
+  background: rgba(255, 69, 58, 0.1);
+  border-color: rgba(255, 69, 58, 0.2);
+  font-weight: 600;
+}
+
+[data-theme="light"] .freelance-task-date-badge.overdue {
+  background: rgba(255, 69, 58, 0.08);
+}
+
+/* Calendar Item Row */
+.freelance-calendar-item-row {
+  cursor: pointer;
+}
+
+.freelance-calendar-item-icon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  background: rgba(10, 132, 255, 0.1);
+  color: #0A84FF;
+}
+
+[data-theme="light"] .freelance-calendar-item-icon {
+  background: rgba(10, 132, 255, 0.08);
+}
+
+/* Empty State */
+.freelance-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.freelance-empty-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.freelance-empty-state-icon svg {
+  color: inherit;
+}
+
+[data-theme="dark"] .freelance-empty-state-icon svg {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-empty-state-icon svg {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+.freelance-empty-state-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+[data-theme="dark"] .freelance-empty-state-title {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+[data-theme="light"] .freelance-empty-state-title {
+  color: #86868B;
+}
+
+.freelance-empty-state-message {
+  font-size: 0.875rem;
+  margin: 0;
+  font-style: italic;
+}
+
+[data-theme="dark"] .freelance-empty-state-message {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-empty-state-message {
+  color: #86868B;
+}
+
+/* RIGHT PANEL - Widget Stack (3 cols) */
+.freelance-workspace-right {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.freelance-widget {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+[data-theme="dark"] .freelance-widget {
+  background: #1C1C1E;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .freelance-widget {
+  border: none;
+}
+
+.freelance-widget-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 1rem 0;
+}
+
+[data-theme="dark"] .freelance-widget-title {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-widget-title {
+  color: #86868B;
+}
+
+/* Mini Calendar - Integrated Look */
+.freelance-mini-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.freelance-mini-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.freelance-mini-calendar-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+[data-theme="dark"] .freelance-mini-calendar-title {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="light"] .freelance-mini-calendar-title {
+  color: #1D1D1F;
+}
+
+.freelance-mini-calendar-nav {
+  width: 24px;
+  height: 24px;
+  border-radius: 0.375rem;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .freelance-mini-calendar-nav {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .freelance-mini-calendar-nav {
+  color: #86868B;
+}
+
+.freelance-mini-calendar-nav:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .freelance-mini-calendar-nav:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.freelance-mini-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.freelance-mini-calendar-day-name {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.25rem;
+}
+
+[data-theme="dark"] .freelance-mini-calendar-day-name {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme="light"] .freelance-mini-calendar-day-name {
+  color: #86868B;
+}
+
+.freelance-mini-calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.freelance-mini-calendar-day.empty {
+  visibility: hidden;
+}
+
+.freelance-mini-calendar-day-number {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .freelance-mini-calendar-day-number {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .freelance-mini-calendar-day-number {
+  color: #86868B;
+}
+
+.freelance-mini-calendar-day.today {
+  background: #0A84FF;
+}
+
+.freelance-mini-calendar-day.today .freelance-mini-calendar-day-number {
+  color: white;
+  font-weight: 600;
+}
+
+.freelance-mini-calendar-day.has-task .freelance-mini-calendar-day-dot {
+  position: absolute;
+  bottom: 2px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #0A84FF;
+}
+
+.freelance-mini-calendar-day.today.has-task .freelance-mini-calendar-day-dot {
+  background: white;
+}
+
+/* Activity List - Peripheral Vision Info */
+.freelance-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.freelance-activity-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid;
+}
+
+[data-theme="dark"] .freelance-activity-item {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] .freelance-activity-item {
+  border-bottom-color: #E5E5EA;
+}
+
+.freelance-activity-item:last-child {
+  border-bottom: none;
+}
+
+.freelance-activity-text {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .freelance-activity-text {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .freelance-activity-text {
+  color: #86868B;
+}
+
+.freelance-activity-text strong {
+  font-weight: 600;
+}
+
+[data-theme="dark"] .freelance-activity-text strong {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="light"] .freelance-activity-text strong {
+  color: #1D1D1F;
+}
+
+.freelance-activity-time {
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme="dark"] .freelance-activity-time {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="light"] .freelance-activity-time {
+  color: #86868B;
+}
+
+.freelance-activity-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  text-align: center;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+[data-theme="dark"] .freelance-activity-empty {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="light"] .freelance-activity-empty {
+  color: #86868B;
+}
+
+.freelance-activity-empty svg {
+  opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .freelance-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .freelance-workspace-left {
+    grid-column: span 12;
+  }
+
+  .freelance-workspace-right {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 768px) {
+  .freelance-dashboard-cockpit {
+    padding: 1rem 0.75rem;
+  }
+
+  .freelance-dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem 0 1rem 0;
+  }
+
+  .freelance-dashboard-header-right {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .freelance-dashboard-greeting {
+    font-size: 1.5rem;
+  }
+
+  .freelance-task-section,
+  .freelance-widget {
+    padding: 1rem;
+  }
+}

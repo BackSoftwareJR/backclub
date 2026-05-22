@@ -1,0 +1,226 @@
+/* Email Page Styles */
+
+.segreteria-email-page {
+  min-height: 100%;
+}
+
+.segreteria-email-container {
+  display: grid;
+  grid-template-columns: 200px 1fr 1fr;
+  gap: var(--spacing-4);
+  height: calc(100vh - 200px);
+  min-height: 600px;
+}
+
+.segreteria-email-sidebar {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.segreteria-folder-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: inherit;
+  text-align: left;
+}
+
+.segreteria-folder-btn:hover {
+  background: var(--glass-bg-light);
+  color: var(--color-text-primary);
+}
+
+.segreteria-folder-btn.active {
+  background: var(--glass-bg-medium);
+  color: var(--color-accent-blue);
+}
+
+.segreteria-folder-count {
+  margin-left: auto;
+  font-size: var(--font-size-xs);
+  background: var(--color-bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.segreteria-email-list {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.segreteria-email-search {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-primary);
+  position: relative;
+}
+
+.segreteria-email-search .search-icon {
+  position: absolute;
+  left: var(--spacing-6);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.segreteria-email-search .venditori-search-input {
+  padding-left: 40px;
+}
+
+.segreteria-emails {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.segreteria-email-item {
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.segreteria-email-item:hover {
+  background: var(--glass-bg-light);
+}
+
+.segreteria-email-item.unread {
+  background: rgba(10, 132, 255, 0.05);
+  font-weight: var(--font-weight-semibold);
+}
+
+.segreteria-email-item.selected {
+  background: var(--glass-bg-medium);
+  border-left: 3px solid var(--color-accent-blue);
+}
+
+.segreteria-email-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-2);
+}
+
+.segreteria-email-from {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.segreteria-email-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.segreteria-email-subject {
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.segreteria-email-linked {
+  margin-top: var(--spacing-2);
+}
+
+.segreteria-linked-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-info);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
+.segreteria-email-detail {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.segreteria-email-detail-header {
+  padding: var(--spacing-6);
+  border-bottom: 1px solid var(--color-border-primary);
+}
+
+.segreteria-email-detail-subject {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-3) 0;
+}
+
+.segreteria-email-detail-from {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.segreteria-email-detail-body {
+  flex: 1;
+  padding: var(--spacing-6);
+  overflow-y: auto;
+  color: var(--color-text-primary);
+  line-height: var(--line-height-relaxed);
+}
+
+.segreteria-email-link-section {
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-4);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.segreteria-email-empty-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-text-tertiary);
+  gap: var(--spacing-3);
+}
+
+@media (max-width: 1024px) {
+  .segreteria-email-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .segreteria-email-sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+

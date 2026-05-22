@@ -1,0 +1,432 @@
+/* Seller Clients Page - Apple Contacts Style Design */
+
+.seller-clients-page {
+  min-height: 100vh;
+  background: #000000;
+  color: #f5f5f7;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  padding: 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Loading */
+.seller-clients-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Header */
+.seller-clients-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.seller-clients-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.seller-clients-new-btn {
+  padding: 0.625rem 1.25rem;
+  background: #007AFF;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-clients-new-btn:hover {
+  background: #0051D5;
+}
+
+/* Unified Toolbar */
+.seller-clients-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.seller-clients-search {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.seller-clients-search-icon {
+  position: absolute;
+  left: 1rem;
+  color: #a0a0a0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.seller-clients-search-input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 9999px;
+  color: #f5f5f7;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.seller-clients-search-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.seller-clients-search-input::placeholder {
+  color: #a0a0a0;
+}
+
+/* List Container - Finder Style (No Heavy Block) */
+.seller-clients-list {
+  background: transparent;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+/* Row Design - Contact Card Feel */
+.seller-clients-row {
+  display: grid;
+  grid-template-columns: 2.5fr 1.8fr 1.5fr 1.2fr auto;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 0.15s ease;
+  cursor: pointer;
+}
+
+.seller-clients-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.seller-clients-row:last-child {
+  border-bottom: none;
+}
+
+/* Column 1: Identity (The Hero) */
+.seller-clients-col-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.seller-clients-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.seller-clients-identity-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.seller-clients-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-clients-subtitle {
+  font-size: 0.8125rem;
+  color: #a0a0a0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Column 2: Contact Info */
+.seller-clients-col-contact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.seller-clients-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  color: #a0a0a0;
+}
+
+.seller-clients-contact-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.seller-clients-contact-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seller-clients-no-contact {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+/* Column 3: Activity Stats */
+.seller-clients-col-stats {
+  min-width: 0;
+}
+
+.seller-clients-stats-text {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a0a0a0;
+  line-height: 1.4;
+}
+
+/* Column 4: Last Activity */
+.seller-clients-col-activity {
+  min-width: 0;
+}
+
+.seller-clients-activity-date {
+  font-size: 0.8125rem;
+  color: #a0a0a0;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.seller-clients-no-activity {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+/* Column 5: Action (Chevron) */
+.seller-clients-col-action {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.seller-clients-chevron {
+  color: rgba(255, 255, 255, 0.3);
+  transition: color 0.15s ease;
+}
+
+.seller-clients-row:hover .seller-clients-chevron {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Empty State */
+.seller-clients-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.seller-clients-empty-icon {
+  color: #a0a0a0;
+  margin-bottom: 1.5rem;
+  opacity: 0.5;
+}
+
+.seller-clients-empty-state h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
+}
+
+.seller-clients-empty-state p {
+  font-size: 0.875rem;
+  color: #a0a0a0;
+  margin: 0 0 2rem 0;
+}
+
+.seller-clients-empty-btn {
+  padding: 0.75rem 1.5rem;
+  background: #007AFF;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seller-clients-empty-btn:hover {
+  background: #0051D5;
+}
+
+/* Light Mode Support */
+[data-theme="light"] .seller-clients-page {
+  background: #F5F5F7;
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-clients-title {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-clients-search-input {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .seller-clients-search-input:focus {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .seller-clients-search-input::placeholder {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-clients-search-icon {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-clients-row {
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .seller-clients-row:hover {
+  background: #ffffff;
+}
+
+[data-theme="light"] .seller-clients-name {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-clients-subtitle,
+[data-theme="light"] .seller-clients-contact-item,
+[data-theme="light"] .seller-clients-stats-text,
+[data-theme="light"] .seller-clients-activity-date {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-clients-no-contact,
+[data-theme="light"] .seller-clients-no-activity {
+  color: #9ca3af;
+}
+
+[data-theme="light"] .seller-clients-chevron {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .seller-clients-row:hover .seller-clients-chevron {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .seller-clients-empty-state h3 {
+  color: #1d1d1f;
+}
+
+[data-theme="light"] .seller-clients-empty-state p {
+  color: #6b7280;
+}
+
+[data-theme="light"] .seller-clients-empty-icon {
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .seller-clients-row {
+    grid-template-columns: 2fr 1.5fr 1.2fr auto;
+  }
+
+  .seller-clients-col-activity {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .seller-clients-page {
+    padding: 1.5rem 1rem;
+  }
+
+  .seller-clients-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .seller-clients-new-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .seller-clients-toolbar {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .seller-clients-search {
+    width: 100%;
+  }
+
+  .seller-clients-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .seller-clients-col-contact,
+  .seller-clients-col-stats,
+  .seller-clients-col-activity {
+    margin-left: 3.25rem; /* Align with avatar */
+  }
+
+  .seller-clients-col-action {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .seller-clients-row {
+    position: relative;
+  }
+}

@@ -1,0 +1,444 @@
+.payment-plans-tab {
+  width: 100%;
+}
+
+.payment-plans-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payment-plans-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.payment-plans-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+/* Box semplici per lista piani */
+.payment-plans-grid-simple {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-4);
+}
+
+.payment-plan-box-simple {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-3);
+}
+
+.payment-plan-box-simple:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.payment-plan-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-2);
+}
+
+.payment-plan-box-info {
+  flex: 1;
+}
+
+.payment-plan-box-client {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-1) 0;
+}
+
+.payment-plan-box-project {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.payment-plan-box-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.payment-plan-box-badge-warning {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.payment-plan-box-badge-success {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.payment-plan-box-badge-info {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-primary);
+}
+
+.payment-plan-box-badge-danger {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error);
+}
+
+.payment-plan-box-actions {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.payment-plan-box-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background-hover);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  justify-content: center;
+}
+
+.payment-plan-box-btn:hover {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.payment-plan-box-btn.primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.payment-plan-box-btn.primary:hover {
+  background: var(--color-primary-hover);
+}
+
+.payment-plan-card {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-4);
+  transition: all 0.2s ease;
+}
+
+.payment-plan-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+}
+
+.payment-plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-4);
+}
+
+.payment-plan-info {
+  flex: 1;
+}
+
+.payment-plan-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-1);
+}
+
+.payment-plan-ref {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-text-secondary);
+}
+
+.payment-plan-meta {
+  display: flex;
+  gap: var(--spacing-2);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.payment-plan-client {
+  font-weight: var(--font-weight-medium);
+}
+
+.payment-plan-status {
+  display: flex;
+  align-items: center;
+}
+
+.payment-plan-badge {
+  display: inline-block;
+  padding: var(--spacing-1) var(--spacing-3);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.payment-plan-badge-warning {
+  background: rgba(255, 159, 10, 0.15);
+  color: var(--color-warning);
+}
+
+.payment-plan-badge-success {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--color-success);
+}
+
+.payment-plan-badge-info {
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-primary);
+}
+
+.payment-plan-badge-danger {
+  background: rgba(255, 69, 58, 0.15);
+  color: var(--color-error);
+}
+
+.payment-plan-body {
+  margin-bottom: var(--spacing-4);
+}
+
+.payment-plan-stats {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.payment-plan-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.stat-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.payment-plan-renewals {
+  margin-bottom: var(--spacing-4);
+  padding-bottom: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.renewals-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.renewal-item {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background: var(--color-background-hover);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-2);
+  font-size: var(--font-size-sm);
+}
+
+.renewal-type {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.renewal-frequency {
+  color: var(--color-text-secondary);
+}
+
+.renewal-amount {
+  margin-left: auto;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.payment-plan-timeline {
+  margin-bottom: var(--spacing-4);
+}
+
+.timeline-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.timeline-item {
+  display: flex;
+  gap: var(--spacing-3);
+  padding: var(--spacing-2);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.timeline-item:hover {
+  background: var(--color-background-hover);
+}
+
+.timeline-marker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-border);
+  margin-top: var(--spacing-1);
+  flex-shrink: 0;
+}
+
+.timeline-item-pending .timeline-marker {
+  background: var(--color-warning);
+}
+
+.timeline-item-invoiced .timeline-marker {
+  background: var(--color-primary);
+}
+
+.timeline-item-paid .timeline-marker {
+  background: var(--color-success);
+}
+
+.timeline-item-overdue .timeline-marker {
+  background: var(--color-error);
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-date {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.timeline-amount {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-top: var(--spacing-1);
+}
+
+.timeline-description {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+}
+
+.payment-plan-actions {
+  display: flex;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.payment-plan-action-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.payment-plan-action-btn:hover {
+  background: var(--color-background-hover);
+  border-color: var(--color-primary);
+}
+
+.payment-plan-action-btn.danger {
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.payment-plan-action-btn.danger:hover {
+  background: rgba(255, 69, 58, 0.1);
+}
+
+.payment-plan-action-btn.primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.payment-plan-action-btn.primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.filter-tab-btn {
+  padding: var(--spacing-2) var(--spacing-3);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-tab-btn:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filter-tab-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.pending-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 var(--spacing-2);
+  background: var(--color-warning);
+  color: white;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+

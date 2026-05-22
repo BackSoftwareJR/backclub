@@ -1,0 +1,75 @@
+.task-execution-mode-selector {
+  margin-bottom: 24px;
+}
+
+.task-execution-mode-label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.task-execution-mode-hint {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.4;
+}
+
+.task-execution-mode-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+@media (max-width: 720px) {
+  .task-execution-mode-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.task-execution-mode-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.task-execution-mode-card:hover:not(:disabled) {
+  border-color: rgba(10, 132, 255, 0.45);
+  background: rgba(10, 132, 255, 0.08);
+}
+
+.task-execution-mode-card.selected {
+  border-color: #0a84ff;
+  background: rgba(10, 132, 255, 0.15);
+  box-shadow: 0 0 0 1px rgba(10, 132, 255, 0.3);
+}
+
+.task-execution-mode-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-execution-mode-card-icon {
+  color: #0a84ff;
+}
+
+.task-execution-mode-card-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.task-execution-mode-card-desc {
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.55);
+}
