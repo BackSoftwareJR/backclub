@@ -1,182 +1,175 @@
 /* ============================================================
-   SELLER DESIGN SYSTEM - Apple Style
+   SELLER DESIGN SYSTEM — Apple iOS 17 / macOS Sonoma
+   Dark mode default · Glassmorphism · Hairline borders
    ============================================================ */
 
-/* Base Page Styles */
-.seller-page {
-  padding: var(--spacing-6);
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.seller-page-header {
-  margin-bottom: var(--spacing-8);
-}
-
-.seller-page-header h1 {
-  font-size: var(--font-size-2xl);
-  font-weight: 600;
-  color: var(--seller-text-primary);
-  margin: 0 0 var(--spacing-2) 0;
-}
-
-.seller-page-header p {
-  color: var(--seller-text-secondary);
-  font-size: var(--font-size-base);
-  margin: 0;
-}
-
-.seller-page-content {
-  background: var(--seller-secondary-bg);
-  border: 1px solid var(--seller-border-light);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-8);
-}
-
-.seller-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-4);
-  padding: var(--spacing-12);
-  text-align: center;
-  color: var(--seller-text-tertiary);
-}
-
-.seller-empty-state h3 {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--seller-text-primary);
-  margin: 0;
-}
-
-.seller-empty-state p {
-  font-size: var(--font-size-sm);
-  color: var(--seller-text-secondary);
-  margin: 0;
-}
-
+/* ── CSS Custom Properties (dark default) ─────────────────── */
 :root {
-  /* Apple Colors */
-  --seller-primary: #007AFF;
-  --seller-primary-dark: #0051D5;
-  --seller-primary-light: #5AC8FA;
-  
-  --seller-success: #34C759;
-  --seller-success-dark: #28A745;
-  
-  --seller-warning: #FF9500;
-  --seller-warning-dark: #FF8800;
-  
-  --seller-error: #FF3B30;
-  --seller-error-dark: #D32F2F;
-  
-  /* Background Colors - Light Mode */
-  --seller-bg-primary: #FFFFFF;
-  --seller-bg-secondary: #F2F2F7;
-  --seller-bg-tertiary: #E5E5EA;
-  --seller-bg-elevated: #FFFFFF;
-  
-  /* Text Colors - Light Mode */
-  --seller-text-primary: #000000;
-  --seller-text-secondary: #3C3C43;
-  --seller-text-tertiary: #8E8E93;
-  --seller-text-inverse: #FFFFFF;
-  
-  /* Border Colors */
-  --seller-border: #C6C6C8;
-  --seller-border-light: #E5E5EA;
-  --seller-border-dark: #8E8E93;
-  
-  /* Spacing System (4px base) */
-  --seller-spacing-1: 4px;
-  --seller-spacing-2: 8px;
-  --seller-spacing-3: 12px;
-  --seller-spacing-4: 16px;
-  --seller-spacing-5: 20px;
-  --seller-spacing-6: 24px;
-  --seller-spacing-8: 32px;
+  /* Backgrounds */
+  --seller-bg:              #09090b;
+  --seller-bg-elevated:     #111113;
+  --seller-bg-overlay:      rgba(255, 255, 255, 0.04);
+
+  /* Hairline borders */
+  --seller-border:          rgba(255, 255, 255, 0.08);
+  --seller-border-strong:   rgba(255, 255, 255, 0.14);
+
+  /* Typography */
+  --seller-text-primary:    #f4f4f5;
+  --seller-text-secondary:  #a1a1aa;
+  --seller-text-tertiary:   #71717a;
+
+  /* Accent — Apple blue */
+  --seller-accent:          #3b82f6;
+  --seller-accent-hover:    #2563eb;
+  --seller-accent-soft:     rgba(59, 130, 246, 0.12);
+
+  /* Semantic */
+  --seller-success:         #22c55e;
+  --seller-success-soft:    rgba(34, 197, 94, 0.12);
+  --seller-warning:         #f59e0b;
+  --seller-warning-soft:    rgba(245, 158, 11, 0.12);
+  --seller-danger:          #ef4444;
+  --seller-danger-soft:     rgba(239, 68, 68, 0.12);
+
+  /* Layout */
+  --seller-sidebar-width:           220px;
+  --seller-sidebar-collapsed-width: 60px;
+
+  /* Radii */
+  --seller-radius-sm: 8px;
+  --seller-radius-md: 12px;
+  --seller-radius-lg: 16px;
+  --seller-radius-xl: 20px;
+
+  /* Spacing */
+  --seller-spacing-1:  4px;
+  --seller-spacing-2:  8px;
+  --seller-spacing-3:  12px;
+  --seller-spacing-4:  16px;
+  --seller-spacing-5:  20px;
+  --seller-spacing-6:  24px;
+  --seller-spacing-8:  32px;
   --seller-spacing-10: 40px;
   --seller-spacing-12: 48px;
   --seller-spacing-16: 64px;
-  
-  /* Typography Scale */
-  --seller-font-xs: 11px;
-  --seller-font-sm: 13px;
+
+  /* Font family */
+  --seller-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+
+  /* Typography scale */
+  --seller-font-xs:   11px;
+  --seller-font-sm:   13px;
+  --seller-font-md:   15px;
   --seller-font-base: 15px;
-  --seller-font-lg: 17px;
-  --seller-font-xl: 20px;
-  --seller-font-2xl: 24px;
-  --seller-font-3xl: 28px;
-  --seller-font-4xl: 34px;
-  
-  /* Font Weights */
-  --seller-weight-regular: 400;
-  --seller-weight-medium: 500;
+  --seller-font-lg:   17px;
+  --seller-font-xl:   20px;
+  --seller-font-2xl:  24px;
+  --seller-font-3xl:  28px;
+  --seller-font-4xl:  34px;
+
+  /* Font weights */
+  --seller-weight-regular:  400;
+  --seller-weight-medium:   500;
   --seller-weight-semibold: 600;
-  --seller-weight-bold: 700;
-  
-  /* Border Radius */
-  --seller-radius-sm: 6px;
-  --seller-radius-md: 8px;
-  --seller-radius-lg: 12px;
-  --seller-radius-xl: 16px;
-  --seller-radius-full: 9999px;
-  
-  /* Shadows */
-  --seller-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --seller-shadow-md: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --seller-shadow-lg: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --seller-shadow-xl: 0 10px 15px rgba(0, 0, 0, 0.1);
-  
+  --seller-weight-bold:     700;
+
+  /* Shadows (minimal, depth only) */
+  --seller-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --seller-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --seller-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+
   /* Transitions */
-  --seller-transition-fast: 150ms ease;
-  --seller-transition-base: 200ms ease;
-  --seller-transition-slow: 300ms ease;
-  
-  /* Z-Index */
-  --seller-z-sidebar: 100;
+  --seller-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --seller-transition-base: 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  --seller-transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index */
+  --seller-z-sidebar:  100;
   --seller-z-dropdown: 200;
-  --seller-z-modal: 300;
-  --seller-z-toast: 400;
+  --seller-z-tooltip:  250;
+  --seller-z-modal:    300;
+  --seller-z-toast:    400;
+
+  /* Legacy aliases (so old pages don't break) */
+  --seller-primary:        var(--seller-accent);
+  --seller-primary-dark:   var(--seller-accent-hover);
+  --seller-bg-primary:     var(--seller-bg);
+  --seller-bg-secondary:   var(--seller-bg-elevated);
+  --seller-bg-tertiary:    rgba(255, 255, 255, 0.06);
+  --seller-border-light:   var(--seller-border);
+  --seller-border-dark:    var(--seller-border-strong);
+  --seller-error:          var(--seller-danger);
+  --seller-radius-full:    9999px;
+  --seller-text-inverse:   #09090b;
+
+  /* Decorative gradients */
+  --seller-gradient-avatar: linear-gradient(135deg, #6366f1, #8b5cf6);
 }
 
-/* Dark Mode Support (future) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --seller-bg-primary: #000000;
-    --seller-bg-secondary: #1C1C1E;
-    --seller-bg-tertiary: #2C2C2E;
-    --seller-bg-elevated: #1C1C1E;
-    
-    --seller-text-primary: #FFFFFF;
-    --seller-text-secondary: #EBEBF5;
-    --seller-text-tertiary: #8E8E93;
-    
-    --seller-border: #38383A;
-    --seller-border-light: #2C2C2E;
-    --seller-border-dark: #8E8E93;
-  }
+/* ── Light mode override ──────────────────────────────────── */
+[data-theme="light"] {
+  --seller-bg:             #fafafa;
+  --seller-bg-elevated:    #ffffff;
+  --seller-bg-overlay:     rgba(0, 0, 0, 0.02);
+  --seller-border:         rgba(0, 0, 0, 0.08);
+  --seller-border-strong:  rgba(0, 0, 0, 0.14);
+  --seller-text-primary:   #09090b;
+  --seller-text-secondary: #52525b;
+  --seller-text-tertiary:  #a1a1aa;
+  --seller-text-inverse:   #ffffff;
+
+  /* Legacy aliases */
+  --seller-bg-primary:   var(--seller-bg);
+  --seller-bg-secondary: var(--seller-bg-elevated);
+  --seller-bg-tertiary:  rgba(0, 0, 0, 0.04);
+  --seller-border-light: var(--seller-border);
+  --seller-border-dark:  var(--seller-border-strong);
+
+  --seller-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --seller-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --seller-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
 }
 
-/* ============================================================
-   BASE COMPONENTS
-   ============================================================ */
+/* ── Global font base ─────────────────────────────────────── */
+.seller-layout,
+.seller-layout * {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-/* Card */
+/* ── Glassmorphism utilities ──────────────────────────────── */
+.seller-glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="light"] .seller-glass {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Card ─────────────────────────────────────────────────── */
 .seller-card {
   background: var(--seller-bg-elevated);
-  border-radius: var(--seller-radius-lg);
-  padding: var(--seller-spacing-4);
-  border: 1px solid var(--seller-border-light);
-  box-shadow: var(--seller-shadow-sm);
-  transition: all var(--seller-transition-base);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  transition: border-color var(--seller-transition-base),
+              box-shadow var(--seller-transition-base);
 }
 
 .seller-card:hover {
-  box-shadow: var(--seller-shadow-md);
-  transform: translateY(-1px);
+  border-color: var(--seller-border-strong);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06),
+              0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .seller-card:hover {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06),
+              0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 .seller-card-header {
@@ -199,18 +192,153 @@
   line-height: 1.5;
 }
 
-/* Button */
+/* ── Page layout ──────────────────────────────────────────── */
+.seller-page {
+  padding: var(--seller-spacing-8) var(--seller-spacing-6);
+  max-width: 1600px;
+  margin: 0 auto;
+  background: var(--seller-bg);
+  min-height: 100%;
+}
+
+.seller-page-header {
+  margin-bottom: var(--seller-spacing-8);
+}
+
+.seller-page-header h1 {
+  font-size: var(--seller-font-2xl);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0 0 var(--seller-spacing-2) 0;
+  letter-spacing: -0.02em;
+}
+
+.seller-page-header p {
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-base);
+  margin: 0;
+}
+
+.seller-page-content {
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-8);
+}
+
+/* ── Badge states ─────────────────────────────────────────── */
+.seller-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.seller-badge::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.seller-badge-active {
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
+}
+.seller-badge-active::before { background: var(--seller-success); }
+
+.seller-badge-pending {
+  background: var(--seller-warning-soft);
+  color: var(--seller-warning);
+}
+.seller-badge-pending::before { background: var(--seller-warning); }
+
+.seller-badge-cancelled {
+  background: var(--seller-danger-soft);
+  color: var(--seller-danger);
+}
+.seller-badge-cancelled::before { background: var(--seller-danger); }
+
+.seller-badge-draft {
+  background: rgba(113, 113, 122, 0.12);
+  color: var(--seller-text-tertiary);
+}
+.seller-badge-draft::before { background: var(--seller-text-tertiary); }
+
+.seller-badge-primary {
+  background: var(--seller-accent-soft);
+  color: var(--seller-accent);
+}
+.seller-badge-primary::before { background: var(--seller-accent); }
+
+.seller-badge-secondary {
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-secondary);
+}
+.seller-badge-secondary::before { background: var(--seller-text-tertiary); }
+
+/* ── Minimal table ────────────────────────────────────────── */
+.seller-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-primary);
+}
+
+.seller-table thead th {
+  padding: var(--seller-spacing-3) var(--seller-spacing-4);
+  text-align: left;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--seller-border);
+}
+
+.seller-table tbody tr {
+  border-bottom: 1px solid var(--seller-border);
+  transition: background var(--seller-transition-fast);
+}
+
+.seller-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.seller-table tbody tr:hover {
+  background: var(--seller-bg-overlay);
+}
+
+.seller-table tbody td {
+  padding: var(--seller-spacing-3) var(--seller-spacing-4);
+  color: var(--seller-text-secondary);
+  vertical-align: middle;
+}
+
+.seller-table tbody td:first-child {
+  color: var(--seller-text-primary);
+  font-weight: var(--seller-weight-medium);
+}
+
+/* ── Button ───────────────────────────────────────────────── */
 .seller-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--seller-spacing-2);
-  padding: var(--seller-spacing-3) var(--seller-spacing-6);
+  padding: 7px var(--seller-spacing-4);
   border: none;
-  border-radius: var(--seller-radius-md);
-  font-size: var(--seller-font-base);
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-sm);
   font-weight: var(--seller-weight-medium);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: inherit;
   cursor: pointer;
   transition: all var(--seller-transition-base);
   white-space: nowrap;
@@ -219,57 +347,53 @@
 }
 
 .seller-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .seller-btn-primary {
-  background: var(--seller-primary);
-  color: var(--seller-text-inverse);
+  background: var(--seller-accent);
+  color: #ffffff;
 }
 
 .seller-btn-primary:hover:not(:disabled) {
-  background: var(--seller-primary-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--seller-shadow-md);
-}
-
-.seller-btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: var(--seller-shadow-sm);
+  background: var(--seller-accent-hover);
+  box-shadow: 0 0 0 3px var(--seller-accent-soft);
 }
 
 .seller-btn-secondary {
-  background: var(--seller-bg-secondary);
+  background: var(--seller-bg-overlay);
   color: var(--seller-text-primary);
   border: 1px solid var(--seller-border);
 }
 
 .seller-btn-secondary:hover:not(:disabled) {
-  background: var(--seller-bg-tertiary);
-  border-color: var(--seller-border-dark);
+  border-color: var(--seller-border-strong);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .seller-btn-ghost {
   background: transparent;
-  color: var(--seller-text-primary);
+  color: var(--seller-text-secondary);
 }
 
 .seller-btn-ghost:hover:not(:disabled) {
-  background: var(--seller-bg-secondary);
+  color: var(--seller-text-primary);
+  background: var(--seller-bg-overlay);
 }
 
-/* Input */
+/* ── Input ────────────────────────────────────────────────── */
 .seller-input {
   width: 100%;
-  padding: var(--seller-spacing-3) var(--seller-spacing-4);
+  padding: 7px var(--seller-spacing-3);
   border: 1px solid var(--seller-border);
-  border-radius: var(--seller-radius-md);
-  font-size: var(--seller-font-base);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: var(--seller-bg-primary);
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-sm);
+  font-family: inherit;
+  background: var(--seller-bg-elevated);
   color: var(--seller-text-primary);
-  transition: all var(--seller-transition-base);
+  transition: border-color var(--seller-transition-base),
+              box-shadow var(--seller-transition-base);
 }
 
 .seller-input::placeholder {
@@ -278,165 +402,112 @@
 
 .seller-input:focus {
   outline: none;
-  border-color: var(--seller-primary);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: var(--seller-accent);
+  box-shadow: 0 0 0 3px var(--seller-accent-soft);
 }
 
 .seller-input:disabled {
-  background: var(--seller-bg-secondary);
-  color: var(--seller-text-tertiary);
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* Badge */
-.seller-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--seller-spacing-1) var(--seller-spacing-3);
-  border-radius: var(--seller-radius-full);
-  font-size: var(--seller-font-xs);
-  font-weight: var(--seller-weight-medium);
-  line-height: 1;
+/* ── Typography ───────────────────────────────────────────── */
+.seller-heading-1 { font-size: var(--seller-font-4xl); font-weight: var(--seller-weight-bold); color: var(--seller-text-primary); line-height: 1.15; margin: 0; letter-spacing: -0.03em; }
+.seller-heading-2 { font-size: var(--seller-font-3xl); font-weight: var(--seller-weight-bold); color: var(--seller-text-primary); line-height: 1.2; margin: 0; letter-spacing: -0.02em; }
+.seller-heading-3 { font-size: var(--seller-font-2xl); font-weight: var(--seller-weight-semibold); color: var(--seller-text-primary); line-height: 1.3; margin: 0; letter-spacing: -0.015em; }
+.seller-text    { font-size: var(--seller-font-base); color: var(--seller-text-secondary); line-height: 1.55; margin: 0; }
+.seller-text-sm { font-size: var(--seller-font-sm);   color: var(--seller-text-secondary); line-height: 1.5;  margin: 0; }
+.seller-text-xs { font-size: var(--seller-font-xs);   color: var(--seller-text-tertiary);  line-height: 1.4;  margin: 0; }
+
+/* ── Divider ──────────────────────────────────────────────── */
+.seller-divider {
+  height: 1px;
+  background: var(--seller-border);
+  border: none;
+  margin: var(--seller-spacing-4) 0;
 }
 
-.seller-badge-primary {
-  background: rgba(0, 122, 255, 0.15);
-  color: var(--seller-primary);
-}
-
-.seller-badge-success {
-  background: rgba(52, 199, 89, 0.15);
-  color: var(--seller-success);
-}
-
-.seller-badge-warning {
-  background: rgba(255, 149, 0, 0.15);
-  color: var(--seller-warning);
-}
-
-.seller-badge-error {
-  background: rgba(255, 59, 48, 0.15);
-  color: var(--seller-error);
-}
-
-.seller-badge-secondary {
-  background: var(--seller-bg-secondary);
-  color: var(--seller-text-secondary);
-}
-
-/* Typography */
-.seller-heading-1 {
-  font-size: var(--seller-font-4xl);
-  font-weight: var(--seller-weight-bold);
-  color: var(--seller-text-primary);
-  line-height: 1.2;
-  margin: 0;
-}
-
-.seller-heading-2 {
-  font-size: var(--seller-font-3xl);
-  font-weight: var(--seller-weight-bold);
-  color: var(--seller-text-primary);
-  line-height: 1.2;
-  margin: 0;
-}
-
-.seller-heading-3 {
-  font-size: var(--seller-font-2xl);
-  font-weight: var(--seller-weight-semibold);
-  color: var(--seller-text-primary);
-  line-height: 1.3;
-  margin: 0;
-}
-
-.seller-text {
-  font-size: var(--seller-font-base);
-  color: var(--seller-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.seller-text-sm {
-  font-size: var(--seller-font-sm);
-  color: var(--seller-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
-.seller-text-xs {
-  font-size: var(--seller-font-xs);
-  color: var(--seller-text-tertiary);
-  line-height: 1.4;
-  margin: 0;
-}
-
-/* Loading Spinner */
-.seller-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--seller-border-light);
-  border-top-color: var(--seller-primary);
-  border-radius: 50%;
-  animation: seller-spin 0.6s linear infinite;
-}
-
-@keyframes seller-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Empty State */
+/* ── Empty state ──────────────────────────────────────────── */
 .seller-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--seller-spacing-4);
   padding: var(--seller-spacing-16) var(--seller-spacing-4);
   text-align: center;
 }
 
 .seller-empty-state-icon {
-  width: 64px;
-  height: 64px;
-  margin-bottom: var(--seller-spacing-4);
-  opacity: 0.3;
+  width: 48px;
+  height: 48px;
+  opacity: 0.25;
   color: var(--seller-text-tertiary);
 }
 
+.seller-empty-state h3,
 .seller-empty-state-title {
   font-size: var(--seller-font-xl);
   font-weight: var(--seller-weight-semibold);
   color: var(--seller-text-primary);
-  margin-bottom: var(--seller-spacing-2);
+  margin: 0;
 }
 
+.seller-empty-state p,
 .seller-empty-state-text {
   font-size: var(--seller-font-base);
   color: var(--seller-text-secondary);
-  margin-bottom: var(--seller-spacing-6);
+  margin: 0;
 }
 
-/* Divider */
-.seller-divider {
-  height: 1px;
-  background: var(--seller-border-light);
-  border: none;
-  margin: var(--seller-spacing-4) 0;
+/* ── Spinner ──────────────────────────────────────────────── */
+.seller-spinner {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--seller-border);
+  border-top-color: var(--seller-accent);
+  border-radius: 50%;
+  animation: seller-spin 0.65s linear infinite;
 }
 
-/* Glassmorphism Effect (subtle) */
-.seller-glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+@keyframes seller-spin {
+  to { transform: rotate(360deg); }
 }
 
-@media (prefers-color-scheme: dark) {
-  .seller-glass {
-    background: rgba(28, 28, 30, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes seller-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes seller-slide-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Custom scrollbar (seller areas) ─────────────────────── */
+.seller-layout ::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.seller-layout ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.seller-layout ::-webkit-scrollbar-thumb {
+  background: var(--seller-border-strong);
+  border-radius: 2px;
+}
+
+.seller-layout ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] .seller-layout ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+}
+
+[data-theme="light"] .seller-layout ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.22);
+}

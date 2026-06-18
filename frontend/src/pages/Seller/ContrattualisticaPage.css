@@ -1,29 +1,62 @@
-/* ========== Contrattualistica – Pagina dedicata ========== */
+/* ========================================================================
+   Contrattualistica — Apple-style restyling
+   Design tokens defined here; zero hardcoded colors outside declarations
+   ======================================================================== */
 
+/* ── Page-level design tokens (dark default) ──────────────────────────── */
 .contrattualistica-page {
+  --contr-bg:             #09090b;
+  --contr-bg-elevated:    #111113;
+  --contr-accent:         #818cf8;
+  --contr-accent-hover:   #6366f1;
+  --contr-accent-soft:    rgba(129, 140, 248, 0.12);
+  --contr-accent-border:  rgba(129, 140, 248, 0.22);
+  --contr-text-primary:   #f4f4f5;
+  --contr-text-secondary: #a1a1aa;
+  --contr-text-tertiary:  #71717a;
+  --contr-border:         rgba(255, 255, 255, 0.08);
+  --contr-border-strong:  rgba(255, 255, 255, 0.14);
+  --contr-shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.32);
+  --contr-shadow-md:      0 4px 16px rgba(0, 0, 0, 0.44);
+  --contr-success:        #22c55e;
+  --contr-success-soft:   rgba(34, 197, 94, 0.12);
+  --contr-success-border: rgba(34, 197, 94, 0.22);
+  --contr-blue:           #3b82f6;
+  --contr-blue-soft:      rgba(59, 130, 246, 0.12);
+  --contr-purple:         #a855f7;
+  --contr-purple-soft:    rgba(168, 85, 247, 0.12);
+
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  background: var(--contr-bg);
+  color: var(--contr-text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Light mode overrides ─────────────────────────────────────────────── */
 .contrattualistica-page.theme-light {
-  background: #F5F5F7;
-  color: #1D1D1F;
+  --contr-bg:             #fafafa;
+  --contr-bg-elevated:    #ffffff;
+  --contr-accent:         #6366f1;
+  --contr-accent-hover:   #4f46e5;
+  --contr-accent-soft:    rgba(99, 102, 241, 0.07);
+  --contr-accent-border:  rgba(99, 102, 241, 0.18);
+  --contr-text-primary:   #09090b;
+  --contr-text-secondary: #52525b;
+  --contr-text-tertiary:  #a1a1aa;
+  --contr-border:         rgba(0, 0, 0, 0.08);
+  --contr-border-strong:  rgba(0, 0, 0, 0.14);
+  --contr-shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.06);
+  --contr-shadow-md:      0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
-.contrattualistica-page.theme-dark {
-  background: #000000;
-  color: #FFFFFF;
-}
-
-/* ========== Back link ========== */
-
+/* ── Back link ────────────────────────────────────────────────────────── */
 .contr-back-wrap {
   position: relative;
   z-index: 2;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 16px 24px 0;
 }
@@ -31,8 +64,8 @@
 .contr-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 7px 12px;
   border: none;
   background: none;
   font-size: 0.9375rem;
@@ -40,24 +73,15 @@
   font-family: inherit;
   cursor: pointer;
   border-radius: 10px;
-  transition: background 0.2s ease;
-  color: #6366F1;
+  color: var(--contr-accent);
+  transition: background 0.18s ease;
 }
 
 .contr-back-btn:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: var(--contr-accent-soft);
 }
 
-.contrattualistica-page.theme-dark .contr-back-btn {
-  color: #818CF8;
-}
-
-.contrattualistica-page.theme-dark .contr-back-btn:hover {
-  background: rgba(99, 102, 241, 0.15);
-}
-
-/* ========== Decorative background ========== */
-
+/* ── Decorative background ────────────────────────────────────────────── */
 .contr-hero-bg {
   position: absolute;
   inset: 0;
@@ -69,70 +93,50 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.35;
-  animation: contr-float 12s ease-in-out infinite;
+  opacity: 0.25;
+  animation: contr-float 14s ease-in-out infinite;
 }
 
 .contr-hero-orb-1 {
-  width: 320px;
-  height: 320px;
-  top: -80px;
-  right: -60px;
-  background: linear-gradient(135deg, #6366F1 0%, #818CF8 50%, transparent 100%);
+  width: 360px;
+  height: 360px;
+  top: -100px;
+  right: -80px;
+  background: radial-gradient(circle, var(--contr-accent) 0%, transparent 70%);
   animation-delay: 0s;
 }
 
 .contr-hero-orb-2 {
-  width: 240px;
-  height: 240px;
-  bottom: 20%;
-  left: -40px;
-  background: linear-gradient(135deg, #4F46E5 0%, #6366F1 40%, transparent 100%);
-  animation-delay: -4s;
-}
-
-.contrattualistica-page.theme-dark .contr-hero-orb {
-  opacity: 0.25;
+  width: 260px;
+  height: 260px;
+  bottom: 18%;
+  left: -60px;
+  background: radial-gradient(circle, var(--contr-accent-hover) 0%, transparent 70%);
+  animation-delay: -5s;
 }
 
 .contr-hero-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--contr-accent-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--contr-accent-soft) 1px, transparent 1px);
   background-size: 32px 32px;
-  mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+  mask-image: linear-gradient(to bottom, black 0%, transparent 65%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 65%);
 }
 
 @keyframes contr-float {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10px, -15px) scale(1.05); }
+  50%       { transform: translate(12px, -18px) scale(1.06); }
 }
 
-/* ========== Animations ========== */
-
-.contr-anim-in {
-  opacity: 0;
-  transform: translateY(16px);
-  animation: contr-fadeUp 0.6s ease forwards;
-}
-
-@keyframes contr-fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========== Hero ========== */
-
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 .contr-hero {
   position: relative;
   z-index: 1;
   padding: clamp(32px, 6vw, 56px) 24px clamp(24px, 4vw, 40px);
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -145,51 +149,41 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.08) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: var(--contr-accent-soft);
+  border: 1px solid var(--contr-accent-border);
   margin-bottom: 20px;
-  animation: contr-fadeUp 0.5s ease 0.1s both;
 }
 
 .contr-hero-icon {
-  color: #6366F1;
+  color: var(--contr-accent);
 }
 
 .contr-hero-title {
-  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   margin: 0 0 12px 0;
-  animation: contr-fadeUp 0.5s ease 0.15s both;
+  color: var(--contr-text-primary);
 }
 
 .contr-hero-subtitle {
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: 1.0625rem;
+  line-height: 1.6;
   margin: 0;
-  opacity: 0.85;
-  animation: contr-fadeUp 0.5s ease 0.2s both;
+  color: var(--contr-text-secondary);
+  max-width: 580px;
 }
 
-.contrattualistica-page.theme-light .contr-hero-subtitle {
-  color: #4B5563;
-}
-
-.contrattualistica-page.theme-dark .contr-hero-subtitle {
-  color: #98989D;
-}
-
-/* ========== Section ========== */
-
+/* ── Sections ─────────────────────────────────────────────────────────── */
 .contr-section {
   position: relative;
   z-index: 1;
-  max-width: 720px;
-  margin: 0 auto 32px;
+  max-width: 960px;
+  margin: 0 auto 36px;
   padding: 0 24px;
 }
 
@@ -197,43 +191,227 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.25rem;
+  font-size: 1.1875rem;
   font-weight: 600;
-  margin: 0 0 18px 0;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px 0;
+  color: var(--contr-text-primary);
 }
 
 .contr-section-heading svg {
-  color: #6366F1;
+  color: var(--contr-accent);
   flex-shrink: 0;
 }
 
-/* ========== Guide list ========== */
+/* ── Document card grid ───────────────────────────────────────────────── */
+.contr-doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
 
+.contr-doc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid var(--contr-border);
+  background: var(--contr-bg-elevated);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.contr-doc-card:hover {
+  border-color: var(--contr-accent-border);
+  box-shadow: var(--contr-shadow-md);
+}
+
+.contr-doc-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.contr-doc-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--contr-accent-soft);
+  border: 1px solid var(--contr-accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--contr-accent);
+  flex-shrink: 0;
+}
+
+/* Status badges */
+.contr-doc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.contr-doc-status--active {
+  background: var(--contr-success-soft);
+  color: var(--contr-success);
+  border: 1px solid var(--contr-success-border);
+}
+
+.contr-doc-status--archived {
+  background: var(--contr-border);
+  color: var(--contr-text-tertiary);
+  border: 1px solid var(--contr-border-strong);
+}
+
+.contr-doc-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--contr-text-primary);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.contr-doc-desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--contr-text-secondary);
+  margin: 0;
+  flex: 1;
+}
+
+/* Document action button */
+.contr-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--contr-accent-border);
+  background: none;
+  color: var(--contr-accent);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  align-self: flex-start;
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.contr-doc-btn:hover:not(:disabled) {
+  background: var(--contr-accent-soft);
+  border-color: var(--contr-accent);
+}
+
+.contr-doc-btn--outline {
+  border-color: var(--contr-border);
+  color: var(--contr-text-tertiary);
+  cursor: default;
+}
+
+/* ── Google Drive card ────────────────────────────────────────────────── */
+.contr-drive-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-radius: 18px;
+  border: 1px solid var(--contr-accent-border);
+  background: var(--contr-accent-soft);
+  flex-wrap: wrap;
+}
+
+.contr-drive-card-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.contr-drive-icon {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: var(--contr-bg-elevated);
+  border: 1px solid var(--contr-accent-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--contr-accent);
+}
+
+.contr-drive-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--contr-text-primary);
+  margin: 0 0 4px 0;
+}
+
+.contr-drive-desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--contr-text-secondary);
+  margin: 0;
+}
+
+.contr-drive-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--contr-accent);
+  background: var(--contr-bg-elevated);
+  color: var(--contr-accent);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.contr-drive-btn:hover {
+  background: var(--contr-accent-soft);
+  box-shadow: var(--contr-shadow-md);
+}
+
+/* ── Guide accordion ──────────────────────────────────────────────────── */
 .contr-guide-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .contr-guide-item {
   border-radius: 16px;
   overflow: hidden;
-  transition: box-shadow 0.25s ease;
+  background: var(--contr-bg-elevated);
+  border: 1px solid var(--contr-border);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-.contrattualistica-page.theme-light .contr-guide-item {
-  background: #FFFFFF;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+.contr-guide-item:hover {
+  border-color: var(--contr-border-strong);
+  box-shadow: var(--contr-shadow-sm);
 }
 
-.contrattualistica-page.theme-dark .contr-guide-item {
-  background: #1C1C1E;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.contr-guide-item:focus-within,
-.contr-guide-trigger:hover {
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.12);
+.contr-guide-item:focus-within {
+  border-color: var(--contr-accent-border);
+  box-shadow: 0 0 0 3px var(--contr-accent-soft);
 }
 
 .contr-guide-trigger {
@@ -247,32 +425,26 @@
   background: none;
   cursor: pointer;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
-  transition: background 0.2s ease;
-}
-
-.contrattualistica-page.theme-light .contr-guide-trigger {
-  color: #1D1D1F;
-}
-
-.contrattualistica-page.theme-dark .contr-guide-trigger {
-  color: #FFFFFF;
+  color: var(--contr-text-primary);
+  transition: background 0.18s ease;
 }
 
 .contr-guide-trigger:hover {
-  background: rgba(99, 102, 241, 0.06);
+  background: var(--contr-accent-soft);
 }
 
 .contr-guide-trigger-text {
   flex: 1;
   min-width: 0;
+  line-height: 1.4;
 }
 
 .contr-guide-chevron {
   flex-shrink: 0;
-  color: #6366F1;
+  color: var(--contr-accent);
   transition: transform 0.25s ease;
 }
 
@@ -287,40 +459,33 @@
 }
 
 .contr-guide-body.expanded {
-  max-height: 600px;
-  transition: max-height 0.4s ease-in;
+  max-height: 800px;
+  transition: max-height 0.45s ease-in;
 }
 
 .contr-guide-body-inner {
   padding: 0 20px 20px 20px;
+  border-top: 1px solid var(--contr-border);
 }
 
 .contr-guide-body-inner p {
   font-size: 0.9375rem;
-  line-height: 1.65;
-  margin: 0;
+  line-height: 1.7;
+  margin: 14px 0 0 0;
+  color: var(--contr-text-secondary);
 }
 
-.contrattualistica-page.theme-light .contr-guide-body-inner p {
-  color: #4B5563;
-}
-
-.contrattualistica-page.theme-dark .contr-guide-body-inner p {
-  color: #98989D;
-}
-
-/* ========== Summary strip ========== */
-
+/* ── Summary strip ────────────────────────────────────────────────────── */
 .contr-summary-strip {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto 32px;
   padding: 0 24px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .contr-summary-item {
@@ -332,8 +497,8 @@
 }
 
 .contr-summary-icon-wrap {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -342,117 +507,116 @@
 }
 
 .contr-summary-item:hover .contr-summary-icon-wrap {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .contr-summary-icon-preventivo {
-  background: rgba(99, 102, 241, 0.2);
-  color: #6366F1;
+  background: var(--contr-accent-soft);
+  color: var(--contr-accent);
+  border: 1px solid var(--contr-accent-border);
 }
 
 .contr-summary-icon-firma {
-  background: rgba(34, 197, 94, 0.2);
-  color: #16A34A;
+  background: var(--contr-success-soft);
+  color: var(--contr-success);
+  border: 1px solid var(--contr-success-border);
 }
 
 .contr-summary-icon-contratto {
-  background: rgba(59, 130, 246, 0.2);
-  color: #2563EB;
+  background: var(--contr-blue-soft);
+  color: var(--contr-blue);
+  border: 1px solid rgba(59, 130, 246, 0.22);
 }
 
 .contr-summary-icon-moduli {
-  background: rgba(168, 85, 247, 0.2);
-  color: #9333EA;
+  background: var(--contr-purple-soft);
+  color: var(--contr-purple);
+  border: 1px solid rgba(168, 85, 247, 0.22);
 }
 
 .contr-summary-label {
   font-size: 0.8125rem;
   font-weight: 600;
   text-align: center;
+  color: var(--contr-text-secondary);
 }
 
-.contrattualistica-page.theme-light .contr-summary-label {
-  color: #4B5563;
-}
-
-.contrattualistica-page.theme-dark .contr-summary-label {
-  color: #98989D;
-}
-
-/* ========== CTA ========== */
-
+/* ── CTA ──────────────────────────────────────────────────────────────── */
 .contr-cta {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 0 24px 48px;
+  padding: 0 24px 52px;
 }
 
 .contr-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: 10px;
+  padding: 15px 26px;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(145deg, #6366F1 0%, #4F46E5 100%);
-  color: #FFFFFF;
+  background: var(--contr-accent);
+  color: var(--seller-text-inverse);
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px var(--contr-accent-soft);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .contr-cta-btn:hover {
+  background: var(--contr-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(99, 102, 241, 0.4);
+  box-shadow: var(--contr-shadow-md);
 }
 
 .contr-cta-btn:active {
   transform: translateY(0);
 }
 
-/* ========== Mobile overrides ========== */
-
-.contrattualistica-page[data-mobile="true"] .contr-back-wrap {
-  padding: 16px 16px 0;
+/* ── Mobile overrides ─────────────────────────────────────────────────── */
+.contrattualistica-page[data-mobile='true'] .contr-back-wrap,
+.contrattualistica-page[data-mobile='true'] .contr-section,
+.contrattualistica-page[data-mobile='true'] .contr-summary-strip,
+.contrattualistica-page[data-mobile='true'] .contr-cta {
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-hero {
+.contrattualistica-page[data-mobile='true'] .contr-hero {
   padding: 24px 16px 20px;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-hero-title {
+.contrattualistica-page[data-mobile='true'] .contr-hero-title {
   font-size: 1.75rem;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-section {
-  padding: 0 16px 24px;
+.contrattualistica-page[data-mobile='true'] .contr-doc-grid {
+  grid-template-columns: 1fr;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-guide-trigger {
+.contrattualistica-page[data-mobile='true'] .contr-drive-card {
+  flex-direction: column;
+}
+
+.contrattualistica-page[data-mobile='true'] .contr-drive-btn {
+  align-self: stretch;
+  justify-content: center;
+}
+
+.contrattualistica-page[data-mobile='true'] .contr-guide-trigger {
   padding: 16px 18px;
   font-size: 0.9375rem;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-guide-body-inner {
-  padding: 0 18px 18px 18px;
+.contrattualistica-page[data-mobile='true'] .contr-guide-body-inner {
+  padding: 0 18px 18px;
 }
 
-.contrattualistica-page[data-mobile="true"] .contr-summary-strip {
-  padding: 0 16px 28px;
-  gap: 16px;
-}
-
-.contrattualistica-page[data-mobile="true"] .contr-cta {
-  padding: 0 16px 40px;
-}
-
-.contrattualistica-page[data-mobile="true"] .contr-cta-btn {
+.contrattualistica-page[data-mobile='true'] .contr-cta-btn {
   width: 100%;
   justify-content: center;
-  padding: 16px 20px;
 }

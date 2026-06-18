@@ -1,11 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, FolderKanban, ArrowRight } from 'lucide-react';
+import { Search, FolderKanban, ArrowRight, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { crmProjectsApi } from '../../api/crmProjects';
-import type { CrmProject } from '../../api/crmProjects';
+import type { CrmProject, CrmProjectFilters } from '../../api/crmProjects';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
 import './SellerProjectsPage.css';
+
+const containerVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const } },
+};
+
+const STATUS_MAP: Record<string, { label: string; cls: string }> = {
+  planning:              { label: 'Pianificazione',   cls: 'seller-badge-info' },
+  active:                { label: 'Attivo',            cls: 'seller-badge-active' },
+  on_hold:               { label: 'In Pausa',          cls: 'seller-badge-warning' },
+  completed:             { label: 'Completato',        cls: 'seller-badge-completed' },
+  cancelled:             { label: 'Annullato',         cls: 'seller-badge-danger' },
+  in_attesa_presa_carico:{ label: 'In Attesa',         cls: 'seller-badge-warning' },
+  preso_in_carico:       { label: 'Preso in Carico',   cls: 'seller-badge-info' },
+  avviato:               { label: 'Avviato',           cls: 'seller-badge-active' },
+  paused:                { label: 'In Pausa',          cls: 'seller-badge-warning' },
+  archived:              { label: 'Archiviato',        cls: 'seller-badge-secondary' },
+};
+
+const FILTERS = [
+  { value: 'all',       label: 'Tutti' },
+  { value: 'active',    label: 'Attivi' },
+  { value: 'planning',  label: 'Pianificazione' },
+  { value: 'on_hold',   label: 'In Pausa' },
+  { value: 'completed', label: 'Completati' },
+  { value: 'cancelled', label: 'Annullati' },
+];
+
+const getProgress = (project: CrmProject): number => {
+  switch (project.status as string) {
+    case 'completed':             return 100;
+    case 'active': case 'avviato':return 60;
+    case 'paused': case 'on_hold':return 50;
+    case 'preso_in_carico':       return 20;
+    case 'planning':              return 15;
+    case 'in_attesa_presa_carico':return 5;
+    default:                      return 0;
+  }
+};
 
 const SellerProjectsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,18 +66,11 @@ const SellerProjectsPage: React.FC = () => {
 
   const loadProjects = async () => {
     if (!user?.seller_id) return;
-    
     try {
       setLoading(true);
-      const params: any = {
-        seller_id: user.seller_id // Filtro automatico per venditore
-      };
-      if (statusFilter !== 'all') {
-        params.status = statusFilter;
-      }
-      if (searchTerm) {
-        params.search = searchTerm;
-      }
+      const params: CrmProjectFilters = { seller_id: user.seller_id };
+      if (statusFilter !== 'all') params.status = statusFilter;
+      if (searchTerm) params.search = searchTerm;
       const response = await crmProjectsApi.getAll(params);
       setProjects(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
@@ -44,31 +82,18 @@ const SellerProjectsPage: React.FC = () => {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      if (searchTerm !== undefined) {
-        loadProjects();
-      }
+      if (searchTerm !== undefined) loadProjects();
     }, 300);
     return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
-  const getStatusBadge = (status: string) => {
-    const badges: Record<string, { label: string; class: string }> = {
-      planning: { label: 'Pianificazione', class: 'info' },
-      active: { label: 'Attivo', class: 'success' },
-      on_hold: { label: 'In Pausa', class: 'warning' },
-      completed: { label: 'Completato', class: 'info' },
-      cancelled: { label: 'Annullato', class: 'danger' },
-    };
-    return badges[status] || { label: status, class: '' };
-  };
-
   if (loading) {
     return (
-      <div className="progetti-venditori-page">
-        <div className="venditori-page-header">
+      <div className="sp-page">
+        <div className="sp-header">
           <SkeletonLoader type="page-header" className="skeleton-header-no-btn" />
         </div>
-        <div className="progetti-venditori-skeleton-list">
+        <div className="sp-skeleton-grid">
           <SkeletonLoader type="card" count={8} />
         </div>
       </div>
@@ -76,95 +101,121 @@ const SellerProjectsPage: React.FC = () => {
   }
 
   return (
-    <div className="progetti-venditori-page">
-      <div className="venditori-page-header">
+    <motion.div
+      className="sp-page"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      {/* Header */}
+      <div className="sp-header">
         <div>
-          <h1 className="venditori-page-title">I Miei Progetti</h1>
-          <p className="venditori-page-subtitle">Visualizza i tuoi progetti</p>
+          <h1 className="sp-title">I Miei Progetti</h1>
+          <p className="sp-subtitle">Visualizza e monitora i tuoi progetti</p>
         </div>
       </div>
 
-      <div className="venditori-content-card">
-        <div className="venditori-actions-bar">
-          <div className="venditori-search-wrapper">
-            <Search size={18} className="search-icon" />
-            <input
-              type="text"
-              className="venditori-search-input"
-              placeholder="Cerca progetto..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <select
-            className="filter-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">Tutti gli stati</option>
-            <option value="planning">Pianificazione</option>
-            <option value="active">Attivo</option>
-            <option value="on_hold">In Pausa</option>
-            <option value="completed">Completato</option>
-            <option value="cancelled">Annullato</option>
-          </select>
+      {/* Search + filter pills */}
+      <div className="sp-toolbar">
+        <div className="sp-search-wrap">
+          <Search size={16} className="sp-search-icon" />
+          <input
+            type="text"
+            className="sp-search"
+            placeholder="Cerca progetto..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
-
-        {projects.length === 0 ? (
-          <div className="venditori-empty-state">
-            <FolderKanban size={64} className="venditori-empty-state-icon" />
-            <h3>Nessun progetto trovato</h3>
-            <p>I tuoi progetti appariranno qui</p>
-          </div>
-        ) : (
-          <div className="projects-table-wrapper">
-            <table className="venditori-table">
-              <thead>
-                <tr>
-                  <th>Nome Progetto</th>
-                  <th>Cliente</th>
-                  <th>Stato</th>
-                  <th>Data Inizio</th>
-                  <th>Data Fine</th>
-                  <th>Azioni</th>
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((project) => {
-                  const statusBadge = getStatusBadge(project.status);
-                  return (
-                    <tr key={project.id}>
-                      <td>
-                        <div className="project-name-cell">
-                          <FolderKanban size={18} />
-                          <strong>{project.name}</strong>
-                        </div>
-                      </td>
-                      <td>{project.client?.company_name || '-'}</td>
-                      <td>
-                        <span className={`venditori-badge venditori-badge-${statusBadge.class}`}>
-                          {statusBadge.label}
-                        </span>
-                      </td>
-                      <td>{project.start_date ? new Date(project.start_date).toLocaleDateString('it-IT') : '-'}</td>
-                      <td>{project.end_date ? new Date(project.end_date).toLocaleDateString('it-IT') : '-'}</td>
-                      <td>
-                        <button
-                          className="btn-link"
-                          onClick={() => navigate(`/seller/progetti/${project.id}`)}
-                        >
-                          Visualizza <ArrowRight size={14} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="sp-filters">
+          {FILTERS.map((f) => (
+            <button
+              key={f.value}
+              className={`sp-filter-pill${statusFilter === f.value ? ' active' : ''}`}
+              onClick={() => setStatusFilter(f.value)}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Cards */}
+      {projects.length === 0 ? (
+        <div className="sp-empty">
+          <FolderKanban size={48} className="sp-empty-icon" />
+          <h3 className="sp-empty-title">Nessun progetto trovato</h3>
+          <p className="sp-empty-subtitle">I tuoi progetti appariranno qui</p>
+        </div>
+      ) : (
+        <motion.div
+          className="sp-grid"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          {projects.map((project) => {
+            const statusInfo = STATUS_MAP[project.status] ?? { label: project.status, cls: 'seller-badge-secondary' };
+            const progress = getProgress(project);
+
+            return (
+              <motion.div
+                key={project.id}
+                className="sp-card seller-card"
+                variants={cardVariants}
+                onClick={() => navigate(`/seller/progetti/${project.id}`)}
+                whileHover={{ scale: 1.015 }}
+                whileTap={{ scale: 0.985 }}
+              >
+                <div className="sp-card-top">
+                  <div className="sp-card-icon-wrap">
+                    <FolderKanban size={18} className="sp-card-icon" />
+                  </div>
+                  <span className={`seller-badge ${statusInfo.cls}`}>
+                    {statusInfo.label}
+                  </span>
+                </div>
+
+                <h3 className="sp-card-name">{project.name}</h3>
+
+                {project.client && (
+                  <p className="sp-card-client">{project.client.company_name}</p>
+                )}
+
+                {/* Progress bar */}
+                <div className="sp-progress-wrap">
+                  <div className="sp-progress-bar">
+                    <div className="sp-progress-fill" style={{ width: `${progress}%` }} />
+                  </div>
+                  <span className="sp-progress-label">{progress}%</span>
+                </div>
+
+                {/* Dates */}
+                <div className="sp-card-meta">
+                  {project.start_date && (
+                    <span className="sp-meta-item">
+                      <Calendar size={12} />
+                      {new Date(project.start_date).toLocaleDateString('it-IT')}
+                    </span>
+                  )}
+                  {project.end_date && (
+                    <span className="sp-meta-item">
+                      → {new Date(project.end_date).toLocaleDateString('it-IT')}
+                    </span>
+                  )}
+                </div>
+
+                <div className="sp-card-footer">
+                  <span className="sp-card-view">
+                    Visualizza <ArrowRight size={13} />
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
+    </motion.div>
   );
 };
 

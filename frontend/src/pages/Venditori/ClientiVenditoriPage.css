@@ -9,16 +9,16 @@
 }
 
 .client-avatar {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--color-accent-blue) 0%, #007AFF 100%);
-  color: var(--color-text-inverse);
+  background: rgba(10, 132, 255, 0.15);
+  color: var(--color-accent-blue);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-base);
+  font-weight: 600;
+  font-size: 13px;
   flex-shrink: 0;
 }
 

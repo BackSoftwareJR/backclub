@@ -1,11 +1,34 @@
-/* Advanced Calendar - Google Calendar Style */
+/* Calendario - Apple Style */
 
 .calendario-advanced {
+    padding: 20px;
     max-width: 1400px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-6);
+    gap: 16px;
+}
+
+/* Back Button */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--color-accent-blue);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 180ms;
+    font-family: inherit;
+    align-self: flex-start;
+}
+
+.btn-back:hover {
+    background: var(--color-bg-secondary);
 }
 
 /* Header */
@@ -16,32 +39,59 @@
 }
 
 .header-left-cal h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--color-text-primary);
-    margin: 0 0 4px 0;
+    margin: 0;
+}
+
+.header-left-cal .subtitle {
+    font-size: 12px;
+    color: var(--color-text-quaternary);
+    margin: 2px 0 0 0;
+}
+
+/* Btn-add (reuse from Cocchi.css if in same scope, else define here) */
+.btn-add {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: var(--color-accent-blue);
+    color: white;
+    border: none;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 180ms;
+}
+
+.btn-add:hover {
+    background: #0070e0;
 }
 
 /* KPI Cards Row */
 .calendar-kpi-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-3);
+    gap: 10px;
 }
 
 .kpi-mini-card {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
-    padding: var(--spacing-4);
+    gap: 12px;
+    padding: 14px 16px;
     background: var(--color-bg-secondary);
-    border-radius: 8px;
-    border-left: 3px solid transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    border-left: 2px solid transparent;
 }
 
 .kpi-mini-card.entrate {
-    border-left-color: var(--color-success);
+    border-left-color: var(--color-accent-emerald);
 }
 
 .kpi-mini-card.uscite {
@@ -53,18 +103,18 @@
 }
 
 .kpi-mini-card.promemoria {
-    border-left-color: var(--color-info);
+    border-left-color: var(--color-accent-blue);
 }
 
 .kpi-mini-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 6px;
-    background: var(--glass-bg-medium);
-    color: var(--color-text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-tertiary);
     flex-shrink: 0;
 }
 
@@ -75,9 +125,10 @@
 
 .kpi-mini-label {
     font-size: 11px;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-quaternary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    font-weight: 600;
     margin-bottom: 2px;
 }
 
@@ -85,6 +136,7 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
     letter-spacing: -0.01em;
 }
 
@@ -93,29 +145,31 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--spacing-4);
-    padding: var(--spacing-4) 0;
-    border-bottom: 1px solid var(--color-border-secondary);
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .view-mode-toggle {
     display: flex;
-    gap: 4px;
+    gap: 3px;
     padding: 3px;
     background: var(--color-bg-secondary);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 7px;
 }
 
 .view-mode-toggle button {
-    padding: 6px 14px;
+    padding: 5px 12px;
     background: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: 5px;
     font-size: 13px;
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 180ms;
+    font-family: inherit;
 }
 
 .view-mode-toggle button:hover {
@@ -125,27 +179,28 @@
 .view-mode-toggle button.active {
     background: var(--color-bg-primary);
     color: var(--color-accent-blue);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .calendar-nav {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
+    gap: 10px;
 }
 
 .nav-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     background: var(--color-bg-secondary);
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 6px;
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 180ms;
+    font-family: inherit;
 }
 
 .nav-btn:hover {
@@ -154,10 +209,10 @@
 }
 
 .current-month {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text-primary);
-    min-width: 160px;
+    min-width: 150px;
     text-align: center;
     text-transform: capitalize;
 }
@@ -165,40 +220,43 @@
 .project-filter {
     padding: 6px 12px;
     background: var(--color-bg-secondary);
-    border: 1px solid var(--color-border-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 6px;
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text-primary);
     cursor: pointer;
+    outline: none;
+    font-family: inherit;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238E8E93' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
-    padding-right: 32px;
+    padding-right: 30px;
 }
 
 /* Month View */
 .calendar-month-view {
     background: var(--color-bg-secondary);
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
     overflow: hidden;
-    padding: var(--spacing-4);
+    padding: 12px;
 }
 
 .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-    margin-bottom: var(--spacing-2);
+    margin-bottom: 8px;
 }
 
 .weekday-label {
-    padding: var(--spacing-2);
+    padding: 6px;
     text-align: center;
     font-size: 11px;
     font-weight: 700;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-quaternary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -207,20 +265,20 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     gap: 1px;
-    background: var(--color-border-secondary);
-    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .calendar-day-cell {
-    min-height: 100px;
-    padding: 8px;
+    min-height: 90px;
+    padding: 7px;
     background: var(--color-bg-primary);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 180ms;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 4px;
 }
 
 .calendar-day-cell:hover {
@@ -228,16 +286,16 @@
 }
 
 .calendar-day-cell.empty {
-    background: var(--glass-bg-light);
+    background: rgba(255, 255, 255, 0.01);
     cursor: default;
 }
 
 .calendar-day-cell.empty:hover {
-    background: var(--glass-bg-light);
+    background: rgba(255, 255, 255, 0.01);
 }
 
 .day-number {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--color-text-primary);
     align-self: flex-start;
@@ -246,27 +304,27 @@
 .day-events {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .mini-event {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 4px 6px;
+    gap: 5px;
+    padding: 3px 5px;
     border-radius: 4px;
     font-size: 11px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: opacity 180ms;
 }
 
 .mini-event:hover {
-    transform: translateX(2px);
+    opacity: 0.8;
 }
 
 .mini-event.entrata {
     background: rgba(52, 199, 89, 0.1);
-    color: var(--color-success);
+    color: var(--color-accent-emerald);
 }
 
 .mini-event.uscita {
@@ -276,17 +334,17 @@
 
 .mini-event.admin {
     background: rgba(10, 132, 255, 0.1);
-    color: var(--color-info);
+    color: var(--color-accent-blue);
 }
 
 .mini-event.generale {
     background: rgba(142, 142, 147, 0.1);
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
 }
 
 .mini-event-dot {
-    width: 6px;
-    height: 6px;
+    width: 5px;
+    height: 5px;
     border-radius: 50%;
     background: currentColor;
     flex-shrink: 0;
@@ -303,7 +361,7 @@
 .more-events {
     font-size: 10px;
     color: var(--color-text-quaternary);
-    padding-left: 12px;
+    padding-left: 10px;
     font-weight: 500;
 }
 
@@ -313,15 +371,16 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-4);
-    padding: var(--spacing-12);
+    gap: 12px;
+    padding: 60px 20px;
     background: var(--color-bg-secondary);
-    border-radius: 12px;
-    color: var(--color-text-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    color: var(--color-text-quaternary);
 }
 
 .calendar-coming-soon p {
-    font-size: 15px;
+    font-size: 14px;
     margin: 0;
 }
 
@@ -333,6 +392,10 @@
 }
 
 @media (max-width: 768px) {
+    .calendario-advanced {
+        padding: 16px;
+    }
+
     .calendar-controls {
         flex-wrap: wrap;
     }
@@ -342,8 +405,7 @@
     }
 
     .calendar-day-cell {
-        min-height: 80px;
-        font-size: 12px;
+        min-height: 70px;
     }
 
     .day-number {

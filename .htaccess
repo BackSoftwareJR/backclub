@@ -20,6 +20,9 @@
     # Rewrite /assets/* to /frontend/dist/assets/*
     RewriteRule ^assets/(.*)$ /frontend/dist/assets/$1 [L]
     
+    # Rewrite /images/* to /frontend/dist/images/*
+    RewriteRule ^images/(.*)$ /frontend/dist/images/$1 [L]
+    
     # Rewrite /vite.svg to /frontend/dist/vite.svg
     RewriteRule ^vite\.svg$ /frontend/dist/vite.svg [L]
     

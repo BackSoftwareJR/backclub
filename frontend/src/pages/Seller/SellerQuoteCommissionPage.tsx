@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft, Info } from 'lucide-react';
 import { quotesApi } from '../../api/quotes';
 import { sellerCommissionsApi } from '../../api/sellerCommissions';
@@ -7,6 +8,15 @@ import type { Quote } from '../../types/sellers';
 import { sellerCache } from '../../utils/sellerCache';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
 import './SellerQuoteCommissionPage.css';
+
+const cardVariants = {
+  hidden:  { opacity: 0, y: 12 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const, delay: i * 0.08 },
+  }),
+};
 
 /** Commissione stimata = subtotale servizi × aliquota. Non su rinnovi. */
 function getEstimatedCommission(quote: Quote, commissionRate: number): number {
@@ -106,7 +116,12 @@ const SellerQuoteCommissionPage: React.FC = () => {
 
   return (
     <div className="seller-quote-commission-page">
-      <header className="seller-quote-commission-header">
+      <motion.header
+        className="seller-quote-commission-header"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] as const }}
+      >
         <button
           type="button"
           className="seller-quote-commission-back"
@@ -116,18 +131,30 @@ const SellerQuoteCommissionPage: React.FC = () => {
           <ArrowLeft size={24} />
         </button>
         <h1 className="seller-quote-commission-title">Commissione stimata</h1>
-      </header>
+      </motion.header>
 
       <div className="seller-quote-commission-content">
-        <div className="seller-quote-commission-card seller-quote-commission-card-hero">
+        <motion.div
+          className="seller-quote-commission-card seller-quote-commission-card-hero"
+          custom={0}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="seller-quote-commission-hero-label">Preventivo</div>
           <div className="seller-quote-commission-hero-value">{quote.quote_number}</div>
           {quote.title && (
             <div className="seller-quote-commission-hero-sub">{quote.title}</div>
           )}
-        </div>
+        </motion.div>
 
-        <div className="seller-quote-commission-card">
+        <motion.div
+          className="seller-quote-commission-card"
+          custom={1}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <div className="seller-quote-commission-row">
             <span className="seller-quote-commission-label">Base (subtotale servizi)</span>
             <span className="seller-quote-commission-value">{formatCurrency(quote.subtotal ?? 0)}</span>
@@ -141,9 +168,15 @@ const SellerQuoteCommissionPage: React.FC = () => {
             <span className="seller-quote-commission-label">Commissione stimata</span>
             <span className="seller-quote-commission-value-final">{formatCurrency(estimated)}</span>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="seller-quote-commission-note">
+        <motion.div
+          className="seller-quote-commission-note"
+          custom={2}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <Info size={18} className="seller-quote-commission-note-icon" />
           <div className="seller-quote-commission-note-text">
             <p>
@@ -153,15 +186,19 @@ const SellerQuoteCommissionPage: React.FC = () => {
               Sarà disponibile alla riscossione quando BackSoftware incasserà l&apos;importo del contratto. Se il cliente paga a rate, ad ogni rata effettivamente incassata da BackSoftware verrà reso disponibile alla riscossione il credito di commissione calcolato su quella rata; così fino al completamento del contratto e al saldo completo della commissione.
             </p>
           </div>
-        </div>
+        </motion.div>
 
-        <button
+        <motion.button
           type="button"
           className="seller-quote-commission-btn-primary"
           onClick={() => navigate(`/seller/preventivi/${quote.id}`)}
+          custom={3}
+          variants={cardVariants}
+          initial="hidden"
+          animate="visible"
         >
           Torna al preventivo
-        </button>
+        </motion.button>
       </div>
     </div>
   );

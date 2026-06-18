@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
+// Workspace models
+use App\Models\CrmProjectWorkspaceSetting;
+use App\Models\WorkspaceBranch;
+use App\Models\WorkspaceAgent;
+use App\Models\WorkspaceUserTask;
+
 class CrmProject extends Model
 {
     use HasFactory;
@@ -27,9 +33,9 @@ class CrmProject extends Model
         'budget_cocchi',
         'spent_cocchi',
         'settings',
+        'cover_photo',
         'github_url',
         'website_url',
-        'cover_photo',
         // Campi pubblici per il sito BackSoftware
         'is_public',
         'public_slug',
@@ -179,6 +185,38 @@ class CrmProject extends Model
         // Base per storage: senza /public (il server serve storage da .../backend/storage/app/public/)
         $base = preg_replace('#/public$#', '', $base);
         return $base . '/storage/app/public/' . ltrim($this->cover_photo, '/');
+    }
+
+    /**
+     * Relazione con Workspace Settings
+     */
+    public function workspaceSettings(): HasMany
+    {
+        return $this->hasMany(CrmProjectWorkspaceSetting::class, 'project_id');
+    }
+
+    /**
+     * Relazione con Workspace Branches
+     */
+    public function workspaceBranches(): HasMany
+    {
+        return $this->hasMany(WorkspaceBranch::class, 'project_id');
+    }
+
+    /**
+     * Relazione con Workspace Agents
+     */
+    public function workspaceAgents(): HasMany
+    {
+        return $this->hasMany(WorkspaceAgent::class, 'project_id');
+    }
+
+    /**
+     * Relazione con Workspace User Tasks
+     */
+    public function workspaceUserTasks(): HasMany
+    {
+        return $this->hasMany(WorkspaceUserTask::class, 'project_id');
     }
 }
 

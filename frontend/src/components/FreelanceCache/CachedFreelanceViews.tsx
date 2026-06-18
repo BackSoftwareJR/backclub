@@ -14,6 +14,7 @@ const CACHEABLE_PATH_PATTERNS: Array<{ pattern: RegExp; key: string }> = [
   { pattern: /^\/freelance\/calendario\/?$/, key: '/freelance/calendario' },
   { pattern: /^\/freelance\/supporto\/?$/, key: '/freelance/supporto' },
   { pattern: /^\/freelance\/notifiche\/?$/, key: '/freelance/notifiche' },
+  { pattern: /^\/freelance\/impostazioni\/?$/, key: '/freelance/impostazioni' },
 ];
 
 export function getFreelanceCacheKey(pathname: string): string | null {

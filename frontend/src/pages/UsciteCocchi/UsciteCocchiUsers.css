@@ -1,244 +1,55 @@
+/* Users Page */
+
 .users-page {
-    min-height: 100vh;
-    background: linear-gradient(135deg, rgb(18, 18, 20) 0%, rgb(25, 25, 28) 100%);
-    padding: 1.5rem;
-    color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 /* Header */
 .users-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 12px;
 }
 
 .users-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
 }
 
-/* KPIs */
+/* KPI Cards */
 .users-kpis {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: 12px;
 }
 
-/* Search & Filters */
-.search-filters {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-}
-
-.search-bar {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    background: rgba(30, 30, 35, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 0.875rem 1.25rem;
-}
-
-.search-bar input {
-    flex: 1;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 1rem;
-}
-
-.search-bar input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.filters {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.filters select {
-    padding: 0.875rem 1.25rem;
-    background: rgba(30, 30, 35, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-    cursor: pointer;
-}
-
-/* Users Grid */
-.users-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.25rem;
-}
-
-.user-card {
-    background: rgba(30, 30, 35, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 1.5rem;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.user-card:hover {
-    background: rgba(30, 30, 35, 0.8);
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
-    border-color: rgba(10, 132, 255, 0.3);
-}
-
-.user-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.user-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #0A84FF 0%, #0066CC 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.user-info h3 {
-    margin: 0 0 0.25rem 0;
-    font-size: 1rem;
-    font-weight: 600;
-}
-
-.user-info p {
-    margin: 0;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.user-stats {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    padding: 0.875rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.user-stats .stat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.user-badges {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.badge {
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.625rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.badge.role-admin {
-    background: rgba(255, 69, 58, 0.2);
-    color: #FF453A;
-}
-
-.badge.role-manager {
-    background: rgba(10, 132, 255, 0.2);
-    color: #0A84FF;
-}
-
-.badge.role-developer,
-.badge.role-designer {
-    background: rgba(52, 199, 89, 0.2);
-    color: #34C759;
-}
-
-.badge.status-active {
-    background: rgba(52, 199, 89, 0.2);
-    color: #34C759;
-}
-
-.badge.status-inactive {
-    background: rgba(142, 142, 147, 0.2);
-    color: #8E8E93;
-}
-
-/* States */
-.loading-state,
-.empty-state {
-    text-align: center;
-    padding: 4rem 2rem;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 1.125rem;
-}
-
-/* Buttons */
-.btn-back {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(-4px);
-}
-
-/* KPI Card */
 .kpi-card {
-    background: rgba(30, 30, 35, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 1rem;
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    transition: all 0.3s;
+    gap: 12px;
+    transition: all 180ms;
 }
 
 .kpi-card:hover {
-    transform: translateY(-2px);
-    background: rgba(30, 30, 35, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: none;
 }
 
 .kpi-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -247,26 +58,228 @@
 
 .kpi-content {
     flex: 1;
+    min-width: 0;
 }
 
 .kpi-label {
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 0 0 0.125rem 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-quaternary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
+    margin: 0 0 3px 0;
 }
 
 .kpi-value {
-    font-size: 1.25rem;
+    font-size: 20px;
     font-weight: 700;
+    color: var(--color-text-primary);
+    font-variant-numeric: tabular-nums;
     margin: 0;
+    line-height: 1;
+}
+
+/* Back Button */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--color-accent-blue);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 180ms;
+    font-family: inherit;
+}
+
+.btn-back:hover {
+    background: var(--color-bg-secondary);
+    transform: none;
+}
+
+/* Search & Filters */
+.search-filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-bar {
+    flex: 1;
+    min-width: 240px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    padding: 7px 12px;
+    color: var(--color-text-quaternary);
+}
+
+.search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.search-bar input::placeholder {
+    color: var(--color-text-quaternary);
+}
+
+.filters {
+    display: flex;
+    gap: 8px;
+}
+
+.filters select {
+    padding: 7px 12px;
+    background: var(--color-bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    color: var(--color-text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+    outline: none;
+}
+
+/* Users Grid */
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.user-card {
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 180ms;
+}
+
+.user-card:hover {
+    background: var(--color-bg-tertiary);
+    border-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--color-accent-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    flex-shrink: 0;
+}
+
+.user-info h3 {
+    margin: 0 0 2px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-quaternary);
+}
+
+.user-stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.user-stats .stat {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+}
+
+.user-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.badge.role-admin {
+    background: rgba(255, 69, 58, 0.12);
+    color: var(--color-error);
+}
+
+.badge.role-manager {
+    background: rgba(10, 132, 255, 0.12);
+    color: var(--color-accent-blue);
+}
+
+.badge.role-developer,
+.badge.role-designer {
+    background: rgba(52, 199, 89, 0.12);
+    color: var(--color-accent-emerald);
+}
+
+.badge.status-active {
+    background: rgba(52, 199, 89, 0.12);
+    color: var(--color-accent-emerald);
+}
+
+.badge.status-inactive {
+    background: rgba(142, 142, 147, 0.12);
+    color: var(--color-text-quaternary);
+}
+
+/* States */
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--color-text-quaternary);
+    font-size: 14px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .users-page {
-        padding: 1rem;
+        padding: 16px;
     }
 
     .search-filters {

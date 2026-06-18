@@ -1,16 +1,14 @@
 .modal-invoice-settle {
-  background: rgba(28, 28, 30, 0.95);
-  backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  background: var(--seller-bg-elevated, rgba(17, 17, 19, 1));
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--seller-radius-xl, 20px);
   width: 100%;
   max-width: 700px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  animation: slideUp 0.3s ease;
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
 }
 
 .invoice-info-box {

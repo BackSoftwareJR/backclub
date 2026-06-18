@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import {
   Wallet,
   Percent,
@@ -13,17 +14,29 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { useIsMobile } from '../../hooks/useIsMobile';
 import { sellerCommissionsApi } from '../../api/sellerCommissions';
 import { amministrazioneGuideSections } from '../../data/supportData';
 import './AmministrazioneProvvigioniPage.css';
 
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 16 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.44, ease: [0.22, 1, 0.36, 1] as const, delay },
+});
+
+const stagger = {
+  hidden:  { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
+};
+
+const staggerItem = {
+  hidden:  { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const } },
+};
+
 const AmministrazioneProvvigioniPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { resolvedTheme } = useTheme();
-  const isMobile = useIsMobile();
   const [commissionRate, setCommissionRate] = useState<number | null>(null);
   const [loadingRate, setLoadingRate] = useState(true);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(
@@ -65,15 +78,17 @@ const AmministrazioneProvvigioniPage: React.FC = () => {
     navigate('/seller/commissioni');
   };
 
-  const themeClass = resolvedTheme === 'dark' ? 'theme-dark' : 'theme-light';
-
   return (
-    <div
-      className={`amministrazione-provvigioni-page ${themeClass}`}
-      data-mobile={isMobile}
-    >
-      {/* Back link (mobile-friendly) */}
-      <div className="ammin-back-wrap">
+    <div className="amministrazione-provvigioni-page">
+      {/* Decorative background */}
+      <div className="ammin-hero-bg" aria-hidden>
+        <div className="ammin-hero-orb ammin-hero-orb-1" />
+        <div className="ammin-hero-orb ammin-hero-orb-2" />
+        <div className="ammin-hero-grid" />
+      </div>
+
+      {/* Back link */}
+      <motion.div className="ammin-back-wrap" {...fadeUp(0)}>
         <button
           type="button"
           className="ammin-back-btn"
@@ -83,34 +98,29 @@ const AmministrazioneProvvigioniPage: React.FC = () => {
           <ArrowLeft size={20} aria-hidden />
           <span>Supporto</span>
         </button>
-      </div>
-
-      {/* Decorative background elements */}
-      <div className="ammin-hero-bg" aria-hidden>
-        <div className="ammin-hero-orb ammin-hero-orb-1" />
-        <div className="ammin-hero-orb ammin-hero-orb-2" />
-        <div className="ammin-hero-grid" />
-      </div>
+      </motion.div>
 
       {/* Hero */}
-      <header className="ammin-hero">
+      <motion.header className="ammin-hero" {...fadeUp(0.06)}>
         <div className="ammin-hero-inner">
-          <div className="ammin-hero-icon-wrap">
-            <Wallet className="ammin-hero-icon" size={isMobile ? 40 : 48} strokeWidth={1.5} />
-          </div>
-          <h1 className="ammin-hero-title">Amministrazione & Provvigioni</h1>
-          <p className="ammin-hero-subtitle">
+          <motion.div className="ammin-hero-icon-wrap" {...fadeUp(0.1)}>
+            <Wallet className="ammin-hero-icon" size={40} strokeWidth={1.5} />
+          </motion.div>
+          <motion.h1 className="ammin-hero-title" {...fadeUp(0.15)}>
+            Amministrazione &amp; Provvigioni
+          </motion.h1>
+          <motion.p className="ammin-hero-subtitle" {...fadeUp(0.2)}>
             Pagamenti, fatture, calcolo fee e storico bonifici. Tutto quello che ti serve per gestire le tue provvigioni.
-          </p>
+          </motion.p>
         </div>
-      </header>
+      </motion.header>
 
       {/* Commission badge card */}
-      <section className="ammin-commission-card ammin-anim-in">
-        <div className="ammin-commission-card-glow" aria-hidden />
+      <motion.section className="ammin-commission-card seller-card" {...fadeUp(0.22)}>
+        <div className="ammin-commission-card-accent" aria-hidden />
         <div className="ammin-commission-content">
           <div className="ammin-commission-header">
-            <Percent className="ammin-commission-icon" size={28} strokeWidth={2} />
+            <Percent className="ammin-commission-icon" size={24} strokeWidth={2} />
             <span className="ammin-commission-label">La tua commissione</span>
           </div>
           {loadingRate ? (
@@ -128,25 +138,30 @@ const AmministrazioneProvvigioniPage: React.FC = () => {
             La percentuale è quella associata al tuo profilo venditore.
           </p>
         </div>
-      </section>
+      </motion.section>
 
       {/* Guide sections */}
       <section className="ammin-guide">
-        <h2 className="ammin-guide-heading ammin-anim-in">
-          <FileText size={22} aria-hidden />
+        <motion.h2 className="ammin-guide-heading" {...fadeUp(0.28)}>
+          <FileText size={20} aria-hidden />
           Come funzionano le commissioni
-        </h2>
-        <div className="ammin-guide-list">
-          {amministrazioneGuideSections.map((section, index) => {
+        </motion.h2>
+        <motion.div
+          className="ammin-guide-list"
+          variants={stagger}
+          initial="hidden"
+          animate="visible"
+        >
+          {amministrazioneGuideSections.map((section) => {
             const isExpanded = expandedSections.has(section.id);
             return (
-              <div
+              <motion.div
                 key={section.id}
-                className="ammin-guide-item ammin-anim-in"
+                className="ammin-guide-item seller-card"
                 ref={(el) => {
                   sectionRefs.current[section.id] = el;
                 }}
-                style={{ animationDelay: `${index * 0.06}s` }}
+                variants={staggerItem}
               >
                 <button
                   type="button"
@@ -156,9 +171,9 @@ const AmministrazioneProvvigioniPage: React.FC = () => {
                 >
                   <span className="ammin-guide-trigger-text">{section.title}</span>
                   {isExpanded ? (
-                    <ChevronUp size={22} className="ammin-guide-chevron" aria-hidden />
+                    <ChevronUp size={20} className="ammin-guide-chevron" aria-hidden />
                   ) : (
-                    <ChevronDown size={22} className="ammin-guide-chevron" aria-hidden />
+                    <ChevronDown size={20} className="ammin-guide-chevron" aria-hidden />
                   )}
                 </button>
                 <div
@@ -169,46 +184,51 @@ const AmministrazioneProvvigioniPage: React.FC = () => {
                     <p>{section.content}</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </section>
 
-      {/* Visual summary strip (icons + short labels) */}
-      <section className="ammin-summary-strip ammin-anim-in">
-        <div className="ammin-summary-item">
+      {/* Visual summary strip */}
+      <motion.section
+        className="ammin-summary-strip"
+        variants={stagger}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div className="ammin-summary-item" variants={staggerItem}>
           <div className="ammin-summary-icon-wrap ammin-summary-icon-pending">
             <Clock size={20} aria-hidden />
           </div>
           <span className="ammin-summary-label">In attesa</span>
-        </div>
-        <div className="ammin-summary-item">
+        </motion.div>
+        <motion.div className="ammin-summary-item" variants={staggerItem}>
           <div className="ammin-summary-icon-wrap ammin-summary-icon-ready">
             <CircleDollarSign size={20} aria-hidden />
           </div>
           <span className="ammin-summary-label">Prelevabile</span>
-        </div>
-        <div className="ammin-summary-item">
+        </motion.div>
+        <motion.div className="ammin-summary-item" variants={staggerItem}>
           <div className="ammin-summary-icon-wrap ammin-summary-icon-done">
             <CheckCircle2 size={20} aria-hidden />
           </div>
           <span className="ammin-summary-label">Riscossa</span>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
       {/* CTA */}
-      <section className="ammin-cta ammin-anim-in">
+      <motion.section className="ammin-cta" {...fadeUp(0.4)}>
         <button
           type="button"
           className="ammin-cta-btn"
           onClick={handleGoToCommissions}
         >
-          <Wallet size={22} aria-hidden />
+          <Wallet size={20} aria-hidden />
           <span>Vai a Commissioni</span>
-          <ArrowRight size={20} aria-hidden />
+          <ArrowRight size={18} aria-hidden />
         </button>
-      </section>
+      </motion.section>
     </div>
   );
 };

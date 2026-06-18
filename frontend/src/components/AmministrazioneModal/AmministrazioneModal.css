@@ -1,186 +1,140 @@
-/* Amministrazione Modal - Commission badge & guide */
+/* ============================================================
+   AmministrazioneModal — Apple-style, seller design system
+   ============================================================ */
 
 .amministrazione-modal-overlay {
-  z-index: 1000;
+    z-index: 1000;
 }
 
 .amministrazione-modal-content {
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .amministrazione-modal-header .amministrazione-modal-icon {
-  color: #8B5CF6;
+    color: #8b5cf6;
 }
 
 .amministrazione-modal-body {
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
 }
 
+/* Commission badge */
 .amministrazione-commission-badge {
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(139, 92, 246, 0.25);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0.02) 100%);
-}
-
-.seller-support-page.theme-light .amministrazione-commission-badge,
-[data-theme="light"] .amministrazione-commission-badge {
-  border-color: rgba(139, 92, 246, 0.3);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(139, 92, 246, 0.02) 100%);
-}
-
-.seller-support-page.theme-dark .amministrazione-commission-badge,
-[data-theme="dark"] .amministrazione-commission-badge {
-  border-color: rgba(167, 139, 250, 0.2);
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(139, 92, 246, 0.04) 100%);
+    padding: 20px;
+    border-radius: var(--seller-radius-md);
+    margin-bottom: 24px;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    background: rgba(139, 92, 246, 0.06);
 }
 
 .amministrazione-commission-label {
-  display: block;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 4px;
-  color: #8B5CF6;
+    display: block;
+    font-size: var(--seller-font-xs);
+    font-weight: var(--seller-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    color: #8b5cf6;
 }
 
 .amministrazione-commission-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1D1D1F;
+    font-size: 1.75rem;
+    font-weight: var(--seller-weight-bold);
+    color: var(--seller-text-primary);
 }
 
 .amministrazione-commission-value.loading {
-  color: #86868B;
-}
-
-.seller-support-page.theme-dark .amministrazione-commission-value,
-[data-theme="dark"] .amministrazione-commission-value {
-  color: #FFFFFF;
-}
-
-.seller-support-page.theme-dark .amministrazione-commission-value.loading,
-[data-theme="dark"] .amministrazione-commission-value.loading {
-  color: #98989D;
+    color: var(--seller-text-tertiary);
 }
 
 .amministrazione-commission-note {
-  font-size: 0.875rem;
-  margin: 10px 0 0 0;
-  line-height: 1.5;
-  color: #6B7280;
+    font-size: var(--seller-font-sm);
+    margin: 10px 0 0 0;
+    line-height: 1.5;
+    color: var(--seller-text-secondary);
 }
 
-.seller-support-page.theme-dark .amministrazione-commission-note,
-[data-theme="dark"] .amministrazione-commission-note {
-  color: #98989D;
-}
-
+/* Guide sections */
 .amministrazione-guide-sections {
-  margin-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .amministrazione-guide-section {
-  margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .amministrazione-guide-section-title {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 10px;
-  border: none;
-  background: #F5F5F7;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: left;
-  font-family: inherit;
-  transition: background 0.2s ease;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: var(--seller-radius-sm);
+    border: 1px solid var(--seller-border);
+    background: var(--seller-bg-overlay);
+    cursor: pointer;
+    font-size: var(--seller-font-sm);
+    font-weight: var(--seller-weight-semibold);
+    text-align: left;
+    font-family: inherit;
+    color: var(--seller-text-primary);
+    transition: background var(--seller-transition-fast), border-color var(--seller-transition-fast);
 }
 
 .amministrazione-guide-section-title:hover {
-  background: #EBEBED;
-}
-
-.seller-support-page.theme-light .amministrazione-guide-section-title,
-[data-theme="light"] .amministrazione-guide-section-title {
-  color: #1D1D1F;
-}
-
-.seller-support-page.theme-dark .amministrazione-guide-section-title,
-[data-theme="dark"] .amministrazione-guide-section-title {
-  background: #2C2C2E;
-  color: #FFFFFF;
-}
-
-.seller-support-page.theme-dark .amministrazione-guide-section-title:hover,
-[data-theme="dark"] .amministrazione-guide-section-title:hover {
-  background: #3A3A3C;
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--seller-border-strong);
 }
 
 .amministrazione-guide-section-content {
-  padding: 12px 16px 16px;
-  animation: amministrazioneSlideDown 0.25s ease;
+    padding: 12px 16px 16px;
+    animation: amministrazioneSlideDown 0.2s ease;
 }
 
 .amministrazione-guide-section-content p {
-  font-size: 0.9375rem;
-  line-height: 1.65;
-  margin: 0;
-  color: #4B5563;
-}
-
-.seller-support-page.theme-dark .amministrazione-guide-section-content p,
-[data-theme="dark"] .amministrazione-guide-section-content p {
-  color: #98989D;
+    font-size: var(--seller-font-sm);
+    line-height: 1.65;
+    margin: 0;
+    color: var(--seller-text-secondary);
 }
 
 @keyframes amministrazioneSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
+/* CTA */
 .amministrazione-modal-cta {
-  padding-top: 8px;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.seller-support-page.theme-dark .amministrazione-modal-cta,
-[data-theme="dark"] .amministrazione-modal-cta {
-  border-top-color: rgba(255, 255, 255, 0.08);
+    padding-top: 16px;
+    border-top: 1px solid var(--seller-border);
 }
 
 .amministrazione-cta-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 20px;
-  border-radius: 10px;
-  border: none;
-  background: #8B5CF6;
-  color: #FFFFFF;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 100px;
+    border: none;
+    background: #8b5cf6;
+    color: #ffffff;
+    font-size: var(--seller-font-sm);
+    font-weight: var(--seller-weight-semibold);
+    font-family: inherit;
+    cursor: pointer;
+    transition: opacity var(--seller-transition-fast);
 }
 
 .amministrazione-cta-btn:hover {
-  background: #7C3AED;
+    opacity: 0.85;
 }

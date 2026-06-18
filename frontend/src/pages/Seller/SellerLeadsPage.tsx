@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus, Phone, Mail, Search, MapPin, X, ChevronRight, Trash2, Copy, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -274,24 +275,20 @@ const SellerLeadsPage: React.FC = () => {
     return typeof first === 'string' ? first : first.email;
   };
 
-  // Generate avatar color based on company name
-  const getAvatarColor = (companyName: string) => {
-    const colors = [
-      { bg: '#DBEAFE', text: '#1E40AF' }, // blue
-      { bg: '#E9D5FF', text: '#6B21A8' }, // purple
-      { bg: '#FCE7F3', text: '#9F1239' }, // pink
-      { bg: '#D1FAE5', text: '#065F46' }, // green
-      { bg: '#FEF3C7', text: '#92400E' }, // yellow
-      { bg: '#FED7AA', text: '#9A3412' }, // orange
-      { bg: '#E0E7FF', text: '#3730A3' }, // indigo
-      { bg: '#F3E8FF', text: '#6B21A8' }, // violet
-    ];
-    const index = companyName.charCodeAt(0) % colors.length;
-    return colors[index];
+  // HSL avatar style — deterministic hue from name hash
+  const getAvatarStyle = (name: string): React.CSSProperties => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return { background: `hsl(${hue}, 70%, 45%)`, color: '#ffffff' };
   };
 
   const getInitials = (companyName: string): string => {
-    return companyName.charAt(0).toUpperCase();
+    const parts = companyName.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return companyName.substring(0, 2).toUpperCase();
   };
 
   // Render mobile version if on mobile
@@ -316,6 +313,10 @@ const SellerLeadsPage: React.FC = () => {
     <div className={`apple-crm-page ${resolvedTheme === 'dark' ? 'dark' : 'light'}`}>
       <GuideTour steps={contattiTourSteps} tourId="contatti-tour" />
       <GuideTour steps={completeTourSteps} tourId="complete-tour" />
+      {/* Page Header */}
+      <div className="apple-crm-page-header">
+        <h1 className="apple-crm-page-title">I Miei Contatti</h1>
+      </div>
       {/* Unified Toolbar */}
       <div className="apple-crm-toolbar">
         <div className="apple-crm-search">
@@ -389,28 +390,28 @@ const SellerLeadsPage: React.FC = () => {
         </div>
       ) : (
         <div className="apple-crm-list">
-          {filteredLeads.map((lead) => {
+          {filteredLeads.map((lead, index) => {
             const priorityBadge = getPriorityBadge(lead.priority);
             const primaryPhone = getPrimaryPhone(lead);
             const primaryEmail = getPrimaryEmail(lead);
             
-            const avatarColor = getAvatarColor(lead.company_name);
+            const avatarStyle = getAvatarStyle(lead.company_name);
             const initials = getInitials(lead.company_name);
             
             return (
-              <div 
+              <motion.div
                 key={lead.id} 
                 className="apple-crm-row"
                 onClick={() => navigate(`/seller/contatti/${lead.id}`)}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03, duration: 0.18, ease: 'easeOut' }}
               >
                 {/* Avatar Column */}
                 <div className="apple-crm-avatar">
                   <div 
                     className="contact-avatar"
-                    style={{ 
-                      backgroundColor: avatarColor.bg, 
-                      color: avatarColor.text 
-                    }}
+                    style={avatarStyle}
                   >
                     {initials}
                   </div>
@@ -533,7 +534,7 @@ const SellerLeadsPage: React.FC = () => {
                     </button>
                   )}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

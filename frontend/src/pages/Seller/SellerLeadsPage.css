@@ -1,47 +1,68 @@
-/* Apple CRM Style - Contacts/Leads Page */
+/* ============================================================
+   Seller Leads Page — Apple iOS 17 / macOS Sonoma style
+   Uses --seller-* design system variables
+   .dark / .light classes from resolvedTheme prop override vars
+   ============================================================ */
 
 .apple-crm-page {
   width: 100%;
   min-height: 100vh;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  -webkit-font-smoothing: antialiased;
   letter-spacing: -0.01em;
+  background: transparent;
+  color: var(--seller-text-primary);
 }
 
-/* Light Mode */
 .apple-crm-page.light {
-  background: #F5F5F7;
-  color: #1d1d1f;
+  color: var(--seller-text-primary);
 }
-
-/* Dark Mode */
 .apple-crm-page.dark {
-  background: #000000;
-  color: #ffffff;
+  color: var(--seller-text-primary);
 }
 
-/* Unified Toolbar */
+/* ── Page Header ──────────────────────────────────────────── */
+.apple-crm-page-header {
+  padding: var(--seller-spacing-8) var(--seller-spacing-6) 0;
+}
+
+.apple-crm-page-title {
+  font-size: var(--seller-font-3xl);
+  font-weight: var(--seller-weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin: 0 0 var(--seller-spacing-5) 0;
+  color: var(--seller-text-primary);
+}
+
+.apple-crm-page.light .apple-crm-page-title {
+  color: var(--seller-text-primary);
+}
+.apple-crm-page.dark .apple-crm-page-title {
+  color: var(--seller-text-primary);
+}
+
+/* ── Toolbar ──────────────────────────────────────────────── */
 .apple-crm-toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 20px 24px;
-  border-bottom: 1px solid;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-4) var(--seller-spacing-6);
+  border-bottom: 1px solid var(--seller-border);
 }
 
 .apple-crm-page.light .apple-crm-toolbar {
-  border-bottom-color: #e5e5e5;
-  background: #F5F5F7;
+  border-bottom-color: rgba(0, 0, 0, 0.08);
 }
-
 .apple-crm-page.dark .apple-crm-toolbar {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
-  background: #000000;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
+/* ── Search ───────────────────────────────────────────────── */
 .apple-crm-search {
   flex: 1;
   position: relative;
-  max-width: 600px;
+  max-width: 520px;
 }
 
 .search-icon {
@@ -50,162 +71,148 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-}
-
-.apple-crm-page.light .search-icon {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .search-icon {
-  color: #98989d;
+  color: var(--seller-text-tertiary);
 }
 
 .apple-crm-search-input {
   width: 100%;
-  padding: 10px 12px 10px 40px;
+  padding: 9px 14px 9px 38px;
   border: 1px solid;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
   font-family: inherit;
-  transition: all 0.2s;
+  transition: border-color var(--seller-transition-fast), box-shadow var(--seller-transition-fast);
+  outline: none;
 }
 
 .apple-crm-page.light .apple-crm-search-input {
-  background: #ffffff;
-  border-color: #d1d1d6;
-  color: #1d1d1f;
+  background: var(--seller-bg-elevated);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--seller-text-primary);
 }
-
+.apple-crm-page.light .apple-crm-search-input::placeholder {
+  color: var(--seller-text-secondary);
+}
 .apple-crm-page.light .apple-crm-search-input:focus {
-  outline: none;
-  border-color: #0a84ff;
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+  border-color: var(--seller-accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 .apple-crm-page.dark .apple-crm-search-input {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--seller-text-primary);
 }
-
-.apple-crm-page.dark .apple-crm-search-input:focus {
-  outline: none;
-  border-color: rgba(10, 132, 255, 0.5);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
-}
-
 .apple-crm-page.dark .apple-crm-search-input::placeholder {
-  color: #636366;
+  color: var(--seller-text-secondary);
+}
+.apple-crm-page.dark .apple-crm-search-input:focus {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
-.apple-crm-page.light .apple-crm-search-input::placeholder {
-  color: #86868b;
-}
-
+/* ── Filter Pills ─────────────────────────────────────────── */
 .apple-crm-filters {
   display: flex;
-  gap: 8px;
+  gap: var(--seller-spacing-2);
 }
 
 .apple-crm-filter-pill {
-  padding: 8px 16px;
+  padding: 7px 14px;
   border: 1px solid;
-  border-radius: 20px;
-  font-size: 14px;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
   font-family: inherit;
-  font-weight: 500;
+  font-weight: var(--seller-weight-medium);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--seller-transition-fast);
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%2371717a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 36px;
+  background-position: right 10px center;
+  padding-right: 28px;
+  white-space: nowrap;
 }
 
 .apple-crm-page.light .apple-crm-filter-pill {
-  background-color: #ffffff;
-  border-color: #d1d1d6;
-  color: #1d1d1f;
+  background-color: var(--seller-bg-elevated);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: var(--seller-text-primary);
 }
-
 .apple-crm-page.light .apple-crm-filter-pill:hover {
-  background-color: #f5f5f7;
-  border-color: #86868b;
+  border-color: rgba(0, 0, 0, 0.18);
+  background-color: var(--seller-bg);
 }
 
 .apple-crm-page.dark .apple-crm-filter-pill {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--seller-text-primary);
 }
-
 .apple-crm-page.dark .apple-crm-filter-pill:hover {
   background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
+/* ── Primary Button ───────────────────────────────────────── */
 .apple-crm-primary-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: #0a84ff;
+  gap: 6px;
+  padding: 8px 18px;
+  background: var(--seller-accent);
   color: #ffffff;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--seller-transition-fast), transform var(--seller-transition-fast);
   white-space: nowrap;
 }
 
 .apple-crm-primary-btn:hover {
-  background: #0066cc;
+  background: var(--seller-accent-hover);
 }
-
 .apple-crm-primary-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
-/* Contact List */
+/* ── Contact List ─────────────────────────────────────────── */
 .apple-crm-list {
   display: flex;
   flex-direction: column;
 }
 
+/* ── Row ──────────────────────────────────────────────────── */
 .apple-crm-row {
   display: grid;
   grid-template-columns: auto 2fr 1.8fr 1fr 1fr;
-  gap: 12px;
+  gap: var(--seller-spacing-3);
   align-items: center;
-  padding: 10px 24px;
+  padding: 11px var(--seller-spacing-6);
   border-bottom: 1px solid;
-  transition: background-color 0.15s;
+  transition: background var(--seller-transition-fast);
   cursor: pointer;
+  position: relative;
 }
 
 .apple-crm-page.light .apple-crm-row {
-  border-bottom-color: #e5e5e5;
-  background: transparent;
+  border-bottom-color: rgba(0, 0, 0, 0.07);
 }
-
 .apple-crm-page.light .apple-crm-row:hover {
-  background: #ffffff;
+  background: rgba(0, 0, 0, 0.02);
 }
 
 .apple-crm-page.dark .apple-crm-row {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
-  background: transparent;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
 }
-
 .apple-crm-page.dark .apple-crm-row:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
 }
 
-/* Avatar Column */
+/* ── Avatar ───────────────────────────────────────────────── */
 .apple-crm-avatar {
   display: flex;
   align-items: center;
@@ -214,139 +221,107 @@
 }
 
 .contact-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-size: 13px;
+  font-weight: var(--seller-weight-semibold);
+  letter-spacing: -0.02em;
   flex-shrink: 0;
+  color: #ffffff;
 }
 
-/* Column 1: Entity */
+/* ── Col 1: Entity ────────────────────────────────────────── */
 .apple-crm-entity {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
 .entity-name {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
   letter-spacing: -0.01em;
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-.apple-crm-page.light .entity-name {
-  color: #1d1d1f;
-}
-
-.apple-crm-page.dark .entity-name {
-  color: #ffffff;
-}
+.apple-crm-page.light .entity-name { color: var(--seller-text-primary); }
+.apple-crm-page.dark  .entity-name { color: var(--seller-text-primary); }
 
 .entity-meta {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: var(--seller-font-xs);
   flex-wrap: wrap;
 }
-
 .entity-type {
-  font-weight: 500;
+  font-weight: var(--seller-weight-medium);
 }
+.apple-crm-page.light .entity-type     { color: var(--seller-text-tertiary); }
+.apple-crm-page.dark  .entity-type     { color: var(--seller-text-tertiary); }
 
-.apple-crm-page.light .entity-type {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .entity-type {
-  color: #98989d;
-}
-
-.entity-separator {
-  color: #86868b;
-  opacity: 0.5;
-}
-
-.apple-crm-page.dark .entity-separator {
-  color: #636366;
-}
+.entity-separator { opacity: 0.4; }
 
 .entity-location {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
+.apple-crm-page.light .entity-location { color: var(--seller-text-tertiary); }
+.apple-crm-page.dark  .entity-location { color: var(--seller-text-tertiary); }
 
-.apple-crm-page.light .entity-location {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .entity-location {
-  color: #98989d;
-}
-
-/* Column 2: Contact Person */
+/* ── Col 2: Contact Person ────────────────────────────────── */
 .apple-crm-contact {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   min-width: 0;
 }
 
 .contact-name {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
   line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-
-.apple-crm-page.light .contact-name {
-  color: #1d1d1f;
-}
-
-.apple-crm-page.dark .contact-name {
-  color: #ffffff;
-}
+.apple-crm-page.light .contact-name { color: var(--seller-text-secondary); }
+.apple-crm-page.dark  .contact-name { color: var(--seller-text-secondary); }
 
 .contact-phone {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 11px;
+  font-size: var(--seller-font-xs);
 }
+.apple-crm-page.light .contact-phone { color: var(--seller-text-tertiary); }
+.apple-crm-page.dark  .contact-phone { color: var(--seller-text-secondary); }
 
-.apple-crm-page.light .contact-phone {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .contact-phone {
-  color: #98989d;
-}
-
-/* Column 3: Priority */
+/* ── Col 3: Priority ──────────────────────────────────────── */
 .apple-crm-priority {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
 }
 
 .priority-indicator {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 500;
+  gap: 5px;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
 }
 
 .priority-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -356,70 +331,74 @@
   white-space: nowrap;
 }
 
-/* Column 4: Smart Actions */
+/* ── Col 4: Actions ───────────────────────────────────────── */
 .apple-crm-actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
   justify-content: flex-end;
   flex-shrink: 0;
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--seller-transition-fast),
+    transform var(--seller-transition-fast);
 }
 
-/* Phone Tooltip */
+.apple-crm-row:hover .apple-crm-actions {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* ── Phone Tooltip ────────────────────────────────────────── */
 .phone-tooltip-wrapper {
   position: relative;
 }
 
 .phone-tooltip {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 8px);
   right: 0;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
+  padding: 7px 11px;
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
   white-space: nowrap;
-  z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: var(--seller-z-dropdown);
+  box-shadow: var(--seller-shadow-md);
 }
-
 .apple-crm-page.light .phone-tooltip {
-  background: #ffffff;
-  border: 1px solid #d1d1d6;
-  color: #1d1d1f;
+  background: var(--seller-bg-elevated);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: var(--seller-text-primary);
 }
-
 .apple-crm-page.dark .phone-tooltip {
-  background: #1c1c1e;
+  background: var(--seller-bg-elevated);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--seller-text-primary);
 }
 
-/* Email Menu Dropdown */
+/* ── Email Menu ───────────────────────────────────────────── */
 .email-menu-wrapper {
   position: relative;
 }
 
 .email-menu-dropdown {
   position: absolute;
-  bottom: 100%;
+  bottom: calc(100% + 8px);
   right: 0;
-  margin-bottom: 8px;
   min-width: 200px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  border-radius: var(--seller-radius-md);
+  box-shadow: var(--seller-shadow-lg);
+  z-index: var(--seller-z-dropdown);
   overflow: hidden;
 }
-
 .apple-crm-page.light .email-menu-dropdown {
-  background: #ffffff;
-  border: 1px solid #d1d1d6;
+  background: var(--seller-bg-elevated);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
-
 .apple-crm-page.dark .email-menu-dropdown {
-  background: #1c1c1e;
+  background: var(--seller-bg-elevated);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -432,99 +411,63 @@
   border: none;
   background: transparent;
   text-align: left;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  font-family: inherit;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background var(--seller-transition-fast);
 }
-
-.apple-crm-page.light .email-menu-item {
-  color: #1d1d1f;
-}
-
-.apple-crm-page.light .email-menu-item:hover {
-  background: #f5f5f7;
-}
-
-.apple-crm-page.dark .email-menu-item {
-  color: #ffffff;
-}
-
-.apple-crm-page.dark .email-menu-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
 .email-menu-item:not(:last-child) {
   border-bottom: 1px solid;
 }
+.apple-crm-page.light .email-menu-item { color: var(--seller-text-primary); }
+.apple-crm-page.light .email-menu-item:hover { background: var(--seller-text-primary); }
+.apple-crm-page.light .email-menu-item:not(:last-child) { border-bottom-color: rgba(0, 0, 0, 0.07); }
 
-.apple-crm-page.light .email-menu-item:not(:last-child) {
-  border-bottom-color: #e5e5e5;
-}
+.apple-crm-page.dark .email-menu-item { color: var(--seller-text-primary); }
+.apple-crm-page.dark .email-menu-item:hover { background: rgba(255, 255, 255, 0.06); }
+.apple-crm-page.dark .email-menu-item:not(:last-child) { border-bottom-color: rgba(255, 255, 255, 0.06); }
 
-.apple-crm-page.dark .email-menu-item:not(:last-child) {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
-}
-
+/* ── Action Icon Button ───────────────────────────────────── */
 .action-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background var(--seller-transition-fast), color var(--seller-transition-fast);
   flex-shrink: 0;
 }
 
-.apple-crm-page.light .action-icon-btn {
-  color: #86868b;
-}
-
+.apple-crm-page.light .action-icon-btn { color: var(--seller-text-tertiary); }
 .apple-crm-page.light .action-icon-btn:hover {
-  background: #e5e5e5;
-  color: #1d1d1f;
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--seller-text-primary);
 }
-
-.apple-crm-page.dark .action-icon-btn {
-  color: #98989d;
-}
-
+.apple-crm-page.dark .action-icon-btn { color: var(--seller-text-secondary); }
 .apple-crm-page.dark .action-icon-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--seller-text-primary);
 }
 
-.action-icon-btn-danger {
-  opacity: 0.6;
-}
-
-.action-icon-btn-danger:hover {
-  opacity: 1;
-}
-
-.apple-crm-page.light .action-icon-btn-danger {
-  color: #ff3b30;
-}
-
+.action-icon-btn-danger { opacity: 0.6; }
+.action-icon-btn-danger:hover { opacity: 1; }
+.apple-crm-page.light .action-icon-btn-danger { color: var(--seller-danger); }
 .apple-crm-page.light .action-icon-btn-danger:hover {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--seller-danger);
 }
-
-.apple-crm-page.dark .action-icon-btn-danger {
-  color: #ff453a;
-}
-
+.apple-crm-page.dark .action-icon-btn-danger { color: var(--seller-danger); }
 .apple-crm-page.dark .action-icon-btn-danger:hover {
-  background: rgba(255, 69, 58, 0.2);
-  color: #ff453a;
+  background: rgba(248, 113, 113, 0.14);
+  color: var(--seller-danger);
 }
 
-/* Empty State */
+/* ── Empty State ──────────────────────────────────────────── */
 .apple-crm-empty-state {
   display: flex;
   flex-direction: column;
@@ -535,67 +478,48 @@
 }
 
 .empty-state-icon {
-  margin-bottom: 24px;
-  opacity: 0.5;
+  margin-bottom: var(--seller-spacing-6);
+  opacity: 0.4;
 }
-
-.apple-crm-page.light .empty-state-icon {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .empty-state-icon {
-  color: #636366;
-}
+.apple-crm-page.light .empty-state-icon { color: var(--seller-text-secondary); }
+.apple-crm-page.dark  .empty-state-icon { color: var(--seller-text-secondary); }
 
 .apple-crm-empty-state h3 {
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 8px 0;
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-semibold);
+  margin: 0 0 var(--seller-spacing-2) 0;
   letter-spacing: -0.02em;
 }
-
-.apple-crm-page.light .apple-crm-empty-state h3 {
-  color: #1d1d1f;
-}
-
-.apple-crm-page.dark .apple-crm-empty-state h3 {
-  color: #ffffff;
-}
+.apple-crm-page.light .apple-crm-empty-state h3 { color: var(--seller-text-primary); }
+.apple-crm-page.dark  .apple-crm-empty-state h3 { color: var(--seller-text-primary); }
 
 .apple-crm-empty-state p {
-  font-size: 15px;
-  margin: 0 0 32px 0;
+  font-size: var(--seller-font-base);
+  margin: 0 0 var(--seller-spacing-8) 0;
 }
+.apple-crm-page.light .apple-crm-empty-state p { color: var(--seller-text-tertiary); }
+.apple-crm-page.dark  .apple-crm-empty-state p { color: var(--seller-text-secondary); }
 
-.apple-crm-page.light .apple-crm-empty-state p {
-  color: #86868b;
-}
-
-.apple-crm-page.dark .apple-crm-empty-state p {
-  color: #98989d;
-}
-
-/* Modal Styles (keeping existing modal styles) */
+/* ── Modal ────────────────────────────────────────────────── */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-4);
+  z-index: var(--seller-z-modal);
+  padding: var(--seller-spacing-4);
+  backdrop-filter: blur(4px);
 }
 
 .modal-content {
-  background: var(--color-background);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-xl);
+  box-shadow: var(--seller-shadow-lg);
   width: 100%;
-  max-width: 600px;
+  max-width: 540px;
   max-height: 90vh;
   overflow-y: auto;
   display: flex;
@@ -606,35 +530,36 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-4);
-  border-bottom: 1px solid var(--color-border);
+  padding: var(--seller-spacing-5) var(--seller-spacing-6);
+  border-bottom: 1px solid var(--seller-border);
 }
-
 .modal-header h2 {
   margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  letter-spacing: -0.02em;
 }
 
 .modal-close {
   background: none;
   border: none;
   cursor: pointer;
-  padding: var(--spacing-1);
+  padding: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-secondary);
-  transition: color 0.2s;
+  color: var(--seller-text-tertiary);
+  border-radius: var(--seller-radius-sm);
+  transition: color var(--seller-transition-fast), background var(--seller-transition-fast);
 }
-
 .modal-close:hover {
-  color: var(--color-text-primary);
+  color: var(--seller-text-primary);
+  background: var(--seller-bg-overlay);
 }
 
 .modal-body {
-  padding: var(--spacing-4);
+  padding: var(--seller-spacing-5) var(--seller-spacing-6);
   flex: 1;
   overflow-y: auto;
 }
@@ -643,45 +568,47 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4);
-  border-top: 1px solid var(--color-border);
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-4) var(--seller-spacing-6);
+  border-top: 1px solid var(--seller-border);
 }
 
+/* ── Form ─────────────────────────────────────────────────── */
 .form-group {
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--seller-spacing-4);
 }
 
 .form-label {
   display: block;
-  margin-bottom: var(--spacing-2);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-primary);
+  margin-bottom: var(--seller-spacing-2);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
   width: 100%;
-  padding: var(--spacing-2) var(--spacing-3);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
+  padding: 9px var(--seller-spacing-3);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  font-size: var(--seller-font-sm);
   font-family: inherit;
-  color: var(--color-text-primary);
-  background: var(--color-background);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  color: var(--seller-text-primary);
+  background: var(--seller-bg);
+  transition: border-color var(--seller-transition-fast), box-shadow var(--seller-transition-fast);
+  outline: none;
+  box-sizing: border-box;
 }
-
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus {
-  outline: none;
-  border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+  border-color: var(--seller-accent);
+  box-shadow: 0 0 0 3px var(--seller-accent-soft);
 }
-
 .form-textarea {
   resize: vertical;
   min-height: 80px;
@@ -690,108 +617,93 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-4);
+  gap: var(--seller-spacing-4);
 }
 
+/* ── Buttons ──────────────────────────────────────────────── */
 .btn-primary,
 .btn-secondary {
-  padding: var(--spacing-2) var(--spacing-4);
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  padding: 9px var(--seller-spacing-5);
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--seller-transition-fast);
   border: none;
   display: inline-flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--seller-spacing-2);
 }
 
 .btn-primary {
-  background: var(--color-accent-blue);
-  color: white;
+  background: var(--seller-accent);
+  color: #ffffff;
 }
-
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-accent-blue-dark);
+  background: var(--seller-accent-hover);
 }
-
 .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .btn-secondary {
-  background: var(--color-background-secondary);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border);
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-primary);
+  border: 1px solid var(--seller-border);
 }
-
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-background-tertiary);
+  background: var(--seller-bg-elevated);
 }
 
-/* Responsive adjustments */
+/* ── Responsive ───────────────────────────────────────────── */
 @media (max-width: 1200px) {
   .apple-crm-row {
-    grid-template-columns: auto 2fr 1.5fr 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: auto 2fr 1.5fr 1fr;
   }
-  
-  .contact-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+}
+
+@media (max-width: 900px) {
+  .apple-crm-row {
+    grid-template-columns: auto 2fr 1fr;
   }
+  .apple-crm-contact { display: none; }
 }
 
 @media (max-width: 768px) {
   .apple-crm-toolbar {
     flex-wrap: wrap;
-    padding: 16px;
+    padding: var(--seller-spacing-4);
   }
-
   .apple-crm-search {
     width: 100%;
     max-width: 100%;
     order: 1;
   }
-
   .apple-crm-filters {
     order: 2;
     flex: 1;
   }
-
   .apple-crm-primary-btn {
     order: 3;
     width: 100%;
     justify-content: center;
   }
-
   .apple-crm-row {
     grid-template-columns: auto 1fr;
-    gap: 12px;
-    padding: 12px 16px;
+    padding: 10px var(--seller-spacing-4);
   }
-
-  .apple-crm-entity {
-    grid-column: 2;
-  }
-
   .apple-crm-contact,
-  .apple-crm-priority {
-    display: none;
-  }
-
+  .apple-crm-priority { display: none; }
   .apple-crm-actions {
     grid-column: 2;
     justify-content: flex-start;
-    margin-top: 8px;
+    margin-top: 6px;
+    opacity: 1;
+    transform: none;
   }
-  
-  .contact-avatar {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }

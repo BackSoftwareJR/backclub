@@ -85,6 +85,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | Default sender email address
+    | 
+    | IMPORTANT: For Hostinger SMTP, this MUST match PHPMAILER_USERNAME
+    | If different, the system will automatically use PHPMAILER_USERNAME as From
+    | and set this address as Reply-To instead.
     |
     */
     'from' => [
@@ -101,8 +105,8 @@ return [
     |
     */
     'reply_to' => [
-        'address' => env('PHPMAILER_REPLY_TO_ADDRESS', 'noreply@backclub.it'),
-        'name' => env('PHPMAILER_REPLY_TO_NAME', 'Supporto'),
+        'address' => env('PHPMAILER_REPLY_TO_ADDRESS', ''),
+        'name' => env('PHPMAILER_REPLY_TO_NAME', 'Support Team'),
     ],
 
     /*

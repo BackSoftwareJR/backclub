@@ -6,6 +6,367 @@
     min-height: 100vh;
 }
 
+/* ─── New Shell Override ───────────────────────────────────── */
+.project-detail-page.pdp-shell {
+    padding: 0;
+    max-width: 100%;
+    background: #09090b;
+}
+
+/* Always dark tab-content when shell is active */
+.project-detail-page.pdp-shell .tab-content-section {
+    background: #09090b;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    padding: 24px 32px 40px;
+}
+
+.project-detail-page.pdp-shell .section-title {
+    color: #ffffff;
+}
+
+.project-detail-page.pdp-shell .section-count {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* ─── Cover Hero ───────────────────────────────────────────── */
+.pdp-hero {
+    position: relative;
+    height: 200px;
+    max-height: 200px;
+    overflow: hidden;
+    background: #18181b;
+    flex-shrink: 0;
+}
+
+.pdp-hero-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+/* No-cover fallback: radial gradient mesh from department/status color */
+.pdp-hero-fallback {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 90% at 15% 50%, color-mix(in srgb, var(--pdp-dept-color, #0A84FF) 28%, transparent) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 70% at 85% 20%, color-mix(in srgb, var(--pdp-dept-color, #0A84FF) 18%, transparent) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 55% at 55% 90%, color-mix(in srgb, var(--pdp-dept-color, #0A84FF) 12%, transparent) 0%, transparent 60%),
+        #0f0f11;
+}
+
+/* Gradient fade: transparent at top 40%, solid #09090b at bottom */
+.pdp-hero-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 35%,
+        rgba(9, 9, 11, 0.6) 65%,
+        #09090b 100%
+    );
+    pointer-events: none;
+}
+
+/* Back button — glass pill, top-left */
+.pdp-hero-back {
+    position: absolute;
+    top: 14px;
+    left: 16px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(9, 9, 11, 0.52);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.pdp-hero-back:hover {
+    background: rgba(9, 9, 11, 0.72);
+    border-color: rgba(255, 255, 255, 0.32);
+}
+
+/* Action buttons — glass pills, top-right */
+.pdp-hero-actions {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pdp-hero-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(9, 9, 11, 0.52);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgba(255, 255, 255, 0.85);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.pdp-hero-action-btn:hover {
+    background: rgba(9, 9, 11, 0.72);
+    border-color: rgba(255, 255, 255, 0.32);
+    color: #ffffff;
+}
+
+/* Project name — bottom-left, over image */
+.pdp-hero-title-row {
+    position: absolute;
+    bottom: 16px;
+    left: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.pdp-hero-name {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7), 0 2px 20px rgba(0, 0, 0, 0.5);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pdp-hero-name--editable {
+    cursor: pointer;
+}
+
+.pdp-hero-name--editable:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.pdp-hero-name-edit-icon {
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.pdp-hero-name-input {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    background: rgba(9, 9, 11, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 6px 12px;
+    width: 100%;
+    max-width: 520px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.pdp-hero-name-input:focus {
+    outline: none;
+    border-color: rgba(10, 132, 255, 0.8);
+}
+
+/* ─── Metrics Bar ──────────────────────────────────────────── */
+.pdp-metrics-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(9, 9, 11, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    transition: box-shadow 0.25s ease;
+}
+
+.pdp-metrics-bar--stuck {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.45);
+}
+
+.pdp-metrics-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    padding: 10px 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+}
+
+.pdp-metrics-inner::-webkit-scrollbar {
+    display: none;
+}
+
+/* Override status-badge sizing for the metrics bar */
+.pdp-metrics-inner .status-badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+.pdp-metrics-div {
+    display: inline-block;
+    width: 1px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 14px;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
+.pdp-metric {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1px;
+    flex-shrink: 0;
+}
+
+.pdp-metric--pm {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.pdp-metric-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.pdp-metric-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.38);
+    line-height: 1.2;
+}
+
+.pdp-metric-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+}
+
+.pdp-pm-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.pdp-pm-avatar--placeholder {
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* ─── Segmented Control Tab Bar ────────────────────────────── */
+.pdp-tabs-bar {
+    position: sticky;
+    top: 45px; /* sits just below the metrics bar (~45px tall) */
+    z-index: 39;
+    background: rgba(9, 9, 11, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    padding: 8px 20px;
+    transition: box-shadow 0.25s ease;
+}
+
+.pdp-tabs-bar--stuck {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.pdp-segmented {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    white-space: nowrap;
+}
+
+.pdp-segmented::-webkit-scrollbar {
+    display: none;
+}
+
+.pdp-seg-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.18s ease;
+}
+
+.pdp-seg-label {
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.42);
+    transition: color 0.18s ease;
+    line-height: 1;
+}
+
+.pdp-seg-btn--active .pdp-seg-label {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.pdp-seg-btn:hover:not(.pdp-seg-btn--active) .pdp-seg-label {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+/* Framer Motion animated background for active tab */
+.pdp-seg-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    display: block;
+}
+
 .project-detail-page.calendar-mode {
     padding: 0;
     max-width: 100%;
@@ -2370,6 +2731,584 @@
     opacity: 0.5;
 }
 
+/* ========== pd-team: Team Tab Card Grid ========== */
+.pd-team-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (max-width: 1024px) {
+    .pd-team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .pd-team-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pd-team-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    position: relative;
+    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    cursor: default;
+}
+
+.pd-team-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.14);
+    transform: translateY(-1px);
+}
+
+.pd-team-avatar-wrap {
+    position: relative;
+    margin-bottom: 4px;
+}
+
+.pd-team-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.pd-team-avatar--pm {
+    box-shadow: 0 0 0 2px #007AFF;
+}
+
+.pd-team-initials {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+    user-select: none;
+}
+
+.pd-team-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.3;
+}
+
+.pd-team-role-badge {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 3px 10px;
+    line-height: 1.4;
+}
+
+.pd-team-payment-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 2px;
+}
+
+.pd-team-pay-method {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    padding: 2px 6px;
+}
+
+.pd-team-cocchi-rate {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.pd-team-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.pd-team-action-btn {
+    padding: 5px 7px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.pd-team-action-btn--edit {
+    background: rgba(10, 132, 255, 0.1);
+    color: #0A84FF;
+}
+
+.pd-team-action-btn--edit:hover:not(:disabled) {
+    background: rgba(10, 132, 255, 0.22);
+}
+
+.pd-team-action-btn--remove {
+    background: rgba(255, 59, 48, 0.1);
+    color: #FF3B30;
+}
+
+.pd-team-action-btn--remove:hover:not(:disabled) {
+    background: rgba(255, 59, 48, 0.22);
+}
+
+.pd-team-action-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.pd-team-card--add {
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    min-height: 120px;
+    justify-content: center;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.pd-team-card--add:hover {
+    border-color: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(255, 255, 255, 0.65);
+    transform: none;
+}
+
+.pd-team-add-icon {
+    color: inherit;
+}
+
+.pd-team-add-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: inherit;
+}
+
+/* ========== pd-pmchat: PM Chat Tab (iMessage Dark Mode) ========== */
+.pd-pmchat-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 320px);
+    min-height: 500px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.pd-pmchat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+}
+
+.pd-pmchat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-pmchat-header-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(0, 122, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-size: 15px;
+    font-weight: 700;
+    color: #007AFF;
+    flex-shrink: 0;
+}
+
+.pd-pmchat-header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd-pmchat-header-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.pd-pmchat-header-status {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 2px;
+}
+
+.pd-pmchat-status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.pd-pmchat-status-dot--online { background: #34C759; }
+.pd-pmchat-status-dot--offline { background: rgba(255, 255, 255, 0.25); }
+
+.pd-pmchat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background: transparent;
+}
+
+.pd-pmchat-messages::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pd-pmchat-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pd-pmchat-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 2px;
+}
+
+.pd-pmchat-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+}
+
+.pd-pmchat-empty svg {
+    opacity: 0.35;
+}
+
+.pd-pmchat-empty p {
+    font-size: 15px;
+    font-weight: 500;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.pd-pmchat-empty span {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.32);
+}
+
+.pd-pmchat-date-sep {
+    display: flex;
+    justify-content: center;
+    margin: 14px 0 8px;
+}
+
+.pd-pmchat-date-sep span {
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.42);
+}
+
+.pd-pmchat-msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 2px;
+}
+
+.pd-pmchat-msg-row--sent {
+    justify-content: flex-end;
+}
+
+.pd-pmchat-msg-row--recv {
+    justify-content: flex-start;
+}
+
+.pd-pmchat-msg-row--grouped {
+    margin-top: 1px;
+}
+
+.pd-pmchat-bubble-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 122, 255, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: #007AFF;
+    align-self: flex-end;
+}
+
+.pd-pmchat-bubble-avatar--hidden {
+    visibility: hidden;
+}
+
+.pd-pmchat-bubble-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd-pmchat-bubble-col {
+    display: flex;
+    flex-direction: column;
+    max-width: 65%;
+}
+
+.pd-pmchat-sender-name {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.42);
+    margin-bottom: 4px;
+    padding-left: 12px;
+}
+
+.pd-pmchat-bubble {
+    padding: 10px 14px;
+    word-wrap: break-word;
+    word-break: break-word;
+    position: relative;
+}
+
+.pd-pmchat-bubble--sent {
+    background: #007AFF;
+    color: #ffffff;
+    border-radius: 18px 18px 4px 18px;
+    align-self: flex-end;
+}
+
+.pd-pmchat-bubble--recv {
+    background: rgba(44, 44, 46, 1);
+    color: #ffffff;
+    border-radius: 18px 18px 18px 4px;
+    align-self: flex-start;
+}
+
+.pd-pmchat-img-msg {
+    border-radius: 12px;
+    overflow: hidden;
+    max-width: 240px;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.pd-pmchat-img-msg img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: opacity 0.2s;
+}
+
+.pd-pmchat-img-msg:hover img {
+    opacity: 0.88;
+}
+
+.pd-pmchat-bubble-text {
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.pd-pmchat-bubble-meta {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.pd-pmchat-bubble-time {
+    font-size: 11px;
+    opacity: 0.62;
+}
+
+.pd-pmchat-read-status {
+    font-size: 13px;
+    line-height: 1;
+}
+
+.pd-pmchat-input-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    padding: 12px 16px;
+    background: rgba(9, 9, 11, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    flex-shrink: 0;
+}
+
+.pd-pmchat-attach-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 0;
+    padding: 0;
+}
+
+.pd-pmchat-attach-btn:hover {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.pd-pmchat-img-preview {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    overflow: visible;
+    flex-shrink: 0;
+    align-self: flex-end;
+}
+
+.pd-pmchat-img-preview > img {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    object-fit: cover;
+    display: block;
+}
+
+.pd-pmchat-img-remove {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.85);
+    border: none;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+}
+
+.pd-pmchat-textarea {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 14px;
+    font-family: inherit;
+    resize: none;
+    line-height: 1.45;
+    padding: 8px 0;
+    min-height: 36px;
+    max-height: 120px;
+    overflow-y: auto;
+    align-self: flex-end;
+}
+
+.pd-pmchat-textarea::placeholder {
+    color: rgba(255, 255, 255, 0.28);
+}
+
+.pd-pmchat-send-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #007AFF;
+    border: none;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    align-self: flex-end;
+    padding: 0;
+    transition: background 0.2s;
+}
+
+.pd-pmchat-send-btn:hover:not(:disabled) {
+    background: #0071E3;
+}
+
+.pd-pmchat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pd-pmchat-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 24px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.pd-pmchat-empty-state svg {
+    opacity: 0.35;
+}
+
+.pd-pmchat-empty-state p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.65);
+    margin: 0;
+}
+
 /* ========== Freelance Gestione: mobile UX (iOS / Material You) ========== */
 @media (max-width: 768px) {
     .project-detail-page.freelance-gestione {
@@ -2667,5 +3606,2399 @@
 
     .project-detail-page.freelance-gestione .quick-stat-card {
         padding: 16px;
+    }
+}
+
+/* ===== WORKSPACE TAB STYLES ===== */
+
+/* Workspace Panel */
+.workspace-panel .section-card {
+    margin-bottom: 32px;
+}
+
+.workspace-panel .section-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.workspace-panel .section-card-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--color-text-primary, #1d1d1f);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.workspace-panel .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    font-size: 15px;
+    color: var(--color-text-primary, #1d1d1f);
+}
+
+.workspace-panel .checkbox-text {
+    font-weight: 500;
+}
+
+.workspace-panel .form-help {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--color-text-secondary, #6e6e73);
+    line-height: 1.4;
+}
+
+.workspace-panel .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.workspace-panel .form-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 24px;
+}
+
+/* Branches List */
+.branches-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.branch-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px;
+    background: var(--color-bg-secondary, #ffffff);
+    border: 1px solid var(--color-border, #d2d2d7);
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.branch-item:hover {
+    border-color: var(--color-accent, #0a84ff);
+    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.1);
+}
+
+.branch-info {
+    flex: 1;
+}
+
+.branch-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.branch-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.branch-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary, #1d1d1f);
+    margin: 0;
+}
+
+.branch-git {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--color-text-secondary, #6e6e73);
+    background: var(--color-bg-tertiary, #f5f5f7);
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.branch-description {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    color: var(--color-text-secondary, #6e6e73);
+    line-height: 1.4;
+}
+
+.branch-roles {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.roles-label {
+    font-size: 13px;
+    color: var(--color-text-secondary, #6e6e73);
+    font-weight: 500;
+}
+
+.role-tag {
+    background: var(--color-accent-light, #e6f3ff);
+    color: var(--color-accent, #0a84ff);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.branch-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 16px;
+}
+
+/* Branch Modal */
+.workspace-branch-modal {
+    width: 100%;
+    max-width: 600px;
+}
+
+.color-picker {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.color-option.selected {
+    border-color: var(--color-text-primary, #1d1d1f);
+}
+
+.color-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.roles-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+/* Empty states for workspace */
+.workspace-panel .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--color-text-secondary, #6e6e73);
+}
+
+.workspace-panel .empty-state p:first-of-type {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary, #1d1d1f);
+    margin: 16px 0 8px 0;
+}
+
+.workspace-panel .empty-state p:last-of-type {
+    font-size: 14px;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.workspace-panel .loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: var(--color-text-secondary, #6e6e73);
+}
+
+/* Workspace responsive adjustments */
+@media (max-width: 768px) {
+    .workspace-panel .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+    
+    .branch-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+    
+    .branch-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+    
+    .color-picker {
+        gap: 8px;
+    }
+    
+    .color-option {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* ================================================================
+   pd-tasks — Tasks Data Grid (Apple + Linear style, dark mode)
+   ================================================================ */
+
+/* ── Toolbar ── */
+.pd-tasks-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.pd-tasks-toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pd-tasks-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.pd-tasks-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 22px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.55);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* ── Segmented filter pills ── */
+.pd-tasks-filter-pills {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 3px;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.pd-tasks-pill {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.5);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.pd-tasks-pill:hover {
+    color: rgba(255,255,255,0.8);
+    background: rgba(255,255,255,0.06);
+}
+
+.pd-tasks-pill.active {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+    font-weight: 600;
+}
+
+/* ── Right side (new btn + view toggle) ── */
+.pd-tasks-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.pd-tasks-new-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(0,122,255,0.12);
+    color: #007AFF;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+    height: 32px;
+}
+
+.pd-tasks-new-btn:hover {
+    background: rgba(0,122,255,0.22);
+}
+
+.pd-tasks-view-toggle {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    padding: 3px;
+}
+
+.pd-tasks-view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.4);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.pd-tasks-view-btn:hover {
+    color: rgba(255,255,255,0.7);
+    background: rgba(255,255,255,0.07);
+}
+
+.pd-tasks-view-btn.active {
+    background: rgba(255,255,255,0.1);
+    color: #ffffff;
+}
+
+/* ── Active filter chips ── */
+.pd-tasks-active-filters {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.pd-tasks-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.75);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pd-tasks-filter-chip.urgent {
+    background: rgba(255,59,48,0.12);
+    border-color: rgba(255,59,48,0.25);
+    color: #FF3B30;
+}
+
+.pd-tasks-chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s;
+}
+
+.pd-tasks-chip-remove:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+/* ── Reschedule banner ── */
+.pd-tasks-reschedule-banner {
+    background: rgba(255,149,0,0.1);
+    border: 1px solid rgba(255,149,0,0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.pd-tasks-reschedule-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pd-tasks-reschedule-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.pd-tasks-reschedule-count {
+    background: rgba(255,149,0,0.2);
+    color: #FF9500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.pd-tasks-reschedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pd-tasks-reschedule-item {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-tasks-reschedule-task-title {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 3px;
+}
+
+.pd-tasks-reschedule-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+}
+
+.pd-tasks-reschedule-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ── Loading / empty ── */
+.pd-tasks-loading {
+    text-align: center;
+    padding: 40px;
+    color: rgba(255,255,255,0.4);
+}
+
+.pd-tasks-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 56px 24px;
+    gap: 12px;
+    text-align: center;
+}
+
+.pd-tasks-empty-icon {
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 4px;
+}
+
+.pd-tasks-empty-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.5);
+    margin: 0;
+}
+
+.pd-tasks-empty-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(0,122,255,0.15);
+    color: #007AFF;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    margin-top: 4px;
+}
+
+.pd-tasks-empty-btn:hover {
+    background: rgba(0,122,255,0.25);
+}
+
+/* ── Groupby toggle ── */
+.pd-tasks-groupby-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.pd-tasks-groupby-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.pd-tasks-groupby-pill {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: transparent;
+    color: rgba(255,255,255,0.4);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pd-tasks-groupby-pill:hover {
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.65);
+    border-color: rgba(255,255,255,0.15);
+}
+
+.pd-tasks-groupby-pill.active {
+    background: rgba(255,255,255,0.08);
+    color: #ffffff;
+    border-color: rgba(255,255,255,0.2);
+}
+
+/* ── Data Grid container ── */
+.pd-tasks-grid-container {
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    overflow: hidden;
+}
+
+/* ── Grid header row ── */
+.pd-tasks-grid-header {
+    display: grid;
+    grid-template-columns: 28px 28px 1fr 160px 120px 100px 36px;
+    align-items: center;
+    height: 36px;
+    background: rgba(255,255,255,0.03);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 0 4px;
+}
+
+.pd-tasks-col {
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    overflow: hidden;
+}
+
+.pd-tasks-grid-header .pd-tasks-col {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.28);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.pd-tasks-col-checkbox { justify-content: center; padding: 0; }
+.pd-tasks-col-priority { justify-content: center; padding: 0; }
+.pd-tasks-col-title    { flex: 1; overflow: hidden; }
+.pd-tasks-col-actions  { justify-content: center; padding: 0; }
+
+/* ── Group header row ── */
+.pd-tasks-group-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 32px;
+    padding: 0 16px;
+    background: rgba(255,255,255,0.02);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.pd-tasks-group-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.pd-tasks-group-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 16px;
+    padding: 0 5px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.45);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ── Data rows ── */
+.pd-tasks-grid-row {
+    display: grid;
+    grid-template-columns: 28px 28px 1fr 160px 120px 100px 36px;
+    align-items: center;
+    height: 44px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding: 0 4px;
+    cursor: pointer;
+    transition: background 0.12s;
+    position: relative;
+}
+
+.pd-tasks-grid-row:hover {
+    background: rgba(255,255,255,0.03);
+}
+
+.pd-tasks-grid-row.last {
+    border-bottom: none;
+}
+
+.pd-tasks-grid-row.completed {
+    opacity: 0.6;
+}
+
+/* Show more-btn only on row hover */
+.pd-tasks-more-btn {
+    opacity: 0;
+    transition: opacity 0.12s;
+}
+
+.pd-tasks-grid-row:hover .pd-tasks-more-btn {
+    opacity: 1;
+}
+
+/* ── Checkbox ── */
+.pd-tasks-checkbox {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+    color: #ffffff;
+}
+
+.pd-tasks-checkbox:hover {
+    border-color: rgba(52,199,89,0.6);
+}
+
+.pd-tasks-checkbox.checked {
+    background: #34C759;
+    border-color: #34C759;
+}
+
+.pd-tasks-checkbox:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ── Priority dot ── */
+.pd-tasks-priority-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ── Task title ── */
+.pd-tasks-task-title {
+    font-size: 13px;
+    color: rgba(255,255,255,0.9);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.pd-tasks-task-title.completed {
+    text-decoration: line-through;
+    color: rgba(255,255,255,0.35);
+}
+
+/* ── Avatar stack ── */
+.pd-tasks-avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.pd-tasks-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(28,28,30,1);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.pd-tasks-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd-tasks-avatar span {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.8);
+    text-transform: uppercase;
+}
+
+.pd-tasks-assignee-name {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-left: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+}
+
+.pd-tasks-avatar-more {
+    font-size: 10px;
+    color: rgba(255,255,255,0.45);
+    margin-left: 4px;
+}
+
+.pd-tasks-unassigned {
+    font-size: 13px;
+    color: rgba(255,255,255,0.2);
+}
+
+/* ── Status badge ── */
+.pd-tasks-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.pd-tasks-status-pending    { background: rgba(255,149,0,0.15);  color: #FF9500; }
+.pd-tasks-status-in_progress{ background: rgba(0,122,255,0.15);  color: #007AFF; }
+.pd-tasks-status-review     { background: rgba(175,82,222,0.15); color: #AF52DE; }
+.pd-tasks-status-completed  { background: rgba(52,199,89,0.15);  color: #34C759; }
+.pd-tasks-status-cancelled  { background: rgba(142,142,147,0.15);color: #8E8E93; }
+
+/* ── Row actions dropdown ── */
+.pd-tasks-more-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.35);
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+    padding: 0;
+}
+
+.pd-tasks-more-btn:hover {
+    background: rgba(255,255,255,0.07);
+    color: rgba(255,255,255,0.7);
+}
+
+.pd-tasks-actions-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-tasks-row-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 100;
+    background: #2c2c2e;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 4px;
+    min-width: 140px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.pd-tasks-row-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.75);
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.1s;
+}
+
+.pd-tasks-row-menu-item:hover {
+    background: rgba(255,255,255,0.07);
+}
+
+.pd-tasks-row-menu-item.danger {
+    color: #FF3B30;
+}
+
+.pd-tasks-row-menu-item.danger:hover {
+    background: rgba(255,59,48,0.1);
+}
+
+/* ── Cards view ── */
+.pd-tasks-cards-view {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 12px;
+}
+
+.pd-tasks-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pd-tasks-card:hover {
+    background: rgba(255,255,255,0.055);
+    border-color: rgba(255,255,255,0.14);
+}
+
+.pd-tasks-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.pd-tasks-card-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    flex: 1;
+    line-height: 1.35;
+}
+
+.pd-tasks-card-title.completed {
+    text-decoration: line-through;
+    color: rgba(255,255,255,0.35);
+}
+
+.pd-tasks-card-desc {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.pd-tasks-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pd-tasks-card-priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 500;
+}
+
+.pd-tasks-card-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pd-tasks-card-progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.pd-tasks-card-progress-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.pd-tasks-card-progress-label {
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+    flex-shrink: 0;
+    min-width: 28px;
+    text-align: right;
+}
+
+.pd-tasks-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.pd-tasks-card-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+}
+
+.pd-tasks-card-btn:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.9);
+}
+
+.pd-tasks-card-btn.success {
+    color: #34C759;
+    background: rgba(52,199,89,0.1);
+}
+
+.pd-tasks-card-btn.success:hover {
+    background: rgba(52,199,89,0.18);
+}
+
+.pd-tasks-card-btn.danger {
+    color: #FF3B30;
+    background: rgba(255,59,48,0.1);
+}
+
+.pd-tasks-card-btn.danger:hover {
+    background: rgba(255,59,48,0.18);
+}
+
+.pd-tasks-card-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 900px) {
+    .pd-tasks-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .pd-tasks-toolbar-right {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .pd-tasks-grid-header,
+    .pd-tasks-grid-row {
+        grid-template-columns: 28px 28px 1fr 100px 90px 36px;
+    }
+
+    .pd-tasks-col-assignee { display: none; }
+}
+
+@media (max-width: 600px) {
+    .pd-tasks-grid-header,
+    .pd-tasks-grid-row {
+        grid-template-columns: 28px 28px 1fr 90px 36px;
+    }
+
+    .pd-tasks-col-status { display: none; }
+
+    .pd-tasks-cards-view {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========== Inset Grouped List (Apple iOS/macOS pattern) pd-inset- ========== */
+
+.pd-inset-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.pd-inset-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pd-inset-total-count {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 500;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+}
+
+.pd-inset-add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 14px;
+    background: rgba(0, 122, 255, 0.12);
+    border: none;
+    border-radius: 20px;
+    color: #007AFF;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.pd-inset-add-btn:hover {
+    background: rgba(0, 122, 255, 0.22);
+}
+
+.pd-inset-groups {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.pd-inset-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pd-inset-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 4px;
+    margin-bottom: 2px;
+}
+
+.pd-inset-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.pd-inset-count-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.07);
+    padding: 2px 7px;
+    border-radius: 10px;
+}
+
+.pd-inset-container {
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+}
+
+.pd-inset-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pd-inset-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.pd-inset-row:active {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pd-inset-row--last {
+    border-bottom: none;
+}
+
+.pd-inset-row-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pd-inset-row-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 0;
+}
+
+.pd-inset-row-primary {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+}
+
+.pd-inset-row-secondary {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    line-height: 1.3;
+}
+
+.pd-inset-row-mono {
+    font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.pd-inset-row-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.pd-inset-amount {
+    font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+}
+
+.pd-inset-amount--accepted {
+    color: #34C759;
+}
+
+/* More button and dropdown */
+.pd-inset-more-wrap {
+    position: relative;
+}
+
+.pd-inset-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.25);
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.pd-inset-more-btn:hover,
+.pd-inset-row:hover .pd-inset-more-btn {
+    color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.pd-inset-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 4px);
+    background: rgba(44, 44, 46, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 6px;
+    min-width: 150px;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.pd-inset-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 7px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+
+.pd-inset-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.pd-inset-dropdown-item--danger {
+    color: #FF3B30;
+}
+
+.pd-inset-dropdown-item--danger:hover {
+    background: rgba(255, 59, 48, 0.1);
+}
+
+@media (max-width: 768px) {
+    .pd-inset-row-primary {
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .pd-inset-row-secondary {
+        font-size: 13px;
+    }
+
+    .pd-inset-section-header {
+        margin-bottom: 20px;
+    }
+
+    .pd-inset-groups {
+        gap: 24px;
+    }
+}
+
+/* ─────────────────────────────────────────────
+   BENTO GRID OVERVIEW  (prefix: pd-bento-)
+   ───────────────────────────────────────────── */
+
+.pd-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 14px;
+    padding: 4px 0 24px;
+}
+
+/* Column-span helpers */
+.pd-bento-col-2 { grid-column: span 2; }
+.pd-bento-col-3 { grid-column: span 3; }
+.pd-bento-col-4 { grid-column: span 4; }
+.pd-bento-col-6 { grid-column: span 6; }
+
+/* Base card */
+.pd-bento-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 160px;
+    transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.pd-bento-card:hover {
+    border-color: rgba(255, 255, 255, 0.13);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Center content vertically (used for progress ring) */
+.pd-bento-card--center {
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Widget header ── */
+.pd-bento-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.pd-bento-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    user-select: none;
+}
+
+.pd-bento-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: none;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.45);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+
+.pd-bento-action-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Empty state ── */
+.pd-bento-empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+}
+
+.pd-bento-empty-icon {
+    color: rgba(255, 255, 255, 0.18);
+}
+
+.pd-bento-empty-msg {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.28);
+    margin: 0;
+    text-align: center;
+}
+
+.pd-bento-empty-cta {
+    font-size: 11px;
+    color: #007AFF;
+    background: rgba(0, 122, 255, 0.1);
+    border: 1px solid rgba(0, 122, 255, 0.22);
+    border-radius: 20px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.pd-bento-empty-cta:hover {
+    background: rgba(0, 122, 255, 0.18);
+}
+
+/* ── Footer link ── */
+.pd-bento-footer-link {
+    font-size: 12px;
+    color: #007AFF;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px 0 0;
+    text-align: left;
+    margin-top: auto;
+    transition: opacity 0.15s;
+}
+
+.pd-bento-footer-link:hover {
+    opacity: 0.75;
+}
+
+/* ── 1. Description ── */
+.pd-bento-desc-text {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.75);
+    line-height: 1.6;
+    margin: 0;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 7;
+    -webkit-box-orient: vertical;
+}
+
+/* ── 2. Progress Ring ── */
+.pd-bento-ring-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 6px;
+}
+
+.pd-bento-ring-svg {
+    overflow: visible;
+}
+
+.pd-bento-ring-num {
+    fill: rgba(255, 255, 255, 0.9);
+    font-size: 18px;
+    font-weight: 700;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+}
+
+.pd-bento-ring-sub-svg {
+    fill: rgba(255, 255, 255, 0.35);
+    font-size: 9px;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ── 3. Quick Links ── */
+.pd-bento-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.pd-bento-link-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pd-bento-link-pill:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.pd-bento-links-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.pd-bento-link-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.15s;
+}
+
+.pd-bento-link-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.pd-bento-link-input:focus {
+    border-color: rgba(0, 122, 255, 0.5);
+}
+
+.pd-bento-links-edit-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.pd-bento-save-btn {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 7px;
+    background: #007AFF;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+}
+
+.pd-bento-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.pd-bento-save-btn:hover:not(:disabled) { opacity: 0.85; }
+
+.pd-bento-cancel-btn {
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.07);
+    color: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.pd-bento-cancel-btn:hover:not(:disabled) { background: rgba(255, 255, 255, 0.11); }
+.pd-bento-cancel-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── 4. Timeline (Key Dates) ── */
+.pd-bento-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+    justify-content: center;
+}
+
+.pd-bento-tl-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-bento-tl-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.pd-bento-tl-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.pd-bento-tl-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.pd-bento-tl-date {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.pd-bento-tl-line {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-left: 4px;
+}
+
+/* ── 5. Task List ── */
+.pd-bento-task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.pd-bento-task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.14s;
+}
+
+.pd-bento-task-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.pd-bento-task-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.pd-bento-task-name {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-bento-task-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    flex-shrink: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-bento-task-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd-bento-task-avatar span {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.pd-bento-task-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+/* ── 6. Financial ── */
+.pd-bento-fin-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.pd-bento-fin-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pd-bento-fin-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+}
+
+.pd-bento-fin-bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    transition: width 0.4s ease;
+}
+
+.pd-bento-fin-pct {
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-bento-fin-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pd-bento-fin-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pd-bento-fin-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.pd-bento-fin-val {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'SF Mono', 'Menlo', monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-bento-fin-trend {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: auto;
+}
+
+/* ── 7. Team ── */
+.pd-bento-avatar-stack {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.pd-bento-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(30, 30, 32, 0.9);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: -8px;
+    transition: transform 0.15s;
+    flex-shrink: 0;
+}
+
+.pd-bento-avatar:first-child {
+    margin-left: 0;
+}
+
+.pd-bento-avatar:hover {
+    transform: translateY(-2px);
+    z-index: 10 !important;
+}
+
+.pd-bento-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.pd-bento-avatar span {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.pd-bento-avatar-more {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.pd-bento-team-names {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.45);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pd-bento-team-more {
+    color: rgba(255, 255, 255, 0.28);
+    font-size: 11px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1200px) {
+    .pd-bento-col-4 { grid-column: span 6; }
+    .pd-bento-col-2 { grid-column: span 3; }
+    .pd-bento-col-6 { grid-column: span 12; }
+    .pd-bento-col-3 { grid-column: span 6; }
+}
+
+@media (max-width: 768px) {
+    .pd-bento-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .pd-bento-col-2,
+    .pd-bento-col-3,
+    .pd-bento-col-4,
+    .pd-bento-col-6 {
+        grid-column: span 2;
+    }
+    .pd-bento-card {
+        min-height: 130px;
+    }
+}
+
+/* ============================================================
+   FINANCIAL TAB — Apple-native redesign  (pd-fin- prefix)
+   ============================================================ */
+
+/* Two-column layout */
+.pd-fin-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.pd-fin-left {
+    flex: 0 0 60%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.pd-fin-right {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Section label — "11px, uppercase, dim, tracking" */
+.pd-fin-section-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.3);
+    margin-top: 20px;
+    margin-bottom: 6px;
+    padding-left: 2px;
+}
+
+.pd-fin-left > .pd-fin-section-label:first-child,
+.pd-fin-right > .pd-fin-section-label:first-child {
+    margin-top: 0;
+}
+
+/* Base card shell */
+.pd-fin-card {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+/* ── Summary card ── */
+.pd-fin-summary-card {
+    padding: 18px 20px 20px;
+}
+
+.pd-fin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.pd-fin-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.pd-fin-extra-budget-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 122, 255, 0.12);
+    border: 1px solid rgba(0, 122, 255, 0.28);
+    color: #007AFF;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.pd-fin-extra-budget-btn:hover {
+    background: rgba(0, 122, 255, 0.22);
+}
+
+/* Three-tile row */
+.pd-fin-stat-tiles-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.pd-fin-stat-tile {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    position: relative;
+}
+
+.pd-fin-stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+    margin-bottom: 5px;
+    /* shrink text if it overflows the tile */
+    word-break: break-all;
+}
+
+.pd-fin-stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.38);
+    font-weight: 500;
+}
+
+/* Trend badge (absolute top-right of tile) */
+.pd-fin-stat-trend {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-fin-trend-blue   { background: rgba(0,   122, 255, 0.15); color: #007AFF; }
+.pd-fin-trend-orange { background: rgba(255, 149,   0, 0.15); color: #FF9500; }
+.pd-fin-trend-green  { background: rgba(52,  199,  89, 0.15); color: #34C759; }
+.pd-fin-trend-red    { background: rgba(255,  59,  48, 0.15); color: #FF3B30; }
+
+/* Semantic color helpers */
+.pd-fin-positive { color: #34C759 !important; }
+.pd-fin-negative { color: #FF3B30 !important; }
+
+/* Budget utilization bar */
+.pd-fin-utilization {
+    /* sits below the tiles row, inside summary card */
+}
+
+.pd-fin-util-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 7px;
+}
+
+.pd-fin-util-label {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.pd-fin-util-pct {
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-fin-progress-track {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.pd-fin-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.45s ease;
+}
+
+/* ── Inset list card (transactions / expenses) ── */
+.pd-fin-inset-card {
+    padding: 0;
+}
+
+/* Generic row inside an inset card */
+.pd-fin-tx-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* last direct child removes its separator */
+.pd-fin-inset-card > *:last-child {
+    border-bottom: none;
+}
+
+/* Category icon pill */
+.pd-fin-tx-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.pd-fin-icon-green  { background: rgba(52,  199, 89,  0.15); color: #34C759; }
+.pd-fin-icon-red    { background: rgba(255,  59, 48,  0.15); color: #FF3B30; }
+.pd-fin-icon-orange { background: rgba(255, 149,  0,  0.15); color: #FF9500; }
+
+/* Description */
+.pd-fin-tx-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.pd-fin-tx-desc {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Right-side meta (date + amount) */
+.pd-fin-tx-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex-shrink: 0;
+}
+
+.pd-fin-tx-date {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.28);
+}
+
+.pd-fin-tx-amount {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Empty state row */
+.pd-fin-empty-row {
+    padding: 22px 16px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.28);
+    text-align: center;
+}
+
+/* "Vedi tutte →" footer link */
+.pd-fin-footer-link {
+    padding: 11px 16px;
+    font-size: 12px;
+    color: #007AFF;
+    cursor: pointer;
+    text-align: center;
+    transition: opacity 0.15s;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.pd-fin-footer-link:hover {
+    opacity: 0.75;
+}
+
+/* ── Calendar card wrap + FinancialCalendar overrides ── */
+.pd-fin-calendar-wrap {
+    padding: 0;
+}
+
+/* Strip the component's own background/borders so it inherits our card */
+.pd-fin-calendar-wrap .financial-calendar {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    color: #fff;
+}
+
+/* Header: month + nav arrows */
+.pd-fin-calendar-wrap .financial-calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 10px;
+    background: transparent;
+    border-bottom: none;
+}
+
+.pd-fin-calendar-wrap .calendar-month-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+/* Glass-circle nav buttons */
+.pd-fin-calendar-wrap .calendar-nav-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.7);
+    transition: background 0.15s;
+    padding: 0;
+}
+
+.pd-fin-calendar-wrap .calendar-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Calendar grid container */
+.pd-fin-calendar-wrap .financial-calendar-grid {
+    padding: 0 12px 12px;
+    background: transparent;
+}
+
+/* Day-of-week header row */
+.pd-fin-calendar-wrap .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-bottom: 4px;
+}
+
+.pd-fin-calendar-wrap .calendar-weekday {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.30);
+    text-align: center;
+    padding: 4px 0;
+    font-weight: 500;
+}
+
+/* Days grid */
+.pd-fin-calendar-wrap .calendar-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+/* Individual day cell: 32×32 circle */
+.pd-fin-calendar-wrap .calendar-day {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    cursor: pointer;
+    position: relative;
+    background: transparent;
+    border: none;
+    transition: background 0.1s;
+}
+
+.pd-fin-calendar-wrap .calendar-day:hover:not(.today) {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.pd-fin-calendar-wrap .calendar-day-number {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1;
+    font-weight: 400;
+}
+
+/* Today — #007AFF filled circle */
+.pd-fin-calendar-wrap .calendar-day.today {
+    background: #007AFF;
+}
+
+.pd-fin-calendar-wrap .calendar-day.today .calendar-day-number {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* Selected (non-today) */
+.pd-fin-calendar-wrap .calendar-day.selected:not(.today) {
+    background: rgba(0, 122, 255, 0.22);
+}
+
+/* Days with transactions — orange dot below number */
+.pd-fin-calendar-wrap .calendar-day.has-transactions::after {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #FF9500;
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Hide the old icon-based transaction indicators */
+.pd-fin-calendar-wrap .calendar-day-transactions {
+    display: none;
+}
+
+/* Weekend — slightly dimmer */
+.pd-fin-calendar-wrap .calendar-day:nth-child(7n+1) .calendar-day-number,
+.pd-fin-calendar-wrap .calendar-day:nth-child(7n) .calendar-day-number {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+/* Other-month empty slots */
+.pd-fin-calendar-wrap .calendar-day.empty {
+    pointer-events: none;
+    background: transparent;
+}
+
+/* Monthly summary panel at bottom */
+.pd-fin-calendar-wrap .financial-summary-panel {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 16px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: transparent;
+}
+
+.pd-fin-calendar-wrap .summary-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.pd-fin-calendar-wrap .summary-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.30);
+    font-weight: 500;
+}
+
+.pd-fin-calendar-wrap .summary-value {
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'SF Mono', 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+.pd-fin-calendar-wrap .summary-value.positive { color: #34C759; }
+.pd-fin-calendar-wrap .summary-value.negative { color: #FF3B30; }
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+    .pd-fin-layout {
+        flex-direction: column;
+    }
+
+    .pd-fin-left,
+    .pd-fin-right {
+        flex: none;
+        width: 100%;
+    }
+
+    .pd-fin-left > .pd-fin-section-label:first-child,
+    .pd-fin-right > .pd-fin-section-label:first-child {
+        margin-top: 0;
+    }
+
+    .pd-fin-right > .pd-fin-section-label:first-child {
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .pd-fin-stat-tiles-row {
+        grid-template-columns: 1fr;
     }
 }

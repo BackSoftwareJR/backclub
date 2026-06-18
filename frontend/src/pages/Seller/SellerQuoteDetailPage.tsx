@@ -15,6 +15,7 @@ import {
   FileCheck,
   ChevronRight,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { quotesApi } from '../../api/quotes';
 import { sellerCommissionsApi } from '../../api/sellerCommissions';
 import type { Quote } from '../../types/sellers';
@@ -185,15 +186,15 @@ const SellerQuoteDetailPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { label: string; class: string; icon: any; color: string }> = {
-      pending: { label: 'In Attesa', class: 'warning', icon: Clock, color: '#f59e0b' },
-      approved: { label: 'Approvato', class: 'success', icon: CheckCircle2, color: '#10b981' },
-      rejected: { label: 'Rifiutato', class: 'danger', icon: XCircle, color: '#ef4444' },
-      started: { label: 'Avviato', class: 'info', icon: CheckCircle2, color: '#3b82f6' },
-      completed: { label: 'Completato', class: 'success', icon: CheckCircle2, color: '#10b981' },
-      contract_requested: { label: 'Contratto Richiesto', class: 'info', icon: FileText, color: '#3b82f6' },
+    const badges: Record<string, { label: string; badgeClass: string; icon: any }> = {
+      pending: { label: 'In Attesa', badgeClass: 'seller-badge seller-badge-pending', icon: Clock },
+      approved: { label: 'Approvato', badgeClass: 'seller-badge seller-badge-active', icon: CheckCircle2 },
+      rejected: { label: 'Rifiutato', badgeClass: 'seller-badge seller-badge-cancelled', icon: XCircle },
+      started: { label: 'Avviato', badgeClass: 'seller-badge seller-badge-primary', icon: CheckCircle2 },
+      completed: { label: 'Completato', badgeClass: 'seller-badge seller-badge-active', icon: CheckCircle2 },
+      contract_requested: { label: 'Contratto Richiesto', badgeClass: 'seller-badge seller-badge-primary', icon: FileText },
     };
-    return badges[status] || { label: status, class: '', icon: FileText, color: '#6b7280' };
+    return badges[status] || { label: status, badgeClass: 'seller-badge seller-badge-secondary', icon: FileText };
   };
 
   const getInitials = (name: string): string => {
@@ -239,11 +240,15 @@ const SellerQuoteDetailPage: React.FC = () => {
   }
 
   const statusBadge = getStatusBadge(quote.status);
-  const StatusIcon = statusBadge.icon;
   const clientInitials = getInitials(quote.client?.company_name || 'Cliente');
 
   return (
-    <div className="seller-quote-detail-page">
+    <motion.div
+      className="seller-quote-detail-page"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+    >
       {/* Unified Header - Compact & Cohesive */}
       <div className="seller-quote-detail-header">
         <div className="seller-quote-detail-header-left">
@@ -258,11 +263,7 @@ const SellerQuoteDetailPage: React.FC = () => {
             <h1 className="seller-quote-detail-title">{quote.title || quote.quote_number}</h1>
             <div className="seller-quote-detail-header-meta">
               <span className="seller-quote-detail-id-badge">{quote.quote_number}</span>
-              <span 
-                className="seller-quote-detail-status-badge"
-                style={{ backgroundColor: `${statusBadge.color}20`, color: statusBadge.color }}
-              >
-                <StatusIcon size={12} />
+              <span className={statusBadge.badgeClass}>
                 {statusBadge.label}
               </span>
             </div>
@@ -533,7 +534,7 @@ const SellerQuoteDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

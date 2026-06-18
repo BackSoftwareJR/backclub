@@ -1,4 +1,4 @@
-/* Venditori Dashboard - Enterprise Style */
+/* Venditori Dashboard */
 
 .venditori-page {
     max-width: 1800px;
@@ -10,9 +10,9 @@
 
 /* Header */
 .venditori-header h1 {
-    font-size: 28px;
-    font-weight: 700;
-    color: #FFFFFF;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
     margin: 0 0 4px 0;
 }
 
@@ -611,10 +611,8 @@
 .renewal-percentage {
     font-size: 64px;
     font-weight: 700;
-    background: linear-gradient(135deg, #34C759 0%, #30D158 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #34C759;
+    letter-spacing: -0.02em;
 }
 
 .renewal-label {

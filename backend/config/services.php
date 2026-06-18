@@ -35,4 +35,42 @@ return [
         ],
     ],
 
+    'google_translate' => [
+        'api_key' => env('GOOGLE_TRANSLATE_API_KEY'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL') . '/api/auth/google/callback'),
+        'frontend_redirect' => env('GOOGLE_OAUTH_FRONTEND_REDIRECT', env('APP_URL') . '/freelance/impostazioni'),
+        'scopes' => env(
+            'GOOGLE_CALENDAR_SCOPES',
+            'https://www.googleapis.com/auth/calendar.events openid email profile'
+        ),
+        'sync_enabled' => env('GOOGLE_CALENDAR_SYNC_ENABLED', true),
+    ],
+
+    'github' => [
+        'token' => env('GITHUB_TOKEN'),
+        'publish_base_branch' => env('GITHUB_PUBLISH_BASE_BRANCH', 'main'),
+        'publish_head_branch' => env('GITHUB_PUBLISH_HEAD_BRANCH', 'staging'),
+    ],
+
+    'n8n' => [
+        'enabled' => env('N8N_ENABLED', false),
+        'webhook_base_url' => env('N8N_WEBHOOK_BASE_URL'),
+        'webhook_url' => env('N8N_WEBHOOK_URL'),
+        'webhook_auth_header' => env('N8N_WEBHOOK_AUTH_HEADER'),
+        'webhook_auth_value' => env('N8N_WEBHOOK_AUTH_VALUE'),
+        'callback_auth_header' => env('N8N_CALLBACK_AUTH_HEADER'),
+        'callback_auth_value' => env('N8N_CALLBACK_AUTH_VALUE'),
+        'start_timeout_seconds' => env('N8N_START_TIMEOUT_SECONDS', 30),
+        'webhook_publish_production' => env('N8N_WEBHOOK_PUBLISH_PRODUCTION'),
+        'calendar_call_webhook' => env('N8N_CALENDAR_CALL_WEBHOOK', 'webhook/backclub-calendar-call'),
+        'workspace_agent_webhook' => env('N8N_WORKSPACE_AGENT_WEBHOOK'),
+        'webhook_secret' => env('N8N_WEBHOOK_SECRET'),
+        'orchestrator_webhook_secret' => env('ORCHESTRATOR_WEBHOOK_SECRET', env('WEBHOOK_SECRET')),
+    ],
+
 ];

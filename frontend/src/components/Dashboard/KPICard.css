@@ -1,194 +1,113 @@
-/* KPI Card Component Styles */
+/* KPI Card — Apple-style compact */
 
 .kpi-card {
-    position: relative;
-    padding: var(--spacing-6);
-    border: 1px solid transparent;
-    transition: all var(--transition-base);
-    text-align: left;
-    width: 100%;
-    background: var(--glass-bg-medium);
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: background 200ms ease;
     cursor: default;
 }
 
-.kpi-card.clickable {
+.kpi-card-clickable {
     cursor: pointer;
 }
 
-.kpi-card.clickable:hover {
-    transform: translateY(-4px);
-    border-color: var(--color-border-hover);
-    box-shadow: var(--shadow-lg);
+.kpi-card:hover,
+.kpi-card-clickable:hover {
+    background: var(--color-bg-tertiary);
 }
 
-.kpi-card.clickable:active {
-    transform: translateY(-2px);
+.kpi-card-clickable:focus-visible {
+    outline: 2px solid var(--color-accent-blue);
+    outline-offset: 2px;
 }
 
-/* Color Variants */
-.kpi-card.kpi-emerald {
-    border-image: linear-gradient(135deg, rgba(52, 199, 89, 0.3), transparent) 1;
-}
-
-.kpi-card.kpi-emerald.clickable:hover {
-    border-color: var(--color-accent-emerald);
-    box-shadow: 0 8px 32px rgba(52, 199, 89, 0.2);
-}
-
-.kpi-card.kpi-blue {
-    border-image: linear-gradient(135deg, rgba(10, 132, 255, 0.3), transparent) 1;
-}
-
-.kpi-card.kpi-blue.clickable:hover {
-    border-color: var(--color-accent-blue);
-    box-shadow: 0 8px 32px rgba(10, 132, 255, 0.2);
-}
-
-.kpi-card.kpi-purple {
-    border-image: linear-gradient(135deg, rgba(175, 82, 222, 0.3), transparent) 1;
-}
-
-.kpi-card.kpi-purple.clickable:hover {
-    border-color: var(--color-accent-purple);
-    box-shadow: 0 8px 32px rgba(175, 82, 222, 0.2);
-}
-
-.kpi-card.kpi-orange {
-    border-image: linear-gradient(135deg, rgba(255, 159, 10, 0.3), transparent) 1;
-}
-
-.kpi-card.kpi-orange.clickable:hover {
-    border-color: var(--color-accent-orange);
-    box-shadow: 0 8px 32px rgba(255, 159, 10, 0.2);
-}
-
-.kpi-card.kpi-red {
-    border-image: linear-gradient(135deg, rgba(255, 69, 58, 0.3), transparent) 1;
-}
-
-.kpi-card.kpi-red.clickable:hover {
-    border-color: var(--color-accent-red);
-    box-shadow: 0 8px 32px rgba(255, 69, 58, 0.2);
-}
-
-/* Header */
-.kpi-header {
+/* Header row: dot + label + optional icon */
+.kpi-card-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-3);
-    margin-bottom: var(--spacing-4);
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
-.kpi-icon {
+.kpi-card-label-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
+    gap: 6px;
+}
+
+.kpi-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
     flex-shrink: 0;
 }
 
-.kpi-icon-emerald {
-    background: rgba(52, 199, 89, 0.15);
-    color: var(--color-accent-emerald);
-}
-
-.kpi-icon-blue {
-    background: rgba(10, 132, 255, 0.15);
-    color: var(--color-accent-blue);
-}
-
-.kpi-icon-purple {
-    background: rgba(175, 82, 222, 0.15);
-    color: var(--color-accent-purple);
-}
-
-.kpi-icon-orange {
-    background: rgba(255, 159, 10, 0.15);
-    color: var(--color-accent-orange);
-}
-
-.kpi-icon-red {
-    background: rgba(255, 69, 58, 0.15);
-    color: var(--color-accent-red);
-}
-
-.kpi-title {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
-    margin: 0;
-}
-
-/* Content */
-.kpi-content {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-3);
-}
-
-.kpi-main-value {
-    font-size: var(--font-size-4xl);
-    font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+.kpi-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-quaternary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     line-height: 1;
 }
 
-.kpi-subtitle {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-tertiary);
-}
-
-/* Stats */
-.kpi-stats {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-3);
-    margin-top: var(--spacing-2);
-}
-
-.kpi-stat-item {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-1);
-}
-
-.kpi-stat-label {
-    font-size: var(--font-size-xs);
-    color: var(--color-text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.kpi-stat-value-row {
+.kpi-card-icon {
+    color: var(--color-text-quaternary);
+    opacity: 0.5;
     display: flex;
     align-items: center;
-    gap: var(--spacing-2);
 }
 
-.kpi-stat-value {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
+/* Main value */
+.kpi-card-value {
+    font-size: 22px;
+    font-weight: 700;
     color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    line-height: 1;
 }
 
-.kpi-trend {
+/* Delta row */
+.kpi-card-delta {
     display: flex;
     align-items: center;
-    gap: 2px;
-    font-size: var(--font-size-xs);
-    font-weight: var(--font-weight-medium);
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
 }
 
-.kpi-trend-up {
-    color: var(--color-success);
-    background: rgba(52, 199, 89, 0.1);
+.kpi-delta-positive {
+    color: var(--color-accent-emerald);
 }
 
-.kpi-trend-down {
+.kpi-delta-negative {
     color: var(--color-error);
-    background: rgba(255, 69, 58, 0.1);
+}
+
+.kpi-delta-label {
+    color: var(--color-text-quaternary);
+    font-weight: 400;
+}
+
+/* Skeleton loading state */
+@keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+}
+
+.kpi-card-skeleton {
+    height: 80px;
+    background: linear-gradient(
+        90deg,
+        var(--color-bg-tertiary) 0%,
+        var(--color-bg-elevated) 50%,
+        var(--color-bg-tertiary) 100%
+    );
+    background-size: 200%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }

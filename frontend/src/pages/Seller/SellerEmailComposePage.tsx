@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Send, Paperclip, X, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowLeft, Send, Paperclip, X, FileText, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import leadsApi from '../../api/leads';
@@ -13,11 +14,10 @@ const SellerEmailComposePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { resolvedTheme } = useTheme();
-  
+
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  
-  // Email form state
+
   const [to, setTo] = useState('');
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
@@ -25,45 +25,37 @@ const SellerEmailComposePage: React.FC = () => {
 
   useEffect(() => {
     const emailFromQuery = searchParams.get('to');
-    if (emailFromQuery) {
-      setTo(emailFromQuery);
-    }
-    
+    if (emailFromQuery) setTo(emailFromQuery);
     if (id) {
       loadLead();
+    } else {
+      setLoading(false);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, searchParams]);
 
   const loadLead = async () => {
     try {
       setLoading(true);
       const leadData = await leadsApi.getById(Number(id));
-      
-      // Set email from lead if not already set from query parameter
+
       if (!to) {
-        // Get primary email from lead
         if (leadData.emails && leadData.emails.length > 0) {
-          const primaryEmail = leadData.emails.find(e => e.isPrimary);
+          const primaryEmail = leadData.emails.find((e: any) => e.isPrimary);
           if (primaryEmail) {
-            const email = typeof primaryEmail === 'string' ? primaryEmail : primaryEmail.email;
-            setTo(email);
+            setTo(typeof primaryEmail === 'string' ? primaryEmail : primaryEmail.email);
           } else {
             const firstEmail = leadData.emails[0];
-            const email = typeof firstEmail === 'string' ? firstEmail : firstEmail.email;
-            setTo(email);
+            setTo(typeof firstEmail === 'string' ? firstEmail : firstEmail.email);
           }
         }
       }
-      
-      // Set default subject if not set
-      if (!subject) {
-        setSubject(`Contatto - ${leadData.company_name}`);
-      }
-      
-      // Set default body template (con saluto iniziale)
+
+      if (!subject) setSubject(`Contatto - ${leadData.company_name}`);
+
       if (!body) {
         const contactName = leadData.contact_person || leadData.company_name || 'Cliente';
-        const templateBody = `Gentile ${contactName},
+        setBody(`Gentile ${contactName},
 
 Spero che questo messaggio la trovi bene.
 
@@ -76,8 +68,7 @@ Saremmo lieti di poter programmare un appuntamento per discutere delle sue esige
 Restiamo a disposizione per qualsiasi chiarimento.
 
 Cordiali saluti,
-${user?.name || 'Il Team'}`;
-        setBody(templateBody);
+${user?.name || 'Il Team'}`);
       }
     } catch (error) {
       console.error('Errore nel caricamento lead:', error);
@@ -89,13 +80,12 @@ ${user?.name || 'Il Team'}`;
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      const newFiles = Array.from(e.target.files);
-      setAttachments([...attachments, ...newFiles]);
+      setAttachments(prev => [...prev, ...Array.from(e.target.files!)]);
     }
   };
 
   const removeAttachment = (index: number) => {
-    setAttachments(attachments.filter((_, i) => i !== index));
+    setAttachments(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSend = async () => {
@@ -103,22 +93,18 @@ ${user?.name || 'Il Team'}`;
       alert('Compila tutti i campi obbligatori');
       return;
     }
-
     if (!id) {
       alert('ID contatto non valido');
       return;
     }
-
     try {
       setSending(true);
-      
       const result = await leadsApi.sendEmail(Number(id), {
         to,
         subject,
         body,
-        attachments: attachments.length > 0 ? attachments : undefined
+        attachments: attachments.length > 0 ? attachments : undefined,
       });
-
       if (result.success) {
         alert('Email inviata con successo!');
         navigate(`/seller/contatti/${id}`);
@@ -129,24 +115,27 @@ ${user?.name || 'Il Team'}`;
       }
     } catch (error: any) {
       console.error('Errore nell\'invio email:', error);
-      const errorMessage = error?.response?.data?.error || 
-                          error?.response?.data?.error_details || 
-                          error?.response?.data?.message ||
-                          error?.message || 
-                          'Errore nell\'invio email. Controlla la console per i dettagli.';
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.error_details ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Errore nell\'invio email.';
       alert('Errore nell\'invio email:\n\n' + errorMessage);
     } finally {
       setSending(false);
     }
   };
 
+  const isDark = resolvedTheme === 'dark';
+
   if (loading) {
     return (
-      <div className={`email-compose-page ${resolvedTheme === 'dark' ? 'dark' : 'light'} email-compose-skeleton`}>
+      <div className={`email-compose-page ${isDark ? 'dark' : 'light'}`}>
         <div className="email-compose-header">
-          <div className="skeleton-line skeleton-pulse-fill w-1/4 short" style={{ height: 24 }} />
+          <div style={{ height: 24, width: '25%', borderRadius: 6, background: 'var(--seller-bg-overlay)' }} />
         </div>
-        <div className="email-compose-skeleton-content">
+        <div style={{ padding: 24 }}>
           <SkeletonLoader type="list" count={6} />
         </div>
       </div>
@@ -154,51 +143,55 @@ ${user?.name || 'Il Team'}`;
   }
 
   return (
-    <div className={`email-compose-page ${resolvedTheme === 'dark' ? 'dark' : 'light'}`}>
+    <div className={`email-compose-page ${isDark ? 'dark' : 'light'}`}>
+      {/* Header */}
       <div className="email-compose-header">
         <div className="email-compose-header-left">
-          <button 
+          <button
             className="email-compose-back-btn"
             onClick={() => navigate(`/seller/contatti/${id}`)}
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
             Torna al contatto
           </button>
-          <h1 className="email-compose-title">Invia Email</h1>
+          <h1 className="email-compose-title">Nuova email</h1>
         </div>
-        <button 
+        <button
           className="email-compose-history-btn"
           onClick={() => navigate(`/seller/contatti/${id}/email/storico`)}
         >
-          <FileText size={18} />
-          Storico Email
+          <FileText size={16} />
+          Storico
         </button>
       </div>
 
+      {/* Form */}
       <div className="email-compose-container">
-        <div className="email-compose-form">
-          {/* To Field */}
-          <div className="email-form-group">
-            <label className="email-form-label">A</label>
+        <motion.div
+          className="email-compose-form"
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {/* To */}
+          <div className="email-field-row email-field-to">
+            <span className="email-field-label">A</span>
             <input
               type="email"
-              className="email-form-input"
+              className="email-field-input"
               value={to}
               onChange={(e) => setTo(e.target.value)}
-              placeholder="email@esempio.com"
+              placeholder="destinatario@email.com"
               required
             />
-            <p className="email-form-hint">
-              L'email verrà inviata all'indirizzo che inserisci qui. Puoi modificarlo se necessario.
-            </p>
           </div>
 
-          {/* Subject Field */}
-          <div className="email-form-group">
-            <label className="email-form-label">Oggetto</label>
+          {/* Subject */}
+          <div className="email-field-row email-field-subject">
+            <span className="email-field-label">Oggetto</span>
             <input
               type="text"
-              className="email-form-input"
+              className="email-field-input"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Oggetto dell'email"
@@ -206,79 +199,78 @@ ${user?.name || 'Il Team'}`;
             />
           </div>
 
-          {/* Body Field */}
-          <div className="email-form-group email-form-group-body">
-            <label className="email-form-label">Messaggio</label>
+          {/* Body */}
+          <div className="email-field-body-wrap">
             <textarea
-              className="email-form-textarea"
+              className="email-field-body"
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Scrivi il tuo messaggio..."
-              rows={15}
+              rows={18}
               required
             />
           </div>
 
-          {/* Attachments */}
-          <div className="email-form-group">
-            <label className="email-form-label">Allegati</label>
-            <div className="email-attachments">
-              <label className="email-attach-btn">
-                <Paperclip size={18} />
-                Aggiungi allegato
-                <input
-                  type="file"
-                  multiple
-                  onChange={handleFileSelect}
-                  style={{ display: 'none' }}
-                />
-              </label>
-              {attachments.length > 0 && (
-                <div className="email-attachments-list">
-                  {attachments.map((file, index) => (
-                    <div key={index} className="email-attachment-item">
-                      <FileText size={16} />
-                      <span>{file.name}</span>
-                      <button
-                        className="email-attachment-remove"
-                        onClick={() => removeAttachment(index)}
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+          {/* Toolbar + attachments */}
+          <div className="email-compose-toolbar">
+            <label className="email-attach-trigger">
+              <Paperclip size={16} />
+              <span>Allega file</span>
+              <input type="file" multiple onChange={handleFileSelect} style={{ display: 'none' }} />
+            </label>
+
+            {attachments.length > 0 && (
+              <div className="email-attachments-chips">
+                {attachments.map((file, index) => (
+                  <div key={index} className="email-attachment-chip">
+                    <FileText size={13} />
+                    <span>{file.name}</span>
+                    <button
+                      type="button"
+                      className="email-attachment-chip-remove"
+                      onClick={() => removeAttachment(index)}
+                      aria-label={`Rimuovi ${file.name}`}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Actions */}
           <div className="email-compose-actions">
             <button
-              className="email-compose-cancel-btn"
+              className="email-compose-draft-btn"
+              type="button"
               onClick={() => navigate(`/seller/contatti/${id}`)}
             >
+              <Save size={15} />
               Annulla
             </button>
-            <button
+            <motion.button
               className="email-compose-send-btn"
+              type="button"
               onClick={handleSend}
               disabled={sending || !to || !subject || !body}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
             >
               {sending ? (
                 <>
-                  <div className="loading-spinner-small"></div>
-                  Invio in corso...
+                  <span className="email-compose-spinner" />
+                  Invio...
                 </>
               ) : (
                 <>
-                  <Send size={18} />
-                  Invia Email
+                  <Send size={15} />
+                  Invia
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

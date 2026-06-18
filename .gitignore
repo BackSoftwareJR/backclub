@@ -48,3 +48,8 @@ logs/
 *.zip
 *.tar.gz
 *.sql.bak
+
+# Legacy frontend backup
+frontend-vecchio/node_modules/
+frontend-vecchio/dist/
+frontend-vecchio/dist-ssr/

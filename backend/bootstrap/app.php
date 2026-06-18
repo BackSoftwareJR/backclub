@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,9 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'seller' => \App\Http\Middleware\SellerOnly::class,
-            'n8n.webhook' => \App\Http\Middleware\VerifyN8nWebhookAuth::class,
         ]);
         $middleware->api(append: [\App\Http\Middleware\ApiResponseHeaders::class]);
+    })
+    ->withSchedule(function (Schedule $schedule): void {
+        $schedule->command('calendar:send-call-reminders')->everyMinute();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

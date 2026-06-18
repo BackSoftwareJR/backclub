@@ -220,4 +220,9 @@ class User extends Authenticatable
         
         return null;
     }
+
+    public function googleIntegration()
+    {
+        return $this->hasOne(UserGoogleIntegration::class);
+    }
 }

@@ -12,7 +12,7 @@ import QuoteStep8Finalize from '../Venditori/QuoteWizard/QuoteStep8Finalize';
 import type { QuoteWizardData, SelectedService } from '../../types/quotes';
 import type { PriceListItem } from '../../types/sellers';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
-import '../Venditori/QuoteWizardPage.css';
+import './SellerQuoteEditPage.css';
 
 const TOTAL_STEPS = 5;
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus, Eye, FileText, Search, Trash2, Copy, MoreVertical, Edit, FileCheck, ShieldAlert, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { quotesApi } from '../../api/quotes';
@@ -151,15 +152,15 @@ const SellerQuotesPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { label: string; color: string; dot: string }> = {
-      pending: { label: t('status.pending'), color: '#f59e0b', dot: '🟡' },
-      approved: { label: t('status.approved'), color: '#10b981', dot: '🟢' },
-      rejected: { label: t('status.rejected'), color: '#ef4444', dot: '🔴' },
-      started: { label: t('status.active'), color: '#3b82f6', dot: '🔵' },
-      completed: { label: t('status.active'), color: '#10b981', dot: '🟢' },
-      contract_requested: { label: t('status.contract_requested'), color: '#3b82f6', dot: '🔵' },
+    const badges: Record<string, { label: string; badgeClass: string }> = {
+      pending: { label: t('status.pending'), badgeClass: 'seller-badge seller-badge-pending' },
+      approved: { label: t('status.approved'), badgeClass: 'seller-badge seller-badge-active' },
+      rejected: { label: t('status.rejected'), badgeClass: 'seller-badge seller-badge-cancelled' },
+      started: { label: t('status.active'), badgeClass: 'seller-badge seller-badge-primary' },
+      completed: { label: t('status.active'), badgeClass: 'seller-badge seller-badge-active' },
+      contract_requested: { label: t('status.contract_requested'), badgeClass: 'seller-badge seller-badge-primary' },
     };
-    return badges[status] || { label: t(`status.${status}`) || status, color: '#6b7280', dot: '⚪' };
+    return badges[status] || { label: t(`status.${status}`) || status, badgeClass: 'seller-badge seller-badge-secondary' };
   };
 
   const getInitials = (name: string): string => {
@@ -305,15 +306,23 @@ const SellerQuotesPage: React.FC = () => {
             </button>
           </div>
         ) : (
-        <div className="seller-quotes-list">
-                {filteredQuotes.map((quote) => {
+        <motion.div
+          className="seller-quotes-list"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+                {filteredQuotes.map((quote, idx) => {
                   const statusBadge = getStatusBadge(quote.status);
             const clientInitials = getInitials(quote.client?.company_name || 'Cliente');
             
                   return (
-              <div
+              <motion.div
                 key={quote.id}
                 className="seller-quotes-row"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15, delay: idx * 0.03 }}
                 onMouseEnter={() => setHoveredRow(quote.id)}
                 onMouseLeave={() => {
                   setHoveredRow(null);
@@ -342,13 +351,9 @@ const SellerQuotesPage: React.FC = () => {
 
                 {/* Column 3: Status */}
                 <div className="seller-quotes-col-status">
-                  <span 
-                    className="seller-quotes-status-badge"
-                    style={{ color: statusBadge.color }}
-                  >
-                    <span className="seller-quotes-status-dot">{statusBadge.dot}</span>
-                          {statusBadge.label}
-                        </span>
+                  <span className={statusBadge.badgeClass}>
+                    {statusBadge.label}
+                  </span>
                 </div>
 
                 {/* Column 4: Date */}
@@ -433,10 +438,10 @@ const SellerQuotesPage: React.FC = () => {
                     )}
                   </div>
                 </div>
-                        </div>
+                        </motion.div>
                   );
                 })}
-          </div>
+          </motion.div>
         )}
     </div>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { invoicesApi } from '../api/invoices';
 import type { Invoice } from '../api/invoices';
@@ -47,8 +48,22 @@ const InvoiceSettleModal: React.FC<InvoiceSettleModalProps> = ({ invoice, onClos
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-invoice-settle" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="modal-overlay"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+    >
+      <motion.div
+        className="modal-invoice-settle"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 8 }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+      >
         <div className="modal-header">
           <h2>Segna come Saldato</h2>
           <button className="btn-close-modal" onClick={onClose}>
@@ -139,8 +154,8 @@ const InvoiceSettleModal: React.FC<InvoiceSettleModalProps> = ({ invoice, onClos
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

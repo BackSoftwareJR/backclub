@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getHomeRouteForUser } from '../utils/userRoles';
 import { LogIn, Loader2 } from 'lucide-react';
 import '../styles/pages/Login.css';
 
@@ -69,25 +70,15 @@ const Login: React.FC = () => {
             );
             
             if (needsOnboarding) {
-                console.log('Login: User needs onboarding, navigating to dashboard (onboarding will be shown)', {
+                console.log('Login: User needs onboarding, navigating to home route (onboarding will be shown)', {
                     onboarding_completed: loginUser.onboarding_completed,
                     user_id: loginUser.id
                 });
-                navigate('/dashboard');
+                navigate(getHomeRouteForUser(loginUser));
                 return;
             }
             
-            // Only redirect to dashboard if user has single role (no role selection needed)
-            // Redirect based on user role - get user from result or localStorage
-            // Usa current_role se disponibile, altrimenti fallback a role
-            const activeRole = loginUser?.current_role || loginUser?.role;
-            if (loginUser && (loginUser.seller_id || activeRole === 'venditori' || activeRole === 'seller')) {
-                navigate('/seller');
-            } else if (activeRole === 'freelance') {
-                navigate('/freelance');
-            } else {
-                navigate('/dashboard');
-            }
+            navigate(getHomeRouteForUser(loginUser));
         } catch (err: any) {
             setError(err.response?.data?.message || 'Credenziali non valide');
         } finally {

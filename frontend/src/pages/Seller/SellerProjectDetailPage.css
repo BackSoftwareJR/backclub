@@ -1,0 +1,422 @@
+/* ============================================================
+   Seller Project Detail Page — Apple iOS 17 / macOS Sonoma style
+   Uses --seller-* design system variables exclusively
+   ============================================================ */
+
+.spd-page {
+  min-height: 100vh;
+  background: var(--seller-bg);
+  color: var(--seller-text-primary);
+  padding: var(--seller-spacing-8) var(--seller-spacing-6);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Back button ─────────────────────────────────────────── */
+.spd-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+  padding: 7px 14px;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-full);
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  cursor: pointer;
+  transition: all var(--seller-transition-fast);
+  margin-bottom: var(--seller-spacing-6);
+}
+
+.spd-back-btn:hover {
+  border-color: var(--seller-border-strong);
+  color: var(--seller-text-primary);
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+.spd-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--seller-spacing-4);
+  margin-bottom: var(--seller-spacing-8);
+}
+
+.spd-header-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--seller-radius-md);
+  background: var(--seller-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--seller-accent);
+  flex-shrink: 0;
+}
+
+.spd-header-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.spd-header-row {
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--seller-spacing-2);
+}
+
+.spd-project-name {
+  font-size: var(--seller-font-2xl);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.spd-project-desc {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  margin: 0;
+  line-height: 1.55;
+}
+
+/* ── 2-column layout ─────────────────────────────────────── */
+.spd-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--seller-spacing-6);
+  align-items: start;
+}
+
+/* ── Sections ────────────────────────────────────────────── */
+.spd-main,
+.spd-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-5);
+}
+
+.spd-section {
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-5);
+}
+
+.spd-section-title {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--seller-spacing-3);
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+}
+
+.spd-section-icon {
+  color: var(--seller-text-tertiary);
+}
+
+.spd-hairline {
+  height: 1px;
+  background: var(--seller-border);
+  margin-bottom: var(--seller-spacing-4);
+}
+
+/* ── Info grid (dl) ──────────────────────────────────────── */
+.spd-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0;
+}
+
+.spd-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--seller-spacing-3) 0;
+  border-bottom: 1px solid var(--seller-border);
+  gap: var(--seller-spacing-3);
+}
+
+.spd-info-row:last-child {
+  border-bottom: none;
+}
+
+.spd-info-label {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-tertiary);
+  font-weight: var(--seller-weight-medium);
+  flex-shrink: 0;
+}
+
+.spd-info-value {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+  text-align: right;
+}
+
+.spd-info-icon {
+  color: var(--seller-text-tertiary);
+  flex-shrink: 0;
+}
+
+.spd-link {
+  color: var(--seller-accent);
+  text-decoration: none;
+  font-weight: var(--seller-weight-medium);
+}
+
+.spd-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Contracts ───────────────────────────────────────────── */
+.spd-contracts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+}
+
+.spd-contract-row {
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-3);
+  background: var(--seller-bg-overlay);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+}
+
+.spd-contract-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--seller-radius-sm);
+  background: var(--seller-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--seller-accent);
+  flex-shrink: 0;
+}
+
+.spd-contract-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spd-contract-number {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+}
+
+.spd-contract-title-text {
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Team ────────────────────────────────────────────────── */
+.spd-team-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+}
+
+.spd-team-row {
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-3) 0;
+  border-bottom: 1px solid var(--seller-border);
+}
+
+.spd-team-row:last-child {
+  border-bottom: none;
+}
+
+.spd-team-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--seller-gradient-avatar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.spd-team-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spd-team-name {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
+}
+
+.spd-team-role {
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-secondary);
+}
+
+/* ── Status card ─────────────────────────────────────────── */
+.spd-status-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+}
+
+.seller-badge-lg {
+  font-size: var(--seller-font-sm) !important;
+  padding: 6px 14px !important;
+}
+
+.spd-status-updated {
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
+  margin: 0;
+}
+
+/* ── Timeline ────────────────────────────────────────────── */
+.spd-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.spd-tl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--seller-spacing-3);
+  position: relative;
+  padding-bottom: var(--seller-spacing-4);
+}
+
+.spd-tl-item:last-child {
+  padding-bottom: 0;
+}
+
+.spd-tl-line {
+  position: absolute;
+  left: 13px;
+  top: 26px;
+  bottom: 0;
+  width: 1px;
+  background: var(--seller-border);
+}
+
+.spd-tl-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid var(--seller-border);
+  background: var(--seller-bg-elevated);
+  color: var(--seller-text-tertiary);
+  position: relative;
+  z-index: 1;
+}
+
+.spd-tl-success .spd-tl-dot {
+  background: var(--seller-success-soft);
+  border-color: var(--seller-success);
+  color: var(--seller-success);
+}
+
+.spd-tl-info .spd-tl-dot {
+  background: var(--seller-accent-soft);
+  border-color: var(--seller-accent);
+  color: var(--seller-accent);
+}
+
+.spd-tl-warning .spd-tl-dot {
+  background: var(--seller-warning-soft);
+  border-color: var(--seller-warning);
+  color: var(--seller-warning);
+}
+
+.spd-tl-content {
+  flex: 1;
+  padding-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.spd-tl-label {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
+}
+
+.spd-tl-date {
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
+}
+
+.spd-tl-empty {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-tertiary);
+  margin: 0;
+}
+
+/* ── Error state ─────────────────────────────────────────── */
+.spd-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--seller-spacing-4);
+  padding: var(--seller-spacing-16) var(--seller-spacing-6);
+  text-align: center;
+  color: var(--seller-text-secondary);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .spd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .spd-sidebar {
+    order: -1;
+  }
+}
+
+@media (max-width: 600px) {
+  .spd-page {
+    padding: var(--seller-spacing-5) var(--seller-spacing-4);
+  }
+
+  .spd-page-header {
+    flex-direction: column;
+  }
+
+  .spd-project-name {
+    font-size: var(--seller-font-xl);
+  }
+}

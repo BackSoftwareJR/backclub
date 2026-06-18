@@ -1,4 +1,4 @@
-/* Apple-Style Success Page */
+/* Quote Step 8 Finalize — Dark Apple-style design system */
 
 .finalize-success-container {
   min-height: 100vh;
@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem 1rem;
-  background: #f5f5f7;
+  background: var(--color-bg-primary);
 }
 
 .finalize-loading {
@@ -14,14 +14,14 @@
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  color: #6b7280;
+  color: var(--color-text-quaternary);
 }
 
 .loading-spinner {
   width: 3rem;
   height: 3rem;
-  border: 3px solid rgba(0, 102, 204, 0.1);
-  border-top-color: #0066cc;
+  border: 3px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--color-accent-blue);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -36,11 +36,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2.5rem;
-  padding-top: 5rem;
+  gap: 2rem;
+  padding-top: 4rem;
 }
 
-/* Hero Success Element */
+/* Hero */
 .finalize-hero {
   display: flex;
   flex-direction: column;
@@ -49,76 +49,67 @@
 }
 
 .finalize-success-icon {
-  color: #10b981;
+  color: #34C759;
   animation: scaleIn 0.5s ease-out;
   stroke-width: 2;
 }
 
 @keyframes scaleIn {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .finalize-success-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #1d1d1f;
-  margin: 1.5rem 0 0.5rem 0;
+  color: var(--color-text-primary);
+  margin: 1.25rem 0 5px 0;
   letter-spacing: -0.02em;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
 }
 
 .finalize-success-subtitle {
   font-size: 1rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--color-text-quaternary);
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
 }
 
-/* Quick Actions Group */
+/* Actions Group */
 .finalize-actions-group {
   width: 100%;
-  background: #FFFFFF;
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 1rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .finalize-action-row {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1.125rem 1.25rem;
   width: 100%;
   background: transparent;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
   text-align: left;
 }
 
 .finalize-action-row:not(.finalize-action-email):hover {
-  background: #f9fafb;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .finalize-action-row:not(.finalize-action-email):active {
-  background: #f3f4f6;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .finalize-action-row:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -126,11 +117,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  background: #f3f4f6;
-  border-radius: 0.5rem;
-  color: #1d1d1f;
+  width: 2.25rem;
+  height: 2.25rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
@@ -138,30 +129,30 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 2px;
   min-width: 0;
 }
 
 .finalize-action-label {
-  font-size: 1rem;
+  font-size: 15px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
 }
 
 .finalize-action-hint {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 13px;
+  color: var(--color-text-quaternary);
 }
 
 .finalize-action-chevron {
-  color: #9ca3af;
+  color: var(--color-text-quaternary);
   flex-shrink: 0;
 }
 
-/* Email Action - iMessage Style */
+/* Email Action */
 .finalize-action-email {
-  border-top: 1px solid rgba(229, 231, 235, 1);
-  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 1.25rem;
   cursor: default;
 }
 
@@ -169,30 +160,30 @@
   flex: 1;
   display: flex;
   align-items: center;
-  background: #f3f4f6;
-  border-radius: 9999px;
-  padding: 0.5rem 0.5rem 0.5rem 1rem;
-  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 100px;
+  padding: 5px 5px 5px 12px;
+  gap: 6px;
   transition: all 0.2s ease;
 }
 
 .finalize-email-input-wrapper:focus-within {
-  background: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  background: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
 }
 
 .finalize-email-input {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 0.9375rem;
-  color: #1d1d1f;
+  font-size: 14px;
+  color: var(--color-text-primary);
   outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
 }
 
 .finalize-email-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-quaternary);
 }
 
 .finalize-email-send-btn {
@@ -202,7 +193,7 @@
   width: 2rem;
   height: 2rem;
   border: none;
-  background: #0066cc;
+  background: var(--color-accent-blue);
   border-radius: 50%;
   color: #FFFFFF;
   cursor: pointer;
@@ -211,7 +202,7 @@
 }
 
 .finalize-email-send-btn:hover:not(:disabled) {
-  background: #0052a3;
+  background: var(--color-accent-blue-dark);
   transform: scale(1.05);
 }
 
@@ -220,7 +211,7 @@
 }
 
 .finalize-email-send-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
@@ -229,27 +220,27 @@
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-top: 1rem;
+  padding-top: 10px;
 }
 
 .finalize-primary-btn {
-  padding: 0.875rem 2rem;
-  background: #0066cc;
+  padding: 12px 2rem;
+  background: var(--color-accent-blue);
   color: #FFFFFF;
   border: none;
-  border-radius: 9999px;
-  font-size: 1rem;
+  border-radius: 100px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
   letter-spacing: -0.01em;
 }
 
 .finalize-primary-btn:hover:not(:disabled) {
-  background: #0052a3;
+  background: var(--color-accent-blue-dark);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.25);
 }
 
 .finalize-primary-btn:active:not(:disabled) {
@@ -257,92 +248,14 @@
 }
 
 .finalize-primary-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 .finalize-actions {
   display: flex;
   justify-content: center;
-  padding: 2rem;
-}
-
-/* Dark Mode Support */
-[data-theme="dark"] .finalize-success-container {
-  background: #000000;
-}
-
-[data-theme="dark"] .finalize-success-title {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .finalize-success-subtitle {
-  color: #9ca3af;
-}
-
-[data-theme="dark"] .finalize-actions-group {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .finalize-action-row:not(.finalize-action-email):hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="dark"] .finalize-action-row:not(.finalize-action-email):active {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .finalize-action-icon {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .finalize-action-label {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .finalize-action-hint {
-  color: #9ca3af;
-}
-
-[data-theme="dark"] .finalize-action-chevron {
-  color: #6b7280;
-}
-
-[data-theme="dark"] .finalize-action-email {
-  border-top-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .finalize-email-input-wrapper {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .finalize-email-input-wrapper:focus-within {
-  background: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 0 0 3px rgba(90, 200, 250, 0.1);
-}
-
-[data-theme="dark"] .finalize-email-input {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .finalize-email-send-btn {
-  background: #5ac8fa;
-}
-
-[data-theme="dark"] .finalize-email-send-btn:hover:not(:disabled) {
-  background: #4ab8ea;
-}
-
-[data-theme="dark"] .finalize-primary-btn {
-  background: #5ac8fa;
-  color: #000000;
-}
-
-[data-theme="dark"] .finalize-primary-btn:hover:not(:disabled) {
-  background: #4ab8ea;
-  box-shadow: 0 4px 12px rgba(90, 200, 250, 0.3);
+  padding: 1.5rem;
 }
 
 /* Responsive */
@@ -351,21 +264,11 @@
     padding-top: 2rem;
   }
 
-  .finalize-success-icon {
-    width: 5rem;
-    height: 5rem;
-  }
-
   .finalize-success-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
 
   .finalize-action-row {
-    padding: 1rem 1.25rem;
-  }
-
-  .finalize-email-input-wrapper {
-    padding: 0.5rem;
+    padding: 1rem;
   }
 }
-

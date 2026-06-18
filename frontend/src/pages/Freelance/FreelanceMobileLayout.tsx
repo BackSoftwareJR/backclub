@@ -13,6 +13,7 @@ import {
   UserCog,
   FolderKanban,
   X,
+  Briefcase,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -137,6 +138,7 @@ const FreelanceMobileLayout: React.FC = () => {
 
   const moreMenuItems = [
     { id: 'progetti', label: 'Progetti', icon: FolderKanban, path: '/freelance/progetti' },
+    { id: 'workspace', label: 'WorkSpace', icon: Briefcase, path: '/workspace' },
     { id: 'richieste', label: 'Richieste', icon: FileText, path: '/freelance/richieste' },
     { id: 'chat', label: 'Chat', icon: MessageSquare, path: '/freelance/chat' },
     { id: 'supporto', label: 'Supporto', icon: HelpCircle, path: '/freelance/supporto' },

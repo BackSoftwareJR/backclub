@@ -1,81 +1,101 @@
+/* Uscite Analytics Page */
+
 .uscite-analytics-page {
-    min-height: 100vh;
-    background: linear-gradient(135deg, rgb(18, 18, 20) 0%, rgb(25, 25, 28) 100%);
-    padding: 1.5rem;
-    color: rgba(255, 255, 255, 0.95);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
+/* Header */
 .analytics-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 12px;
 }
 
 .analytics-header h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
 }
 
+/* Back Button */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: var(--color-accent-blue);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 180ms;
+    font-family: inherit;
+}
+
+.btn-back:hover {
+    background: var(--color-bg-secondary);
+    transform: none;
+}
+
+/* Analytics Content Card */
 .analytics-content {
-    max-width: 600px;
+    max-width: 560px;
     margin: 0 auto;
     text-align: center;
-    padding: 3rem 2rem;
-    background: rgba(30, 30, 35, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
+    padding: 40px 32px;
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
 }
 
 .icon-wrapper {
-    margin-bottom: 2rem;
-    color: #667eea;
+    margin-bottom: 20px;
+    color: var(--color-accent-blue);
 }
 
 .analytics-content h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 10px 0;
 }
 
 .analytics-content p {
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 1rem;
+    color: var(--color-text-quaternary);
+    font-size: 13px;
+    margin: 0 0 8px 0;
 }
 
 .analytics-content ul {
     list-style: none;
     padding: 0;
-    margin-top: 1.5rem;
+    margin-top: 16px;
     text-align: left;
 }
 
 .analytics-content ul li {
-    padding: 0.5rem 0;
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.875rem;
-}
-
-.analytics-content ul li:before {
-    content: "→ ";
-    color: #667eea;
-    margin-right: 0.5rem;
-}
-
-.btn-back {
+    padding: 6px 0;
+    color: var(--color-text-tertiary);
+    font-size: 13px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.9);
-    cursor: pointer;
-    transition: all 0.2s;
+    gap: 8px;
 }
 
-.btn-back:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateX(-4px);
+.analytics-content ul li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-accent-blue);
+    flex-shrink: 0;
+    margin-right: 0;
 }

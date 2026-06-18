@@ -2,68 +2,37 @@
 
 .service-question-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: var(--spacing-4);
+  z-index: var(--seller-z-modal, 300);
+  padding: var(--seller-spacing-4, 16px);
   overflow-y: auto;
-  animation: overlayFadeIn 0.2s ease-out;
 }
 
-@keyframes overlayFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-[data-theme="light"] .service-question-modal-overlay {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* Modal Container - Unified Surface */
+/* Modal Container */
 .service-question-modal-apple {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-radius: 24px;
+  background: var(--seller-bg-elevated, rgba(17, 17, 19, 1));
+  border-radius: var(--seller-radius-xl, 20px);
   width: 100%;
   max-width: 672px;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(229, 231, 235, 0.5);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
   overflow: hidden;
-  animation: modalSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-[data-theme="dark"] .service-question-modal-apple {
-  background: rgba(28, 28, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-}
-
-@keyframes modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+[data-theme="light"] .service-question-modal-apple {
+  background: var(--seller-bg-elevated, #ffffff);
+  border-color: var(--seller-border, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.15);
 }
 
 /* Header - Minimalist */

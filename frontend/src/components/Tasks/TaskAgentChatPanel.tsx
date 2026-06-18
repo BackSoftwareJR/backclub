@@ -38,9 +38,9 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
     try {
       const res = await crmProjectTasksApi.getN8nSteps(projectId, taskId);
       setSteps(res.data.steps);
-      setN8nStatus(res.data.task.n8n_status);
-      setProgress(res.data.task.progress ?? null);
-      setN8nError(res.data.task.n8n_error ?? null);
+      setN8nStatus(res.data.n8n_status);
+      setProgress(res.data.progress ?? null);
+      setN8nError(res.data.n8n_error ?? null);
     } catch (e) {
       console.error('N8N steps load error', e);
     } finally {
@@ -106,7 +106,7 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
               className={`task-agent-chat-bubble task-agent-chat-bubble--${step.status}`}
             >
               <div className="task-agent-chat-bubble-meta">
-                <strong>{step.actor_name || 'Agente'}</strong>
+                <strong>{step.step_key || 'Agente'}</strong>
                 {step.title && <span className="task-agent-chat-bubble-title"> · {step.title}</span>}
                 <time>{new Date(step.created_at).toLocaleString('it-IT')}</time>
               </div>

@@ -1,13 +1,15 @@
-/* Seller Quote Detail Page - Apple Design System */
+/* ============================================================
+   Seller Quote Detail Page — Apple iOS 17 / macOS Sonoma
+   Uses --seller-* design system variables
+   ============================================================ */
 
 .seller-quote-detail-page {
   min-height: 100vh;
-  background: #000000;
-  color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  background: var(--seller-bg);
+  color: var(--seller-text-primary);
 }
 
-/* Loading & Empty States */
+/* ── Loading & Empty States ──────────────────────────────── */
 .seller-quote-detail-loading,
 .seller-quote-detail-empty {
   display: flex;
@@ -15,34 +17,35 @@
   align-items: center;
   justify-content: center;
   min-height: 60vh;
-  color: #f5f5f7;
+  color: var(--seller-text-primary);
 }
 
 .seller-quote-detail-empty-text {
-  color: #a0a0a0;
-  font-size: 0.875rem;
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-sm);
   margin: 0;
 }
 
-/* Unified Header - Compact & Cohesive */
+/* ── Sticky Header ───────────────────────────────────────── */
 .seller-quote-detail-header {
-  background: #1C1C1E;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 1rem 2rem;
+  background: var(--seller-bg-elevated);
+  border-bottom: 1px solid var(--seller-border);
+  padding: var(--seller-spacing-4) var(--seller-spacing-8);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: var(--seller-spacing-6);
   position: sticky;
   top: 0;
   z-index: 100;
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
 .seller-quote-detail-header-left {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--seller-spacing-4);
   flex: 1;
   min-width: 0;
 }
@@ -51,34 +54,35 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--seller-border);
   background: transparent;
-  color: #f5f5f7;
+  color: var(--seller-text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--seller-transition-fast),
+              border-color var(--seller-transition-fast);
   flex-shrink: 0;
 }
 
 .seller-quote-detail-back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--seller-bg-overlay);
+  border-color: var(--seller-border-strong);
 }
 
 .seller-quote-detail-header-title-group {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 4px;
   min-width: 0;
   flex: 1;
 }
 
 .seller-quote-detail-title {
-  font-size: 1.5rem; /* text-2xl */
-  font-weight: 700;
-  color: #ffffff;
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
   margin: 0;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -90,73 +94,65 @@
 .seller-quote-detail-header-meta {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--seller-spacing-2);
   flex-wrap: wrap;
 }
 
 .seller-quote-detail-id-badge {
-  padding: 0.25rem 0.625rem;
-  background: rgba(59, 130, 246, 0.15);
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #60a5fa;
+  padding: 2px 10px;
+  background: var(--seller-accent-soft);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-accent);
   letter-spacing: 0.025em;
+  font-family: 'Monaco', 'Menlo', monospace;
 }
 
-.seller-quote-detail-status-badge {
-  padding: 0.25rem 0.625rem;
-  border-radius: 9999px;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  letter-spacing: 0.025em;
-}
+/* status badge → uses .seller-badge classes, no override needed */
 
 .seller-quote-detail-header-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--seller-spacing-3);
   flex-shrink: 0;
 }
 
+/* Request Contract Button */
 .seller-quote-detail-request-contract-btn-header {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  background: rgba(48, 209, 88, 0.2);
-  border: 1px solid rgba(48, 209, 88, 0.4);
-  border-radius: 0.5rem;
-  color: #30D158;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  gap: var(--seller-spacing-2);
+  padding: 6px 14px;
+  background: var(--seller-success-soft);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: var(--seller-radius-full);
+  color: var(--seller-success);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  transition: background var(--seller-transition-fast);
   white-space: nowrap;
 }
 
 .seller-quote-detail-request-contract-btn-header:hover:not(:disabled) {
-  background: rgba(48, 209, 88, 0.3);
+  background: rgba(34, 197, 94, 0.2);
 }
 
 .seller-quote-detail-request-contract-btn-header:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Action Pill - Unified Toolbar */
+/* Action Pill */
 .seller-quote-detail-action-pill {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 9999px;
-  padding: 0.25rem;
+  background: var(--seller-bg-overlay);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-full);
+  padding: 3px;
   gap: 0;
 }
 
@@ -165,49 +161,39 @@
   height: 32px;
   border-radius: 50%;
   background: transparent;
-  color: #f5f5f7;
+  color: var(--seller-text-primary);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--seller-transition-fast);
   flex-shrink: 0;
 }
 
 .seller-quote-detail-action-pill-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--seller-bg-overlay);
 }
 
-/* Download Button in Header - More Visible */
+/* Download Button in Header */
 .seller-quote-detail-download-btn-header {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: #ffffff;
+  gap: var(--seller-spacing-2);
+  padding: 6px 14px;
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
   border: none;
-  border-radius: 0.5rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.3);
-  letter-spacing: -0.01em;
+  transition: background var(--seller-transition-fast);
   white-space: nowrap;
 }
 
 .seller-quote-detail-download-btn-header:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003D9E 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 122, 255, 0.4);
-}
-
-.seller-quote-detail-download-btn-header:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.3);
+  background: var(--seller-accent-hover);
 }
 
 .seller-quote-detail-download-btn-header svg {
@@ -216,52 +202,52 @@
 
 .seller-quote-detail-action-pill-divider {
   width: 1px;
-  height: 20px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0 0.25rem;
+  height: 18px;
+  background: var(--seller-border);
+  margin: 0 4px;
   flex-shrink: 0;
 }
 
 .seller-quote-detail-email-group-compact {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0 0.5rem;
+  gap: var(--seller-spacing-2);
+  padding: 0 var(--seller-spacing-2);
 }
 
 .seller-quote-detail-email-input-compact {
   flex: 1;
   background: transparent;
   border: none;
-  color: #f5f5f7;
-  font-size: 0.8125rem;
-  padding: 0.25rem 0;
+  color: var(--seller-text-primary);
+  font-size: var(--seller-font-sm);
+  padding: 4px 0;
   outline: none;
-  min-width: 180px;
-  max-width: 240px;
+  min-width: 160px;
+  max-width: 220px;
 }
 
 .seller-quote-detail-email-input-compact::placeholder {
-  color: #a0a0a0;
+  color: var(--seller-text-tertiary);
 }
 
 .seller-quote-detail-email-send-btn-compact {
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #007AFF;
-  color: #ffffff;
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--seller-transition-fast);
   flex-shrink: 0;
 }
 
 .seller-quote-detail-email-send-btn-compact:hover:not(:disabled) {
-  background: #0051D5;
+  background: var(--seller-accent-hover);
 }
 
 .seller-quote-detail-email-send-btn-compact:disabled {
@@ -273,7 +259,7 @@
   width: 16px;
   height: 16px;
   border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #ffffff;
+  border-top-color: var(--seller-text-inverse);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
 }
@@ -282,17 +268,17 @@
   to { transform: rotate(360deg); }
 }
 
-/* Main Container */
+/* ── Main Container ──────────────────────────────────────── */
 .seller-quote-detail-container {
-  max-width: 1280px; /* max-w-7xl */
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: var(--seller-spacing-8) var(--seller-spacing-8);
 }
 
 .seller-quote-detail-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem; /* gap-6 instead of gap-8 */
+  gap: var(--seller-spacing-6);
 }
 
 @media (min-width: 1024px) {
@@ -301,11 +287,11 @@
   }
 }
 
-/* Left Column - Main Content (Span 2) */
+/* ── Left Column — Items ─────────────────────────────────── */
 .seller-quote-detail-main-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--seller-spacing-5);
 }
 
 @media (min-width: 1024px) {
@@ -315,54 +301,46 @@
 }
 
 .seller-quote-detail-items-card {
-  background: #1C1C1E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.25rem; /* rounded-2xl */
-  padding: 1.5rem;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-5);
 }
 
 .seller-quote-detail-items-title {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin: 0 0 1rem 0;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0 0 var(--seller-spacing-4) 0;
   letter-spacing: -0.01em;
 }
 
-/* Table Header */
+/* Items Table Header */
 .seller-quote-detail-items-table-header {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 1rem;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 0.5rem;
+  gap: var(--seller-spacing-4);
+  padding: var(--seller-spacing-2) 0;
+  border-bottom: 1px solid var(--seller-border);
+  margin-bottom: 0;
 }
 
-.seller-quote-detail-items-table-col-desc {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #a0a0a0;
+.seller-quote-detail-items-table-col-desc,
+.seller-quote-detail-items-table-col-qty,
+.seller-quote-detail-items-table-col-price {
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .seller-quote-detail-items-table-col-qty {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #a0a0a0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   text-align: center;
   min-width: 60px;
 }
 
 .seller-quote-detail-items-table-col-price {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #a0a0a0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   text-align: right;
   min-width: 120px;
 }
@@ -375,94 +353,94 @@
 .seller-quote-detail-item-row {
   display: grid;
   grid-template-columns: 1fr auto auto;
-  gap: 1rem;
+  gap: var(--seller-spacing-4);
   align-items: flex-start;
-  padding: 1rem 0;
+  padding: var(--seller-spacing-4) 0;
 }
 
 .seller-quote-detail-item-content {
   min-width: 0;
-  max-width: 100%;
 }
 
 .seller-quote-detail-item-title {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #ffffff;
-  margin: 0 0 0.25rem 0;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
+  margin: 0 0 2px 0;
   line-height: 1.4;
 }
 
 .seller-quote-detail-item-description {
-  font-size: 0.75rem;
-  color: #a0a0a0;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
   line-height: 1.4;
   margin: 0;
-  max-width: 100%;
   overflow-wrap: break-word;
 }
 
 .seller-quote-detail-item-qty {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #ffffff;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
   text-align: center;
   font-variant-numeric: tabular-nums;
   min-width: 60px;
-  padding-top: 0.125rem;
 }
 
 .seller-quote-detail-item-price {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.25rem;
+  gap: 2px;
   flex-shrink: 0;
   min-width: 120px;
 }
 
 .seller-quote-detail-item-price-main {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   text-align: right;
 }
 
 .seller-quote-detail-item-price-detail {
-  font-size: 0.6875rem;
-  color: #a0a0a0;
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
 .seller-quote-detail-item-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.05);
-  margin: 0;
+  background: var(--seller-border);
 }
 
 .seller-quote-detail-notes-content {
-  color: #a0a0a0;
-  font-size: 0.875rem;
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-sm);
   line-height: 1.6;
   white-space: pre-wrap;
   margin: 0;
+  background: var(--seller-bg-overlay);
+  border-radius: var(--seller-radius-sm);
+  padding: var(--seller-spacing-3);
+  border: 1px solid var(--seller-border);
 }
 
-/* Right Column - Inspector Sidebar (Span 1, Sticky) */
+/* ── Right Column — Sidebar ──────────────────────────────── */
 .seller-quote-detail-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--seller-spacing-4);
 }
 
 @media (min-width: 1024px) {
   .seller-quote-detail-sidebar {
     grid-column: span 1;
     position: sticky;
-    top: 5.5rem; /* Adjusted for compact header */
+    top: 5.5rem;
     align-self: flex-start;
     max-height: calc(100vh - 6rem);
     overflow-y: auto;
@@ -470,148 +448,139 @@
 }
 
 .seller-quote-detail-inspector-card {
-  background: #1C1C1E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1.25rem;
-  padding: 1.25rem;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  padding: var(--seller-spacing-4);
 }
 
 .seller-quote-detail-inspector-card-header {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffffff;
+  gap: var(--seller-spacing-2);
+  margin-bottom: var(--seller-spacing-4);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
 }
 
 .seller-quote-detail-inspector-card-header svg {
-  color: #a0a0a0;
+  color: var(--seller-text-tertiary);
   flex-shrink: 0;
 }
 
-/* Totals Card (Hero) */
+/* Totals Card */
 .seller-quote-detail-totals-card {
-  background: linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--seller-bg-elevated);
+  border-color: var(--seller-border-strong);
 }
 
 .seller-quote-detail-totals-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--seller-spacing-2);
 }
 
 .seller-quote-detail-total-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--seller-spacing-4);
 }
 
 .seller-quote-detail-total-label {
-  font-size: 0.875rem;
-  color: #a0a0a0;
-  font-weight: 500;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  font-weight: var(--seller-weight-medium);
 }
 
 .seller-quote-detail-total-value {
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 
 .seller-quote-detail-total-discount {
-  color: #ef4444;
+  color: var(--seller-danger);
 }
 
 .seller-quote-detail-total-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0.5rem 0;
+  background: var(--seller-border);
+  margin: var(--seller-spacing-2) 0;
 }
 
 .seller-quote-detail-total-final {
-  margin-top: 0.5rem;
-  padding-top: 1rem;
+  padding-top: var(--seller-spacing-2);
 }
 
 .seller-quote-detail-total-label-final {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
 }
 
 .seller-quote-detail-total-value-final {
-  font-size: 3rem; /* text-5xl */
-  font-weight: 700;
-  color: #ffffff;
-  letter-spacing: -0.04em;
+  font-size: var(--seller-font-3xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
-/* Download Button - Prominent & Always Visible */
+/* Download Button */
 .seller-quote-detail-download-btn {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
-  margin-top: 1.5rem;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: #ffffff;
+  gap: var(--seller-spacing-2);
+  padding: 10px var(--seller-spacing-4);
+  margin-top: var(--seller-spacing-4);
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
   border: none;
-  border-radius: 0.75rem;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
-  letter-spacing: -0.01em;
+  transition: background var(--seller-transition-fast);
 }
 
 .seller-quote-detail-download-btn:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003D9E 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-}
-
-.seller-quote-detail-download-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.3);
+  background: var(--seller-accent-hover);
 }
 
 .seller-quote-detail-download-btn svg {
   flex-shrink: 0;
 }
 
-/* Client Info Card - Compact Contact Row */
+/* Client Card */
 .seller-quote-detail-client-card-compact {
-  padding: 1rem;
+  padding: var(--seller-spacing-3);
 }
 
 .seller-quote-detail-client-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--seller-spacing-3);
 }
 
 .seller-quote-detail-client-avatar-small {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  color: #ffffff;
+  background: var(--seller-accent-soft);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: var(--seller-accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
   flex-shrink: 0;
 }
 
@@ -621,10 +590,10 @@
 }
 
 .seller-quote-detail-client-name-compact {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 0.125rem;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin-bottom: 2px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -632,8 +601,8 @@
 }
 
 .seller-quote-detail-client-email-compact {
-  font-size: 0.75rem;
-  color: #a0a0a0;
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -641,394 +610,194 @@
 }
 
 .seller-quote-detail-client-action-btn {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #007AFF;
+  border: 1px solid var(--seller-border);
+  color: var(--seller-accent);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background var(--seller-transition-fast),
+              border-color var(--seller-transition-fast);
   flex-shrink: 0;
 }
 
 .seller-quote-detail-client-action-btn:hover {
-  background: rgba(0, 122, 255, 0.1);
-  border-color: rgba(0, 122, 255, 0.3);
+  background: var(--seller-accent-soft);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
-/* Timeline Card */
+/* Timeline */
 .seller-quote-detail-timeline {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: var(--seller-spacing-4);
 }
 
 .seller-quote-detail-timeline-item {
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: 4px;
 }
 
 .seller-quote-detail-timeline-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #a0a0a0;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .seller-quote-detail-timeline-value {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #ffffff;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
 }
 
 .seller-quote-detail-timeline-value-highlight {
-  color: #007AFF;
-  font-weight: 600;
+  color: var(--seller-accent);
+  font-weight: var(--seller-weight-semibold);
 }
 
-/* Commission card (clickable → dettaglio commissione) */
+/* Commission Card */
 .seller-quote-detail-commission-card {
   width: 100%;
   text-align: left;
   cursor: pointer;
-  background: #1C1C1E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  padding: 1rem 1.25rem;
-  margin-top: 0.75rem;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  padding: var(--seller-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  transition: background 0.2s, border-color 0.2s;
+  gap: var(--seller-spacing-2);
+  transition: background var(--seller-transition-fast),
+              border-color var(--seller-transition-fast);
 }
 
 .seller-quote-detail-commission-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--seller-bg-overlay);
+  border-color: var(--seller-border-strong);
 }
 
 .seller-quote-detail-commission-card .seller-quote-detail-inspector-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
   margin-bottom: 0;
 }
 
 .seller-quote-detail-commission-chevron {
   margin-left: auto;
-  color: #8E8E93;
+  color: var(--seller-text-tertiary);
   flex-shrink: 0;
 }
 
 .seller-quote-detail-commission-preview {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 2px;
 }
 
 .seller-quote-detail-commission-amount {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: #ffffff;
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
 }
 
 .seller-quote-detail-commission-meta {
-  font-size: 0.75rem;
-  color: #a0a0a0;
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-secondary);
 }
 
 .seller-quote-detail-commission-note {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: #8E8E93;
+  gap: var(--seller-spacing-2);
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
   margin: 0;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .seller-quote-detail-commission-note svg {
   flex-shrink: 0;
-  margin-top: 0.1rem;
+  margin-top: 1px;
 }
 
+/* Request Contract Button (Sidebar) */
 .seller-quote-detail-request-contract-btn {
   width: 100%;
-  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background: rgba(48, 209, 88, 0.15);
-  border: 1px solid rgba(48, 209, 88, 0.3);
-  border-radius: 0.75rem;
-  color: #30D158;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  gap: var(--seller-spacing-2);
+  padding: 10px var(--seller-spacing-4);
+  background: var(--seller-success-soft);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: var(--seller-radius-full);
+  color: var(--seller-success);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  transition: background var(--seller-transition-fast);
 }
 
 .seller-quote-detail-request-contract-btn:hover:not(:disabled) {
-  background: rgba(48, 209, 88, 0.25);
+  background: rgba(34, 197, 94, 0.2);
 }
 
 .seller-quote-detail-request-contract-btn:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Light Mode Support */
-[data-theme="light"] .seller-quote-detail-page {
-  background: #F5F5F7;
-  color: #1d1d1f;
+/* ── Skeleton ─────────────────────────────────────────────── */
+.seller-quote-detail-skeleton {
+  padding: var(--seller-spacing-8);
 }
 
-[data-theme="light"] .seller-quote-detail-header {
-  background: #ffffff;
-  border-bottom-color: rgba(0, 0, 0, 0.1);
+.seller-quote-detail-skeleton-header {
+  margin-bottom: var(--seller-spacing-8);
 }
 
-[data-theme="light"] .seller-quote-detail-back-btn {
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #1d1d1f;
+.seller-quote-detail-skeleton-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
 }
 
-[data-theme="light"] .seller-quote-detail-back-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="light"] .seller-quote-detail-title {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-id-badge {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.2);
-  color: #2563eb;
-}
-
-[data-theme="light"] .seller-quote-detail-action-btn-secondary {
-  background: rgba(0, 0, 0, 0.05);
-  color: #1d1d1f;
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-action-btn-secondary:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-email-group {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-email-input {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-email-input::placeholder {
-  color: #6b7280;
-}
-
-[data-theme="light"] .seller-quote-detail-items-card,
-[data-theme="light"] .seller-quote-detail-inspector-card,
-[data-theme="light"] .seller-quote-detail-commission-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-commission-card:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-[data-theme="light"] .seller-quote-detail-commission-amount {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-items-title,
-[data-theme="light"] .seller-quote-detail-inspector-card-header {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-item-title,
-[data-theme="light"] .seller-quote-detail-item-price-main,
-[data-theme="light"] .seller-quote-detail-total-value,
-[data-theme="light"] .seller-quote-detail-total-value-final,
-[data-theme="light"] .seller-quote-detail-total-label-final,
-[data-theme="light"] .seller-quote-detail-client-name,
-[data-theme="light"] .seller-quote-detail-timeline-value {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-item-description,
-[data-theme="light"] .seller-quote-detail-item-price-detail,
-[data-theme="light"] .seller-quote-detail-total-label,
-[data-theme="light"] .seller-quote-detail-timeline-label,
-[data-theme="light"] .seller-quote-detail-client-contact,
-[data-theme="light"] .seller-quote-detail-notes-content {
-  color: #6b7280;
-}
-
-[data-theme="light"] .seller-quote-detail-item-divider,
-[data-theme="light"] .seller-quote-detail-total-divider {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="light"] .seller-quote-detail-totals-card {
-  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-/* Light Mode - Download Button */
-[data-theme="light"] .seller-quote-detail-download-btn {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
-}
-
-[data-theme="light"] .seller-quote-detail-download-btn:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003D9E 100%);
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.35);
-}
-
-[data-theme="light"] .seller-quote-detail-timeline-value-highlight {
-  color: #2563eb;
-}
-
-[data-theme="light"] .seller-quote-detail-client-link {
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #2563eb;
-}
-
-[data-theme="light"] .seller-quote-detail-client-link:hover {
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.3);
-}
-
-/* Responsive */
+/* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1023px) {
   .seller-quote-detail-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: var(--seller-spacing-4);
+    padding: var(--seller-spacing-4);
   }
 
   .seller-quote-detail-header-actions {
     width: 100%;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .seller-quote-detail-email-group {
-    width: 100%;
-    min-width: auto;
+    flex-wrap: wrap;
+    gap: var(--seller-spacing-2);
   }
 
   .seller-quote-detail-container {
-    padding: 1.5rem 1rem;
+    padding: var(--seller-spacing-4);
   }
-}
-
-/* Light Mode - Action Pill */
-[data-theme="light"] .seller-quote-detail-action-pill {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-action-pill-btn {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-action-pill-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-/* Light Mode - Download Button Header */
-[data-theme="light"] .seller-quote-detail-request-contract-btn-header {
-  background: rgba(48, 209, 88, 0.15);
-  border-color: rgba(48, 209, 88, 0.35);
-  color: #28a745;
-}
-
-[data-theme="light"] .seller-quote-detail-request-contract-btn-header:hover:not(:disabled) {
-  background: rgba(48, 209, 88, 0.25);
-}
-
-[data-theme="light"] .seller-quote-detail-download-btn-header {
-  background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-  box-shadow: 0 2px 4px rgba(0, 122, 255, 0.25);
-}
-
-[data-theme="light"] .seller-quote-detail-download-btn-header:hover {
-  background: linear-gradient(135deg, #0051D5 0%, #003D9E 100%);
-  box-shadow: 0 4px 8px rgba(0, 122, 255, 0.35);
-}
-
-[data-theme="light"] .seller-quote-detail-action-pill-divider {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-email-input-compact {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-email-input-compact::placeholder {
-  color: #6b7280;
-}
-
-[data-theme="light"] .seller-quote-detail-items-table-header {
-  border-bottom-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-detail-items-table-col-desc,
-[data-theme="light"] .seller-quote-detail-items-table-col-qty,
-[data-theme="light"] .seller-quote-detail-items-table-col-price {
-  color: #6b7280;
-}
-
-[data-theme="light"] .seller-quote-detail-item-qty {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-detail-client-action-btn {
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #2563eb;
-}
-
-[data-theme="light"] .seller-quote-detail-client-action-btn:hover {
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.3);
 }
 
 @media (max-width: 640px) {
-  .seller-quote-detail-header {
-    padding: 1rem 1.5rem;
-  }
-
   .seller-quote-detail-title {
-    font-size: 1.5rem;
+    font-size: var(--seller-font-lg);
   }
 
-  .seller-quote-detail-items-card {
-    padding: 1.5rem;
+  .seller-quote-detail-total-value-final {
+    font-size: var(--seller-font-2xl);
   }
 
   .seller-quote-detail-item-row {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
-  }
-
-  .seller-quote-detail-item-qty,
-  .seller-quote-detail-item-price {
-    justify-self: flex-start;
+    gap: var(--seller-spacing-2);
   }
 }
-

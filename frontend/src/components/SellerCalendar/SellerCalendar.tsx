@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import './SellerCalendar.css';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export type CalendarItemType = 'task' | 'event' | 'call' | 'deadline' | 'reminder';
 
@@ -286,6 +287,17 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
     };
 
     const weekDates = getWeekDates();
+
+    const goToToday = () => setCurrentDate(new Date());
+
+    const getWeekLabel = (): string => {
+        const start = weekDates[0];
+        const end = weekDates[6];
+        if (start.getMonth() === end.getMonth()) {
+            return `${MONTHS[start.getMonth()]} ${start.getFullYear()}`;
+        }
+        return `${MONTHS[start.getMonth()]} – ${MONTHS[end.getMonth()]} ${end.getFullYear()}`;
+    };
 
     // Calcola altezza dinamica per 12 ore visibili
     useEffect(() => {
@@ -1600,6 +1612,39 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
             className={`project-calendar ${resolvedTheme}`}
             ref={calendarContainerRef}
         >
+                {/* Apple-style Toolbar */}
+            <div className="calendar-toolbar">
+                <div className="calendar-toolbar-nav">
+                    <button
+                        className="toolbar-nav-btn"
+                        onClick={goToPreviousWeek}
+                        title="Settimana precedente"
+                    >
+                        <ChevronLeft size={18} />
+                    </button>
+                    <div className="toolbar-date-label">{getWeekLabel()}</div>
+                    <button
+                        className="toolbar-nav-btn"
+                        onClick={goToNextWeek}
+                        title="Settimana successiva"
+                    >
+                        <ChevronRight size={18} />
+                    </button>
+                    <button className="toolbar-today-btn" onClick={goToToday}>
+                        Oggi
+                    </button>
+                </div>
+                <div className="calendar-toolbar-actions">
+                    <button
+                        className="toolbar-new-event-btn"
+                        onClick={() => handleCreateItem('event')}
+                    >
+                        <Plus size={16} />
+                        Nuovo evento
+                    </button>
+                </div>
+            </div>
+
             {/* Split View Layout */}
             <div className="calendar-split-view">
                 {/* Sidebar Sinistra */}
@@ -1899,12 +1944,27 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
             )}
 
             {/* Create Modal - selezione tipo */}
+            <AnimatePresence>
             {showCreateModal && !createType && createStartTime && (
-                <div className="modal-overlay" onClick={() => {
-                    setShowCreateModal(false);
-                    setCreateStartTime(null);
-                }}>
-                    <div className="modal-content create-item-modal" onClick={(e) => e.stopPropagation()}>
+                <motion.div
+                    className="calendar-modal-motion-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    onClick={() => {
+                        setShowCreateModal(false);
+                        setCreateStartTime(null);
+                    }}
+                >
+                    <motion.div
+                        className="modal-content create-item-modal"
+                        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="modal-header">
                             <h2>Cosa vuoi creare?</h2>
                             <button onClick={() => {
@@ -1942,18 +2002,35 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
 
             {/* Create Modal - form creazione */}
+            <AnimatePresence>
             {showCreateModal && createType && createStartTime && (
-                <div className="modal-overlay" onClick={() => {
-                    setShowCreateModal(false);
-                    setCreateType(null);
-                    setCreateStartTime(null);
-                }}>
-                    <div className="modal-content calendar-event-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: createType === 'task' ? '900px' : '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+                <motion.div
+                    className="calendar-modal-motion-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    onClick={() => {
+                        setShowCreateModal(false);
+                        setCreateType(null);
+                        setCreateStartTime(null);
+                    }}
+                >
+                    <motion.div
+                        className="modal-content calendar-event-modal"
+                        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ maxWidth: createType === 'task' ? '900px' : '600px', maxHeight: '90vh', overflowY: 'auto' }}
+                    >
                         <div className="modal-header">
                             <h2>
                                 Crea {
@@ -2472,21 +2549,37 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
                             </div>
                         </form>
                         )}
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
 
             {/* Item Details Modal */}
+            <AnimatePresence>
             {showItemDetailsModal && selectedItem && (
-                <div className="modal-overlay" onClick={() => {
-                    if (!isEditingItem) {
-                    setShowItemDetailsModal(false);
-                    setSelectedItem(null);
-                        setIsEditingItem(false);
-                        setEditFormData(null);
-                    }
-                }}>
-                    <div className="modal-content calendar-event-modal" onClick={(e) => e.stopPropagation()}>
+                <motion.div
+                    className="calendar-modal-motion-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    onClick={() => {
+                        if (!isEditingItem) {
+                        setShowItemDetailsModal(false);
+                        setSelectedItem(null);
+                            setIsEditingItem(false);
+                            setEditFormData(null);
+                        }
+                    }}
+                >
+                    <motion.div
+                        className="modal-content calendar-event-modal"
+                        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         <div className="modal-header">
                             <h2>
                                 {isEditingItem ? 'Modifica Evento' : selectedItem.title}
@@ -2934,18 +3027,35 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
                                 </>
                             )}
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
 
             {/* Modal Esporta CSV */}
+            <AnimatePresence>
             {showExportModal && (
-                <div className="modal-overlay" onClick={() => {
-                    setShowExportModal(false);
-                    setExportStartDate('');
-                    setExportEndDate('');
-                }}>
-                    <div className="modal-content calendar-event-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+                <motion.div
+                    className="calendar-modal-motion-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    onClick={() => {
+                        setShowExportModal(false);
+                        setExportStartDate('');
+                        setExportEndDate('');
+                    }}
+                >
+                    <motion.div
+                        className="modal-content calendar-event-modal"
+                        initial={{ opacity: 0, scale: 0.95, y: 12 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 12 }}
+                        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{ maxWidth: '500px' }}
+                    >
                         <div className="modal-header">
                             <h2>Esporta Calendario CSV</h2>
                             <button onClick={() => {
@@ -3010,9 +3120,10 @@ const SellerCalendar: React.FC<SellerCalendarProps> = () => {
                                 Esporta CSV
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
+            </AnimatePresence>
         </div>
     );
 };

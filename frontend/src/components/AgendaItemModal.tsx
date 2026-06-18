@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, AlertCircle, Plus, Trash2, FileText, Bell, CheckSquare, Calendar as CalendarIcon, CheckCircle2 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { agendaApi } from '../api/agenda';
 import type { AgendaItem, AgendaItemType, ChecklistItem } from '../api/agenda';
 import './AgendaItemModal.css';
@@ -287,13 +288,27 @@ const AgendaItemModal: React.FC<AgendaItemModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
-
   const TypeIcon = getTypeIcon();
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-agenda-item" onClick={(e) => e.stopPropagation()}>
+    <AnimatePresence>
+      {isOpen && (
+    <motion.div
+      className="modal-overlay"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+    >
+      <motion.div
+        className="modal-agenda-item"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 8 }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+      >
         <div className="modal-header">
           <div className="modal-header-title">
             <TypeIcon size={20} style={{ color: getTypeColor() }} />
@@ -563,8 +578,10 @@ const AgendaItemModal: React.FC<AgendaItemModalProps> = ({
             )}
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

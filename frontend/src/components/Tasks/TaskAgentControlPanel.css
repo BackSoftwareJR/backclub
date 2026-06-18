@@ -1,0 +1,219 @@
+.task-agent-control {
+  margin-bottom: 24px;
+}
+
+.task-agent-control-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+  color: #0a84ff;
+}
+
+.task-agent-control-title {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.task-agent-control-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.task-agent-control-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: rgba(255, 59, 48, 0.12);
+  color: #ff6b6b;
+  font-size: 13px;
+}
+
+.task-agent-control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.task-agent-control-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.task-agent-control-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.task-agent-control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.task-agent-control-btn--restart {
+  border-color: rgba(52, 199, 89, 0.3);
+  background: rgba(52, 199, 89, 0.1);
+  color: #34c759;
+}
+
+.task-agent-control-btn--restart:hover:not(:disabled) {
+  background: rgba(52, 199, 89, 0.15);
+  border-color: rgba(52, 199, 89, 0.4);
+}
+
+.task-agent-control-btn--stop {
+  border-color: rgba(255, 59, 48, 0.3);
+  background: rgba(255, 59, 48, 0.1);
+  color: #ff3b30;
+}
+
+.task-agent-control-btn--stop:hover:not(:disabled) {
+  background: rgba(255, 59, 48, 0.15);
+  border-color: rgba(255, 59, 48, 0.4);
+}
+
+.task-agent-control-btn--review {
+  border-color: rgba(255, 159, 10, 0.3);
+  background: rgba(255, 159, 10, 0.1);
+  color: #ff9f0a;
+}
+
+.task-agent-control-btn--review:hover:not(:disabled) {
+  background: rgba(255, 159, 10, 0.15);
+  border-color: rgba(255, 159, 10, 0.4);
+}
+
+.task-agent-control-spinner {
+  animation: task-agent-control-spin 1s linear infinite;
+}
+
+@keyframes task-agent-control-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Review Form */
+.task-agent-control-review {
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: rgba(255, 159, 10, 0.08);
+  border: 1px solid rgba(255, 159, 10, 0.25);
+}
+
+.task-agent-control-review-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.task-agent-control-review-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  line-height: 1.4;
+  resize: vertical;
+  min-height: 60px;
+}
+
+.task-agent-control-review-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.task-agent-control-review-textarea:focus {
+  outline: none;
+  border-color: #ff9f0a;
+  box-shadow: 0 0 0 2px rgba(255, 159, 10, 0.2);
+}
+
+.task-agent-control-review-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.task-agent-control-review-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.task-agent-control-review-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.task-agent-control-review-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.task-agent-control-review-btn--send {
+  background: #ff9f0a;
+  border-color: #ff9f0a;
+  color: white;
+}
+
+.task-agent-control-review-btn--send:hover:not(:disabled) {
+  background: #e68900;
+  border-color: #e68900;
+}
+
+.task-agent-control-review-btn--cancel {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .task-agent-control-actions {
+    flex-direction: column;
+  }
+  
+  .task-agent-control-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .task-agent-control-review-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .task-agent-control-review-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

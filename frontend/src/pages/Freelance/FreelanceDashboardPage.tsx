@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { 
+import {
   FolderKanban,
   CheckSquare,
   MessageSquare,
   Circle,
   ChevronLeft,
   ChevronRight,
-  Bell
+  Bell,
+  Plus,
+  FolderOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useFreelanceCrm } from '../../context/FreelanceCrmContext';
@@ -16,16 +18,19 @@ import { freelanceApi } from '../../api/freelance';
 import { freelanceCrmApi } from '../../api/freelanceCrm';
 import { freelanceCalendarApi, type FreelanceCalendarItem } from '../../api/freelanceCalendar';
 import type { FreelanceDashboardStats, FreelanceTask } from '../../types/freelance';
-import { Calendar, Video, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { Calendar, Video, AlertCircle, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import GuideTour from '../../components/Guide/GuideTour';
 import { freelanceDashboardTourSteps, freelanceCompleteTourSteps } from '../../config/freelanceGuideTours';
 import './FreelanceDashboardPage.css';
 
-// Mini Calendar Component
+// ============================================================
+// Mini Calendar — Apple Calendar style
+// ============================================================
+
 const MiniCalendar: React.FC<{ tasks: FreelanceTask[] }> = ({ tasks }) => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const today = new Date();
-  
+
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
   };
@@ -44,14 +49,9 @@ const MiniCalendar: React.FC<{ tasks: FreelanceTask[] }> = ({ tasks }) => {
 
   const daysInMonth = getDaysInMonth(currentDate);
   const firstDay = getFirstDayOfMonth(currentDate);
-  const days = [];
-  
-  // Add empty days at the start
-  for (let i = 0; i < firstDay; i++) {
-    days.push(null);
-  }
-  
-  // Add days of the month
+  const days: (Date | null)[] = [];
+
+  for (let i = 0; i < firstDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) {
     days.push(new Date(currentDate.getFullYear(), currentDate.getMonth(), i));
   }
@@ -70,44 +70,51 @@ const MiniCalendar: React.FC<{ tasks: FreelanceTask[] }> = ({ tasks }) => {
     return date.toDateString() === today.toDateString();
   };
 
-  const monthNames = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 
-                     'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'];
+  const monthNames = [
+    'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
+    'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre',
+  ];
   const dayNames = ['Do', 'Lu', 'Ma', 'Me', 'Gi', 'Ve', 'Sa'];
 
   return (
-    <div className="freelance-mini-calendar">
-      <div className="freelance-mini-calendar-header">
-        <button 
-          className="freelance-mini-calendar-nav"
+    <div className="fd-mini-calendar">
+      <div className="fd-mini-calendar-header">
+        <button
+          className="fd-mini-calendar-nav"
           onClick={handlePrevMonth}
           aria-label="Mese precedente"
         >
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} strokeWidth={1.5} />
         </button>
-        <h3 className="freelance-mini-calendar-title">
+        <h3 className="fd-mini-calendar-title">
           {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h3>
-        <button 
-          className="freelance-mini-calendar-nav"
+        <button
+          className="fd-mini-calendar-nav"
           onClick={handleNextMonth}
           aria-label="Mese successivo"
         >
-          <ChevronRight size={16} />
+          <ChevronRight size={14} strokeWidth={1.5} />
         </button>
       </div>
-      <div className="freelance-mini-calendar-grid">
+      <div className="fd-mini-calendar-grid">
         {dayNames.map(day => (
-          <div key={day} className="freelance-mini-calendar-day-name">{day}</div>
+          <div key={day} className="fd-mini-calendar-day-name">{day}</div>
         ))}
         {days.map((date, index) => (
           <div
             key={index}
-            className={`freelance-mini-calendar-day ${!date ? 'empty' : ''} ${isToday(date) ? 'today' : ''} ${hasTaskOnDay(date) ? 'has-task' : ''}`}
+            className={[
+              'fd-mini-calendar-day',
+              !date ? 'empty' : '',
+              isToday(date) ? 'today' : '',
+              hasTaskOnDay(date) ? 'has-task' : '',
+            ].filter(Boolean).join(' ')}
           >
             {date && (
               <>
-                <span className="freelance-mini-calendar-day-number">{date.getDate()}</span>
-                {hasTaskOnDay(date) && <span className="freelance-mini-calendar-day-dot" />}
+                <span className="fd-mini-calendar-day-number">{date.getDate()}</span>
+                {hasTaskOnDay(date) && <span className="fd-mini-calendar-day-dot" />}
               </>
             )}
           </div>
@@ -117,7 +124,15 @@ const MiniCalendar: React.FC<{ tasks: FreelanceTask[] }> = ({ tasks }) => {
   );
 };
 
+// ============================================================
+// Types
+// ============================================================
+
 type TaskTab = 'oggi' | 'prossimi' | 'in-revisione' | 'scaduti';
+
+// ============================================================
+// Main Component
+// ============================================================
 
 const FreelanceDashboardPage: React.FC = () => {
   const { t } = useTranslation();
@@ -139,7 +154,6 @@ const FreelanceDashboardPage: React.FC = () => {
 
       try {
         if (isCrmScoped && crmDepartmentCode) {
-          // Vista CRM: dati di TUTTI (backend dedicato)
           const [dashboardData, calendarData] = await Promise.all([
             freelanceCrmApi.getDashboardData(crmDepartmentCode),
             freelanceCrmApi.getCalendarItems(crmDepartmentCode),
@@ -148,7 +162,6 @@ const FreelanceDashboardPage: React.FC = () => {
           setTasks(dashboardData.tasks ?? []);
           setCalendarItems(Array.isArray(calendarData.events) ? calendarData.events : []);
         } else {
-          // Vista normale: solo i miei dati
           const [dashboardData, calendarData] = await Promise.all([
             freelanceApi.getDashboardData(),
             freelanceCalendarApi.getItems(),
@@ -183,42 +196,42 @@ const FreelanceDashboardPage: React.FC = () => {
     return 'Buonasera';
   };
 
+  const getCurrentDate = () => {
+    return new Date().toLocaleDateString('it-IT', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+    });
+  };
+
   const formatDate = (dateString: string | null) => {
     if (!dateString) return null;
     const date = new Date(dateString);
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === today.toDateString()) {
-      return 'Oggi';
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Domani';
-    } else {
-      return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-    }
+
+    if (date.toDateString() === today.toDateString()) return 'Oggi';
+    if (date.toDateString() === tomorrow.toDateString()) return 'Domani';
+    return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
   };
 
-  // Get calendar items for today
   const getTodayCalendarItems = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
     return calendarItems.filter(item => {
-      if (item.completed_at) return false; // Skip completed items
+      if (item.completed_at) return false;
       const startDate = new Date(item.start_time);
       startDate.setHours(0, 0, 0, 0);
       return startDate.getTime() === today.getTime();
     });
   };
 
-  // Get calendar items for upcoming (future dates)
   const getUpcomingCalendarItems = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
     return calendarItems.filter(item => {
-      if (item.completed_at) return false; // Skip completed items
+      if (item.completed_at) return false;
       const startDate = new Date(item.start_time);
       startDate.setHours(0, 0, 0, 0);
       return startDate.getTime() > today.getTime();
@@ -228,9 +241,8 @@ const FreelanceDashboardPage: React.FC = () => {
   const getFilteredTasks = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
     let filtered = tasks.filter(task => task.status !== 'completed' && task.status !== 'cancelled');
-    
+
     if (activeTab === 'oggi') {
       filtered = filtered.filter(task => {
         if (!task.due_date) return false;
@@ -257,29 +269,22 @@ const FreelanceDashboardPage: React.FC = () => {
     }
 
     return filtered.sort((a, b) => {
-      // Sort by: overdue first, then by due_date
       if (a.isOverdue && !b.isOverdue) return -1;
       if (!a.isOverdue && b.isOverdue) return 1;
-      if (a.due_date && b.due_date) {
-        return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
-      }
+      if (a.due_date && b.due_date) return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
       if (a.due_date) return -1;
       if (b.due_date) return 1;
       return 0;
     });
   };
 
-  // Get combined items for "Oggi" tab (tasks + calendar items)
   const getTodayItems = () => {
     const todayTasks = getFilteredTasks();
     const todayCalendarItems = getTodayCalendarItems();
-    
-    // Combine and sort by time
     const combined = [
       ...todayTasks.map(task => ({ type: 'task' as const, item: task })),
-      ...todayCalendarItems.map(item => ({ type: 'calendar' as const, item }))
+      ...todayCalendarItems.map(item => ({ type: 'calendar' as const, item })),
     ];
-    
     return combined.sort((a, b) => {
       if (a.type === 'task' && b.type === 'task') {
         const taskA = a.item as FreelanceTask;
@@ -293,29 +298,22 @@ const FreelanceDashboardPage: React.FC = () => {
         const calB = b.item as FreelanceCalendarItem;
         return new Date(calA.start_time).getTime() - new Date(calB.start_time).getTime();
       }
-      // Tasks first, then calendar items
       return a.type === 'task' ? -1 : 1;
     });
   };
 
   const getCalendarItemIcon = (type: FreelanceCalendarItem['type']) => {
     switch (type) {
-      case 'event':
-        return <Calendar size={16} />;
-      case 'call':
-        return <Video size={16} />;
-      case 'deadline':
-        return <AlertCircle size={16} />;
-      case 'reminder':
-        return <FileText size={16} />;
-      default:
-        return <Calendar size={16} />;
+      case 'event': return <Calendar size={14} strokeWidth={1.5} />;
+      case 'call': return <Video size={14} strokeWidth={1.5} />;
+      case 'deadline': return <AlertCircle size={14} strokeWidth={1.5} />;
+      case 'reminder': return <FileText size={14} strokeWidth={1.5} />;
+      default: return <Calendar size={14} strokeWidth={1.5} />;
     }
   };
 
   const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    return new Date(dateString).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
   };
 
   const getTasksTodayCount = () => {
@@ -332,14 +330,11 @@ const FreelanceDashboardPage: React.FC = () => {
 
   const handleTaskToggle = async (task: FreelanceTask) => {
     if (!task.project) return;
-    
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     try {
       await freelanceApi.updateTaskStatus(task.project.id, task.id, newStatus);
       setTasks(prevTasks =>
-        prevTasks.map(t =>
-          t.id === task.id ? { ...t, status: newStatus } : t
-        )
+        prevTasks.map(t => t.id === task.id ? { ...t, status: newStatus } : t)
       );
     } catch (error) {
       console.error('Error updating task:', error);
@@ -350,7 +345,7 @@ const FreelanceDashboardPage: React.FC = () => {
   const tasksTodayCount = getTasksTodayCount();
   const todayItems = getTodayItems();
   const upcomingCalendarItems = getUpcomingCalendarItems();
-  const upcomingTasksCount = activeTab === 'prossimi' ? filteredTasks.length : 
+  const upcomingTasksCount = activeTab === 'prossimi' ? filteredTasks.length :
     tasks.filter(task => {
       if (task.status === 'completed' || task.status === 'cancelled') return false;
       if (!task.due_date) return false;
@@ -373,216 +368,210 @@ const FreelanceDashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="freelance-loading">
-        <div className="freelance-spinner"></div>
+      <div className="fd-loading">
+        <div className="fd-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="freelance-dashboard-cockpit">
+    <div className="fd-cockpit">
       <GuideTour steps={freelanceDashboardTourSteps} tourId="freelance-dashboard-tour" />
       <GuideTour steps={freelanceCompleteTourSteps} tourId="freelance-complete-tour" />
-      {/* Header - Light Touch */}
-      <div className="freelance-dashboard-header">
-        <div className="freelance-dashboard-header-left">
-          <h1 className="freelance-dashboard-greeting">
-            {getGreeting()}, {user?.name?.split(' ')[0] || 'Freelance'}
+
+      {/* ── Header ── */}
+      <div className="fd-header">
+        <div className="fd-header-left">
+          <h1 className="fd-greeting">
+            {getGreeting()}, <span className="fd-greeting-name">{user?.name?.split(' ')[0] || 'Freelance'}</span>
           </h1>
+          <p className="fd-date">{getCurrentDate()}</p>
         </div>
-        <div className="freelance-dashboard-header-right">
-          <div 
-            className="freelance-kpi-stat"
-            onClick={() => navigate('/freelance/progetti')}
-          >
-            <FolderKanban size={14} />
-            <span>{stats?.activeProjects || 0} Progetto{stats?.activeProjects !== 1 ? 'i' : ''}</span>
+        <div className="fd-header-right">
+          <div className="fd-header-stats">
+            <button
+              className="fd-stat-pill"
+              onClick={() => navigate('/freelance/progetti')}
+            >
+              <FolderKanban size={13} strokeWidth={1.5} />
+              <span>{stats?.activeProjects || 0} Progetti</span>
+            </button>
+            <button
+              className="fd-stat-pill"
+              onClick={() => navigate('/freelance/task')}
+            >
+              <CheckSquare size={13} strokeWidth={1.5} />
+              <span>{tasksTodayCount} Oggi</span>
+            </button>
+            {(stats?.unreadMessages ?? 0) > 0 && (
+              <button
+                className="fd-stat-pill fd-stat-pill-accent"
+                onClick={() => navigate('/freelance/chat')}
+              >
+                <MessageSquare size={13} strokeWidth={1.5} />
+                <span>{stats?.unreadMessages} nuovi</span>
+              </button>
+            )}
           </div>
-          <div className="freelance-kpi-separator">|</div>
-          <div 
-            className="freelance-kpi-stat"
-            onClick={() => navigate('/freelance/task')}
-          >
-            <CheckSquare size={14} />
-            <span>{tasksTodayCount} Task Oggi</span>
-          </div>
-          <div className="freelance-kpi-separator">|</div>
-          <div 
-            className="freelance-kpi-stat"
-            onClick={() => navigate('/freelance/chat')}
-          >
-            <MessageSquare size={14} />
-            <span>{stats?.unreadMessages || 0} Messaggi</span>
+          <div className="fd-header-actions">
+            <button
+              className="fd-action-btn"
+              onClick={() => navigate('/freelance/progetti')}
+            >
+              <Plus size={13} strokeWidth={2} />
+              <span>Progetto</span>
+            </button>
+            <button
+              className="fd-action-btn fd-action-btn-primary"
+              onClick={() => navigate('/freelance/task')}
+            >
+              <Plus size={13} strokeWidth={2} />
+              <span>Task</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Main Workspace - 12 Column Grid */}
-      <div className="freelance-workspace">
-        {/* LEFT PANEL - Task List (8-9 cols) */}
-        <div className="freelance-workspace-left">
-          <div className="freelance-task-section">
+      {/* ── Main Grid ── */}
+      <div className="fd-workspace">
+
+        {/* LEFT — Task List */}
+        <div className="fd-workspace-left">
+          <div className="fd-task-section">
             {/* Tabs */}
-            <div className="freelance-task-tabs">
-              <button
-                className={`freelance-task-tab ${activeTab === 'oggi' ? 'active' : ''}`}
-                onClick={() => setActiveTab('oggi')}
-              >
-                Oggi
-              </button>
-              <button
-                className={`freelance-task-tab ${activeTab === 'prossimi' ? 'active' : ''}`}
-                onClick={() => setActiveTab('prossimi')}
-              >
-                Prossimi
-                {upcomingTotalCount > 0 && (
-                  <span className="freelance-task-tab-badge freelance-task-tab-badge-orange">{upcomingTotalCount}</span>
-                )}
-              </button>
-              <button
-                className={`freelance-task-tab ${activeTab === 'in-revisione' ? 'active' : ''}`}
-                onClick={() => setActiveTab('in-revisione')}
-              >
-                In Revisione
-              </button>
-              <button
-                className={`freelance-task-tab ${activeTab === 'scaduti' ? 'active' : ''}`}
-                onClick={() => setActiveTab('scaduti')}
-              >
-                Scaduti
-                {scadutiCount > 0 && (
-                  <span className="freelance-task-tab-badge freelance-task-tab-badge-red">{scadutiCount}</span>
-                )}
-              </button>
+            <div className="fd-task-tabs">
+              {(['oggi', 'prossimi', 'in-revisione', 'scaduti'] as TaskTab[]).map(tab => (
+                <button
+                  key={tab}
+                  className={`fd-task-tab ${activeTab === tab ? 'active' : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {tab === 'oggi' && 'Oggi'}
+                  {tab === 'prossimi' && (
+                    <>Prossimi{upcomingTotalCount > 0 && <span className="fd-tab-badge fd-tab-badge-orange">{upcomingTotalCount}</span>}</>
+                  )}
+                  {tab === 'in-revisione' && 'In Revisione'}
+                  {tab === 'scaduti' && (
+                    <>Scaduti{scadutiCount > 0 && <span className="fd-tab-badge fd-tab-badge-red">{scadutiCount}</span>}</>
+                  )}
+                </button>
+              ))}
             </div>
 
-            {/* Messaggio task scadute (solo in vista Oggi) */}
+            {/* Overdue banner */}
             {activeTab === 'oggi' && scadutiCount > 0 && (
               <button
                 type="button"
-                className="freelance-scaduti-banner"
+                className="fd-scaduti-banner"
                 onClick={() => setActiveTab('scaduti')}
               >
-                <AlertCircle size={18} />
-                <span>Hai delle task scadute. Clicca per vederle.</span>
+                <AlertCircle size={14} strokeWidth={1.5} />
+                <span>Hai {scadutiCount} task scadut{scadutiCount === 1 ? 'a' : 'e'} — clicca per vederle</span>
               </button>
             )}
 
             {/* Task List */}
-            {todayItems.length > 0 || (activeTab !== 'oggi' && filteredTasks.length > 0) ? (
-              <div className="freelance-task-list">
+            {(todayItems.length > 0 || (activeTab !== 'oggi' && filteredTasks.length > 0)) ? (
+              <div className="fd-task-list">
                 {activeTab === 'oggi' ? (
-                  // Show combined tasks + calendar items for "Oggi"
                   todayItems.map((item) => {
                     if (item.type === 'task') {
                       const task = item.item as FreelanceTask;
                       const dueDateFormatted = formatDate(task.due_date);
                       const isOverdue = task.isOverdue;
-                      
+
                       return (
                         <div
                           key={`task-${task.id}`}
-                          className="freelance-task-row"
+                          className="fd-task-row"
                           onClick={() => navigate(`/freelance/task/${task.id}`)}
                         >
                           <button
-                            className="freelance-task-checkbox"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleTaskToggle(task);
-                            }}
+                            className="fd-task-checkbox"
+                            onClick={(e) => { e.stopPropagation(); handleTaskToggle(task); }}
                             aria-label={task.status === 'completed' ? 'Segna come non completato' : 'Segna come completato'}
                           >
-                            {task.status === 'completed' ? (
-                              <CheckSquare size={18} className="freelance-task-checkbox-checked" />
-                            ) : (
-                              <Circle size={18} className="freelance-task-checkbox-unchecked" />
-                            )}
+                            {task.status === 'completed'
+                              ? <CheckSquare size={16} strokeWidth={1.5} className="fd-checkbox-checked" />
+                              : <Circle size={16} strokeWidth={1.5} className="fd-checkbox-unchecked" />
+                            }
                           </button>
-                          <div className="freelance-task-content">
-                            <div className="freelance-task-title">{task.title}</div>
+                          <div className="fd-task-content">
+                            <div className="fd-task-title">{task.title}</div>
                             {task.project && (
-                              <div className="freelance-task-meta">
-                                <span className="freelance-task-project">{task.project.name}</span>
+                              <div className="fd-task-meta">
+                                <FolderOpen size={11} strokeWidth={1.5} />
+                                <span>{task.project.name}</span>
                               </div>
                             )}
                           </div>
                           {dueDateFormatted && (
-                            <div className={`freelance-task-date-badge ${isOverdue ? 'overdue' : ''}`}>
+                            <div className={`fd-task-badge ${isOverdue ? 'overdue' : ''}`}>
                               {dueDateFormatted}
                             </div>
                           )}
                         </div>
                       );
                     } else {
-                      // Calendar item
                       const calItem = item.item as FreelanceCalendarItem;
-                      const timeStr = formatTime(calItem.start_time);
-                      
                       return (
                         <div
                           key={`calendar-${calItem.id}`}
-                          className="freelance-task-row freelance-calendar-item-row"
+                          className="fd-task-row fd-calendar-row"
                           onClick={() => navigate('/freelance/calendario')}
                         >
-                          <div className="freelance-calendar-item-icon">
+                          <div className="fd-calendar-icon">
                             {getCalendarItemIcon(calItem.type)}
                           </div>
-                          <div className="freelance-task-content">
-                            <div className="freelance-task-title">{calItem.title}</div>
-                            <div className="freelance-task-meta">
-                              <span className="freelance-task-project">
-                                {calItem.type === 'event' ? 'Evento' : 
-                                 calItem.type === 'call' ? 'Chiamata' :
-                                 calItem.type === 'deadline' ? 'Scadenza' :
-                                 calItem.type === 'reminder' ? 'Promemoria' : 'Attività'}
+                          <div className="fd-task-content">
+                            <div className="fd-task-title">{calItem.title}</div>
+                            <div className="fd-task-meta">
+                              <span>
+                                {calItem.type === 'event' ? 'Evento' :
+                                  calItem.type === 'call' ? 'Chiamata' :
+                                    calItem.type === 'deadline' ? 'Scadenza' :
+                                      calItem.type === 'reminder' ? 'Promemoria' : 'Attività'}
                               </span>
                             </div>
                           </div>
-                          <div className="freelance-task-date-badge">
-                            {timeStr}
-                          </div>
+                          <div className="fd-task-badge">{formatTime(calItem.start_time)}</div>
                         </div>
                       );
                     }
                   })
                 ) : (
-                  // Show only tasks for other tabs (Prossimi, In Revisione, Scaduti)
                   filteredTasks.map((task) => {
                     const dueDateFormatted = formatDate(task.due_date);
                     const isOverdue = task.isOverdue;
                     const isScadutiRow = activeTab === 'scaduti';
-                    
+
                     return (
                       <div
                         key={task.id}
-                        className={`freelance-task-row ${isScadutiRow ? 'freelance-task-row-overdue' : ''}`}
+                        className={`fd-task-row ${isScadutiRow ? 'fd-task-row-overdue' : ''}`}
                         onClick={() => navigate(`/freelance/task/${task.id}`)}
                       >
                         <button
-                          className="freelance-task-checkbox"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleTaskToggle(task);
-                          }}
+                          className="fd-task-checkbox"
+                          onClick={(e) => { e.stopPropagation(); handleTaskToggle(task); }}
                           aria-label={task.status === 'completed' ? 'Segna come non completato' : 'Segna come completato'}
                         >
-                          {task.status === 'completed' ? (
-                            <CheckSquare size={18} className="freelance-task-checkbox-checked" />
-                          ) : (
-                            <Circle size={18} className="freelance-task-checkbox-unchecked" />
-                          )}
+                          {task.status === 'completed'
+                            ? <CheckSquare size={16} strokeWidth={1.5} className="fd-checkbox-checked" />
+                            : <Circle size={16} strokeWidth={1.5} className="fd-checkbox-unchecked" />
+                          }
                         </button>
-                        <div className="freelance-task-content">
-                          <div className="freelance-task-title">{task.title}</div>
+                        <div className="fd-task-content">
+                          <div className="fd-task-title">{task.title}</div>
                           {task.project && (
-                            <div className="freelance-task-meta">
-                              <span className="freelance-task-project">{task.project.name}</span>
+                            <div className="fd-task-meta">
+                              <FolderOpen size={11} strokeWidth={1.5} />
+                              <span>{task.project.name}</span>
                             </div>
                           )}
                         </div>
                         {dueDateFormatted && (
-                          <div className={`freelance-task-date-badge ${isOverdue || isScadutiRow ? 'overdue' : ''}`}>
+                          <div className={`fd-task-badge ${isOverdue || isScadutiRow ? 'overdue' : ''}`}>
                             {isScadutiRow ? `Scaduto il ${dueDateFormatted}` : dueDateFormatted}
                           </div>
                         )}
@@ -592,42 +581,97 @@ const FreelanceDashboardPage: React.FC = () => {
                 )}
               </div>
             ) : (
-              <div className="freelance-empty-state">
-                <div className="freelance-empty-state-icon">
-                  <CheckCircle2 size={48} strokeWidth={1.5} aria-hidden />
+              <div className="fd-empty">
+                <div className="fd-empty-icon">
+                  <CheckCircle2 size={40} strokeWidth={1} />
                 </div>
-                <h3 className="freelance-empty-state-title">{t('freelance.no_task')}</h3>
-                <p className="freelance-empty-state-message">Tutto a posto.</p>
+                <h3 className="fd-empty-title">{t('freelance.no_task')}</h3>
+                <p className="fd-empty-message">Tutto a posto.</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* RIGHT PANEL - Widget Stack (3-4 cols) */}
-        <div className="freelance-workspace-right">
-          {/* Mini Calendar Widget */}
-          <div className="freelance-widget">
+        {/* RIGHT — Widget Stack */}
+        <div className="fd-workspace-right">
+
+          {/* Mini Calendar */}
+          <div className="fd-widget">
             <MiniCalendar tasks={tasks} />
           </div>
 
-          {/* Recent Activity Widget */}
-          <div className="freelance-widget">
-            <h3 className="freelance-widget-title">Attività Recenti</h3>
-            <div className="freelance-activity-list">
+          {/* Quick Stats */}
+          <div className="fd-widget">
+            <h3 className="fd-widget-label">Riepilogo</h3>
+            <div className="fd-stats-grid">
+              <div
+                className="fd-stat-tile"
+                onClick={() => navigate('/freelance/progetti')}
+              >
+                <div className="fd-stat-tile-number" style={{ color: '#007AFF' }}>
+                  {stats?.activeProjects ?? 0}
+                </div>
+                <div className="fd-stat-tile-label">Progetti attivi</div>
+              </div>
+              <div
+                className="fd-stat-tile"
+                onClick={() => navigate('/freelance/task')}
+              >
+                <div className="fd-stat-tile-number" style={{ color: '#34C759' }}>
+                  {stats?.pendingTasks ?? 0}
+                </div>
+                <div className="fd-stat-tile-label">Task in sospeso</div>
+              </div>
+              <div
+                className="fd-stat-tile"
+                onClick={() => navigate('/freelance/task')}
+              >
+                <div className="fd-stat-tile-number" style={{ color: '#FF9500' }}>
+                  {tasksTodayCount}
+                </div>
+                <div className="fd-stat-tile-label">Task oggi</div>
+              </div>
+              <div
+                className="fd-stat-tile"
+                onClick={() => navigate('/freelance/chat')}
+              >
+                <div className="fd-stat-tile-number" style={{ color: scadutiCount > 0 ? '#FF3B30' : 'rgba(255,255,255,0.6)' }}>
+                  {scadutiCount}
+                </div>
+                <div className="fd-stat-tile-label">Scadute</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Activity Feed */}
+          <div className="fd-widget">
+            <h3 className="fd-widget-label">Attività Recenti</h3>
+            <div className="fd-activity-list">
               {stats && stats.upNextTasks.length > 0 ? (
                 stats.upNextTasks.slice(0, 5).map((task, index) => (
-                  <div key={task.id || index} className="freelance-activity-item">
-                    <div className="freelance-activity-text">
-                      Task <strong>{task.title}</strong> in {task.project?.name || 'Progetto'}
+                  <div
+                    key={task.id || index}
+                    className="fd-activity-item"
+                    onClick={() => navigate(`/freelance/task/${task.id}`)}
+                  >
+                    <div className="fd-activity-dot" />
+                    <div className="fd-activity-body">
+                      <div className="fd-activity-text">
+                        <strong>{task.title}</strong>
+                      </div>
+                      <div className="fd-activity-sub">
+                        {task.project?.name || 'Progetto'}
+                        {task.due_date && (
+                          <span className="fd-activity-date">{formatDate(task.due_date)}</span>
+                        )}
+                      </div>
                     </div>
-                    <div className="freelance-activity-time">
-                      {task.due_date && formatDate(task.due_date)}
-                    </div>
+                    <ArrowUpRight size={12} strokeWidth={1.5} className="fd-activity-arrow" />
                   </div>
                 ))
               ) : (
-                <div className="freelance-activity-empty">
-                  <Bell size={14} />
+                <div className="fd-activity-empty">
+                  <Bell size={14} strokeWidth={1.5} />
                   <span>{t('freelance.no_recent_activity')}</span>
                 </div>
               )}

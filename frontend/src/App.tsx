@@ -104,7 +104,15 @@ const FreelanceAgendaPage = lazy(() => import('./pages/Freelance/FreelanceAgenda
 const FreelanceProjectDetailPage = lazy(() => import('./pages/Freelance/FreelanceProjectDetailPage.tsx'));
 const FreelanceSupportPage = lazy(() => import('./pages/Freelance/FreelanceSupportPage.tsx'));
 const FreelanceNotificationsPage = lazy(() => import('./pages/Freelance/FreelanceNotificationsPage.tsx'));
+const FreelanceSettingsPage = lazy(() => import('./pages/Freelance/FreelanceSettingsPage.tsx'));
 const FreelanceCrmHub = lazy(() => import('./pages/Freelance/FreelanceCrmHub.tsx'));
+const WorkspaceTypeSelectorPage = lazy(() => import('./pages/Workspace/WorkspaceTypeSelectorPage.tsx'));
+const WorkspaceDeveloperLayout = lazy(() => import('./pages/Workspace/WorkspaceDeveloperLayout.tsx'));
+const WorkspaceProjectsPage = lazy(() => import('./pages/Workspace/WorkspaceProjectsPage.tsx'));
+const WorkspaceProjectPage = lazy(() => import('./pages/Workspace/WorkspaceProjectPage.tsx'));
+const WorkspaceAgentsPage = lazy(() => import('./pages/Workspace/WorkspaceAgentsPage.tsx'));
+const WorkspaceAgentDetailPage = lazy(() => import('./pages/Workspace/WorkspaceAgentDetailPage.tsx'));
+const WorkspaceTasksPage = lazy(() => import('./pages/Workspace/WorkspaceTasksPage.tsx'));
 const Progetti = lazy(() => import('./pages/Progetti/Progetti.tsx'));
 const ProgettiInAttesaPage = lazy(() => import('./pages/ProgettiInAttesa/ProgettiInAttesaPage.tsx'));
 const GestioneProgettiPage = lazy(() => import('./pages/GestioneProgetti/GestioneProgettiPage.tsx'));
@@ -150,6 +158,9 @@ import './styles/backclub.css';
 import './styles/seller-design-system.css';
 import './styles/mobile-safe-area.css';
 import './styles/ios-design-system.css';
+import { getHomeRouteForUser, isFreelanceUser, isSellerUser, canAccessAdminArea, canAccessStaffArea } from './utils/userRoles.ts';
+import { WorkspaceProvider, useWorkspace } from './context/WorkspaceContext.tsx';
+import WorkspaceDeveloperRoute from './components/Routes/WorkspaceDeveloperRoute.tsx';
 
 // Protected Route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -235,13 +246,8 @@ const SellerOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) 
     return <OnboardingRoute>{children}</OnboardingRoute>;
   }
 
-  // Verifica che l'utente sia un venditore
-  // Usa current_role se disponibile, altrimenti fallback a role
-  const activeRole = user.current_role || user.role;
-  const isSeller = user.seller_id || activeRole === 'seller' || activeRole === 'venditori';
-  if (!isSeller) {
-    // Se l'utente non è più un venditore, reindirizza alla dashboard principale
-    return <Navigate to="/dashboard" replace />;
+  if (!isSellerUser(user)) {
+    return <Navigate to={getHomeRouteForUser(user)} replace />;
   }
 
   return <>{children}</>;
@@ -290,14 +296,113 @@ const FreelanceOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children 
     return <OnboardingRoute>{children}</OnboardingRoute>;
   }
 
-  // Verifica che l'utente sia un freelance
-  const activeRole = user.current_role || user.role;
-  const isFreelance = activeRole === 'freelance' || user.roles?.includes('freelance');
-  if (!isFreelance) {
+  if (!isFreelanceUser(user)) {
+    return <Navigate to={getHomeRouteForUser(user)} replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// Admin Only Route — only users with admin role can access these pages
+const AdminOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'var(--color-bg-primary)'
+      }}>
+        <div className="animate-spin" style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid var(--color-bg-tertiary)',
+          borderTopColor: 'var(--color-accent-blue)',
+          borderRadius: '50%'
+        }} />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!canAccessAdminArea(user)) {
+    // Non-admin staff see dashboard; non-staff users go to their home
+    if (!canAccessStaffArea(user)) {
+      return <Navigate to={getHomeRouteForUser(user)} replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 
   return <>{children}</>;
+};
+
+// Workspace Gateway component (inline)
+const WorkspaceGateway: React.FC = () => {
+  const { isFirstVisit, isLoading, workspaceType } = useWorkspace();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'var(--color-bg-primary)'
+      }}>
+        <div className="animate-spin" style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid var(--color-bg-tertiary)',
+          borderTopColor: 'var(--color-accent-blue)',
+          borderRadius: '50%'
+        }} />
+      </div>
+    );
+  }
+
+  if (isFirstVisit || !workspaceType) {
+    return <Navigate to="/workspace/type-selector" replace />;
+  }
+
+  if (workspaceType === 'developer') {
+    return <Navigate to="/workspace/developer" replace />;
+  }
+
+  // Default fallback
+  return <Navigate to="/workspace/type-selector" replace />;
+};
+
+// Catch-all: authenticated users go to their role-specific home, guests to public home
+const CatchAllRoute: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'var(--color-bg-primary)'
+      }}>
+        <div className="animate-spin" style={{
+          width: '48px',
+          height: '48px',
+          border: '3px solid var(--color-bg-tertiary)',
+          borderTopColor: 'var(--color-accent-blue)',
+          borderRadius: '50%'
+        }} />
+      </div>
+    );
+  }
+
+  return <Navigate to={user ? getHomeRouteForUser(user) : '/'} replace />;
 };
 
 // Public Route wrapper (redirect to dashboard if already authenticated)
@@ -332,13 +437,7 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       return <>{children}</>;
     }
     
-    // Redirect sellers to their dashboard, others to main dashboard
-    // Usa current_role se disponibile, altrimenti fallback a role
-    const activeRole = user.current_role || user.role;
-    if (user.seller_id || activeRole === 'venditori' || activeRole === 'seller') {
-      return <Navigate to="/seller" replace />;
-    }
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to={getHomeRouteForUser(user)} replace />;
   }
 
   return <>{children}</>;
@@ -592,6 +691,44 @@ function App() {
               <Route path="impostazioni" element={<SellerSettingsMobile />} />
               <Route path="more" element={<div />} />
             </Route>
+            {/* Workspace Portal */}
+            <Route
+              path="/workspace"
+              element={
+                <WorkspaceDeveloperRoute>
+                  <WorkspaceProvider>
+                    <WorkspaceGateway />
+                  </WorkspaceProvider>
+                </WorkspaceDeveloperRoute>
+              }
+            />
+            <Route
+              path="/workspace/type-selector"
+              element={
+                <WorkspaceDeveloperRoute>
+                  <WorkspaceProvider>
+                    <WorkspaceTypeSelectorPage />
+                  </WorkspaceProvider>
+                </WorkspaceDeveloperRoute>
+              }
+            />
+            <Route
+              path="/workspace/developer/*"
+              element={
+                <WorkspaceDeveloperRoute>
+                  <WorkspaceProvider>
+                    <WorkspaceDeveloperLayout />
+                  </WorkspaceProvider>
+                </WorkspaceDeveloperRoute>
+              }
+            >
+              <Route index element={<Navigate to="progetti" replace />} />
+              <Route path="progetti" element={<WorkspaceProjectsPage />} />
+              <Route path="progetti/:projectId/lavorazioni/:agentId" element={<WorkspaceAgentDetailPage />} />
+              <Route path="progetti/:id" element={<WorkspaceProjectPage />} />
+              <Route path="agenti" element={<WorkspaceAgentsPage />} />
+              <Route path="task" element={<WorkspaceTasksPage />} />
+            </Route>
             {/* Freelance Portal */}
             <Route
               path="/freelance"
@@ -613,6 +750,7 @@ function App() {
               <Route path="progetti/:id/gestione" element={<ProjectDetailPage />} />
               <Route path="supporto" element={<FreelanceSupportPage />} />
               <Route path="notifiche" element={<FreelanceNotificationsPage />} />
+              <Route path="impostazioni" element={<FreelanceSettingsPage />} />
               {/* CRM dedicati: vista dedicata per ogni CRM assegnato all'utente */}
               <Route path="crm/:code" element={<FreelanceCrmHub />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
@@ -702,21 +840,21 @@ function App() {
             <Route
               path="/template-admin"
               element={
-                <ProtectedRoute>
+                <AdminOnlyRoute>
                   <MainLayout>
                     <TemplateAdmin />
                   </MainLayout>
-                </ProtectedRoute>
+                </AdminOnlyRoute>
               }
             />
             <Route
               path="/gestione-utenti"
               element={
-                <ProtectedRoute>
+                <AdminOnlyRoute>
                   <MainLayout>
                     <GestioneUtenti />
                   </MainLayout>
-                </ProtectedRoute>
+                </AdminOnlyRoute>
               }
             />
             <Route
@@ -965,8 +1103,8 @@ function App() {
               path="/schede-tecniche/all-in-one-visibility-booster"
               element={<AllInOneVisibilityBooster />}
             />
-            {/* Redirect authenticated users from public pages to dashboard if they try to access protected routes */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch-all: authenticated users go to their role home, guests go to public home */}
+            <Route path="*" element={<CatchAllRoute />} />
           </Routes>
           </Suspense>
           </Router>

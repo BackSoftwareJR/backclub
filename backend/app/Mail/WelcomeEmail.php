@@ -31,7 +31,7 @@ class WelcomeEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Benvenuto in Sunlight Marketing CRM',
+            subject: 'Benvenuto in Backclub CRM',
         );
     }
 

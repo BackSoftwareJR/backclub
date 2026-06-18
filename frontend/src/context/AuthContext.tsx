@@ -50,8 +50,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const login = async (email: string, password: string) => {
         const response = await authApi.login({ email, password });
         storeToken(response.access_token);
-        storeUser(response.user);
-        setUser(response.user);
+        const userWithRoles = {
+            ...response.user,
+            roles: response.roles ?? response.user.roles,
+        };
+        storeUser(userWithRoles);
+        setUser(userWithRoles);
         
         // Debug: log response to see what we're getting
         console.log('Login response:', {
@@ -68,14 +72,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return {
                 requiresRoleSelection: true,
                 roles: response.roles || [],
-                user: response.user, // Include user for redirect logic
+                user: userWithRoles,
             };
         }
         
-        // Return user for redirect logic (single role case)
-        console.log('Single role or no role selection needed, redirecting to dashboard');
+        console.log('Single role or no role selection needed');
         return {
-            user: response.user,
+            user: userWithRoles,
         };
     };
 

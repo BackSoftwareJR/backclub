@@ -46,10 +46,10 @@ export interface CrmProject {
     budget_cocchi: number;
     spent_cocchi: number;
     settings: Record<string, any> | null;
-    github_url: string | null;
-    website_url: string | null;
     cover_photo: string | null;
     cover_photo_url?: string | null;
+    github_url?: string | null;
+    website_url?: string | null;
     created_at: string;
     updated_at: string;
     
@@ -549,17 +549,13 @@ export type TaskN8nStatus = 'pending' | 'processing' | 'completed' | 'failed' | 
 
 export interface CrmProjectTaskN8nStep {
     id: number;
-    crm_project_task_id: number;
+    crm_project_task_id?: number;
     step_key: string | null;
-    step_index: number;
-    status: 'pending' | 'running' | 'completed' | 'failed';
+    status: 'pending' | 'processing' | 'completed' | 'failed' | 'skipped';
     title: string | null;
     message: string | null;
-    actor_type: string;
-    actor_name: string | null;
     payload?: unknown;
-    progress: number | null;
-    is_final: boolean;
+    sort_order: number;
     created_at: string;
     updated_at: string;
 }
@@ -582,6 +578,7 @@ export interface CrmProjectTask {
     parent_task_id: number | null;
     created_by: number;
     execution_mode?: TaskExecutionMode;
+    exact_prompt?: boolean;
     n8n_status?: TaskN8nStatus | null;
     n8n_response?: unknown;
     n8n_response_format?: string | null;
@@ -807,6 +804,7 @@ export const crmProjectTasksApi = {
         title: string;
         description?: string;
         execution_mode: TaskExecutionMode;
+        exact_prompt?: boolean;
         status?: string;
         priority?: string;
         start_date?: string;
@@ -897,11 +895,36 @@ export const crmProjectTasksApi = {
     getN8nSteps: async (projectId: number, taskId: number): Promise<{
         success: boolean;
         data: {
-            task: Pick<CrmProjectTask, 'id' | 'execution_mode' | 'n8n_status' | 'status' | 'progress' | 'n8n_error' | 'n8n_response' | 'n8n_completed_at'>;
+            task_id: number;
+            execution_mode: string;
+            n8n_status: TaskN8nStatus | null;
+            n8n_execution_id: string | null;
+            n8n_error: string | null;
+            n8n_completed_at: string | null;
+            progress: number | null;
             steps: CrmProjectTaskN8nStep[];
         };
     }> => {
         const response = await apiClient.get(`/crm-projects/${projectId}/tasks/${taskId}/n8n-steps`);
+        return response.data;
+    },
+
+    /**
+     * Controlli agente N8N (restart, stop, request_review)
+     */
+    n8nAction: async (projectId: number, taskId: number, data: {
+        action: 'restart' | 'stop' | 'request_review';
+        review_message?: string;
+    }): Promise<{
+        success: boolean;
+        message: string;
+        data?: {
+            task_id: number;
+            action: string;
+            n8n_status: TaskN8nStatus | null;
+        };
+    }> => {
+        const response = await apiClient.post(`/crm-projects/${projectId}/tasks/${taskId}/n8n-actions`, data);
         return response.data;
     },
 

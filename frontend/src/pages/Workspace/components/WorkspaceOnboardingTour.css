@@ -1,0 +1,204 @@
+/* Workspace Onboarding Tour — spotlight style */
+.workspace-onboarding-backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--ws-overlay);
+  z-index: 9998;
+  animation: workspace-onboarding-backdrop-enter 0.3s ease;
+}
+
+@keyframes workspace-onboarding-backdrop-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.workspace-onboarding-highlight {
+  position: fixed;
+  border: 2px solid var(--ws-accent);
+  border-radius: var(--ws-radius);
+  pointer-events: none;
+  z-index: 9999;
+  background: var(--ws-accent-muted);
+  animation: workspace-onboarding-highlight-pulse 2s infinite;
+}
+
+@keyframes workspace-onboarding-highlight-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--ws-accent-muted);
+  }
+  50% {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.workspace-onboarding-tooltip {
+  position: fixed;
+  z-index: 10000;
+  max-width: 380px;
+  width: 90vw;
+  animation: workspace-onboarding-tooltip-enter 0.28s ease;
+}
+
+@keyframes workspace-onboarding-tooltip-enter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.workspace-onboarding-content {
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-xl);
+  padding: var(--ws-spacing-xl);
+  box-shadow: var(--ws-shadow-lg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.workspace-onboarding-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ws-spacing-md);
+  margin-bottom: var(--ws-spacing-md);
+}
+
+.workspace-onboarding-title {
+  font-size: var(--ws-font-md);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.workspace-onboarding-close {
+  background: transparent;
+  border: none;
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  padding: var(--ws-spacing-xs);
+  border-radius: var(--ws-radius-sm);
+  transition: all var(--ws-transition);
+  flex-shrink: 0;
+}
+
+.workspace-onboarding-close:hover {
+  background: var(--ws-surface-hover);
+  color: var(--ws-text);
+}
+
+.workspace-onboarding-description {
+  font-size: var(--ws-font-sm);
+  line-height: 1.5;
+  color: var(--ws-text-secondary);
+  margin: 0 0 var(--ws-spacing-lg) 0;
+}
+
+.workspace-onboarding-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing);
+  margin-bottom: var(--ws-spacing-xl);
+  justify-content: center;
+}
+
+.workspace-onboarding-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ws-border-strong);
+  transition: all var(--ws-transition);
+}
+
+.workspace-onboarding-dot.active {
+  background: var(--ws-accent);
+  transform: scale(1.25);
+}
+
+.workspace-onboarding-dot.completed {
+  background: var(--ws-success);
+}
+
+.workspace-onboarding-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ws-spacing-md);
+}
+
+.workspace-onboarding-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing);
+}
+
+.workspace-onboarding-btn {
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  border-radius: var(--ws-radius);
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-medium);
+  cursor: pointer;
+  transition: all var(--ws-transition);
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing-sm);
+  border: none;
+}
+
+.workspace-onboarding-btn-primary {
+  background: var(--ws-accent);
+  color: var(--ws-text-inverse);
+}
+
+.workspace-onboarding-btn-primary:hover {
+  background: var(--ws-accent-hover);
+}
+
+.workspace-onboarding-btn-secondary {
+  background: var(--ws-surface-hover);
+  color: var(--ws-text-secondary);
+}
+
+.workspace-onboarding-btn-secondary:hover {
+  background: var(--ws-surface-active);
+  color: var(--ws-text);
+}
+
+.workspace-onboarding-btn-ghost {
+  background: transparent;
+  color: var(--ws-text-secondary);
+}
+
+.workspace-onboarding-btn-ghost:hover {
+  background: var(--ws-surface-hover);
+  color: var(--ws-text);
+}
+
+@media (max-width: 480px) {
+  .workspace-onboarding-tooltip {
+    max-width: none;
+    width: calc(100vw - 32px);
+    left: 16px !important;
+    right: 16px;
+    transform: none !important;
+  }
+
+  .workspace-onboarding-content {
+    padding: var(--ws-spacing-lg);
+  }
+
+  .workspace-onboarding-actions {
+    flex-direction: column;
+    gap: var(--ws-spacing-md);
+  }
+
+  .workspace-onboarding-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+}

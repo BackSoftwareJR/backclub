@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { invoicesApi } from '../api/invoices';
 import type { Invoice } from '../api/invoices';
@@ -71,10 +72,27 @@ const EditInvoiceModal: React.FC<EditInvoiceModalProps> = ({ invoice, onClose, o
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(value);
 
+  const motionOverlay = {
+    className: "modal-overlay",
+    onClick: onClose,
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: { duration: 0.15 },
+  } as const;
+  const motionModal = {
+    className: "modal-invoice-issue",
+    onClick: (e: React.MouseEvent) => e.stopPropagation(),
+    initial: { opacity: 0, scale: 0.96 as number, y: 8 as number },
+    animate: { opacity: 1, scale: 1 as number, y: 0 as number },
+    exit: { opacity: 0, scale: 0.96 as number, y: 8 as number },
+    transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const },
+  };
+
   if (invoice.status === 'paid') {
     return (
-      <div className="modal-overlay" onClick={onClose}>
-        <div className="modal-invoice-issue" onClick={e => e.stopPropagation()}>
+      <motion.div {...motionOverlay}>
+        <motion.div {...motionModal}>
           <div className="modal-header">
             <h2>Modifica Fattura</h2>
             <button type="button" className="btn-close-modal" onClick={onClose}>
@@ -85,14 +103,14 @@ const EditInvoiceModal: React.FC<EditInvoiceModalProps> = ({ invoice, onClose, o
           <div className="modal-actions">
             <button type="button" className="btn-primary" onClick={onClose}>Chiudi</button>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-invoice-issue" onClick={e => e.stopPropagation()}>
+    <motion.div {...motionOverlay}>
+      <motion.div {...motionModal}>
         <div className="modal-header">
           <h2>Modifica Fattura</h2>
           <button type="button" className="btn-close-modal" onClick={onClose}>
@@ -190,8 +208,8 @@ const EditInvoiceModal: React.FC<EditInvoiceModalProps> = ({ invoice, onClose, o
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

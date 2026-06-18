@@ -2460,3 +2460,98 @@
         overflow-y: auto;
     }
 }
+
+.participants-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.participants-input-row .form-input {
+    flex: 1;
+}
+
+.btn-add-participant {
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(10, 132, 255, 0.15);
+    color: #0a84ff;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.participants-chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.participant-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 13px;
+}
+
+.participant-chip button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.call-google-hint {
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: rgba(52, 199, 89, 0.12);
+    color: #34c759;
+    font-size: 13px;
+}
+
+.form-hint-minimal {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.call-meet-section {
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 149, 0, 0.08);
+    border: 1px solid rgba(255, 149, 0, 0.2);
+}
+
+.call-meet-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.call-meet-link {
+    word-break: break-all;
+}
+
+.btn-copy-meet-link {
+    align-self: flex-start;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(10, 132, 255, 0.15);
+    color: #0a84ff;
+    cursor: pointer;
+}
+
+.call-sync-pending {
+    color: #ff9500;
+}
+
+.call-sync-error {
+    color: #ff3b30;
+}

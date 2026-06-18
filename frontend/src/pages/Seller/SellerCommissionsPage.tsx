@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight, Clock, CheckCircle2, Percent, Wallet } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, ChevronRight, Clock, CheckCircle2, Percent, Wallet, TrendingUp, ArrowUpRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { sellerCommissionsApi } from '../../api/sellerCommissions';
 import type { SellerCommissionContract } from '../../types/sellerCommissions';
@@ -9,6 +10,32 @@ import GuideTour from '../../components/Guide/GuideTour';
 import { commissioniTourSteps, completeTourSteps } from '../../config/guideTours';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
 import './SellerCommissionsPage.css';
+
+const kpiContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08, delayChildren: 0.05 },
+  },
+};
+
+const kpiItem = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const listVariants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const, delay: 0.28 },
+  },
+};
 
 const SellerCommissionsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -77,7 +104,7 @@ const SellerCommissionsPage: React.FC = () => {
       style: 'currency',
       currency: 'EUR',
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -93,12 +120,12 @@ const SellerCommissionsPage: React.FC = () => {
 
   const getStatusBadge = (item: SellerCommissionContract) => {
     if (item.total_pending_collection > 0) {
-      return { label: 'Liquidabile', class: 'status-liquidabile', color: 'emerald' };
+      return { label: 'Liquidabile', class: 'status-liquidabile' };
     }
     if (item.total_pending > 0 || (item.total_expected_commissions && item.total_expected_commissions > 0)) {
-      return { label: 'In Maturazione', class: 'status-maturazione', color: 'gray' };
+      return { label: 'In Maturazione', class: 'status-maturazione' };
     }
-    return { label: 'Completato', class: 'status-completato', color: 'gray' };
+    return { label: 'Completato', class: 'status-completato' };
   };
 
   const getTotalContractAmount = (item: SellerCommissionContract) => {
@@ -108,10 +135,10 @@ const SellerCommissionsPage: React.FC = () => {
   if (loading) {
     return (
       <div className="commissions-page-fintech">
-        <div className="commissions-skeleton-premium skeleton-bg" style={{ padding: 24, borderRadius: 20, marginBottom: 24 }}>
-          <div className="skeleton-line skeleton-pulse-fill w-1/3 short" style={{ height: 12, marginBottom: 12 }} />
-          <div className="skeleton-line skeleton-pulse-fill w-1/2" style={{ height: 36, marginBottom: 12 }} />
-          <div className="skeleton-line skeleton-pulse-fill w-2/3 short" style={{ height: 14 }} />
+        <div className="commissions-kpi-grid commissions-kpi-grid-skeleton">
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} className="commissions-kpi-card seller-card commissions-kpi-skeleton" />
+          ))}
         </div>
         <div className="commissions-skeleton-inset">
           <SkeletonLoader type="action-row" count={3} />
@@ -127,61 +154,79 @@ const SellerCommissionsPage: React.FC = () => {
     <div className="commissions-page-fintech">
       <GuideTour steps={commissioniTourSteps} tourId="commissioni-tour" />
       <GuideTour steps={completeTourSteps} tourId="complete-tour" />
-      {/* Hero Card - Card Finanziaria Premium (Apple Card style) */}
-      {summary && (
-        <>
-          <div className="commissions-premium-card">
-            <span className="premium-card-label">SALDO DISPONIBILE</span>
-            <div className="premium-card-amount">
-              {formatCurrency(summary.total_pending_collection)}
-            </div>
-            <div className="premium-card-mini-stats">
-              <span className="mini-stat maturate">
-                Maturate {formatCurrency(summary.total_collected)}
-              </span>
-              <span className="mini-stat-divider" aria-hidden="true" />
-              <span className="mini-stat pending">
-                In Attesa {formatCurrency(summary.total_pending)}
-              </span>
-            </div>
-          </div>
 
-          {/* Inset Grouped List - Dettaglio tecnico */}
-          <div className="commissions-inset-group">
-            <div className="inset-group-item">
-              <span className="inset-icon-wrap collected">
-                <CheckCircle2 size={20} className="inset-icon collected" aria-hidden />
-              </span>
-              <span className="inset-label">Maturate</span>
-              <span className="inset-value collected">{formatCurrency(summary.total_collected)}</span>
+      {/* KPI Grid — 4 cards, Apple-style, numeri in evidenza */}
+      {summary && (
+        <motion.div
+          className="commissions-kpi-grid"
+          variants={kpiContainer}
+          initial="hidden"
+          animate="visible"
+        >
+          {/* Saldo Disponibile — hero KPI */}
+          <motion.div variants={kpiItem} className="commissions-kpi-card commissions-kpi-hero seller-card">
+            <span className="kpi-label">Saldo Disponibile</span>
+            <div className="kpi-value kpi-value-hero">{formatCurrency(summary.total_pending_collection)}</div>
+            <span className="kpi-badge kpi-badge-success">
+              <ArrowUpRight size={11} aria-hidden />
+              Pronto da riscuotere
+            </span>
+          </motion.div>
+
+          {/* Commissioni Maturate */}
+          <motion.div variants={kpiItem} className="commissions-kpi-card seller-card">
+            <div className="kpi-icon-row">
+              <CheckCircle2 size={16} className="kpi-icon kpi-icon-success" aria-hidden />
+              <span className="kpi-label">Maturate</span>
             </div>
-            <div className="inset-group-item">
-              <span className="inset-icon-wrap pending">
-                <Clock size={20} className="inset-icon pending" aria-hidden />
-              </span>
-              <span className="inset-label">In Attesa</span>
-              <span className="inset-value pending">{formatCurrency(summary.total_pending)}</span>
+            <div className="kpi-value kpi-value-success">{formatCurrency(summary.total_collected)}</div>
+          </motion.div>
+
+          {/* In Attesa */}
+          <motion.div variants={kpiItem} className="commissions-kpi-card seller-card">
+            <div className="kpi-icon-row">
+              <Clock size={16} className="kpi-icon kpi-icon-warning" aria-hidden />
+              <span className="kpi-label">In Attesa</span>
             </div>
-            <div className="inset-group-item">
-              <span className="inset-icon-wrap rate">
-                <Percent size={20} className="inset-icon rate" aria-hidden />
-              </span>
-              <span className="inset-label">La tua Fee</span>
-              <span className="inset-value rate">{summary.commission_rate}%</span>
+            <div className="kpi-value kpi-value-warning">{formatCurrency(summary.total_pending)}</div>
+          </motion.div>
+
+          {/* Fee */}
+          <motion.div variants={kpiItem} className="commissions-kpi-card seller-card">
+            <div className="kpi-icon-row">
+              <Percent size={16} className="kpi-icon kpi-icon-muted" aria-hidden />
+              <span className="kpi-label">La tua Fee</span>
             </div>
-          </div>
-        </>
+            <div className="kpi-value kpi-value-rate">
+              {summary.commission_rate}
+              <span className="kpi-value-unit">%</span>
+            </div>
+          </motion.div>
+        </motion.div>
       )}
 
       {/* Sezione Movimenti / Contratti */}
-      <div className="commissions-movimenti-section">
-        <h2 className="movimenti-section-title">Movimenti</h2>
+      <motion.div
+        className="commissions-movimenti-section"
+        variants={listVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="commissions-movimenti-header">
+          <h2 className="movimenti-section-title">Movimenti</h2>
+          {summary && (
+            <span className="movimenti-section-count">
+              {filteredContracts.length} {filteredContracts.length === 1 ? 'contratto' : 'contratti'}
+            </span>
+          )}
+        </div>
+
         <div className="commissions-search-bar commissions-search-ios">
           <Search size={18} className="search-icon" aria-hidden />
           <input
             type="text"
             className="commissions-search-input"
-            placeholder="Cerca contratto, cliente..."
+            placeholder="Cerca contratto, cliente…"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -197,7 +242,7 @@ const SellerCommissionsPage: React.FC = () => {
           </div>
         ) : (
           <ul className="commissions-movimenti-list" role="list">
-            {filteredContracts.map((item) => {
+            {filteredContracts.map((item, index) => {
               const contract = item.contract;
               const isExpanded = expandedRows.has(contract.id);
               const statusBadge = getStatusBadge(item);
@@ -205,7 +250,13 @@ const SellerCommissionsPage: React.FC = () => {
               const commissionAmount = item.total_commissions + (item.total_expected_commissions || 0);
 
               return (
-                <li key={contract.id} className="movimenti-list-item">
+                <motion.li
+                  key={contract.id}
+                  className="movimenti-list-item"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, delay: 0.32 + index * 0.04, ease: [0.22, 1, 0.36, 1] as const }}
+                >
                   <button
                     type="button"
                     className={`movimenti-item-row ${isExpanded ? 'expanded' : ''}`}
@@ -233,65 +284,78 @@ const SellerCommissionsPage: React.FC = () => {
                     </div>
                     <ChevronRight size={20} className={`movimenti-chevron ${isExpanded ? 'expanded' : ''}`} aria-hidden />
                   </button>
-                  {isExpanded && (
-                    <div className="movimenti-item-details">
-                      <div className="details-section">
-                        <h4 className="details-title">Calcolo Provvigione</h4>
-                        <div className="details-calculation">
-                          <span className="calc-text">
-                            Totale € {totalAmount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                          </span>
-                          <span className="calc-operator">×</span>
-                          <span className="calc-text">{summary?.commission_rate || 0}%</span>
-                          <span className="calc-operator">=</span>
-                          <span className="calc-result">
-                            € {(totalAmount * (summary?.commission_rate || 0) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="details-section">
-                        <h4 className="details-title">Timeline Pagamenti</h4>
-                        <div className="details-timeline">
-                          <div className="timeline-item">
-                            <span className="timeline-label">Riscosse:</span>
-                            <span className="timeline-value collected">{formatCurrency(item.total_collected)}</span>
-                          </div>
-                          <div className="timeline-item">
-                            <span className="timeline-label">Da Riscuotere:</span>
-                            <span className="timeline-value liquidabile">{formatCurrency(item.total_pending_collection)}</span>
-                          </div>
-                          <div className="timeline-item">
-                            <span className="timeline-label">In Attesa:</span>
-                            <span className="timeline-value pending">{formatCurrency(item.total_pending)}</span>
-                          </div>
-                          {item.total_expected_commissions && item.total_expected_commissions > 0 && (
-                            <div className="timeline-item">
-                              <span className="timeline-label">Previste:</span>
-                              <span className="timeline-value expected">{formatCurrency(item.total_expected_commissions)}</span>
+
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        className="movimenti-item-details"
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] as const }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <div className="movimenti-item-details-inner">
+                          <div className="details-section">
+                            <h4 className="details-title">Calcolo Provvigione</h4>
+                            <div className="details-calculation">
+                              <span className="calc-text">
+                                Totale €{totalAmount.toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                              </span>
+                              <span className="calc-operator">×</span>
+                              <span className="calc-text">{summary?.commission_rate || 0}%</span>
+                              <span className="calc-operator">=</span>
+                              <span className="calc-result">
+                                €{(totalAmount * (summary?.commission_rate || 0) / 100).toLocaleString('it-IT', { minimumFractionDigits: 2 })}
+                              </span>
                             </div>
-                          )}
+                          </div>
+                          <div className="details-section">
+                            <h4 className="details-title">Timeline Pagamenti</h4>
+                            <div className="details-timeline">
+                              <div className="timeline-item">
+                                <span className="timeline-label">Riscosse</span>
+                                <span className="timeline-value collected">{formatCurrency(item.total_collected)}</span>
+                              </div>
+                              <div className="timeline-item">
+                                <span className="timeline-label">Da Riscuotere</span>
+                                <span className="timeline-value liquidabile">{formatCurrency(item.total_pending_collection)}</span>
+                              </div>
+                              <div className="timeline-item">
+                                <span className="timeline-label">In Attesa</span>
+                                <span className="timeline-value pending">{formatCurrency(item.total_pending)}</span>
+                              </div>
+                              {item.total_expected_commissions && item.total_expected_commissions > 0 && (
+                                <div className="timeline-item">
+                                  <span className="timeline-label">Previste</span>
+                                  <span className="timeline-value expected">{formatCurrency(item.total_expected_commissions)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="details-actions">
+                            <button
+                              type="button"
+                              className="btn-details"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/seller/commissioni/${contract.id}`);
+                              }}
+                            >
+                              <TrendingUp size={15} aria-hidden />
+                              Vedi Dettaglio Completo
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <div className="details-actions">
-                        <button
-                          type="button"
-                          className="btn-details"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/seller/commissioni/${contract.id}`);
-                          }}
-                        >
-                          Vedi Dettaglio Completo
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </li>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.li>
               );
             })}
           </ul>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 };

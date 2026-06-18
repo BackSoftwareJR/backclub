@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Building, User, FileText, Link as LinkIcon, AlertCircle, Key, CreditCard, Globe } from 'lucide-react';
-import { createClient, updateClient, type Client, type CreateClientData } from '../../api/clients';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createClient, updateClient, type Client, type CreateClientData, type UpdateClientData } from '../../api/clients';
 import './CreateClientModal.css';
 
 interface CreateClientModalProps {
@@ -9,6 +10,20 @@ interface CreateClientModalProps {
     onSuccess: () => void;
     client?: Client | null;
 }
+
+const overlayVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+    exit: { opacity: 0 },
+};
+
+const containerVariants = {
+    hidden: { opacity: 0, scale: 0.96, y: 8 },
+    visible: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 0.96, y: 8 },
+};
+
+const transition = { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const };
 
 const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, onSuccess, client }) => {
     const [loading, setLoading] = useState(false);
@@ -59,7 +74,6 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
 
     useEffect(() => {
         if (isOpen && client) {
-            // Pre-fill form with client data
             const clientFormData: CreateClientData = {
                 company_name: client.company_name || '',
                 ragione_sociale: client.ragione_sociale || '',
@@ -101,14 +115,12 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
             setFormData(clientFormData);
             setInitialFormData(clientFormData);
         } else if (isOpen && !client) {
-            // Reset form
             const emptyForm = getInitialFormData();
             setFormData(emptyForm);
             setInitialFormData(emptyForm);
         }
     }, [isOpen, client]);
 
-    // Handle ESC key to close modal
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen && !showConfirmDialog) {
@@ -173,39 +185,26 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
     };
 
     const hasUnsavedChanges = (): boolean => {
-        if (!initialFormData) {
-            return false;
-        }
-        
-        // Confronta i dati attuali con quelli iniziali
+        if (!initialFormData) return false;
+
         return Object.keys(formData).some(key => {
             const currentValue = formData[key as keyof CreateClientData];
             const initialValue = initialFormData[key as keyof CreateClientData];
-            
-            // Ignora access_password se access_enabled è false o se non è stato modificato
+
             if (key === 'access_password') {
-                if (!formData.access_enabled) {
-                    return false;
-                }
-                // Se access_enabled è true, considera solo se la password è stata inserita/modificata
-                if (!currentValue) {
-                    return false;
-                }
+                if (!formData.access_enabled) return false;
+                if (!currentValue) return false;
             }
-            
-            // Ignora i campi booleani con valore false (tranne quelli specifici) se erano già false
-            if (typeof currentValue === 'boolean' && currentValue === false && 
+
+            if (typeof currentValue === 'boolean' && currentValue === false &&
                 !['access_enabled', 'is_active', 'visura_camerale_reminder'].includes(key)) {
                 return false;
             }
-            
-            // Confronta i valori
+
             if (currentValue !== initialValue) {
-                // Se il valore attuale è una stringa vuota e quello iniziale era null/undefined/stringa vuota, non è una modifica
                 if (currentValue === '' && (initialValue === null || initialValue === undefined || initialValue === '')) {
                     return false;
                 }
-                // Se il valore iniziale era una stringa vuota e quello attuale è null/undefined, non è una modifica
                 if ((currentValue === null || currentValue === undefined) && initialValue === '') {
                     return false;
                 }
@@ -217,7 +216,7 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
-        
+
         if (type === 'checkbox') {
             const checked = (e.target as HTMLInputElement).checked;
             setFormData(prev => ({ ...prev, [name]: checked }));
@@ -234,7 +233,7 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
             setActiveTab('base');
             return false;
         }
-        
+
         if (formData.email && !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
             setError('Email non valida');
             setActiveTab('contacts');
@@ -265,35 +264,26 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
             setLoading(true);
             setError(null);
 
-            // Clean up data (remove empty strings and undefined values)
-            const cleanData: any = {};
+            const cleanData: Record<string, unknown> = {};
             Object.entries(formData).forEach(([key, value]) => {
-                // Skip empty strings, undefined, null
-                if (value === '' || value === undefined || value === null) {
-                    return;
-                }
-                // Skip boolean false values except for specific fields
-                if (value === false && !['access_enabled', 'is_active', 'visura_camerale_reminder'].includes(key)) {
-                    return;
-                }
+                if (value === '' || value === undefined || value === null) return;
+                if (value === false && !['access_enabled', 'is_active', 'visura_camerale_reminder'].includes(key)) return;
                 cleanData[key] = value;
             });
 
             console.log('Sending client data:', cleanData);
 
             if (client) {
-                // Update existing client
-                await updateClient(client.id, cleanData);
+                await updateClient(client.id, cleanData as unknown as UpdateClientData);
             } else {
-                // Create new client
-                await createClient(cleanData);
+                await createClient(cleanData as unknown as CreateClientData);
             }
 
             onSuccess();
             handleClose();
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error saving client:', err);
-            setError(err.toString());
+            setError(String(err));
         } finally {
             setLoading(false);
         }
@@ -318,9 +308,7 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
     };
 
     const handleConfirmClose = () => {
-        if (pendingClose) {
-            pendingClose();
-        }
+        if (pendingClose) pendingClose();
         handleClose();
     };
 
@@ -329,552 +317,587 @@ const CreateClientModal: React.FC<CreateClientModalProps> = ({ isOpen, onClose, 
         setPendingClose(null);
     };
 
-    if (!isOpen) return null;
-
     return (
         <>
-            <div className="modal-overlay" onClick={() => handleCloseWithConfirm(() => handleClose())}>
-                <div className="modal-create-client" onClick={(e) => e.stopPropagation()}>
-                    {/* Header */}
-                    <div className="modal-header">
-                        <h2>{client ? 'Modifica Cliente' : 'Nuovo Cliente'}</h2>
-                        <button className="btn-close-modal" onClick={() => handleCloseWithConfirm(() => handleClose())}>
-                            <X size={20} />
-                        </button>
-                    </div>
-
-                {/* Error */}
-                {error && (
-                    <div className="modal-error">
-                        <AlertCircle size={18} />
-                        <span>{error}</span>
-                    </div>
-                )}
-
-                {/* Tabs */}
-                <div className="modal-tabs">
-                    <button
-                        className={activeTab === 'base' ? 'active' : ''}
-                        onClick={() => setActiveTab('base')}
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        className="ccm-overlay"
+                        variants={overlayVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={transition}
+                        onClick={() => handleCloseWithConfirm(() => handleClose())}
                     >
-                        <Building size={16} />
-                        Base
-                    </button>
-                    <button
-                        className={activeTab === 'contacts' ? 'active' : ''}
-                        onClick={() => setActiveTab('contacts')}
-                    >
-                        <User size={16} />
-                        Contatti
-                    </button>
-                    <button
-                        className={activeTab === 'fiscal' ? 'active' : ''}
-                        onClick={() => setActiveTab('fiscal')}
-                    >
-                        <FileText size={16} />
-                        Fiscale
-                    </button>
-                    <button
-                        className={activeTab === 'links' ? 'active' : ''}
-                        onClick={() => setActiveTab('links')}
-                    >
-                        <LinkIcon size={16} />
-                        Links
-                    </button>
-                    <button
-                        className={activeTab === 'access' ? 'active' : ''}
-                        onClick={() => setActiveTab('access')}
-                    >
-                        <Key size={16} />
-                        Accesso
-                    </button>
-                </div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="modal-form">
-                    {/* Base Tab */}
-                    {activeTab === 'base' && (
-                        <div className="form-tab">
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Nome Azienda *</label>
-                                    <input
-                                        type="text"
-                                        name="company_name"
-                                        value={formData.company_name}
-                                        onChange={handleChange}
-                                        placeholder="Es: Tech Solutions SRL"
-                                        required
-                                    />
-                                </div>
+                        <motion.div
+                            className="modal-create-client"
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            transition={transition}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="modal-header">
+                                <h2>{client ? 'Modifica Cliente' : 'Nuovo Cliente'}</h2>
+                                <button className="btn-close-modal" onClick={() => handleCloseWithConfirm(() => handleClose())} aria-label="Chiudi">
+                                    <X size={20} />
+                                </button>
                             </div>
 
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Ragione Sociale</label>
-                                    <input
-                                        type="text"
-                                        name="ragione_sociale"
-                                        value={formData.ragione_sociale}
-                                        onChange={handleChange}
-                                        placeholder="Ragione sociale completa"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Indirizzo</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        placeholder="Via, Città, CAP"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Telefono</label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        placeholder="+39 123 456 7890"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Email</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="info@azienda.it"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Note</label>
-                                <textarea
-                                    name="notes"
-                                    value={formData.notes}
-                                    onChange={handleChange}
-                                    placeholder="Note aggiuntive sul cliente..."
-                                    rows={3}
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="is_active"
-                                        checked={formData.is_active}
-                                        onChange={handleChange}
-                                    />
-                                    <span>Cliente attivo</span>
-                                </label>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Contacts Tab */}
-                    {activeTab === 'contacts' && (
-                        <div className="form-tab">
-                            <h3><User size={18} /> Referente</h3>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Nome</label>
-                                    <input
-                                        type="text"
-                                        name="referente_nome"
-                                        value={formData.referente_nome}
-                                        onChange={handleChange}
-                                        placeholder="Nome referente"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Cognome</label>
-                                    <input
-                                        type="text"
-                                        name="referente_cognome"
-                                        value={formData.referente_cognome}
-                                        onChange={handleChange}
-                                        placeholder="Cognome referente"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Telefono Referente</label>
-                                    <input
-                                        type="tel"
-                                        name="referente_telefono"
-                                        value={formData.referente_telefono}
-                                        onChange={handleChange}
-                                        placeholder="+39 123 456 7890"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Email Referente</label>
-                                    <input
-                                        type="email"
-                                        name="referente_email"
-                                        value={formData.referente_email}
-                                        onChange={handleChange}
-                                        placeholder="referente@azienda.it"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label>Persona di Contatto</label>
-                                <input
-                                    type="text"
-                                    name="contact_person"
-                                    value={formData.contact_person}
-                                    onChange={handleChange}
-                                    placeholder="Nome contatto generico"
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Fiscal Tab */}
-                    {activeTab === 'fiscal' && (
-                        <div className="form-tab">
-                            <h3><FileText size={18} /> Dati Fiscali</h3>
-                            
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Partita IVA</label>
-                                    <input
-                                        type="text"
-                                        name="partita_iva"
-                                        value={formData.partita_iva}
-                                        onChange={handleChange}
-                                        placeholder="12345678901"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Codice Fiscale</label>
-                                    <input
-                                        type="text"
-                                        name="codice_fiscale"
-                                        value={formData.codice_fiscale}
-                                        onChange={handleChange}
-                                        placeholder="RSSMRA80A01H501U"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Codice SDI</label>
-                                    <input
-                                        type="text"
-                                        name="sdi_code"
-                                        value={formData.sdi_code}
-                                        onChange={handleChange}
-                                        placeholder="0000000"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>PEC</label>
-                                    <input
-                                        type="email"
-                                        name="pec"
-                                        value={formData.pec}
-                                        onChange={handleChange}
-                                        placeholder="pec@pec.it"
-                                    />
-                                </div>
-                            </div>
-
-                            <h3><CreditCard size={18} /> Dati Bancari</h3>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>IBAN</label>
-                                    <input
-                                        type="text"
-                                        name="iban"
-                                        value={formData.iban}
-                                        onChange={handleChange}
-                                        placeholder="IT60X0542811101000000123456"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>SWIFT/BIC</label>
-                                    <input
-                                        type="text"
-                                        name="swift"
-                                        value={formData.swift}
-                                        onChange={handleChange}
-                                        placeholder="BCITITMM"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-row">
-                                <div className="form-group">
-                                    <label>Termini di Pagamento</label>
-                                    <input
-                                        type="text"
-                                        name="payment_terms"
-                                        value={formData.payment_terms}
-                                        onChange={handleChange}
-                                        placeholder="30 giorni data fattura"
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Limite Credito Cocchi (€)</label>
-                                    <input
-                                        type="number"
-                                        name="credit_limit_cocchi"
-                                        value={formData.credit_limit_cocchi || ''}
-                                        onChange={handleChange}
-                                        placeholder="10000"
-                                        step="0.01"
-                                        min="0"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Links Tab */}
-                    {activeTab === 'links' && (
-                        <div className="form-tab">
-                            <h3><Globe size={18} /> Web & Social</h3>
-                            
-                            <div className="form-group">
-                                <label>Sito Web</label>
-                                <input
-                                    type="url"
-                                    name="sito_web"
-                                    value={formData.sito_web}
-                                    onChange={handleChange}
-                                    placeholder="https://www.azienda.it"
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Profilo Facebook</label>
-                                <input
-                                    type="url"
-                                    name="facebook_profile"
-                                    value={formData.facebook_profile}
-                                    onChange={handleChange}
-                                    placeholder="https://facebook.com/..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Google My Business</label>
-                                <input
-                                    type="url"
-                                    name="google_my_business"
-                                    value={formData.google_my_business}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Account Google Ads</label>
-                                <input
-                                    type="text"
-                                    name="google_ads_account"
-                                    value={formData.google_ads_account}
-                                    onChange={handleChange}
-                                    placeholder="ID Account Google Ads"
-                                />
-                            </div>
-
-                            <h3><LinkIcon size={18} /> Drive & Documenti</h3>
-
-                            <div className="form-group">
-                                <label>Link Foto</label>
-                                <input
-                                    type="url"
-                                    name="drive_link_foto"
-                                    value={formData.drive_link_foto}
-                                    onChange={handleChange}
-                                    placeholder="https://drive.google.com/..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Link Video</label>
-                                <input
-                                    type="url"
-                                    name="drive_link_video"
-                                    value={formData.drive_link_video}
-                                    onChange={handleChange}
-                                    placeholder="https://drive.google.com/..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Link Materiali</label>
-                                <input
-                                    type="url"
-                                    name="drive_link_materiali"
-                                    value={formData.drive_link_materiali}
-                                    onChange={handleChange}
-                                    placeholder="https://drive.google.com/..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Visura Camerale</label>
-                                <input
-                                    type="url"
-                                    name="visura_camerale_url"
-                                    value={formData.visura_camerale_url}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Privacy Sheet</label>
-                                <input
-                                    type="url"
-                                    name="privacy_sheet_url"
-                                    value={formData.privacy_sheet_url}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Carta Servizi</label>
-                                <input
-                                    type="url"
-                                    name="carta_servizi_url"
-                                    value={formData.carta_servizi_url}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Carta Identità</label>
-                                <input
-                                    type="url"
-                                    name="carta_identita_url"
-                                    value={formData.carta_identita_url}
-                                    onChange={handleChange}
-                                    placeholder="https://..."
-                                />
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Access Tab */}
-                    {activeTab === 'access' && (
-                        <div className="form-tab">
-                            <h3><Key size={18} /> Accesso Cliente ai Progetti</h3>
-                            
-                            <div className="form-group">
-                                <label className="checkbox-label">
-                                    <input
-                                        type="checkbox"
-                                        name="access_enabled"
-                                        checked={formData.access_enabled}
-                                        onChange={handleChange}
-                                    />
-                                    <span>Abilita accesso portale clienti</span>
-                                </label>
-                                <p className="field-hint">
-                                    Il cliente potrà visualizzare i suoi progetti e documenti
-                                </p>
-                            </div>
-
-                            {formData.access_enabled && (
-                                <div className="form-group">
-                                    <label>Password Accesso {client ? '(lascia vuoto per non modificare)' : '*'}</label>
-                                    <input
-                                        type="password"
-                                        name="access_password"
-                                        value={formData.access_password}
-                                        onChange={handleChange}
-                                        placeholder="Minimo 6 caratteri"
-                                        minLength={6}
-                                        required={!client && formData.access_enabled}
-                                    />
-                                    <p className="field-hint">
-                                        Password per l'accesso del cliente al portale
-                                    </p>
+                            {/* Error */}
+                            {error && (
+                                <div className="modal-error">
+                                    <AlertCircle size={16} />
+                                    <span>{error}</span>
                                 </div>
                             )}
-                        </div>
-                    )}
 
-                    {/* Actions */}
-                    <div className="modal-actions">
-                        <button
-                            type="button"
-                            className="btn-secondary"
-                            onClick={() => handleCloseWithConfirm(() => handleClose())}
-                            disabled={loading}
-                        >
-                            Annulla
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={loading}
-                        >
-                            {loading ? 'Salvataggio...' : (client ? 'Aggiorna Cliente' : 'Crea Cliente')}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                            {/* Tabs */}
+                            <div className="modal-tabs">
+                                <button
+                                    className={activeTab === 'base' ? 'active' : ''}
+                                    onClick={() => setActiveTab('base')}
+                                >
+                                    <Building size={14} />
+                                    Base
+                                </button>
+                                <button
+                                    className={activeTab === 'contacts' ? 'active' : ''}
+                                    onClick={() => setActiveTab('contacts')}
+                                >
+                                    <User size={14} />
+                                    Contatti
+                                </button>
+                                <button
+                                    className={activeTab === 'fiscal' ? 'active' : ''}
+                                    onClick={() => setActiveTab('fiscal')}
+                                >
+                                    <FileText size={14} />
+                                    Fiscale
+                                </button>
+                                <button
+                                    className={activeTab === 'links' ? 'active' : ''}
+                                    onClick={() => setActiveTab('links')}
+                                >
+                                    <LinkIcon size={14} />
+                                    Links
+                                </button>
+                                <button
+                                    className={activeTab === 'access' ? 'active' : ''}
+                                    onClick={() => setActiveTab('access')}
+                                >
+                                    <Key size={14} />
+                                    Accesso
+                                </button>
+                            </div>
 
-        {/* Confirm Dialog */}
-        {showConfirmDialog && (
-            <div className="confirm-dialog-overlay" onClick={handleCancelClose}>
-                <div className="confirm-dialog" onClick={(e) => e.stopPropagation()}>
-                    <div className="confirm-dialog-header">
-                        <AlertCircle size={24} className="confirm-dialog-icon" />
-                        <h3>Conferma chiusura</h3>
-                    </div>
-                    <div className="confirm-dialog-content">
-                        <p>Sei sicuro di voler chiudere il popup? I dati inseriti non salvati andranno persi.</p>
-                    </div>
-                    <div className="confirm-dialog-actions">
-                        <button
-                            type="button"
-                            className="btn-secondary"
-                            onClick={handleCancelClose}
+                            {/* Form */}
+                            <form onSubmit={handleSubmit} className="modal-form">
+                                {/* Base Tab */}
+                                {activeTab === 'base' && (
+                                    <div className="form-tab">
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Nome Azienda *</label>
+                                                <input
+                                                    type="text"
+                                                    name="company_name"
+                                                    value={formData.company_name}
+                                                    onChange={handleChange}
+                                                    placeholder="Es: Tech Solutions SRL"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Ragione Sociale</label>
+                                                <input
+                                                    type="text"
+                                                    name="ragione_sociale"
+                                                    value={formData.ragione_sociale}
+                                                    onChange={handleChange}
+                                                    placeholder="Ragione sociale completa"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Indirizzo</label>
+                                                <input
+                                                    type="text"
+                                                    name="address"
+                                                    value={formData.address}
+                                                    onChange={handleChange}
+                                                    placeholder="Via, Città, CAP"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Telefono</label>
+                                                <input
+                                                    type="tel"
+                                                    name="phone"
+                                                    value={formData.phone}
+                                                    onChange={handleChange}
+                                                    placeholder="+39 123 456 7890"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Email</label>
+                                                <input
+                                                    type="email"
+                                                    name="email"
+                                                    value={formData.email}
+                                                    onChange={handleChange}
+                                                    placeholder="info@azienda.it"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Note</label>
+                                            <textarea
+                                                name="notes"
+                                                value={formData.notes}
+                                                onChange={handleChange}
+                                                placeholder="Note aggiuntive sul cliente..."
+                                                rows={3}
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label className="checkbox-label">
+                                                <input
+                                                    type="checkbox"
+                                                    name="is_active"
+                                                    checked={formData.is_active}
+                                                    onChange={handleChange}
+                                                />
+                                                <span>Cliente attivo</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Contacts Tab */}
+                                {activeTab === 'contacts' && (
+                                    <div className="form-tab">
+                                        <h3><User size={14} /> Referente</h3>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Nome</label>
+                                                <input
+                                                    type="text"
+                                                    name="referente_nome"
+                                                    value={formData.referente_nome}
+                                                    onChange={handleChange}
+                                                    placeholder="Nome referente"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Cognome</label>
+                                                <input
+                                                    type="text"
+                                                    name="referente_cognome"
+                                                    value={formData.referente_cognome}
+                                                    onChange={handleChange}
+                                                    placeholder="Cognome referente"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Telefono Referente</label>
+                                                <input
+                                                    type="tel"
+                                                    name="referente_telefono"
+                                                    value={formData.referente_telefono}
+                                                    onChange={handleChange}
+                                                    placeholder="+39 123 456 7890"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Email Referente</label>
+                                                <input
+                                                    type="email"
+                                                    name="referente_email"
+                                                    value={formData.referente_email}
+                                                    onChange={handleChange}
+                                                    placeholder="referente@azienda.it"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Persona di Contatto</label>
+                                            <input
+                                                type="text"
+                                                name="contact_person"
+                                                value={formData.contact_person}
+                                                onChange={handleChange}
+                                                placeholder="Nome contatto generico"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Fiscal Tab */}
+                                {activeTab === 'fiscal' && (
+                                    <div className="form-tab">
+                                        <h3><FileText size={14} /> Dati Fiscali</h3>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Partita IVA</label>
+                                                <input
+                                                    type="text"
+                                                    name="partita_iva"
+                                                    value={formData.partita_iva}
+                                                    onChange={handleChange}
+                                                    placeholder="12345678901"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Codice Fiscale</label>
+                                                <input
+                                                    type="text"
+                                                    name="codice_fiscale"
+                                                    value={formData.codice_fiscale}
+                                                    onChange={handleChange}
+                                                    placeholder="RSSMRA80A01H501U"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Codice SDI</label>
+                                                <input
+                                                    type="text"
+                                                    name="sdi_code"
+                                                    value={formData.sdi_code}
+                                                    onChange={handleChange}
+                                                    placeholder="0000000"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>PEC</label>
+                                                <input
+                                                    type="email"
+                                                    name="pec"
+                                                    value={formData.pec}
+                                                    onChange={handleChange}
+                                                    placeholder="pec@pec.it"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <h3><CreditCard size={14} /> Dati Bancari</h3>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>IBAN</label>
+                                                <input
+                                                    type="text"
+                                                    name="iban"
+                                                    value={formData.iban}
+                                                    onChange={handleChange}
+                                                    placeholder="IT60X0542811101000000123456"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>SWIFT/BIC</label>
+                                                <input
+                                                    type="text"
+                                                    name="swift"
+                                                    value={formData.swift}
+                                                    onChange={handleChange}
+                                                    placeholder="BCITITMM"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-row">
+                                            <div className="form-group">
+                                                <label>Termini di Pagamento</label>
+                                                <input
+                                                    type="text"
+                                                    name="payment_terms"
+                                                    value={formData.payment_terms}
+                                                    onChange={handleChange}
+                                                    placeholder="30 giorni data fattura"
+                                                />
+                                            </div>
+                                            <div className="form-group">
+                                                <label>Limite Credito Cocchi (€)</label>
+                                                <input
+                                                    type="number"
+                                                    name="credit_limit_cocchi"
+                                                    value={formData.credit_limit_cocchi || ''}
+                                                    onChange={handleChange}
+                                                    placeholder="10000"
+                                                    step="0.01"
+                                                    min="0"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Links Tab */}
+                                {activeTab === 'links' && (
+                                    <div className="form-tab">
+                                        <h3><Globe size={14} /> Web & Social</h3>
+
+                                        <div className="form-group">
+                                            <label>Sito Web</label>
+                                            <input
+                                                type="url"
+                                                name="sito_web"
+                                                value={formData.sito_web}
+                                                onChange={handleChange}
+                                                placeholder="https://www.azienda.it"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Profilo Facebook</label>
+                                            <input
+                                                type="url"
+                                                name="facebook_profile"
+                                                value={formData.facebook_profile}
+                                                onChange={handleChange}
+                                                placeholder="https://facebook.com/..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Google My Business</label>
+                                            <input
+                                                type="url"
+                                                name="google_my_business"
+                                                value={formData.google_my_business}
+                                                onChange={handleChange}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Account Google Ads</label>
+                                            <input
+                                                type="text"
+                                                name="google_ads_account"
+                                                value={formData.google_ads_account}
+                                                onChange={handleChange}
+                                                placeholder="ID Account Google Ads"
+                                            />
+                                        </div>
+
+                                        <h3><LinkIcon size={14} /> Drive & Documenti</h3>
+
+                                        <div className="form-group">
+                                            <label>Link Foto</label>
+                                            <input
+                                                type="url"
+                                                name="drive_link_foto"
+                                                value={formData.drive_link_foto}
+                                                onChange={handleChange}
+                                                placeholder="https://drive.google.com/..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Link Video</label>
+                                            <input
+                                                type="url"
+                                                name="drive_link_video"
+                                                value={formData.drive_link_video}
+                                                onChange={handleChange}
+                                                placeholder="https://drive.google.com/..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Link Materiali</label>
+                                            <input
+                                                type="url"
+                                                name="drive_link_materiali"
+                                                value={formData.drive_link_materiali}
+                                                onChange={handleChange}
+                                                placeholder="https://drive.google.com/..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Visura Camerale</label>
+                                            <input
+                                                type="url"
+                                                name="visura_camerale_url"
+                                                value={formData.visura_camerale_url}
+                                                onChange={handleChange}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Privacy Sheet</label>
+                                            <input
+                                                type="url"
+                                                name="privacy_sheet_url"
+                                                value={formData.privacy_sheet_url}
+                                                onChange={handleChange}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Carta Servizi</label>
+                                            <input
+                                                type="url"
+                                                name="carta_servizi_url"
+                                                value={formData.carta_servizi_url}
+                                                onChange={handleChange}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Carta Identità</label>
+                                            <input
+                                                type="url"
+                                                name="carta_identita_url"
+                                                value={formData.carta_identita_url}
+                                                onChange={handleChange}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Access Tab */}
+                                {activeTab === 'access' && (
+                                    <div className="form-tab">
+                                        <h3><Key size={14} /> Accesso Cliente ai Progetti</h3>
+
+                                        <div className="form-group">
+                                            <label className="checkbox-label">
+                                                <input
+                                                    type="checkbox"
+                                                    name="access_enabled"
+                                                    checked={formData.access_enabled}
+                                                    onChange={handleChange}
+                                                />
+                                                <span>Abilita accesso portale clienti</span>
+                                            </label>
+                                            <p className="field-hint">
+                                                Il cliente potrà visualizzare i suoi progetti e documenti
+                                            </p>
+                                        </div>
+
+                                        {formData.access_enabled && (
+                                            <div className="form-group">
+                                                <label>Password Accesso {client ? '(lascia vuoto per non modificare)' : '*'}</label>
+                                                <input
+                                                    type="password"
+                                                    name="access_password"
+                                                    value={formData.access_password}
+                                                    onChange={handleChange}
+                                                    placeholder="Minimo 6 caratteri"
+                                                    minLength={6}
+                                                    required={!client && formData.access_enabled}
+                                                />
+                                                <p className="field-hint">
+                                                    Password per l'accesso del cliente al portale
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Actions */}
+                                <div className="modal-actions">
+                                    <button
+                                        type="button"
+                                        className="btn-secondary"
+                                        onClick={() => handleCloseWithConfirm(() => handleClose())}
+                                        disabled={loading}
+                                    >
+                                        Annulla
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="btn-primary"
+                                        disabled={loading}
+                                    >
+                                        {loading ? 'Salvataggio...' : (client ? 'Aggiorna Cliente' : 'Crea Cliente')}
+                                    </button>
+                                </div>
+                            </form>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Confirm Dialog */}
+            <AnimatePresence>
+                {isOpen && showConfirmDialog && (
+                    <motion.div
+                        className="confirm-dialog-overlay"
+                        variants={overlayVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        transition={transition}
+                        onClick={handleCancelClose}
+                    >
+                        <motion.div
+                            className="confirm-dialog"
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            transition={transition}
+                            onClick={(e) => e.stopPropagation()}
                         >
-                            Annulla
-                        </button>
-                        <button
-                            type="button"
-                            className="btn-primary danger"
-                            onClick={handleConfirmClose}
-                        >
-                            Chiudi comunque
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )}
+                            <div className="confirm-dialog-header">
+                                <AlertCircle size={22} className="confirm-dialog-icon" />
+                                <h3>Conferma chiusura</h3>
+                            </div>
+                            <div className="confirm-dialog-content">
+                                <p>Sei sicuro di voler chiudere il popup? I dati inseriti non salvati andranno persi.</p>
+                            </div>
+                            <div className="confirm-dialog-actions">
+                                <button
+                                    type="button"
+                                    className="btn-secondary"
+                                    onClick={handleCancelClose}
+                                >
+                                    Annulla
+                                </button>
+                                <button
+                                    type="button"
+                                    className="btn-primary danger"
+                                    onClick={handleConfirmClose}
+                                >
+                                    Chiudi comunque
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </>
     );
 };
 
 export default CreateClientModal;
-

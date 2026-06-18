@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   Search,
@@ -14,6 +15,7 @@ import {
   HelpCircle,
   Settings,
   ChevronRight,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getClients } from '../../api/clients';
@@ -87,7 +89,12 @@ export type SearchResultItem =
   | SearchResultLead
   | SearchResultPriceItem;
 
-const PAGE_KEYWORDS: Array<{ path: string; label: string; keywords: string[]; icon: React.ComponentType<{ size?: number; className?: string }> }> = [
+const PAGE_KEYWORDS: Array<{
+  path: string;
+  label: string;
+  keywords: string[];
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+}> = [
   { path: '/seller', label: 'Dashboard', keywords: ['dashboard', 'home', 'panoramica', 'riepilogo'], icon: Home },
   { path: '/seller/listini', label: 'Listini', keywords: ['listini', 'listino', 'prezzi', 'prezzo', 'prodotti', 'servizi', 'catalogo'], icon: Package },
   { path: '/seller/preventivi', label: 'Preventivi', keywords: ['preventivi', 'preventivo', 'offerte', 'quote'], icon: FileText },
@@ -122,24 +129,31 @@ function matchPage(query: string): SearchResultPage[] {
   }));
 }
 
+const TYPE_LABEL: Record<string, string> = {
+  page: 'Pagina',
+  client: 'Cliente',
+  contract: 'Contratto',
+  quote: 'Preventivo',
+  lead: 'Contatto',
+  price_item: 'Listino',
+};
+
 interface SellerGlobalSearchProps {
   className?: string;
   placeholder?: string;
   onBlur?: () => void;
   onFocus?: () => void;
-  /** Quando true, mette il focus sull'input al mount (es. overlay mobile) */
   autoFocus?: boolean;
-  /** Se fornito, i risultati vengono renderizzati in questo contenitore (es. in cima alla pagina) */
+  /** @deprecated kept for backward compat */
   resultsPortalRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
   className = '',
-  placeholder = 'Cerca qui...',
+  placeholder = 'Cerca...',
   onBlur,
   onFocus,
   autoFocus = false,
-  resultsPortalRef,
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -149,14 +163,42 @@ const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
   const [results, setResults] = useState<SearchResultItem[]>([]);
   const [highlightIndex, setHighlightIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const sellerId = user?.seller_id;
 
+  const openSpotlight = useCallback(() => {
+    setIsOpen(true);
+    setTimeout(() => inputRef.current?.focus(), 50);
+  }, []);
+
+  const closeSpotlight = useCallback(() => {
+    setIsOpen(false);
+    setQuery('');
+    setResults([]);
+    setHighlightIndex(-1);
+    onBlur?.();
+  }, [onBlur]);
+
+  /* ⌘K global shortcut */
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        if (isOpen) {
+          closeSpotlight();
+        } else {
+          openSpotlight();
+        }
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [isOpen, openSpotlight, closeSpotlight]);
+
   const runSearch = useCallback(async (q: string) => {
     const trimmed = q.trim();
-
     const pageResults = matchPage(trimmed);
     const all: SearchResultItem[] = [...pageResults];
 
@@ -222,14 +264,7 @@ const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
         path: `/seller/listini/${p.id}`,
       }));
 
-      setResults([
-        ...all,
-        ...clientResults,
-        ...contractResults,
-        ...quoteResults,
-        ...leadResults,
-        ...priceItemResults,
-      ]);
+      setResults([...all, ...clientResults, ...contractResults, ...quoteResults, ...leadResults, ...priceItemResults]);
     } catch (e) {
       console.error('Seller global search error:', e);
       setResults(all);
@@ -258,29 +293,22 @@ const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
   }, [query, runSearch]);
 
   const flatResults = useMemo(() => results, [results]);
-  const hasResults = flatResults.length > 0;
-  const showDropdown = isOpen && (query.length > 0 || hasResults);
 
   const handleSelect = useCallback(
     (item: SearchResultItem) => {
       navigate(item.path);
-      setQuery('');
-      setIsOpen(false);
-      setHighlightIndex(-1);
-      inputRef.current?.blur();
+      closeSpotlight();
     },
-    [navigate]
+    [navigate, closeSpotlight]
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (!showDropdown || flatResults.length === 0) {
-        if (e.key === 'Escape') {
-          setIsOpen(false);
-          setHighlightIndex(-1);
-        }
+      if (e.key === 'Escape') {
+        closeSpotlight();
         return;
       }
+      if (flatResults.length === 0) return;
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         setHighlightIndex((i) => (i < flatResults.length - 1 ? i + 1 : 0));
@@ -294,14 +322,9 @@ const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
       if (e.key === 'Enter' && highlightIndex >= 0 && flatResults[highlightIndex]) {
         e.preventDefault();
         handleSelect(flatResults[highlightIndex]);
-        return;
-      }
-      if (e.key === 'Escape') {
-        setIsOpen(false);
-        setHighlightIndex(-1);
       }
     },
-    [showDropdown, flatResults, highlightIndex, handleSelect]
+    [flatResults, highlightIndex, handleSelect, closeSpotlight]
   );
 
   useEffect(() => {
@@ -310,217 +333,174 @@ const SellerGlobalSearch: React.FC<SellerGlobalSearchProps> = ({
 
   useEffect(() => {
     if (autoFocus) {
-      const t = setTimeout(() => inputRef.current?.focus(), 100);
+      const t = setTimeout(() => openSpotlight(), 100);
       return () => clearTimeout(t);
     }
-  }, [autoFocus]);
+  }, [autoFocus, openSpotlight]);
 
+  /* Scroll highlighted item into view */
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (
-        dropdownRef.current?.contains(target) ||
-        inputRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if (highlightIndex >= 0 && listRef.current) {
+      const el = listRef.current.children[highlightIndex] as HTMLElement | undefined;
+      el?.scrollIntoView({ block: 'nearest' });
+    }
+  }, [highlightIndex]);
 
-  const dropdownContent = (
+  const getIcon = (item: SearchResultItem) => {
+    if (item.type === 'page') {
+      const Icon = item.icon;
+      return <Icon size={17} />;
+    }
+    const icons: Record<string, React.ReactNode> = {
+      client:     <UserCircle size={17} />,
+      contract:   <Briefcase size={17} />,
+      quote:      <FileText size={17} />,
+      lead:       <Phone size={17} />,
+      price_item: <Package size={17} />,
+    };
+    return icons[item.type] ?? <Search size={17} />;
+  };
+
+  const trigger = (
     <div
-      id="seller-global-search-dropdown"
-      ref={dropdownRef}
-      className={`seller-global-search-dropdown${resultsPortalRef ? ' seller-global-search-dropdown--top-portal' : ''}`}
-      role="listbox"
+      className={`seller-global-search-trigger ${className}`}
+      onClick={openSpotlight}
+      role="button"
+      tabIndex={0}
+      onFocus={() => { onFocus?.(); }}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openSpotlight(); }}
+      aria-label="Apri ricerca (⌘K)"
     >
-      {loading && flatResults.length <= matchPage(query).length && (
-        <div className="seller-global-search-loading">
-          Ricerca in corso...
-        </div>
-      )}
-      {!loading && flatResults.length === 0 && (
-        <div className="seller-global-search-empty">
-          Nessun risultato per "{query}"
-        </div>
-      )}
-      {flatResults.length > 0 && (
-        <ul className="seller-global-search-list" role="listbox">
-          {flatResults.map((item, index) => {
-            const isHighlighted = index === highlightIndex;
-            if (item.type === 'page') {
-              const Icon = item.icon;
-              return (
-                <li
-                  key={item.id}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item seller-global-search-item-page ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <Icon size={18} className="seller-global-search-item-icon" />
-                  <span className="seller-global-search-item-label">{item.label}</span>
-                  <span className="seller-global-search-item-meta">Pagina</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            if (item.type === 'client') {
-              return (
-                <li
-                  key={`client-${item.id}`}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <UserCircle size={18} className="seller-global-search-item-icon" />
-                  <div className="seller-global-search-item-text">
-                    <span className="seller-global-search-item-label">{item.label}</span>
-                    {item.subtitle && (
-                      <span className="seller-global-search-item-subtitle">{item.subtitle}</span>
-                    )}
-                  </div>
-                  <span className="seller-global-search-item-meta">Cliente</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            if (item.type === 'contract') {
-              return (
-                <li
-                  key={`contract-${item.id}`}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <Briefcase size={18} className="seller-global-search-item-icon" />
-                  <div className="seller-global-search-item-text">
-                    <span className="seller-global-search-item-label">{item.label}</span>
-                    {item.subtitle && (
-                      <span className="seller-global-search-item-subtitle">{item.subtitle}</span>
-                    )}
-                  </div>
-                  <span className="seller-global-search-item-meta">Contratto</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            if (item.type === 'quote') {
-              return (
-                <li
-                  key={`quote-${item.id}`}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <FileText size={18} className="seller-global-search-item-icon" />
-                  <div className="seller-global-search-item-text">
-                    <span className="seller-global-search-item-label">{item.label}</span>
-                    {item.subtitle && (
-                      <span className="seller-global-search-item-subtitle">{item.subtitle}</span>
-                    )}
-                  </div>
-                  <span className="seller-global-search-item-meta">Preventivo</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            if (item.type === 'lead') {
-              return (
-                <li
-                  key={`lead-${item.id}`}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <Phone size={18} className="seller-global-search-item-icon" />
-                  <div className="seller-global-search-item-text">
-                    <span className="seller-global-search-item-label">{item.label}</span>
-                    {item.subtitle && (
-                      <span className="seller-global-search-item-subtitle">{item.subtitle}</span>
-                    )}
-                  </div>
-                  <span className="seller-global-search-item-meta">Contatto</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            if (item.type === 'price_item') {
-              return (
-                <li
-                  key={`price-${item.id}`}
-                  role="option"
-                  aria-selected={isHighlighted}
-                  className={`seller-global-search-item ${isHighlighted ? 'highlighted' : ''}`}
-                  onClick={() => handleSelect(item)}
-                  onMouseEnter={() => setHighlightIndex(index)}
-                >
-                  <Package size={18} className="seller-global-search-item-icon" />
-                  <div className="seller-global-search-item-text">
-                    <span className="seller-global-search-item-label">{item.label}</span>
-                    {item.subtitle && (
-                      <span className="seller-global-search-item-subtitle">{item.subtitle}</span>
-                    )}
-                  </div>
-                  <span className="seller-global-search-item-meta">Listino</span>
-                  <ChevronRight size={14} className="seller-global-search-item-chevron" />
-                </li>
-              );
-            }
-            return null;
-          })}
-        </ul>
-      )}
+      <Search size={15} className="seller-global-search-trigger-icon" />
+      <span className="seller-global-search-trigger-placeholder">{placeholder}</span>
+      <kbd className="seller-global-search-trigger-kbd">⌘K</kbd>
     </div>
   );
 
-  const usePortal = Boolean(resultsPortalRef?.current && showDropdown);
-  const renderInline = showDropdown && !resultsPortalRef;
+  const overlay = (
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="sgs-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          onMouseDown={(e) => { if (e.target === e.currentTarget) closeSpotlight(); }}
+        >
+          <motion.div
+            className="sgs-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Ricerca globale"
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+          >
+            {/* Search input bar */}
+            <div className="sgs-input-row">
+              <Search size={20} className="sgs-input-icon" />
+              <input
+                ref={inputRef}
+                type="text"
+                className="sgs-input"
+                placeholder="Cerca in tutto il portale..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                aria-autocomplete="list"
+                aria-expanded={flatResults.length > 0}
+                aria-controls="sgs-results-list"
+                autoComplete="off"
+                spellCheck={false}
+              />
+              {query && (
+                <button
+                  className="sgs-clear-btn"
+                  onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                  tabIndex={-1}
+                  aria-label="Cancella ricerca"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            {/* Results */}
+            <div className="sgs-results">
+              {loading && flatResults.length === 0 && (
+                <div className="sgs-state">
+                  <span className="sgs-state-text">Ricerca in corso...</span>
+                </div>
+              )}
+
+              {!loading && query.trim() && flatResults.length === 0 && (
+                <div className="sgs-state">
+                  <Search size={28} className="sgs-state-icon" />
+                  <span className="sgs-state-text">Nessun risultato per "{query}"</span>
+                </div>
+              )}
+
+              {!query.trim() && (
+                <div className="sgs-state">
+                  <Search size={28} className="sgs-state-icon" />
+                  <span className="sgs-state-text">Digita per cercare clienti, contratti, preventivi…</span>
+                </div>
+              )}
+
+              {flatResults.length > 0 && (
+                <ul
+                  id="sgs-results-list"
+                  ref={listRef}
+                  className="sgs-list"
+                  role="listbox"
+                >
+                  {flatResults.map((item, index) => {
+                    const isHighlighted = index === highlightIndex;
+                    const key = item.type === 'page' ? item.id : `${item.type}-${item.id}`;
+                    return (
+                      <li
+                        key={key}
+                        role="option"
+                        aria-selected={isHighlighted}
+                        className={`sgs-item${isHighlighted ? ' sgs-item--active' : ''}${item.type === 'page' ? ' sgs-item--page' : ''}`}
+                        onClick={() => handleSelect(item)}
+                        onMouseEnter={() => setHighlightIndex(index)}
+                      >
+                        <span className="sgs-item-icon">{getIcon(item)}</span>
+                        <span className="sgs-item-body">
+                          <span className="sgs-item-label">{item.label}</span>
+                          {item.type !== 'page' && (item as any).subtitle && (
+                            <span className="sgs-item-sub">{(item as any).subtitle}</span>
+                          )}
+                        </span>
+                        <span className="sgs-item-type">{TYPE_LABEL[item.type]}</span>
+                        <ChevronRight size={14} className="sgs-item-chevron" />
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+
+            {/* Footer hint */}
+            <div className="sgs-footer">
+              <span className="sgs-footer-hint"><kbd>↑↓</kbd> naviga</span>
+              <span className="sgs-footer-hint"><kbd>↵</kbd> apri</span>
+              <span className="sgs-footer-hint"><kbd>Esc</kbd> chiudi</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
 
   return (
-    <div className={`seller-global-search ${className}`}>
-      <div
-        className="seller-global-search-bar"
-        onClick={() => {
-          setIsOpen(true);
-          inputRef.current?.focus();
-        }}
-      >
-        <Search size={16} className="seller-global-search-icon" />
-        <input
-          ref={inputRef}
-          type="text"
-          className="seller-global-search-input"
-          placeholder={placeholder}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => {
-            setIsOpen(true);
-            onFocus?.();
-          }}
-          onBlur={() => onBlur?.()}
-          onKeyDown={handleKeyDown}
-          aria-autocomplete="list"
-          aria-expanded={showDropdown}
-          aria-controls="seller-global-search-dropdown"
-        />
-      </div>
-
-      {usePortal && createPortal(dropdownContent, resultsPortalRef!.current!)}
-      {renderInline && dropdownContent}
-    </div>
+    <>
+      {trigger}
+      {createPortal(overlay, document.body)}
+    </>
   );
 };
 

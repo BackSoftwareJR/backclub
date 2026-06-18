@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import QuoteStep1Shop from '../Venditori/QuoteWizard/QuoteStep1Shop';
@@ -463,9 +464,22 @@ const SellerQuoteWizardPage: React.FC = () => {
   return (
     <div className="quote-wizard-page">
       {/* Prompt per riprendere preventivo salvato */}
+      <AnimatePresence>
       {showRestorePrompt && (
-        <div className="restore-wizard-overlay">
-          <div className="restore-wizard-modal">
+        <motion.div
+          className="restore-wizard-overlay"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          <motion.div
+            className="restore-wizard-modal"
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 10 }}
+            transition={{ duration: 0.2 }}
+          >
             <h2>Preventivo in corso</h2>
             <p>Hai un preventivo in corso di creazione. Vuoi riprendere da dove eri rimasto o iniziare un preventivo nuovo?</p>
             <div className="restore-wizard-actions">
@@ -476,9 +490,10 @@ const SellerQuoteWizardPage: React.FC = () => {
                 Inizia nuovo preventivo
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
 
       {isMobile ? (
         <>
@@ -509,7 +524,17 @@ const SellerQuoteWizardPage: React.FC = () => {
 
           {/* Step Content - Mobile */}
           <div className="quote-wizard-content-mobile">
-            {renderStep()}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] as const }}
+              >
+                {renderStep()}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Mobile Navigation - Show for all steps except step 1 (which has its own footer) */}
@@ -591,7 +616,17 @@ const SellerQuoteWizardPage: React.FC = () => {
             <div className="quote-wizard-step-header">
               <h2>Step {currentStep} di {TOTAL_STEPS}: {getStepTitle(currentStep)}</h2>
             </div>
-            {renderStep()}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -12 }}
+                transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] as const }}
+              >
+                {renderStep()}
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           {/* Navigation */}

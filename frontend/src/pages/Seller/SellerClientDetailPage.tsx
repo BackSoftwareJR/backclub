@@ -573,10 +573,21 @@ const SellerClientDetailPage: React.FC = () => {
 
   // Get initials for avatar
   const getInitials = () => {
-    if (client.company_name) {
-      return client.company_name.charAt(0).toUpperCase();
+    if (!client.company_name) return 'C';
+    const parts = client.company_name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return client.company_name.substring(0, 2).toUpperCase();
+  };
+
+  // HSL avatar style — deterministic hue from name hash
+  const getAvatarStyle = (): React.CSSProperties => {
+    const name = client.company_name || 'C';
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return 'C';
+    const hue = Math.abs(hash) % 360;
+    return { background: `hsl(${hue}, 70%, 45%)`, color: '#ffffff' };
   };
 
   // Get subtitle (role/company)
@@ -624,7 +635,7 @@ const SellerClientDetailPage: React.FC = () => {
       {/* Unified Profile Header */}
       <div className="client-profile-header">
         <div className="profile-header-left">
-          <div className="profile-avatar">
+          <div className="profile-avatar" style={getAvatarStyle()}>
             {getInitials()}
           </div>
           <div className="profile-info">

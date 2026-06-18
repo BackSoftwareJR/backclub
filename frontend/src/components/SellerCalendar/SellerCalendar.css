@@ -2060,3 +2060,650 @@
         overflow-y: auto;
     }
 }
+
+/* ============================================================
+   SELLER CALENDAR — Design System Integration (Apple macOS)
+   Overrides legacy hardcoded values with --seller-* variables
+   ============================================================ */
+
+/* ── Toolbar Apple-style ─────────────────────────────────── */
+.calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    background: var(--seller-bg);
+    border-bottom: 1px solid var(--seller-border);
+    flex-shrink: 0;
+    gap: 16px;
+    min-height: 52px;
+}
+
+.calendar-toolbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.toolbar-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: var(--seller-text-secondary);
+    border-radius: var(--seller-radius-sm);
+    cursor: pointer;
+    transition: all var(--seller-transition-fast);
+}
+
+.toolbar-nav-btn:hover {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-primary);
+}
+
+.toolbar-date-label {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--seller-text-primary);
+    padding: 0 10px;
+    min-width: 200px;
+    text-align: center;
+    letter-spacing: -0.3px;
+    line-height: 1;
+}
+
+.toolbar-today-btn {
+    margin-left: 8px;
+    padding: 5px 13px;
+    border: 1px solid var(--seller-border);
+    background: transparent;
+    color: var(--seller-text-secondary);
+    border-radius: var(--seller-radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--seller-transition-fast);
+    font-family: inherit;
+}
+
+.toolbar-today-btn:hover {
+    border-color: var(--seller-accent);
+    color: var(--seller-accent);
+    background: var(--seller-accent-soft);
+}
+
+.calendar-toolbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.toolbar-new-event-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: var(--seller-accent);
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--seller-transition-fast);
+    white-space: nowrap;
+    font-family: inherit;
+    letter-spacing: -0.1px;
+}
+
+.toolbar-new-event-btn:hover {
+    background: var(--seller-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.toolbar-new-event-btn:active {
+    transform: translateY(0);
+}
+
+/* ── Split view flex fix ─────────────────────────────────── */
+.project-calendar .calendar-split-view {
+    flex: 1;
+    min-height: 0;
+}
+
+/* ── Color / Border overrides ────────────────────────────── */
+
+/* Sidebar */
+.project-calendar.dark .calendar-sidebar-left,
+.project-calendar.light .calendar-sidebar-left {
+    background: var(--seller-bg-elevated);
+    border-right: 1px solid var(--seller-border);
+}
+
+/* Main content */
+.project-calendar.dark .calendar-main-content,
+.project-calendar.light .calendar-main-content {
+    background: var(--seller-bg);
+}
+
+/* Week header */
+.project-calendar.dark .calendar-week-header,
+.project-calendar.light .calendar-week-header {
+    border-bottom: 1px solid var(--seller-border);
+    background: var(--seller-bg);
+}
+
+.project-calendar.dark .calendar-time-column-header,
+.project-calendar.light .calendar-time-column-header {
+    border-right: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .calendar-day-header,
+.project-calendar.light .calendar-day-header {
+    border-right: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .calendar-day-name,
+.project-calendar.light .calendar-day-name {
+    color: var(--seller-text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.project-calendar.dark .calendar-day-number,
+.project-calendar.light .calendar-day-number {
+    color: var(--seller-text-secondary);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.project-calendar.dark .calendar-day-number.today-circle,
+.project-calendar.light .calendar-day-number.today-circle {
+    background: var(--seller-danger);
+    color: white;
+}
+
+/* Time column */
+.project-calendar.dark .calendar-time-column,
+.project-calendar.light .calendar-time-column {
+    background: var(--seller-bg);
+    border-right: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .calendar-time-slot,
+.project-calendar.light .calendar-time-slot {
+    color: var(--seller-text-tertiary);
+    border-bottom: 1px solid var(--seller-border);
+    font-size: 11px;
+}
+
+.project-calendar.dark .calendar-all-day-section,
+.project-calendar.light .calendar-all-day-section {
+    color: var(--seller-text-tertiary);
+    border-bottom: 1px solid var(--seller-border);
+    background: var(--seller-bg);
+}
+
+.project-calendar.dark .calendar-day-slots,
+.project-calendar.light .calendar-day-slots {
+    background: var(--seller-bg);
+}
+
+.project-calendar.dark .calendar-all-day-slots,
+.project-calendar.light .calendar-all-day-slots {
+    border-bottom: 1px solid var(--seller-border);
+    background: var(--seller-bg);
+}
+
+.project-calendar.dark .calendar-day-column,
+.project-calendar.light .calendar-day-column {
+    border-right: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .calendar-hour-slot,
+.project-calendar.light .calendar-hour-slot {
+    border-bottom: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .calendar-hour-slot:hover,
+.project-calendar.light .calendar-hour-slot:hover {
+    background: var(--seller-bg-overlay);
+}
+
+/* Current time line — red, Apple-style */
+.project-calendar.dark .calendar-current-time-line,
+.project-calendar.light .calendar-current-time-line {
+    background: var(--seller-danger);
+    height: 2px;
+}
+
+.project-calendar.dark .calendar-current-time-line::before,
+.project-calendar.light .calendar-current-time-line::before {
+    background: var(--seller-danger);
+    width: 10px;
+    height: 10px;
+    left: -5px;
+    top: -4px;
+}
+
+/* Calendar items — Apple event pill */
+.project-calendar.dark .calendar-item,
+.project-calendar.light .calendar-item {
+    border-radius: 4px;
+    min-height: 22px;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+.project-calendar.dark .calendar-item:hover,
+.project-calendar.light .calendar-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.06);
+}
+
+.project-calendar.dark .calendar-item-title,
+.project-calendar.light .calendar-item-title {
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Mini calendar */
+.project-calendar.dark .mini-calendar-nav-btn,
+.project-calendar.light .mini-calendar-nav-btn {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-secondary);
+}
+
+.project-calendar.dark .mini-calendar-nav-btn:hover,
+.project-calendar.light .mini-calendar-nav-btn:hover {
+    background: var(--seller-border-strong);
+    color: var(--seller-text-primary);
+}
+
+.project-calendar.dark .mini-calendar-month-year,
+.project-calendar.light .mini-calendar-month-year {
+    color: var(--seller-text-primary);
+}
+
+.project-calendar.dark .mini-calendar-weekday,
+.project-calendar.light .mini-calendar-weekday {
+    color: var(--seller-text-tertiary);
+}
+
+.project-calendar.dark .mini-calendar-day,
+.project-calendar.light .mini-calendar-day {
+    color: var(--seller-text-secondary);
+}
+
+.project-calendar.dark .mini-calendar-day:hover:not(.empty),
+.project-calendar.light .mini-calendar-day:hover:not(.empty) {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-primary);
+}
+
+.mini-calendar-day.in-week {
+    background: var(--seller-accent-soft) !important;
+    color: var(--seller-accent) !important;
+}
+
+.mini-calendar-day.today {
+    background: var(--seller-danger) !important;
+    color: white !important;
+}
+
+/* Sidebar labels */
+.project-calendar.dark .sidebar-section-title,
+.project-calendar.light .sidebar-section-title {
+    color: var(--seller-text-tertiary);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.project-calendar.dark .sidebar-calendar-item span:not(.calendar-color-indicator),
+.project-calendar.light .sidebar-calendar-item span:not(.calendar-color-indicator) {
+    color: var(--seller-text-secondary);
+    font-size: 13px;
+}
+
+.project-calendar.dark .sidebar-calendar-item:hover,
+.project-calendar.light .sidebar-calendar-item:hover {
+    background: var(--seller-bg-overlay);
+}
+
+.project-calendar.dark .sidebar-calendars-section-bottom,
+.project-calendar.light .sidebar-calendars-section-bottom {
+    border-top: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .sidebar-export-section,
+.project-calendar.light .sidebar-export-section {
+    border-bottom: 1px solid var(--seller-border);
+}
+
+/* ── Modal Glass Effect ─────────────────────────────────── */
+.project-calendar.dark .modal-overlay,
+.project-calendar.light .modal-overlay {
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.project-calendar.dark .modal-content,
+.project-calendar.light .modal-content {
+    background: var(--seller-bg-elevated);
+    border: 1px solid var(--seller-border);
+    border-radius: var(--seller-radius-lg);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    box-shadow: var(--seller-shadow-lg);
+}
+
+.project-calendar.dark .modal-header,
+.project-calendar.light .modal-header {
+    border-bottom: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .modal-header h2,
+.project-calendar.light .modal-header h2 {
+    color: var(--seller-text-primary);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+}
+
+.project-calendar.dark .modal-header button,
+.project-calendar.light .modal-header button {
+    color: var(--seller-text-tertiary);
+    border-radius: 6px;
+}
+
+.project-calendar.dark .modal-header button:hover,
+.project-calendar.light .modal-header button:hover {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-secondary);
+}
+
+.project-calendar.dark .modal-footer-minimal,
+.project-calendar.light .modal-footer-minimal {
+    border-top: 1px solid var(--seller-border);
+}
+
+/* ── Form overrides ──────────────────────────────────────── */
+.project-calendar.dark .form-input-title,
+.project-calendar.light .form-input-title {
+    color: var(--seller-text-primary);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.project-calendar.dark .form-input-title::placeholder,
+.project-calendar.light .form-input-title::placeholder {
+    color: var(--seller-text-tertiary);
+}
+
+.project-calendar.dark .form-input,
+.project-calendar.light .form-input {
+    background: var(--seller-bg-overlay);
+    border: 1px solid var(--seller-border);
+    color: var(--seller-text-primary);
+    border-radius: var(--seller-radius-sm);
+}
+
+.project-calendar.dark .form-input:focus,
+.project-calendar.light .form-input:focus {
+    border-color: var(--seller-accent);
+    box-shadow: 0 0 0 3px var(--seller-accent-soft);
+    outline: none;
+}
+
+.project-calendar.dark .form-input::placeholder,
+.project-calendar.light .form-input::placeholder {
+    color: var(--seller-text-tertiary);
+}
+
+.project-calendar.dark .form-input-description,
+.project-calendar.light .form-input-description {
+    color: var(--seller-text-secondary);
+    border-bottom: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .form-input-description:focus,
+.project-calendar.light .form-input-description:focus {
+    border-bottom-color: var(--seller-accent);
+    outline: none;
+}
+
+.project-calendar.dark .form-input-description::placeholder,
+.project-calendar.light .form-input-description::placeholder {
+    color: var(--seller-text-tertiary);
+}
+
+.project-calendar.dark .form-label-minimal,
+.project-calendar.light .form-label-minimal {
+    color: var(--seller-text-tertiary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.project-calendar.dark .btn-cancel,
+.project-calendar.light .btn-cancel {
+    color: var(--seller-text-secondary);
+}
+
+.project-calendar.dark .btn-cancel:hover:not(:disabled),
+.project-calendar.light .btn-cancel:hover:not(:disabled) {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-primary);
+}
+
+.btn-create {
+    background: var(--seller-accent) !important;
+    color: white !important;
+    border-radius: 9999px !important;
+    padding: 8px 20px !important;
+    letter-spacing: -0.1px;
+}
+
+.btn-create:hover:not(:disabled) {
+    background: var(--seller-accent-hover) !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-create:active:not(:disabled) {
+    transform: translateY(0) !important;
+}
+
+.btn-delete {
+    background: var(--seller-danger-soft) !important;
+    color: var(--seller-danger) !important;
+    border-radius: 8px !important;
+}
+
+.btn-delete:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2) !important;
+}
+
+.project-calendar.dark .btn-secondary,
+.project-calendar.light .btn-secondary {
+    border: 1px solid var(--seller-border);
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-secondary);
+}
+
+.project-calendar.dark .btn-secondary:hover:not(:disabled),
+.project-calendar.light .btn-secondary:hover:not(:disabled) {
+    background: var(--seller-bg-elevated);
+    border-color: var(--seller-border-strong);
+    color: var(--seller-text-primary);
+}
+
+/* ── Checklist ───────────────────────────────────────────── */
+.project-calendar.dark .checklist-container,
+.project-calendar.light .checklist-container {
+    background: var(--seller-bg-overlay);
+    border: 1px solid var(--seller-border);
+    border-radius: var(--seller-radius-sm);
+}
+
+.project-calendar.dark .checklist-item,
+.project-calendar.light .checklist-item {
+    background: transparent;
+    color: var(--seller-text-secondary);
+}
+
+/* ── Context menu ────────────────────────────────────────── */
+.project-calendar.dark .context-menu,
+.project-calendar.light .context-menu {
+    background: var(--seller-bg-elevated);
+    border: 1px solid var(--seller-border);
+    box-shadow: var(--seller-shadow-lg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.project-calendar.dark .context-menu button,
+.project-calendar.light .context-menu button {
+    color: var(--seller-text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.project-calendar.dark .context-menu button:hover,
+.project-calendar.light .context-menu button:hover {
+    background: var(--seller-bg-overlay);
+    color: var(--seller-text-primary);
+}
+
+/* ── Visibility pill segmented control ───────────────────── */
+.project-calendar.dark .visibility-options-minimal,
+.project-calendar.light .visibility-options-minimal {
+    background: var(--seller-bg-overlay);
+    border: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .radio-option-minimal:has(input[type="radio"]:checked),
+.project-calendar.light .radio-option-minimal:has(input[type="radio"]:checked) {
+    background: var(--seller-accent-soft);
+    box-shadow: none;
+}
+
+.project-calendar.dark .radio-option-minimal input[type="radio"]:checked + span,
+.project-calendar.light .radio-option-minimal input[type="radio"]:checked + span {
+    color: var(--seller-accent);
+    font-weight: 600;
+}
+
+/* ── Users list ──────────────────────────────────────────── */
+.project-calendar.dark .users-checkbox-list-minimal,
+.project-calendar.light .users-checkbox-list-minimal {
+    background: var(--seller-bg-overlay);
+    border: 1px solid var(--seller-border);
+}
+
+/* ── Export button ───────────────────────────────────────── */
+.btn-export-csv {
+    background: var(--seller-accent-soft) !important;
+    border: 1px solid rgba(59, 130, 246, 0.25) !important;
+    color: var(--seller-accent) !important;
+    border-radius: 10px !important;
+    font-family: inherit !important;
+}
+
+.btn-export-csv:hover {
+    background: rgba(59, 130, 246, 0.2) !important;
+    border-color: var(--seller-accent) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* ── Item detail sections ─────────────────────────────────── */
+.project-calendar.dark .item-detail-section,
+.project-calendar.light .item-detail-section {
+    border-bottom: 1px solid var(--seller-border);
+}
+
+.project-calendar.dark .item-detail-label,
+.project-calendar.light .item-detail-label {
+    color: var(--seller-text-tertiary);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+
+.project-calendar.dark .item-detail-value,
+.project-calendar.light .item-detail-value {
+    color: var(--seller-text-secondary);
+}
+
+.item-detail-link {
+    color: var(--seller-accent) !important;
+}
+
+/* ── Scrollbars ──────────────────────────────────────────── */
+.project-calendar.dark .calendar-days-wrapper::-webkit-scrollbar-track,
+.project-calendar.light .calendar-days-wrapper::-webkit-scrollbar-track,
+.project-calendar.dark .calendar-sidebar-left::-webkit-scrollbar-track,
+.project-calendar.light .calendar-sidebar-left::-webkit-scrollbar-track {
+    background: var(--seller-bg);
+}
+
+.project-calendar.dark .calendar-days-wrapper::-webkit-scrollbar-thumb,
+.project-calendar.light .calendar-days-wrapper::-webkit-scrollbar-thumb,
+.project-calendar.dark .calendar-sidebar-left::-webkit-scrollbar-thumb,
+.project-calendar.light .calendar-sidebar-left::-webkit-scrollbar-thumb {
+    background: var(--seller-border-strong);
+    border-radius: 4px;
+}
+
+/* ── Create item option cards ─────────────────────────────── */
+.project-calendar.dark .create-item-option,
+.project-calendar.light .create-item-option {
+    background: var(--seller-bg-overlay);
+    border: 1px solid var(--seller-border);
+    color: var(--seller-text-secondary);
+    border-radius: var(--seller-radius-md);
+}
+
+.project-calendar.dark .create-item-option:hover,
+.project-calendar.light .create-item-option:hover {
+    background: var(--seller-bg-elevated);
+    border-color: var(--seller-accent);
+    color: var(--seller-text-primary);
+    transform: translateY(-2px);
+}
+
+/* ── Framer Motion — modal overlay wrapper ───────────────── */
+.calendar-modal-motion-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.calendar-modal-motion-overlay .modal-content {
+    background: var(--seller-bg-elevated);
+    border: 1px solid var(--seller-border);
+    border-radius: var(--seller-radius-lg);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    box-shadow: var(--seller-shadow-lg);
+}

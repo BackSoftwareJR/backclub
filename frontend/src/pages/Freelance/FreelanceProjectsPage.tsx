@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FolderKanban, Calendar } from 'lucide-react';
+import { FolderKanban, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useFreelanceCrm } from '../../context/FreelanceCrmContext';
 import { freelanceApi } from '../../api/freelance';
@@ -9,7 +10,57 @@ import { freelanceCache } from '../../utils/freelanceCache';
 import type { FreelanceProject } from '../../types/freelance';
 import GuideTour from '../../components/Guide/GuideTour';
 import { freelanceProgettiTourSteps, freelanceCompleteTourSteps } from '../../config/freelanceGuideTours';
+import FreelanceProjectMediaCard from './components/FreelanceProjectMediaCard';
 import './FreelanceProjectsPage.css';
+
+type FilterStatus = 'tutti' | 'attivi' | 'completati' | 'pausa';
+
+const STATUS_LABELS: Record<string, string> = {
+  in_attesa_presa_carico: 'In Attesa',
+  preso_in_carico: 'Preso in Carico',
+  avviato: 'Avviato',
+  active: 'Attivo',
+  paused: 'In Pausa',
+  completed: 'Completato',
+  archived: 'Archiviato',
+};
+
+const STATUS_COLORS: Record<string, string> = {
+  in_attesa_presa_carico: '#007AFF',
+  preso_in_carico: '#007AFF',
+  avviato: '#34C759',
+  active: '#34C759',
+  paused: '#FF9500',
+  completed: '#8E8E93',
+  archived: '#8E8E93',
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.04 },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 10 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.22,
+      ease: [0.25, 0.46, 0.45, 0.94] as const,
+    },
+  },
+};
+
+const FILTERS: { id: FilterStatus; label: string }[] = [
+  { id: 'tutti', label: 'Tutti' },
+  { id: 'attivi', label: 'Attivi' },
+  { id: 'completati', label: 'Completati' },
+  { id: 'pausa', label: 'In Pausa' },
+];
 
 const FreelanceProjectsPage: React.FC = () => {
   const { user } = useAuth();
@@ -17,6 +68,8 @@ const FreelanceProjectsPage: React.FC = () => {
   const { crmDepartmentCode, isCrmScoped } = useFreelanceCrm();
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState<FreelanceProject[]>([]);
+  const [filterStatus, setFilterStatus] = useState<FilterStatus>('tutti');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const basePath = isCrmScoped && crmDepartmentCode
     ? `/freelance/crm/${encodeURIComponent(crmDepartmentCode)}`
@@ -61,111 +114,124 @@ const FreelanceProjectsPage: React.FC = () => {
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short', year: 'numeric' });
+  const formatDate = (dateString: string | null): string | null => {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
   };
 
-  /** Rimuove il prefisso "Contratto - Preventivo" dal nome progetto (solo per la visualizzazione). */
   const getDisplayName = (name: string | null | undefined): string => {
     if (!name?.trim()) return '';
     return name.replace(/^Contratto\s*-\s*[Pp]reventivo\s*/i, '').trim() || name;
   };
 
+  const matchesFilter = (project: FreelanceProject): boolean => {
+    const s = project.status;
+    if (filterStatus === 'tutti') return true;
+    if (filterStatus === 'attivi') return s === 'active' || s === 'avviato' || s === 'preso_in_carico' || s === 'in_attesa_presa_carico';
+    if (filterStatus === 'completati') return s === 'completed' || s === 'archived';
+    if (filterStatus === 'pausa') return s === 'paused';
+    return true;
+  };
+
+  const filteredProjects = projects.filter((p) => {
+    if (!matchesFilter(p)) return false;
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      return (
+        getDisplayName(p.name).toLowerCase().includes(q) ||
+        (p.client?.company_name?.toLowerCase().includes(q) ?? false)
+      );
+    }
+    return true;
+  });
+
   if (loading) {
     return (
-      <div className="freelance-loading">
-        <div className="freelance-spinner"></div>
+      <div className="fp-loading">
+        <div className="fp-spinner" />
       </div>
     );
   }
 
   return (
-    <div className="freelance-projects">
+    <div className="fp-page">
       <GuideTour steps={freelanceProgettiTourSteps} tourId="freelance-progetti-tour" />
       <GuideTour steps={freelanceCompleteTourSteps} tourId="freelance-complete-tour" />
-      <div className="freelance-projects-header">
-        <div>
-          <h1 className="freelance-projects-title">Progetti</h1>
-          <p className="freelance-projects-subtitle">
-            {projects.length} {projects.length === 1 ? 'progetto attivo' : 'progetti attivi'}
-          </p>
+
+      {/* ── Header row ── */}
+      <div className="fp-header">
+        <div className="fp-header-left">
+          <h1 className="fp-title">Progetti</h1>
+          <span className="fp-count-badge">{projects.length}</span>
+        </div>
+        <div className="fp-header-right">
+          <div className="fp-search">
+            <Search size={13} className="fp-search-icon" />
+            <input
+              type="text"
+              placeholder="Cerca..."
+              className="fp-search-input"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="fp-filter-bar">
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className={`fp-filter-pill${filterStatus === f.id ? ' active' : ''}`}
+                onClick={() => setFilterStatus(f.id)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {projects.length > 0 ? (
-        <div className="freelance-projects-grid">
-          {projects.map((project) => (
-            <button
-              type="button"
-              key={project.id}
-              onClick={() => handleProjectClick(project)}
-              className="freelance-project-card-btn"
-            >
-              {/* Copertina o area icona (link restituito dall’API) */}
-              <div className="freelance-project-card-cover">
-                {project.cover_photo_url ? (
-                  <img
-                    src={project.cover_photo_url}
-                    alt=""
-                    className="freelance-project-card-cover-img"
-                  />
-                ) : (
-                  <div className="freelance-project-card-cover-placeholder">
-                    {project.crmDepartment?.icon ? (
-                      <span className="freelance-project-card-cover-icon-emoji">{project.crmDepartment.icon}</span>
-                    ) : (
-                      <FolderKanban size={32} strokeWidth={1.5} />
-                    )}
-                  </div>
-                )}
-                {project.is_project_manager && (
-                  <span className="freelance-project-card-pm-badge-cover">PM</span>
-                )}
-              </div>
+      {/* ── Grid ── */}
+      {filteredProjects.length > 0 ? (
+        <motion.div
+          className="fp-grid"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          {filteredProjects.map((project) => {
+            const statusColor = STATUS_COLORS[project.status] ?? '#8E8E93';
+            const statusLabel = STATUS_LABELS[project.status] ?? project.status;
+            const displayName = getDisplayName(project.name);
+            const progress = project.progress ?? 0;
+            const dueDate = formatDate(project.end_date);
+            const taskCount = project.is_project_manager
+              ? (project.totalTasksCount ?? 0)
+              : (project.myTasksCount ?? 0);
 
-              {/* Contenuto */}
-              <div className="freelance-project-card-body">
-                <div className="freelance-project-card-title-row">
-                  <h3 className="freelance-project-card-title">{getDisplayName(project.name)}</h3>
-                </div>
-
-                {project.end_date && (
-                  <div className="freelance-project-card-deadline">
-                    <Calendar size={14} className="shrink-0 opacity-70" />
-                    <span>Consegna: {formatDate(project.end_date)}</span>
-                  </div>
-                )}
-
-                {project.progress !== undefined && (
-                  <div className="freelance-project-card-progress-row">
-                    <div className="freelance-project-card-progress-track">
-                      <div
-                        className="freelance-project-card-progress-fill"
-                        style={{ width: `${Math.min(100, project.progress)}%` }}
-                      />
-                    </div>
-                    <span className="freelance-project-card-progress-pct">{project.progress}%</span>
-                  </div>
-                )}
-
-                <div className="freelance-project-card-footer">
-                  <span className="freelance-project-card-tasks-count">
-                    {project.is_project_manager
-                      ? `${project.totalTasksCount ?? 0} ${(project.totalTasksCount ?? 0) === 1 ? 'task' : 'task'}`
-                      : `${project.myTasksCount ?? 0} ${(project.myTasksCount ?? 0) === 1 ? 'task' : 'task'}`
-                    }
-                  </span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+            return (
+              <motion.div key={project.id} variants={cardVariants}>
+                <FreelanceProjectMediaCard
+                  project={project}
+                  displayName={displayName}
+                  statusColor={statusColor}
+                  statusLabel={statusLabel}
+                  progress={progress}
+                  taskCount={taskCount}
+                  dueDate={dueDate}
+                  onClick={() => handleProjectClick(project)}
+                />
+              </motion.div>
+            );
+          })}
+        </motion.div>
       ) : (
-        <div className="freelance-empty-state">
-          <FolderKanban size={48} />
-          <p>Nessun progetto assegnato</p>
+        <div className="fp-empty">
+          <FolderKanban size={40} className="fp-empty-icon" />
+          <p className="fp-empty-text">
+            {searchQuery || filterStatus !== 'tutti'
+              ? 'Nessun progetto corrisponde ai filtri'
+              : 'Nessun progetto assegnato'}
+          </p>
         </div>
       )}
     </div>

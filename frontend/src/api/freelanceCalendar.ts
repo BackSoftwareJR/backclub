@@ -10,6 +10,11 @@ export interface ChecklistItem {
     completed: boolean;
 }
 
+export interface CallParticipant {
+    email: string;
+    name?: string;
+}
+
 export interface FreelanceCalendarItem {
     id: number;
     user_id?: number | null;
@@ -21,6 +26,11 @@ export interface FreelanceCalendarItem {
     location?: string | null;
     call_link?: string | null;
     call_notes?: string | null;
+    google_event_id?: string | null;
+    google_meet_link?: string | null;
+    sync_status?: 'pending' | 'synced' | 'failed' | 'skipped' | null;
+    sync_error?: string | null;
+    participants?: CallParticipant[];
     deadline_type?: string | null;
     color?: string | null;
     checklist_items?: ChecklistItem[] | null;
@@ -42,6 +52,7 @@ export interface CreateFreelanceCalendarItemData {
     location?: string;
     call_link?: string;
     call_notes?: string;
+    participants?: CallParticipant[];
     deadline_type?: string;
     color?: string;
     checklist_items?: ChecklistItem[];
@@ -99,6 +110,11 @@ export const freelanceCalendarApi = {
      */
     completeItem: async (itemId: number): Promise<{ success: boolean; data: FreelanceCalendarItem; message: string }> => {
         const response = await apiClient.post<{ success: boolean; data: FreelanceCalendarItem; message: string }>(`/freelance/calendar/items/${itemId}/complete`);
+        return response.data;
+    },
+
+    getItem: async (itemId: number): Promise<{ success: boolean; data: FreelanceCalendarItem }> => {
+        const response = await apiClient.get<{ success: boolean; data: FreelanceCalendarItem }>(`/freelance/calendar/items/${itemId}`);
         return response.data;
     },
 };

@@ -97,12 +97,12 @@
 
 .lead-detail-status-badge {
   background-color: rgba(10, 132, 255, 0.15);
-  color: #0A84FF;
+  color: var(--seller-accent);
 }
 
 .lead-detail-priority-badge {
   background-color: rgba(255, 69, 58, 0.15);
-  color: #FF453A;
+  color: var(--seller-danger);
 }
 
 /* Action Bar - Horizontal Row */

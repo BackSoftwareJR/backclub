@@ -16,9 +16,8 @@ use App\Notifications\TaskAssigned;
 use App\Notifications\TaskReassigned;
 use App\Mail\TaskRescheduleRequestReviewed;
 use App\Mail\TaskDeletionRequestReviewed;
-use App\Jobs\DispatchN8nTaskWorkflowJob;
-use App\Models\CrmProjectTaskN8nStep;
 use App\Services\MailService;
+use App\Services\TaskN8nService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -120,18 +119,12 @@ class CrmProjectTaskController extends Controller
         $project = CrmProject::findOrFail($id);
         $user = Auth::user();
 
-        if (!$this->userCanCreateTask($user, $project)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Non hai i permessi per creare task su questo progetto',
-            ], 403);
-        }
-
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'execution_mode' => 'required|in:agent,agent_human,human',
             'status' => 'nullable|in:pending,in_progress,review,completed,cancelled',
+            'execution_mode' => 'nullable|in:human,agent,agent_human',
+            'exact_prompt' => 'nullable|boolean',
             'priority' => 'nullable|in:low,medium,high,urgent',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date|after_or_equal:start_date',
@@ -154,35 +147,15 @@ class CrmProjectTaskController extends Controller
             ], 422);
         }
 
-        $executionMode = $request->input('execution_mode', CrmProjectTask::EXECUTION_HUMAN);
-        $assignmentsInput = $request->input('assignments', []);
-
-        if (in_array($executionMode, [CrmProjectTask::EXECUTION_HUMAN, CrmProjectTask::EXECUTION_AGENT_HUMAN], true)
-            && count($assignmentsInput) === 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Per le modalità con completamento umano è richiesta almeno un\'assegnazione',
-            ], 422);
-        }
-
         DB::beginTransaction();
         try {
             $taskData = $validator->validated();
             $taskData['crm_project_id'] = $project->id;
             $taskData['created_by'] = $user->id;
-            $taskData['execution_mode'] = $executionMode;
+            $taskData['status'] = $taskData['status'] ?? 'pending';
+            $taskData['execution_mode'] = $taskData['execution_mode'] ?? 'human';
+            $taskData['exact_prompt'] = filter_var($taskData['exact_prompt'] ?? false, FILTER_VALIDATE_BOOLEAN);
             $taskData['priority'] = $taskData['priority'] ?? 'medium';
-
-            if ($executionMode === CrmProjectTask::EXECUTION_AGENT) {
-                $taskData['status'] = 'pending';
-                $taskData['n8n_status'] = CrmProjectTask::N8N_PENDING;
-            } elseif ($executionMode === CrmProjectTask::EXECUTION_AGENT_HUMAN) {
-                $taskData['status'] = $taskData['status'] ?? 'pending';
-                $taskData['n8n_status'] = CrmProjectTask::N8N_PENDING;
-            } else {
-                $taskData['status'] = $taskData['status'] ?? 'pending';
-                $taskData['n8n_status'] = CrmProjectTask::N8N_SKIPPED;
-            }
 
             // Rimuovi assignments dai dati del task
             $assignments = $taskData['assignments'] ?? [];
@@ -231,15 +204,32 @@ class CrmProjectTaskController extends Controller
                 $task->save();
             }
 
-            DB::commit();
-
-            if ($task->usesN8nAutomation()) {
-                DispatchN8nTaskWorkflowJob::dispatchAfterResponse(
-                    $task->id,
-                    $project->id,
-                    $user->id
-                );
+            // Dispatch to N8N if execution_mode is agent or agent_human
+            if (in_array($task->execution_mode, ['agent', 'agent_human'])) {
+                try {
+                    $taskN8nService = app(TaskN8nService::class);
+                    if ($taskN8nService->isEnabled()) {
+                        $taskN8nService->dispatchTaskAgent($task, $project);
+                        Log::info('Task dispatched to N8N orchestrator', [
+                            'task_id' => $task->id,
+                            'execution_mode' => $task->execution_mode
+                        ]);
+                    } else {
+                        Log::warning('N8N not enabled, task created in agent mode but not dispatched', [
+                            'task_id' => $task->id,
+                            'execution_mode' => $task->execution_mode
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Failed to dispatch task to N8N', [
+                        'task_id' => $task->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    // Don't fail task creation if N8N dispatch fails
+                }
             }
+
+            DB::commit();
 
             $task->load([
                 'creator',
@@ -247,18 +237,12 @@ class CrmProjectTaskController extends Controller
                 'project',
                 'events.user',
                 'comments.user',
-                'crmLabel:id,code,name,color,icon',
-                'n8nSteps',
+                'crmLabel:id,code,name,color,icon'
             ]);
-
-            $message = 'Task creato con successo';
-            if ($task->usesN8nAutomation()) {
-                $message = 'Task creato. L\'agente N8N sta elaborando in background — segui gli aggiornamenti nella chat della task.';
-            }
 
             return response()->json([
                 'success' => true,
-                'message' => $message,
+                'message' => 'Task creato con successo',
                 'data' => $task,
             ], 201);
         } catch (\Exception $e) {
@@ -292,7 +276,6 @@ class CrmProjectTaskController extends Controller
                 'crmLabel:id,code,name,color,icon',
                 'project:id,name,crm_department_id',
                 'project.crmDepartment:id,code,name,color,icon',
-                'n8nSteps',
             ])
             ->findOrFail($taskId);
 
@@ -301,6 +284,11 @@ class CrmProjectTaskController extends Controller
                 'success' => false,
                 'message' => 'Non hai accesso a questo task',
             ], 403);
+        }
+
+        if ($task->n8n_status === 'processing' && !empty($task->n8n_execution_id)) {
+            app(TaskN8nService::class)->syncCrmTaskFromOrchestrator($task);
+            $task->refresh();
         }
 
         return response()->json([
@@ -312,18 +300,6 @@ class CrmProjectTaskController extends Controller
     /**
      * Verifica se l'utente può accedere al task: admin, PM, assegnatario attivo o team member del progetto.
      */
-    /**
-     * Admin o project manager possono creare task sul progetto.
-     */
-    private function userCanCreateTask($user, CrmProject $project): bool
-    {
-        if ($user->role === 'admin') {
-            return true;
-        }
-
-        return (int) $project->manager_id === (int) $user->id;
-    }
-
     private function userCanAccessTask($user, CrmProject $project, CrmProjectTask $task): bool
     {
         if ($user->role === 'admin') {
@@ -375,6 +351,8 @@ class CrmProjectTaskController extends Controller
             'title' => 'sometimes|string|max:255',
             'description' => 'nullable|string',
             'status' => 'sometimes|in:pending,in_progress,review,completed,cancelled',
+            'execution_mode' => 'sometimes|in:human,agent,agent_human',
+            'exact_prompt' => 'sometimes|boolean',
             'priority' => 'sometimes|in:low,medium,high,urgent',
             'start_date' => 'nullable|date',
             'due_date' => 'nullable|date|after_or_equal:start_date',
@@ -419,16 +397,8 @@ class CrmProjectTaskController extends Controller
     public function destroy($id, $taskId)
     {
         $project = CrmProject::findOrFail($id);
-        $user = Auth::user();
         $task = CrmProjectTask::where('crm_project_id', $project->id)
             ->findOrFail($taskId);
-
-        if (!$this->userCanCreateTask($user, $project)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Non hai i permessi per eliminare task su questo progetto',
-            ], 403);
-        }
 
         $task->delete();
 
@@ -933,46 +903,6 @@ class CrmProjectTaskController extends Controller
     }
 
     /**
-     * GET /api/crm-projects/{id}/tasks/{taskId}/n8n-steps
-     * Timeline chat step agente N8N (polling frontend).
-     */
-    public function getN8nSteps($id, $taskId)
-    {
-        $user = Auth::user();
-        $project = CrmProject::findOrFail($id);
-        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
-
-        if (!$this->userCanAccessTask($user, $project, $task)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Non hai accesso a questo task',
-            ], 403);
-        }
-
-        $steps = CrmProjectTaskN8nStep::where('crm_project_task_id', $task->id)
-            ->orderBy('step_index')
-            ->orderBy('created_at')
-            ->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'task' => [
-                    'id' => $task->id,
-                    'execution_mode' => $task->execution_mode,
-                    'n8n_status' => $task->n8n_status,
-                    'status' => $task->status,
-                    'progress' => $task->progress,
-                    'n8n_error' => $task->n8n_error,
-                    'n8n_response' => $task->n8n_response,
-                    'n8n_completed_at' => $task->n8n_completed_at,
-                ],
-                'steps' => $steps,
-            ],
-        ]);
-    }
-
-    /**
      * Calcola il costo di un'assegnazione in base al metodo di pagamento
      */
     private function calculateAssignmentCost(CrmProjectTaskAssignment $assignment): float
@@ -1252,5 +1182,288 @@ class CrmProjectTaskController extends Controller
                 'message' => 'Errore durante la riassegnazione: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * GET /api/crm-projects/{id}/tasks/{taskId}/n8n-steps
+     * Recupera lo stato N8N e gli steps di un task
+     */
+    public function getN8nSteps($id, $taskId)
+    {
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)
+            ->with(['n8nSteps' => function($query) {
+                $query->ordered();
+            }])
+            ->findOrFail($taskId);
+
+        $user = Auth::user();
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'task_id' => $task->id,
+                'execution_mode' => $task->execution_mode,
+                'n8n_status' => $task->n8n_status,
+                'n8n_execution_id' => $task->n8n_execution_id,
+                'n8n_error' => $task->n8n_error,
+                'n8n_completed_at' => $task->n8n_completed_at,
+                'progress' => $task->progress,
+                'steps' => $task->n8nSteps->map(function ($step) {
+                    return [
+                        'id' => $step->id,
+                        'step_key' => $step->step_key,
+                        'title' => $step->title,
+                        'message' => $step->message,
+                        'status' => $step->status,
+                        'payload' => $step->payload,
+                        'sort_order' => $step->sort_order,
+                        'created_at' => $step->created_at,
+                        'updated_at' => $step->updated_at,
+                    ];
+                })
+            ]
+        ]);
+    }
+
+    /**
+     * POST /api/crm-projects/{id}/tasks/{taskId}/n8n-callback
+     * Webhook callback dall'orchestratore N8N (endpoint pubblico)
+     */
+    public function n8nCallback(Request $request, $id, $taskId)
+    {
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)
+            ->findOrFail($taskId);
+
+        $taskN8nService = app(TaskN8nService::class);
+
+        // Verify callback authentication
+        if (!$taskN8nService->verifyCallbackAuth($request)) {
+            Log::warning('N8N callback authentication failed', [
+                'task_id' => $taskId,
+                'ip' => $request->ip(),
+                'headers' => $request->headers->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Authentication failed'
+            ], 401);
+        }
+
+        try {
+            $payload = $request->all();
+            $taskN8nService->handleCallback($task, $payload);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Callback processed successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('N8N callback processing failed', [
+                'task_id' => $taskId,
+                'error' => $e->getMessage(),
+                'payload' => $request->all()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Callback processing failed'
+            ], 500);
+        }
+    }
+
+    /**
+     * POST /api/crm-projects/{id}/tasks/{taskId}/n8n-actions
+     * Azioni N8N per admin/PM: restart, stop, request_review
+     */
+    public function n8nAction(Request $request, $id, $taskId)
+    {
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)
+            ->findOrFail($taskId);
+
+        $user = Auth::user();
+
+        // Check permissions: admin, PM del progetto, o creatore del task
+        if ($user->role !== 'admin' && 
+            $project->manager_id !== $user->id && 
+            $task->created_by !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai i permessi per eseguire azioni N8N su questo task'
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'action' => 'required|in:restart,stop,request_review',
+            'review_message' => 'nullable|string|max:2000'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $action = $request->action;
+
+        try {
+            $taskN8nService = app(TaskN8nService::class);
+
+            switch ($action) {
+                case 'restart':
+                    if (!$taskN8nService->isEnabled()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Integrazione N8N non abilitata',
+                        ], 422);
+                    }
+
+                    $task->update([
+                        'n8n_status' => null,
+                        'n8n_execution_id' => null,
+                        'n8n_queue_position' => null,
+                        'n8n_error' => null,
+                        'n8n_response' => null,
+                        'progress' => 0,
+                    ]);
+
+                    if ($request->review_message) {
+                        $this->dispatchTaskWithRevision($task, $project, $request->review_message, $taskN8nService);
+                    } else {
+                        $queue = app(\App\Services\ProjectOrchestratorQueueService::class);
+                        $queue->enqueueCrmTask($task);
+                        $queue->bumpCrmTaskToFront($task);
+                        $queue->tryDispatchNext($project->id);
+                    }
+
+                    $taskN8nService->appendStep($task, [
+                        'step_key' => 'manual_restart',
+                        'title' => 'Task riavviato manualmente',
+                        'message' => "Task riavviato da {$user->name}" . ($request->review_message ? " con feedback: {$request->review_message}" : ''),
+                        'status' => 'completed',
+                        'payload' => ['restarted_by' => $user->id, 'restarted_at' => now(), 'feedback' => $request->review_message]
+                    ]);
+
+                    $message = 'Task riavviato con successo';
+                    break;
+
+                case 'stop':
+                    $task->update([
+                        'n8n_status' => 'skipped',
+                        'n8n_queue_position' => null,
+                        'n8n_error' => "Fermato manualmente da {$user->name}"
+                    ]);
+
+                    app(\App\Services\ProjectOrchestratorQueueService::class)
+                        ->releaseProjectSlot($project->id);
+
+                    $taskN8nService->appendStep($task, [
+                        'step_key' => 'manual_stop',
+                        'title' => 'Task fermato manualmente',
+                        'message' => "Task fermato da {$user->name}",
+                        'status' => 'skipped',
+                        'payload' => ['stopped_by' => $user->id, 'stopped_at' => now()]
+                    ]);
+
+                    $message = 'Task fermato con successo';
+                    break;
+
+                case 'request_review':
+                    // For request_review with message, dispatch with revision
+                    if ($request->review_message) {
+                        $this->dispatchTaskWithRevision($task, $project, $request->review_message, $taskN8nService);
+                        $message = 'Task riavviato con feedback per revisione';
+                    } else {
+                        // Change execution mode to require human review
+                        $task->update([
+                            'execution_mode' => 'agent_human',
+                            'n8n_status' => 'completed' // Mark N8N part as done
+                        ]);
+                        $message = 'Revisione umana richiesta con successo';
+                    }
+
+                    $taskN8nService->appendStep($task, [
+                        'step_key' => 'request_review',
+                        'title' => 'Richiesta revisione umana',
+                        'message' => $request->review_message ?: "Revisione richiesta da {$user->name}",
+                        'status' => 'completed',
+                        'payload' => [
+                            'requested_by' => $user->id,
+                            'requested_at' => now(),
+                            'message' => $request->review_message
+                        ]
+                    ]);
+
+                    break;
+            }
+
+            Log::info("N8N action '{$action}' executed", [
+                'task_id' => $taskId,
+                'user_id' => $user->id,
+                'action' => $action
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'data' => [
+                    'task_id' => $task->id,
+                    'action' => $action,
+                    'n8n_status' => $task->n8n_status
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("N8N action '{$action}' failed", [
+                'task_id' => $taskId,
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => "Errore eseguendo azione '{$action}': " . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Dispatch task with revision feedback
+     */
+    private function dispatchTaskWithRevision(CrmProjectTask $task, CrmProject $project, string $revisionFeedback, TaskN8nService $taskN8nService): void
+    {
+        $task->update([
+            'n8n_status' => null,
+            'n8n_execution_id' => null,
+            'n8n_queue_position' => null,
+            'n8n_error' => null,
+            'n8n_response' => null,
+            'progress' => 0,
+        ]);
+
+        $task->revision_feedback = $revisionFeedback;
+        $task->is_revision = true;
+
+        $queue = app(\App\Services\ProjectOrchestratorQueueService::class);
+        $queue->enqueueCrmTask($task);
+        $queue->bumpCrmTaskToFront($task);
+        $task->refresh();
+        $task->revision_feedback = $revisionFeedback;
+        $task->is_revision = true;
+        $queue->tryDispatchNext($project->id);
+
+        unset($task->revision_feedback);
+        unset($task->is_revision);
     }
 }

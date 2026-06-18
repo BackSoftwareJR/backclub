@@ -65,20 +65,18 @@ class AuthController extends Controller
                 // Don't set current_role automatically - user must select on frontend
             }
             
-            // Get seller_id if user is a seller
-            $sellerId = null;
-            if ($user->seller) {
-                $sellerId = $user->seller->id;
-            } elseif (($user->role === 'venditori' || $user->role === 'seller') && !$user->seller) {
-                // Try to find seller by user_id
-                $seller = \App\Models\Seller::where('user_id', $user->id)->first();
-                if ($seller) {
-                    $sellerId = $seller->id;
+            // seller_id solo se il ruolo attivo è venditore (allineato a me() e changeRole())
+            $activeRole = $user->current_role ?? $user->role;
+            if ($activeRole === 'venditori' || $activeRole === 'seller') {
+                if ($user->seller) {
+                    $user->seller_id = $user->seller->id;
+                } else {
+                    $seller = \App\Models\Seller::where('user_id', $user->id)->first();
+                    $user->seller_id = $seller?->id;
                 }
+            } else {
+                $user->seller_id = null;
             }
-            
-            // Add seller_id to user object for frontend
-            $user->seller_id = $sellerId;
             
             $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -103,11 +101,6 @@ class AuthController extends Controller
                 }
             }
 
-            // Use already-loaded user (no fresh() - avoids 4+ extra queries)
-            if ($user->seller) {
-                $user->seller_id = $user->seller->id;
-            }
-
             // Ensure onboarding fields are explicitly set and cast to proper types
             $user->onboarding_completed = (bool) ($user->onboarding_completed ?? false);
             $user->preferred_language = $user->preferred_language ?? 'it';
@@ -118,6 +111,8 @@ class AuthController extends Controller
 
             // Determine if role selection is required
             $requiresRoleSelection = count($finalRoles) > 1;
+
+            $user->roles = $finalRoles;
             
             return response()->json([
                 'access_token' => $token,

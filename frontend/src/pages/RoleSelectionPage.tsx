@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getHomeRouteForUser } from '../utils/userRoles';
 import { UserCog, Check, Loader2 } from 'lucide-react';
 import './RoleSelectionPage.css';
 
@@ -82,11 +83,11 @@ const RoleSelectionPage: React.FC = () => {
             console.log('✅ Using roles from user object:', rolesToUse);
             hasInitialized.current = true;
         } 
-        // PRIORITY 3: Single role - redirect to dashboard (only if we're sure)
+        // PRIORITY 3: Single role - redirect to home route (only if we're sure)
         else if (user?.roles && Array.isArray(user.roles) && user.roles.length === 1) {
-            console.log('⚠️ Single role detected, redirecting to dashboard');
+            console.log('⚠️ Single role detected, redirecting to home route');
             hasInitialized.current = true;
-            navigate('/dashboard', { replace: true });
+            navigate(getHomeRouteForUser(user), { replace: true });
             return;
         } 
         // PRIORITY 4: No roles available yet - wait for user to load (but don't redirect yet)
@@ -114,9 +115,8 @@ const RoleSelectionPage: React.FC = () => {
                 console.log('Selected first role:', rolesToUse[0]);
             }
         } else if (rolesToUse.length === 1) {
-            // Single role, redirect to dashboard
-            console.log('⚠️ Single role in rolesToUse, redirecting to dashboard');
-            navigate('/dashboard', { replace: true });
+            console.log('⚠️ Single role in rolesToUse, redirecting to home route');
+            navigate(getHomeRouteForUser({ ...user!, roles: rolesToUse, current_role: rolesToUse[0] }), { replace: true });
         } else {
             console.log('❌ No roles found, this should not happen');
         }

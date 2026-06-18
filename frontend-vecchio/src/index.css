@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+
+  body {
+    @apply bg-slate-950 text-slate-50 antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10;
+  }
+
+  .glass-card {
+    @apply bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 shadow-xl;
+  }
+}
+
+/* =====================================================
+   Apple-Style Components - Login V2
+   ===================================================== */
+
+/* Card principale stile Apple */
+.apple-card {
+  @apply bg-white/80 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-black/5 border border-gray-200/50 p-8;
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.02),
+    0 2px 4px rgba(0, 0, 0, 0.02),
+    0 8px 24px rgba(0, 0, 0, 0.04),
+    0 16px 48px rgba(0, 0, 0, 0.06);
+}
+
+/* Input stile Apple */
+.apple-input {
+  @apply w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-white/90 backdrop-blur-sm;
+  @apply text-gray-900 text-base font-medium placeholder-gray-400;
+  @apply transition-all duration-200;
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500;
+  @apply disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400;
+}
+
+.apple-input:hover:not(:disabled) {
+  @apply border-gray-300;
+}
+
+/* Button primario stile Apple */
+.apple-button-primary {
+  @apply w-full py-3.5 px-6 rounded-xl text-white text-base font-semibold;
+  @apply bg-gradient-to-b from-blue-500 to-blue-600;
+  @apply shadow-lg shadow-blue-500/25;
+  @apply transition-all duration-200;
+  @apply hover:shadow-xl hover:shadow-blue-500/30 hover:-translate-y-0.5;
+  @apply active:scale-[0.98];
+  @apply disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-lg;
+}
+
+/* Error message stile Apple */
+.apple-error-message {
+  @apply flex items-center gap-3 p-4 rounded-xl;
+  @apply bg-red-50 border border-red-100;
+  @apply text-red-600;
+}
+
+.apple-message-error {
+  @apply bg-red-50 border-red-100 text-red-600;
+}
+
+.apple-message-success {
+  @apply bg-green-50 border-green-100 text-green-600;
+}
+
+.apple-message {
+  @apply flex items-center gap-3 p-4 rounded-xl border;
+}
+
+/* =====================================================
+   Animazioni Apple-Style
+   ===================================================== */
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+  }
+  to { 
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Smooth transitions globali */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

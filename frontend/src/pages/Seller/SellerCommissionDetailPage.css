@@ -1,92 +1,72 @@
-/* ==================== Commission Detail Page - Financial Statement Design ==================== */
+/* ==================== Commission Detail — Seller Design System ====================
+   Zero hardcoded colours: all values use --seller-* tokens.
+   =================================================================================== */
 
 .commission-detail-page {
-  padding: 24px;
+  padding: var(--seller-spacing-6);
   max-width: 1400px;
   margin: 0 auto;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: #F5F5F7;
+  background: var(--seller-bg);
   min-height: 100vh;
 }
 
-[data-theme="dark"] .commission-detail-page {
-  background: #000000;
-}
-
-/* ==================== Back Button ==================== */
+/* ── Back Button ──────────────────────────────────────────── */
 
 .commission-detail-back-btn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  margin-bottom: 24px;
+  gap: var(--seller-spacing-2);
+  padding: var(--seller-spacing-2) var(--seller-spacing-4);
+  margin-bottom: var(--seller-spacing-6);
   background: transparent;
   border: none;
-  color: #1D1D1F;
-  font-size: 15px;
-  font-weight: 500;
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
   cursor: pointer;
-  border-radius: 8px;
-  transition: background-color 0.2s ease;
+  border-radius: var(--seller-radius-sm);
+  transition: background var(--seller-transition-base), color var(--seller-transition-base);
 }
 
 .commission-detail-back-btn:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-primary);
 }
 
-[data-theme="dark"] .commission-detail-back-btn {
-  color: #FFFFFF;
-}
-
-[data-theme="dark"] .commission-detail-back-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* ==================== Statement Header Card ==================== */
+/* ── Statement Header Card ────────────────────────────────── */
 
 .commission-statement-header {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 32px;
-  padding: 32px;
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 16px;
-  margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="dark"] .commission-statement-header {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  gap: var(--seller-spacing-8);
+  padding: var(--seller-spacing-8);
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  margin-bottom: var(--seller-spacing-6);
+  box-shadow: var(--seller-shadow-sm);
 }
 
 /* Column 1: Identity */
 .statement-col-identity {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--seller-spacing-4);
 }
 
 .statement-contract-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1D1D1F;
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
   margin: 0;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.02em;
   line-height: 1.2;
-}
-
-[data-theme="dark"] .statement-contract-title {
-  color: #FFFFFF;
 }
 
 .statement-client-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--seller-spacing-3);
 }
 
 .statement-client-avatar {
@@ -97,157 +77,128 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: var(--seller-weight-semibold);
+  font-size: var(--seller-font-base);
   flex-shrink: 0;
 }
 
 .statement-client-name {
-  font-size: 15px;
-  font-weight: 500;
-  color: #1D1D1F;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
 }
 
-[data-theme="dark"] .statement-client-name {
-  color: #FFFFFF;
-}
-
+/* Status badge */
 .statement-status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   width: fit-content;
 }
 
 .statement-status-badge.status-active {
-  background: #E8F5E9;
-  color: #2E7D32;
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
 }
 
 .statement-status-badge.status-completed {
-  background: #E3F2FD;
-  color: #1976D2;
+  background: var(--seller-accent-soft);
+  color: var(--seller-accent);
 }
 
 .statement-status-badge.status-cancelled {
-  background: #FFEBEE;
-  color: #C62828;
+  background: var(--seller-danger-soft);
+  color: var(--seller-danger);
 }
 
 .statement-status-badge.status-pending {
-  background: #FFF3E0;
-  color: #F57C00;
+  background: var(--seller-warning-soft);
+  color: var(--seller-warning);
 }
 
-[data-theme="dark"] .statement-status-badge.status-active {
-  background: rgba(52, 199, 89, 0.2);
-  color: #34C759;
+.statement-status-badge.status-paid {
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
 }
 
-[data-theme="dark"] .statement-status-badge.status-completed {
-  background: rgba(10, 132, 255, 0.2);
-  color: #0A84FF;
-}
-
-[data-theme="dark"] .statement-status-badge.status-cancelled {
-  background: rgba(255, 69, 58, 0.2);
-  color: #FF453A;
-}
-
-[data-theme="dark"] .statement-status-badge.status-pending {
-  background: rgba(255, 159, 10, 0.2);
-  color: #FF9F0A;
+.statement-status-badge.status-overdue {
+  background: var(--seller-danger-soft);
+  color: var(--seller-danger);
 }
 
 /* Column 2: Progress */
 .statement-col-progress {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--seller-spacing-3);
   justify-content: center;
 }
 
 .statement-progress-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #86868B;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-[data-theme="dark"] .statement-progress-label {
-  color: #98989D;
+  letter-spacing: 0.06em;
 }
 
 .statement-progress-bar-container {
   width: 100%;
-  height: 8px;
-  background: #E5E5EA;
-  border-radius: 4px;
+  height: 6px;
+  background: var(--seller-border);
+  border-radius: 3px;
   overflow: hidden;
-}
-
-[data-theme="dark"] .statement-progress-bar-container {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .statement-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, #0A84FF 0%, #5E5CE6 100%);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, var(--seller-accent) 0%, var(--seller-success) 100%);
+  border-radius: 3px;
+  transition: width 0.4s ease;
 }
 
 .statement-progress-stats {
-  font-size: 14px;
-  font-weight: 500;
-  color: #1D1D1F;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-secondary);
   font-variant-numeric: tabular-nums;
 }
 
-[data-theme="dark"] .statement-progress-stats {
-  color: #FFFFFF;
-}
-
-/* Column 3: The Money - HERO */
+/* Column 3: The Money */
 .statement-col-money {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--seller-spacing-3);
   justify-content: center;
   align-items: flex-end;
   text-align: right;
 }
 
 .statement-total-commission {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1D1D1F;
-  letter-spacing: -1px;
+  font-size: var(--seller-font-4xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  letter-spacing: -0.04em;
   line-height: 1;
   font-variant-numeric: tabular-nums;
-}
-
-[data-theme="dark"] .statement-total-commission {
-  color: #FFFFFF;
 }
 
 .statement-breakdown {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--seller-spacing-1);
   align-items: flex-end;
 }
 
 .statement-breakdown-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
+  gap: var(--seller-spacing-1);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
   font-variant-numeric: tabular-nums;
 }
 
@@ -255,49 +206,30 @@
   flex-shrink: 0;
 }
 
-.statement-breakdown-item.collected {
-  color: #34C759;
-}
-
-.statement-breakdown-item.pending {
-  color: #86868B;
-}
-
-[data-theme="dark"] .statement-breakdown-item.pending {
-  color: #98989D;
-}
+.statement-breakdown-item.collected { color: var(--seller-success); }
+.statement-breakdown-item.pending   { color: var(--seller-text-tertiary); }
 
 .statement-breakdown-amount {
-  font-weight: 600;
+  font-weight: var(--seller-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
 
-/* ==================== Transactions Table Card ==================== */
+/* ── Transactions Table Card ──────────────────────────────── */
 
 .commission-transactions-card {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-[data-theme="dark"] .commission-transactions-card {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-6);
+  box-shadow: var(--seller-shadow-sm);
 }
 
 .transactions-card-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #1D1D1F;
-  margin: 0 0 24px 0;
-  letter-spacing: -0.3px;
-}
-
-[data-theme="dark"] .transactions-card-title {
-  color: #FFFFFF;
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  margin: 0 0 var(--seller-spacing-6) 0;
+  letter-spacing: -0.02em;
 }
 
 .transactions-table-container {
@@ -307,46 +239,29 @@
 .transactions-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .transactions-table thead {
-  border-bottom: 2px solid #E5E5E5;
-}
-
-[data-theme="dark"] .transactions-table thead {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--seller-border-strong);
 }
 
 .transactions-table th {
   text-align: left;
-  padding: 12px 16px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #86868B;
+  padding: var(--seller-spacing-3) var(--seller-spacing-4);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-[data-theme="dark"] .transactions-table th {
-  color: #98989D;
+  letter-spacing: 0.06em;
 }
 
 .transactions-table tbody tr {
-  border-bottom: 1px solid #F5F5F7;
-  transition: background-color 0.15s ease;
-}
-
-[data-theme="dark"] .transactions-table tbody tr {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid var(--seller-border);
+  transition: background var(--seller-transition-fast);
 }
 
 .transactions-table tbody tr:hover {
-  background: #F5F5F7;
-}
-
-[data-theme="dark"] .transactions-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--seller-bg-overlay);
 }
 
 .transactions-table tbody tr:last-child {
@@ -354,177 +269,110 @@
 }
 
 .transactions-table td {
-  padding: 16px;
+  padding: var(--seller-spacing-4);
   vertical-align: middle;
 }
 
-/* Table Column Styles */
-.table-col-scadenza {
-  width: 140px;
-}
+/* Column widths */
+.table-col-scadenza    { width: 140px; }
+.table-col-rata        { width: 120px; }
+.table-col-importo     { width: 160px; }
+.table-col-commissione { width: 180px; font-weight: var(--seller-weight-semibold); }
+.table-col-stato       { width: 200px; }
 
-.table-col-rata {
-  width: 120px;
-}
-
-.table-col-importo {
-  width: 150px;
-}
-
-.table-col-commissione {
-  width: 180px;
-  font-weight: 600;
-}
-
-.table-col-stato {
-  width: 180px;
-}
-
-/* Transaction Row Content */
+/* Cell content */
 .transaction-date {
-  font-size: 14px;
-  color: #86868B;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-tertiary);
   font-variant-numeric: tabular-nums;
-}
-
-[data-theme="dark"] .transaction-date {
-  color: #98989D;
 }
 
 .transaction-installment {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1D1D1F;
-}
-
-[data-theme="dark"] .transaction-installment {
-  color: #FFFFFF;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
 }
 
 .transaction-amount {
-  font-size: 14px;
-  color: #1D1D1F;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
   font-variant-numeric: tabular-nums;
-}
-
-[data-theme="dark"] .transaction-amount {
-  color: #FFFFFF;
 }
 
 .transaction-commission {
-  font-family: 'Inter', 'SF Mono', 'Monaco', 'Consolas', monospace;
-  font-size: 15px;
-  font-weight: 600;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.01em;
 }
 
-.transaction-commission.commission-paid {
-  color: #34C759;
-}
+.transaction-commission.commission-paid     { color: var(--seller-success); }
+.transaction-commission.commission-pending  { color: var(--seller-text-tertiary); }
+.transaction-commission.commission-expected { color: var(--seller-accent); }
+.transaction-commission.commission-na       { color: var(--seller-text-tertiary); opacity: 0.5; }
 
-.transaction-commission.commission-pending {
-  color: #86868B;
-}
-
-[data-theme="dark"] .transaction-commission.commission-pending {
-  color: #98989D;
-}
-
-.transaction-commission.commission-expected {
-  color: #0A84FF;
-}
-
-[data-theme="dark"] .transaction-commission.commission-expected {
-  color: #0A84FF;
-}
-
-.transaction-commission.commission-na {
-  color: #C7C7CC;
-}
-
-[data-theme="dark"] .transaction-commission.commission-na {
-  color: #636366;
-}
-
+/* Status pills */
 .transaction-status-pill {
   display: inline-flex;
   align-items: center;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  padding: 5px 10px;
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
 }
 
-.transaction-status-pill.status-pending {
-  background: #FFF3E0;
-  color: #F57C00;
-}
+.transaction-status-pill.status-pending            { background: var(--seller-warning-soft); color: var(--seller-warning); }
+.transaction-status-pill.status-pending-collection { background: var(--seller-accent-soft);  color: var(--seller-accent); }
+.transaction-status-pill.status-collected          { background: var(--seller-success-soft); color: var(--seller-success); }
+.transaction-status-pill.status-no-commission      { background: var(--seller-bg-overlay);   color: var(--seller-text-tertiary); }
 
-.transaction-status-pill.status-pending-collection {
-  background: #E3F2FD;
-  color: #1976D2;
-}
-
-.transaction-status-pill.status-collected {
-  background: #E8F5E9;
-  color: #2E7D32;
-}
-
-.transaction-status-pill.status-no-commission {
-  background: #F5F5F7;
-  color: #86868B;
-}
-
-[data-theme="dark"] .transaction-status-pill.status-pending {
-  background: rgba(255, 159, 10, 0.2);
-  color: #FF9F0A;
-}
-
-[data-theme="dark"] .transaction-status-pill.status-pending-collection {
-  background: rgba(10, 132, 255, 0.2);
-  color: #0A84FF;
-}
-
-[data-theme="dark"] .transaction-status-pill.status-collected {
-  background: rgba(52, 199, 89, 0.2);
-  color: #34C759;
-}
-
-[data-theme="dark"] .transaction-status-pill.status-no-commission {
-  background: rgba(255, 255, 255, 0.1);
-  color: #98989D;
-}
-
-/* ==================== Empty State ==================== */
+/* ── Empty State ──────────────────────────────────────────── */
 
 .commission-detail-empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px;
+  padding: var(--seller-spacing-12) var(--seller-spacing-6);
   text-align: center;
+  background: var(--seller-bg);
+  min-height: 100vh;
 }
 
 .commission-detail-empty-state h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1D1D1F;
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
   margin: 0;
 }
 
-[data-theme="dark"] .commission-detail-empty-state h3 {
-  color: #FFFFFF;
+/* ── Skeleton ─────────────────────────────────────────────── */
+
+.commission-detail-skeleton {
+  background: var(--seller-bg);
 }
 
-/* ==================== Responsive Design ==================== */
+.seller-detail-skeleton-header {
+  padding: var(--seller-spacing-6);
+  background: var(--seller-bg-elevated);
+  border-radius: var(--seller-radius-lg);
+  border: 1px solid var(--seller-border);
+  margin-bottom: var(--seller-spacing-6);
+}
+
+.seller-detail-skeleton-content {
+  background: var(--seller-bg-elevated);
+  border-radius: var(--seller-radius-lg);
+  border: 1px solid var(--seller-border);
+  padding: var(--seller-spacing-6);
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
 
 @media (max-width: 1024px) {
   .commission-statement-header {
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: var(--seller-spacing-6);
   }
 
   .statement-col-money {
@@ -543,24 +391,24 @@
 
 @media (max-width: 768px) {
   .commission-detail-page {
-    padding: 16px;
+    padding: var(--seller-spacing-4);
   }
 
   .commission-statement-header {
-    padding: 24px;
+    padding: var(--seller-spacing-6);
   }
 
   .statement-total-commission {
-    font-size: 28px;
+    font-size: var(--seller-font-3xl);
   }
 
   .commission-transactions-card {
-    padding: 16px;
+    padding: var(--seller-spacing-4);
   }
 
   .transactions-table th,
   .transactions-table td {
-    padding: 12px;
-    font-size: 13px;
+    padding: var(--seller-spacing-3);
+    font-size: var(--seller-font-xs);
   }
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { 
   FileText, 
   Briefcase, 
@@ -61,24 +62,18 @@ const SellerDashboardPage: React.FC = () => {
   const [showPeriodDropdown, setShowPeriodDropdown] = useState(false);
 
   useEffect(() => {
-    // IMPORTANT: Don't redirect if user is on role-selection page or role selection is in progress
-    if (window.location.pathname === '/role-selection') {
-      return;
-    }
-    
-    // Check if role selection is in progress
+    if (window.location.pathname === '/role-selection') return;
+
     const roleSelectionInProgress = sessionStorage.getItem('role_selection_in_progress') === 'true';
     if (roleSelectionInProgress) {
       console.log('Role selection in progress, skipping redirect');
       return;
     }
-    
-    // Verifica che l'utente sia effettivamente un venditore
+
     const activeRole = user?.current_role || user?.role;
     const isSeller = user?.seller_id || activeRole === 'seller' || activeRole === 'venditori';
-    
+
     if (!isSeller || !user?.seller_id) {
-      // L'utente non è più un venditore, reindirizza alla dashboard principale
       navigate('/dashboard', { replace: true });
       return;
     }
@@ -131,7 +126,6 @@ const SellerDashboardPage: React.FC = () => {
     fetchStats();
   }, [salesPeriod, user?.current_role, user?.role, user?.seller_id, navigate, user]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
@@ -146,23 +140,19 @@ const SellerDashboardPage: React.FC = () => {
     }
   }, [showPeriodDropdown]);
 
-  // Auto-start tour if user chose to start it during onboarding
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     const shouldStartTour = sessionStorage.getItem('startOnboardingTour') === 'true';
     if (shouldStartTour && !loading && stats) {
       console.log('SellerDashboardPage: Auto-starting tour from onboarding');
-      // Clear the flag
       sessionStorage.removeItem('startOnboardingTour');
-      // Wait a bit for the page to fully render
       setTimeout(() => {
         startTour('complete-tour');
       }, 500);
     }
   }, [loading, stats, startTour]);
 
-  // Render mobile version if on mobile (after all hooks)
   if (isMobile) {
     return <SellerDashboardMobile />;
   }
@@ -174,7 +164,7 @@ const SellerDashboardPage: React.FC = () => {
       value: stats?.pending_quotes || 0,
       change: stats?.quotes_change || 0,
       icon: FileText,
-      color: '#FF9F0A',
+      color: 'var(--seller-warning)',
       action: () => {
         hapticButtonPress();
         navigate('/seller/preventivi?status=pending');
@@ -186,7 +176,7 @@ const SellerDashboardPage: React.FC = () => {
       value: stats?.active_contracts || 0,
       change: stats?.contracts_change || 0,
       icon: Briefcase,
-      color: '#34C759',
+      color: 'var(--seller-success)',
       action: () => {
         hapticButtonPress();
         navigate('/seller/contratti?status=active');
@@ -198,7 +188,7 @@ const SellerDashboardPage: React.FC = () => {
       value: stats?.total_clients || 0,
       change: stats?.new_clients_this_month || 0,
       icon: UserCircle,
-      color: '#0A84FF',
+      color: 'var(--seller-accent)',
       action: () => {
         hapticButtonPress();
         navigate('/seller/clienti');
@@ -210,7 +200,7 @@ const SellerDashboardPage: React.FC = () => {
       value: stats?.leads_to_contact || 0,
       change: stats?.conversion_rate || 0,
       icon: Phone,
-      color: '#FF3B30',
+      color: 'var(--seller-danger)',
       action: () => {
         hapticButtonPress();
         navigate('/seller/contatti?status=new');
@@ -254,7 +244,7 @@ const SellerDashboardPage: React.FC = () => {
         <div className="venditori-page-header">
           <SkeletonLoader type="page-header" />
         </div>
-        <div className="kpi-status-bar overview-skeleton-kpi">
+        <div className="dash-kpi-grid overview-skeleton-kpi">
           {[1, 2, 3, 4].map((i) => (
             <SkeletonLoader key={i} type="kpi-tile" className="overview-skeleton-kpi-item" />
           ))}
@@ -286,12 +276,14 @@ const SellerDashboardPage: React.FC = () => {
     <div className="overview-page">
       <GuideTour steps={dashboardTourSteps} tourId="dashboard-tour" />
       <GuideTour steps={completeTourSteps} tourId="complete-tour" />
+
+      {/* Page Header */}
       <div className="venditori-page-header">
         <div>
           <h1 className="venditori-page-title">{t('dashboard.title')}</h1>
           <p className="venditori-page-subtitle">{t('dashboard.subtitle')}</p>
         </div>
-        <button 
+        <button
           className="venditori-btn venditori-btn-primary"
           onClick={() => {
             hapticButtonPress();
@@ -303,69 +295,70 @@ const SellerDashboardPage: React.FC = () => {
         </button>
       </div>
 
-      {/* KPI Status Bar - Apple Minimalist Design */}
-      <div className="kpi-status-bar">
-        {kpiCards.map((card, index) => {
+      {/* KPI Cards — 4-col grid, Apple minimalist */}
+      <div className="dash-kpi-grid">
+        {kpiCards.map((card, i) => {
           const Icon = card.icon;
           const isPositive = card.change >= 0;
-          const isLast = index === kpiCards.length - 1;
-          
           return (
-            <div 
-              key={card.id} 
-              className={`kpi-status-item ${isLast ? 'last' : ''}`}
+            <motion.div
+              key={card.id}
+              className="dash-kpi-card seller-card"
               onClick={card.action}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.05 }}
             >
-              <div className="kpi-status-content">
-                <div className="kpi-status-label">{card.label}</div>
-                <div className="kpi-status-value-wrapper">
-                  <Icon size={16} className="kpi-status-icon" style={{ color: card.color }} />
-                  <div className="kpi-status-value">{card.value}</div>
+              <div className="dash-kpi-top">
+                <span className="dash-kpi-icon-wrap">
+                  <Icon size={20} style={{ color: card.color }} />
+                </span>
                 {card.change !== 0 && (
-                    <div className={`kpi-status-change ${isPositive ? 'positive' : 'negative'}`}>
-                    {isPositive ? (
-                        <ArrowUpRight size={10} />
-                    ) : (
-                        <ArrowDownRight size={10} />
-                    )}
-                    <span>{Math.abs(card.change).toFixed(1)}%</span>
-                  </div>
+                  <span className={`dash-kpi-delta ${isPositive ? 'positive' : 'negative'}`}>
+                    {isPositive ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
+                    {Math.abs(card.change).toFixed(1)}%
+                  </span>
                 )}
               </div>
-              </div>
-              {!isLast && <div className="kpi-status-divider" />}
-            </div>
+              <div className="dash-kpi-value">{card.value}</div>
+              <div className="dash-kpi-label">{card.label}</div>
+            </motion.div>
           );
         })}
       </div>
 
-      {/* Revenue Card */}
+      {/* Revenue highlight — subtle, no gradient */}
       {stats && stats.total_revenue > 0 && (
-        <div className="overview-revenue-card">
-          <div className="revenue-card-header">
-            <div>
-              <h3>Fatturato Totale</h3>
-              <p>Valore contratti attivi</p>
-            </div>
-            <DollarSign size={32} style={{ opacity: 0.8 }} />
-          </div>
-          <div className="revenue-amount">
-            € {stats.total_revenue.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-          </div>
-          {stats.current_month_revenue > 0 && (
-            <div className="revenue-details">
-              <span>Questo mese: € {stats.current_month_revenue.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-              {stats.revenue_change !== 0 && (
-                <span className={`revenue-change ${stats.revenue_change >= 0 ? 'positive' : 'negative'}`}>
-                  {stats.revenue_change >= 0 ? '+' : ''}{stats.revenue_change.toFixed(1)}%
-                </span>
+        <motion.div
+          className="dash-revenue-card seller-card"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.22 }}
+        >
+          <div className="dash-revenue-inner">
+            <div className="dash-revenue-body">
+              <span className="dash-revenue-label">Fatturato Totale</span>
+              <div className="dash-revenue-value">
+                € {stats.total_revenue.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              {stats.current_month_revenue > 0 && (
+                <div className="dash-revenue-meta">
+                  <span>Questo mese: € {stats.current_month_revenue.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  {stats.revenue_change !== 0 && (
+                    <span className={`dash-kpi-delta ${stats.revenue_change >= 0 ? 'positive' : 'negative'}`}>
+                      {stats.revenue_change >= 0 ? <ArrowUpRight size={11} /> : <ArrowDownRight size={11} />}
+                      {Math.abs(stats.revenue_change).toFixed(1)}%
+                    </span>
+                  )}
+                </div>
               )}
             </div>
-          )}
-        </div>
+            <DollarSign size={28} className="dash-revenue-icon" />
+          </div>
+        </motion.div>
       )}
 
-      {/* Quick Actions - Minimalist Buttons */}
+      {/* Quick Actions */}
       <div className="overview-section">
         <h2 className="section-title">Azioni Rapide</h2>
         <div className="quick-actions-bar">
@@ -385,9 +378,10 @@ const SellerDashboardPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts and Lists Grid */}
+      {/* Main grid — chart + lists */}
       <div className="overview-grid">
-        {/* Sales Trend Chart - Bento UI Apple Style */}
+
+        {/* Sales Trend Chart */}
         <div className={`sales-trend-card ${resolvedTheme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
           <div className="sales-trend-header">
             <div className="sales-trend-content">
@@ -413,20 +407,18 @@ const SellerDashboardPage: React.FC = () => {
               )}
             </div>
             <div className="period-dropdown-wrapper">
-              <button 
+              <button
                 className="period-dropdown-btn-minimal"
                 onClick={() => setShowPeriodDropdown(!showPeriodDropdown)}
-            >
+              >
                 <span>
-                  {salesPeriod === '7' ? '7g' : 
-                   salesPeriod === '30' ? '30g' : 
-                   '90g'}
+                  {salesPeriod === '7' ? '7g' : salesPeriod === '30' ? '30g' : '90g'}
                 </span>
                 <ChevronDown size={12} className={showPeriodDropdown ? 'open' : ''} />
               </button>
               {showPeriodDropdown && (
                 <div className={`period-dropdown-menu ${resolvedTheme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
-                  <button 
+                  <button
                     className={`period-dropdown-item ${salesPeriod === '7' ? 'active' : ''}`}
                     onClick={() => {
                       setSalesPeriod('7');
@@ -435,7 +427,7 @@ const SellerDashboardPage: React.FC = () => {
                   >
                     {t('dashboard.sales_trend.period_7')}
                   </button>
-                  <button 
+                  <button
                     className={`period-dropdown-item ${salesPeriod === '30' ? 'active' : ''}`}
                     onClick={() => {
                       hapticButtonPress();
@@ -445,7 +437,7 @@ const SellerDashboardPage: React.FC = () => {
                   >
                     {t('dashboard.sales_trend.period_30')}
                   </button>
-                  <button 
+                  <button
                     className={`period-dropdown-item ${salesPeriod === '90' ? 'active' : ''}`}
                     onClick={() => {
                       hapticButtonPress();
@@ -462,64 +454,50 @@ const SellerDashboardPage: React.FC = () => {
           <div className="chart-container">
             {stats && stats.sales_trend.length > 0 ? (
               <div className="sales-area-chart">
-                <svg 
-                  className="chart-svg" 
+                <svg
+                  className="chart-svg"
                   viewBox={`0 0 ${stats.sales_trend.length * 40} 200`}
                   preserveAspectRatio="none"
                   onMouseLeave={() => setHoveredPoint(null)}
                 >
                   <defs>
                     <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#6366F1" stopOpacity="0.4" />
-                      <stop offset="50%" stopColor="#6366F1" stopOpacity="0.2" />
-                      <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
+                      <stop offset="0%" stopColor="var(--seller-accent)" stopOpacity="0.35" />
+                      <stop offset="60%" stopColor="var(--seller-accent)" stopOpacity="0.12" />
+                      <stop offset="100%" stopColor="var(--seller-accent)" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  {/* Vertical line on hover */}
+
                   {hoveredPoint && (() => {
                     const pointIndex = stats.sales_trend.findIndex(p => p.date === hoveredPoint.data.date);
                     if (pointIndex === -1) return null;
                     const x = pointIndex * 40 + 20;
-                  return (
+                    return (
                       <line
-                        x1={x}
-                        y1="0"
-                        x2={x}
-                        y2="200"
-                        stroke="rgba(99, 102, 241, 0.4)"
+                        x1={x} y1="0" x2={x} y2="200"
+                        stroke="rgba(59,130,246,0.35)"
                         strokeWidth="1.5"
                         strokeDasharray="3,3"
                         className="chart-hover-line"
                       />
                     );
                   })()}
-                  {/* Area Path with Smooth Curves */}
+
                   <path
                     d={(() => {
                       const maxRevenue = Math.max(...stats.sales_trend.map(p => p.revenue));
                       if (maxRevenue === 0) return '';
-                      
-                      const points = stats.sales_trend.map((point, index) => {
-                        const x = index * 40 + 20;
-                        const y = 200 - (point.revenue / maxRevenue) * 180;
-                        return { x, y };
-                      });
-                      
+                      const points = stats.sales_trend.map((point, index) => ({
+                        x: index * 40 + 20,
+                        y: 200 - (point.revenue / maxRevenue) * 180,
+                      }));
                       if (points.length === 0) return '';
-                      if (points.length === 1) {
-                        return `M ${points[0].x} ${points[0].y} L ${points[0].x} 200 L ${points[0].x} 200 Z`;
-                      }
-                      
-                      // Create smooth curve using cubic bezier for better curves
+                      if (points.length === 1) return `M ${points[0].x} ${points[0].y} L ${points[0].x} 200 Z`;
                       let path = `M ${points[0].x} ${points[0].y}`;
                       for (let i = 0; i < points.length - 1; i++) {
-                        const current = points[i];
-                        const next = points[i + 1];
-                        const cp1x = current.x + (next.x - current.x) / 3;
-                        const cp1y = current.y;
-                        const cp2x = current.x + (next.x - current.x) * 2 / 3;
-                        const cp2y = next.y;
-                        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                        const cp1x = points[i].x + (points[i + 1].x - points[i].x) / 3;
+                        const cp2x = points[i].x + (points[i + 1].x - points[i].x) * 2 / 3;
+                        path += ` C ${cp1x} ${points[i].y}, ${cp2x} ${points[i + 1].y}, ${points[i + 1].x} ${points[i + 1].y}`;
                       }
                       const last = points[points.length - 1];
                       path += ` L ${last.x} 200 L ${points[0].x} 200 Z`;
@@ -528,103 +506,73 @@ const SellerDashboardPage: React.FC = () => {
                     fill="url(#chartGradient)"
                     className="chart-area"
                   />
-                  {/* Line Path with Smooth Curves */}
+
                   <path
                     d={(() => {
                       const maxRevenue = Math.max(...stats.sales_trend.map(p => p.revenue));
                       if (maxRevenue === 0) return '';
-                      
-                      const points = stats.sales_trend.map((point, index) => {
-                        const x = index * 40 + 20;
-                        const y = 200 - (point.revenue / maxRevenue) * 180;
-                        return { x, y };
-                      });
-                      
+                      const points = stats.sales_trend.map((point, index) => ({
+                        x: index * 40 + 20,
+                        y: 200 - (point.revenue / maxRevenue) * 180,
+                      }));
                       if (points.length === 0) return '';
-                      if (points.length === 1) {
-                        return `M ${points[0].x} ${points[0].y}`;
-                      }
-                      
-                      // Create smooth curve using cubic bezier for better curves
+                      if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
                       let path = `M ${points[0].x} ${points[0].y}`;
                       for (let i = 0; i < points.length - 1; i++) {
-                        const current = points[i];
-                        const next = points[i + 1];
-                        const cp1x = current.x + (next.x - current.x) / 3;
-                        const cp1y = current.y;
-                        const cp2x = current.x + (next.x - current.x) * 2 / 3;
-                        const cp2y = next.y;
-                        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${next.x} ${next.y}`;
+                        const cp1x = points[i].x + (points[i + 1].x - points[i].x) / 3;
+                        const cp2x = points[i].x + (points[i + 1].x - points[i].x) * 2 / 3;
+                        path += ` C ${cp1x} ${points[i].y}, ${cp2x} ${points[i + 1].y}, ${points[i + 1].x} ${points[i + 1].y}`;
                       }
                       return path;
                     })()}
                     fill="none"
-                    stroke="#6366F1"
-                    strokeWidth="3"
+                    stroke="var(--seller-accent)"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     className="chart-line"
                   />
-                  {/* Data Points */}
+
                   {stats.sales_trend.map((point, index) => {
                     const maxRevenue = Math.max(...stats.sales_trend.map(p => p.revenue));
                     const x = index * 40 + 20;
                     const y = maxRevenue > 0 ? 200 - (point.revenue / maxRevenue) * 180 : 200;
                     return (
                       <g key={index}>
-                        <g>
-                          {/* Invisible larger hit area */}
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r="12"
-                            fill="transparent"
-                            className="chart-hit-area"
-                            onMouseEnter={(e) => {
-                              const svg = e.currentTarget.closest('.chart-svg') as SVGSVGElement;
-                              const container = svg?.closest('.sales-area-chart') as HTMLElement;
-                              if (svg && container) {
-                                const svgRect = svg.getBoundingClientRect();
-                                const containerRect = container.getBoundingClientRect();
-                                const svgWidth = svgRect.width;
-                                const svgHeight = svgRect.height;
-                                const viewBoxWidth = stats.sales_trend.length * 40;
-                                const viewBoxHeight = 200;
-                                
-                                const xPercent = x / viewBoxWidth;
-                                const yPercent = y / viewBoxHeight;
-                                
-                                setHoveredPoint({
-                                  x: containerRect.left + (xPercent * svgWidth),
-                                  y: containerRect.top + (yPercent * svgHeight),
-                                  data: point
-                                });
-                              }
-                            }}
-                          />
-                          {/* Visible point */}
-                          <circle
-                            cx={x}
-                            cy={y}
-                            r="5"
-                            fill="#6366F1"
-                            stroke="rgba(255, 255, 255, 0.8)"
-                            strokeWidth="2"
-                            className="chart-point"
-                          />
-                        </g>
+                        <circle
+                          cx={x} cy={y} r="12"
+                          fill="transparent"
+                          className="chart-hit-area"
+                          onMouseEnter={(e) => {
+                            const svg = e.currentTarget.closest('.chart-svg') as SVGSVGElement;
+                            const container = svg?.closest('.sales-area-chart') as HTMLElement;
+                            if (svg && container) {
+                              const svgRect = svg.getBoundingClientRect();
+                              const containerRect = container.getBoundingClientRect();
+                              setHoveredPoint({
+                                x: containerRect.left + ((x / (stats.sales_trend.length * 40)) * svgRect.width),
+                                y: containerRect.top + ((y / 200) * svgRect.height),
+                                data: point,
+                              });
+                            }
+                          }}
+                        />
+                        <circle
+                          cx={x} cy={y} r="4.5"
+                          fill="var(--seller-accent)"
+                          stroke="var(--seller-bg-elevated)"
+                          strokeWidth="2"
+                          className="chart-point"
+                        />
                       </g>
                     );
                   })}
                 </svg>
-                {/* Tooltip - Minimalist */}
+
                 {hoveredPoint && (
-                  <div 
+                  <div
                     className={`chart-tooltip ${resolvedTheme === 'dark' ? 'theme-dark' : 'theme-light'}`}
-                    style={{
-                      left: `${hoveredPoint.x}px`,
-                      top: '20px'
-                    }}
+                    style={{ left: `${hoveredPoint.x}px`, top: '20px' }}
                   >
                     <div className="chart-tooltip-value">
                       € {hoveredPoint.data.revenue.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -636,19 +584,13 @@ const SellerDashboardPage: React.FC = () => {
                           if (isNaN(date.getTime())) {
                             const parts = hoveredPoint.data.date.split('-');
                             if (parts.length === 3) {
-                              const validDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                              return validDate.toLocaleDateString('it-IT', { 
-                                day: 'numeric', 
-                                month: 'short'
-                              });
+                              return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]))
+                                .toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
                             }
                             return hoveredPoint.data.date;
                           }
-                          return date.toLocaleDateString('it-IT', { 
-                            day: 'numeric', 
-                            month: 'short'
-                          });
-                        } catch (e) {
+                          return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+                        } catch {
                           return hoveredPoint.data.date;
                         }
                       })()}
@@ -658,7 +600,7 @@ const SellerDashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="chart-empty">
-                <Activity size={48} />
+                <Activity size={40} />
                 <p>{t('dashboard.no_data')}</p>
               </div>
             )}
@@ -669,7 +611,7 @@ const SellerDashboardPage: React.FC = () => {
         <div className="overview-card">
           <div className="card-header">
             <h3>{t('dashboard.urgent_leads.title')}</h3>
-            <button 
+            <button
               className="card-action-link"
               onClick={() => navigate('/seller/contatti?priority=high')}
             >
@@ -679,8 +621,8 @@ const SellerDashboardPage: React.FC = () => {
           <div className="leads-list">
             {stats && stats.urgent_leads.length > 0 ? (
               stats.urgent_leads.map((lead) => (
-                <div 
-                  key={lead.id} 
+                <div
+                  key={lead.id}
                   className="lead-item"
                   onClick={() => navigate(`/seller/contatti/${lead.id}`)}
                 >
@@ -691,7 +633,7 @@ const SellerDashboardPage: React.FC = () => {
                   <div className="lead-meta">
                     {lead.next_followup_date && (
                       <span className="lead-date">
-                        <Calendar size={14} />
+                        <Calendar size={12} />
                         {new Date(lead.next_followup_date).toLocaleDateString('it-IT')}
                       </span>
                     )}
@@ -714,7 +656,7 @@ const SellerDashboardPage: React.FC = () => {
         <div className="overview-card">
           <div className="card-header">
             <h3>{t('dashboard.recent_quotes')}</h3>
-            <button 
+            <button
               className="card-action-link"
               onClick={() => {
                 hapticButtonPress();
@@ -727,19 +669,16 @@ const SellerDashboardPage: React.FC = () => {
           <div className="quotes-list">
             {stats && stats.recent_quotes.length > 0 ? (
               stats.recent_quotes.map((quote) => {
-                const getStatusClass = (status: string) => {
-                  const statusMap: Record<string, string> = {
-                    pending: 'warning',
-                    approved: 'success',
-                    rejected: 'danger',
-                    contract_requested: 'info',
-                  };
-                  return statusMap[status] || 'secondary';
+                const statusClassMap: Record<string, string> = {
+                  pending: 'warning',
+                  approved: 'success',
+                  rejected: 'danger',
+                  contract_requested: 'info',
                 };
-                
+                const statusClass = statusClassMap[quote.status] || 'secondary';
                 return (
-                  <div 
-                    key={quote.id} 
+                  <div
+                    key={quote.id}
                     className="quote-item"
                     onClick={() => navigate(`/seller/preventivi/${quote.id}`)}
                   >
@@ -749,7 +688,7 @@ const SellerDashboardPage: React.FC = () => {
                         € {quote.total_amount.toLocaleString('it-IT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                     </div>
-                    <span className={`venditori-badge venditori-badge-${getStatusClass(quote.status)}`}>
+                    <span className={`venditori-badge venditori-badge-${statusClass}`}>
                       {t(`status.${quote.status}`) || quote.status}
                     </span>
                   </div>
@@ -772,20 +711,16 @@ const SellerDashboardPage: React.FC = () => {
           <div className="activities-list">
             {stats && stats.recent_activities.length > 0 ? (
               stats.recent_activities.map((activity, index) => {
-                const getActivityIcon = () => {
-                  switch(activity.icon) {
-                    case 'FileText': return FileText;
-                    case 'Briefcase': return Briefcase;
-                    case 'TrendingUp': return TrendingUp;
-                    default: return Activity;
-                  }
+                const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
+                  FileText,
+                  Briefcase,
+                  TrendingUp,
                 };
-                const ActivityIcon = getActivityIcon();
-                
+                const ActivityIcon = iconMap[activity.icon] ?? Activity;
                 return (
                   <div key={index} className="activity-item">
                     <div className="activity-icon">
-                      <ActivityIcon size={18} />
+                      <ActivityIcon size={16} />
                     </div>
                     <div className="activity-content">
                       <div className="activity-title">{activity.title}</div>
@@ -808,6 +743,7 @@ const SellerDashboardPage: React.FC = () => {
             )}
           </div>
         </div>
+
       </div>
     </div>
   );

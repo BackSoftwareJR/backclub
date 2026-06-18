@@ -5,6 +5,7 @@ import type { User as UserType } from '../../types/user';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { useTheme } from '../../context/ThemeContext.tsx';
 import { notificationsApi, type Notification } from '../../api/notifications';
+import { getActiveRole, getRoleLabel, isSellerUser, isFreelanceUser } from '../../utils/userRoles';
 import SellerGlobalSearch from '../SellerGlobalSearch/SellerGlobalSearch';
 import FreelanceGlobalSearch from '../FreelanceGlobalSearch/FreelanceGlobalSearch';
 import './Header.css';
@@ -28,16 +29,8 @@ const Header: React.FC = () => {
     
     const hasMultipleRoles = user?.roles && user.roles.length > 1;
     const hasCrmDepartments = user?.crm_departments && user.crm_departments.length > 0;
-    const getRoleLabel = (role: string) => {
-        const labels: Record<string, string> = {
-            admin: 'Amministratore',
-            freelance: 'Freelance',
-            venditori: 'Venditore',
-            seller: 'Venditore',
-            client: 'Cliente',
-        };
-        return labels[role] || role;
-    };
+    const activeRole = getActiveRole(user);
+    const activeRoleLabel = getRoleLabel(activeRole);
     
     const handleRoleChange = async (role: string) => {
         try {
@@ -206,6 +199,18 @@ const Header: React.FC = () => {
             .slice(0, 2);
     };
 
+    /** Deterministic HSL gradient from the first characters of a name */
+    const getAvatarGradient = (name?: string): string => {
+        if (!name) return 'linear-gradient(135deg, hsl(240 70% 60%), hsl(270 65% 55%))';
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const h1 = Math.abs(hash) % 360;
+        const h2 = (h1 + 30) % 360;
+        return `linear-gradient(135deg, hsl(${h1} 68% 56%), hsl(${h2} 62% 48%))`;
+    };
+
     return (
         <header className={`header-main ${resolvedTheme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
             {/* Apple-Style Search Bar / Seller or Freelance Global Search */}
@@ -225,19 +230,22 @@ const Header: React.FC = () => {
                         className={`header-search-bar ${searchActive ? 'active' : ''}`}
                         onClick={handleHeaderClick}
                     >
-                        <Search size={16} className="search-icon" />
+                        <Search size={15} className="search-icon" />
                         {searchActive ? (
                             <input
                                 ref={searchInputRef}
                                 type="text"
                                 className="search-input"
-                                placeholder="Cerca qui..."
+                                placeholder="Cerca..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onBlur={handleSearchBlur}
                             />
                         ) : (
-                            <span className="search-placeholder">Cerca qui...</span>
+                            <>
+                                <span className="search-placeholder">Cerca...</span>
+                                <kbd className="search-kbd">⌘K</kbd>
+                            </>
                         )}
                     </div>
                 )}
@@ -245,6 +253,20 @@ const Header: React.FC = () => {
 
             {/* Right Actions */}
             <div className="header-actions">
+                {/* Role Badge — always visible, clickable for multi-role users */}
+                {user && (
+                    <button
+                        className={`header-role-badge ${hasMultipleRoles ? 'clickable' : ''}`}
+                        onClick={hasMultipleRoles ? () => { setShowRoleMenu(!showRoleMenu); setShowUserMenu(false); } : undefined}
+                        title={hasMultipleRoles ? 'Clicca per cambiare ruolo' : `Ruolo: ${activeRoleLabel}`}
+                        style={{ cursor: hasMultipleRoles ? 'pointer' : 'default' }}
+                    >
+                        <UserCog size={13} />
+                        <span>{activeRoleLabel}</span>
+                        {hasMultipleRoles && <span className="header-role-badge-dot" />}
+                    </button>
+                )}
+
                 {/* Notifications */}
                 <div className="notifications-container">
                     <button 
@@ -252,7 +274,7 @@ const Header: React.FC = () => {
                         title="Notifiche"
                         onClick={() => setShowNotifications(!showNotifications)}
                     >
-                        <Bell size={18} />
+                        <Bell size={20} />
                         {unreadCount > 0 && (
                             <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
                         )}
@@ -309,10 +331,7 @@ const Header: React.FC = () => {
                                 <button 
                                     className="notifications-view-all"
                                     onClick={() => {
-                                        // Redirect freelance users to their dedicated notifications page
-                                        const activeRole = user?.current_role || user?.role;
-                                        const isFreelance = activeRole === 'freelance' || user?.roles?.includes('freelance');
-                                        navigate(isFreelance ? '/freelance/notifiche' : '/notifiche');
+                                        navigate(isFreelanceUser(user) ? '/freelance/notifiche' : '/notifiche');
                                         setShowNotifications(false);
                                     }}
                                 >
@@ -339,7 +358,10 @@ const Header: React.FC = () => {
                         onClick={() => setShowUserMenu(!showUserMenu)}
                         title={user?.nome || 'Utente'}
                     >
-                        <div className="user-avatar-circle">
+                        <div
+                            className="user-avatar-circle"
+                            style={{ background: getAvatarGradient(user?.nome || user?.name) }}
+                        >
                             {getInitials(user?.nome || user?.name)}
                         </div>
                     </button>
@@ -359,7 +381,7 @@ const Header: React.FC = () => {
                                                 Ruolo Attuale
                                             </span>
                                             <span className="role-info-value">
-                                                {user.current_role ? getRoleLabel(user.current_role) : 'Nessuno'}
+                                                {activeRoleLabel}
                                             </span>
                                         </div>
                                     </div>
@@ -391,11 +413,10 @@ const Header: React.FC = () => {
                                 className="dropdown-item"
                                 onClick={() => {
                                     setShowUserMenu(false);
-                                    // Check if user is a seller
-                                    const activeRole = user?.current_role || user?.role;
-                                    const isSeller = user?.seller_id || activeRole === 'venditori' || activeRole === 'seller';
-                                    if (isSeller) {
+                                    if (isSellerUser(user)) {
                                         navigate('/seller/impostazioni');
+                                    } else if (isFreelanceUser(user)) {
+                                        navigate('/freelance/impostazioni');
                                     } else {
                                         navigate('/impostazioni');
                                     }

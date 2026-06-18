@@ -1,47 +1,29 @@
-/* Overlay – Apple-style backdrop */
+/* Overlay – glass backdrop */
 .invoice-issue-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--seller-z-modal, 300);
   padding: 24px;
-  animation: invoiceIssueOverlayIn 0.25s ease-out;
 }
 
-@keyframes invoiceIssueOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Modal container – fixed height, flex column, scroll only in body */
+/* Modal container */
 .invoice-issue-modal {
-  background: rgba(28, 28, 30, 0.98);
-  border-radius: 16px;
+  background: var(--seller-bg-elevated, rgba(17, 17, 19, 1));
+  border-radius: var(--seller-radius-xl, 20px);
   width: 100%;
   max-width: 520px;
   max-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  animation: invoiceIssueModalIn 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-@keyframes invoiceIssueModalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 /* Header – fixed, no scroll */
@@ -50,35 +32,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .invoice-issue-modal-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  letter-spacing: -0.02em;
-  color: #fff;
+  letter-spacing: -0.01em;
+  color: var(--seller-text-primary, #f4f4f5);
 }
 
 .invoice-issue-modal-close {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--seller-text-tertiary, rgba(255, 255, 255, 0.4));
   cursor: pointer;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.15s, color 0.15s;
 }
 
 .invoice-issue-modal-close:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: var(--seller-bg-overlay, rgba(255, 255, 255, 0.06));
+  color: var(--seller-text-secondary, rgba(255, 255, 255, 0.7));
 }
 
 /* Error banner */
@@ -343,44 +325,45 @@
   flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.15);
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .invoice-issue-btn-primary,
 .invoice-issue-btn-secondary {
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.2s, background 0.2s;
+  transition: all 0.15s ease;
   border: none;
 }
 
 .invoice-issue-btn-primary:active,
 .invoice-issue-btn-secondary:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 .invoice-issue-btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: transparent;
+  color: var(--seller-text-secondary, rgba(255, 255, 255, 0.7));
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .invoice-issue-btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--seller-bg-overlay, rgba(255, 255, 255, 0.06));
 }
 
 .invoice-issue-btn-primary {
-  background: #0a84ff;
+  background: var(--seller-accent, #3b82f6);
   color: #fff;
 }
 
 .invoice-issue-btn-primary:hover:not(:disabled) {
-  background: #409cff;
+  background: var(--seller-accent-hover, #2563eb);
 }
 
 .invoice-issue-btn-primary:disabled {
@@ -388,31 +371,31 @@
   cursor: not-allowed;
 }
 
-/* ========== Legacy classes per CreateInvoiceModal (usa stesso CSS) ========== */
+/* ========== Shared global modal classes ========== */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--seller-z-modal, 300);
   padding: 24px;
 }
 
 .modal-invoice-issue {
-  background: rgba(28, 28, 30, 0.98);
-  border-radius: 16px;
+  background: var(--seller-bg-elevated, rgba(17, 17, 19, 1));
+  border-radius: var(--seller-radius-xl, 20px);
   width: 100%;
   max-width: 520px;
   max-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4), 0 0 1px rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 32px 64px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .modal-header {
@@ -420,33 +403,35 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  color: #fff;
+  color: var(--seller-text-primary, #f4f4f5);
+  letter-spacing: -0.01em;
 }
 
 .btn-close-modal {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: 8px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--seller-text-tertiary, rgba(255, 255, 255, 0.4));
   cursor: pointer;
+  transition: background var(--seller-transition-fast, 150ms), color var(--seller-transition-fast, 150ms);
 }
 
 .btn-close-modal:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: var(--seller-bg-overlay, rgba(255, 255, 255, 0.06));
+  color: var(--seller-text-secondary, rgba(255, 255, 255, 0.7));
 }
 
 .modal-error {
@@ -454,9 +439,10 @@
   align-items: center;
   gap: 10px;
   padding: 12px 24px;
-  background: rgba(255, 59, 48, 0.12);
-  color: #ff6b6b;
-  font-size: 14px;
+  background: var(--seller-danger-soft, rgba(239, 68, 68, 0.12));
+  color: var(--seller-danger, #ef4444);
+  font-size: 13px;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.18);
 }
 
 .modal-form {
@@ -472,36 +458,43 @@
   flex-shrink: 0;
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(0, 0, 0, 0.15);
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .modal-actions .btn-primary,
 .modal-actions .btn-secondary {
-  padding: 12px 22px;
-  border-radius: 10px;
-  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 9999px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   border: none;
+  transition: all var(--seller-transition-fast, 150ms);
 }
 
 .modal-actions .btn-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
+  background: transparent;
+  color: var(--seller-text-secondary, rgba(255, 255, 255, 0.7));
+  border: 1px solid var(--seller-border, rgba(255, 255, 255, 0.08));
 }
 
 .modal-actions .btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--seller-bg-overlay, rgba(255, 255, 255, 0.06));
 }
 
 .modal-actions .btn-primary {
-  background: #0a84ff;
+  background: var(--seller-accent, #3b82f6);
   color: #fff;
 }
 
 .modal-actions .btn-primary:hover:not(:disabled) {
-  background: #409cff;
+  background: var(--seller-accent-hover, #2563eb);
+}
+
+.modal-actions .btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

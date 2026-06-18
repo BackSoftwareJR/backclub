@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Notifications\CalendarReminder;
+use App\Services\FreelanceCallService;
+use App\Support\CalendarDateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +13,64 @@ use Illuminate\Support\Facades\Log;
 
 class FreelanceCalendarController extends Controller
 {
+    public function __construct(
+        private FreelanceCallService $callService
+    ) {}
+
+    private function enrichCallEvent(object $event): object
+    {
+        if ($event->type === 'call') {
+            $event->participants = $this->callService->getParticipants((int) $event->id);
+            $event->call_link = $event->google_meet_link ?: $event->call_link;
+        }
+
+        return $this->formatEventTimesForApi($event);
+    }
+
+    private function formatEventTimesForApi(object $event): object
+    {
+        if (isset($event->start_time)) {
+            $event->start_time = CalendarDateTime::toApi($event->start_time);
+        }
+        if (isset($event->end_time)) {
+            $event->end_time = CalendarDateTime::toApi($event->end_time);
+        }
+        if (isset($event->completed_at) && $event->completed_at) {
+            $event->completed_at = CalendarDateTime::toApi($event->completed_at);
+        }
+
+        return $event;
+    }
+
+    /**
+     * GET /api/freelance/calendar/items/{itemId}
+     */
+    public function getItem($itemId)
+    {
+        $userId = Auth::id();
+
+        $event = DB::table('freelance_calendar_events')
+            ->where('id', $itemId)
+            ->where('user_id', $userId)
+            ->where('created_by', $userId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$event) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Item non trovato',
+            ], 404);
+        }
+
+        $event->is_personal = true;
+
+        return response()->json([
+            'success' => true,
+            'data' => $this->enrichCallEvent($event),
+        ]);
+    }
+
     /**
      * GET /api/freelance/calendar/items
      * Ottiene tutti gli items del calendario per il freelance corrente
@@ -43,7 +103,10 @@ class FreelanceCalendarController extends Controller
                     $event->project_id = null;
                     $event->project_name = null;
                     $event->project_color = null;
-                    return $event;
+                    if ($event->type === 'call') {
+                        return $this->enrichCallEvent($event);
+                    }
+                    return $this->formatEventTimesForApi($event);
                 });
 
             // 2. Carica progetti del freelance (team member O project manager, così eventi/task del progetto sono visibili anche al PM)
@@ -183,11 +246,20 @@ class FreelanceCalendarController extends Controller
                     } else {
                         $event->visible_to = [];
                     }
-                    return $event;
+                    return $this->formatEventTimesForApi($event);
                 });
             }
 
-            // Combina tutti gli eventi
+            // Formatta date task progetto per API
+            $tasks = collect($tasks)->map(function ($task) {
+                if (isset($task->start_time)) {
+                    $task->start_time = CalendarDateTime::toApi($task->start_time);
+                }
+                if (isset($task->end_time)) {
+                    $task->end_time = CalendarDateTime::toApi($task->end_time);
+                }
+                return $task;
+            })->all();
             $allEvents = $personalEvents->concat($projectEvents)->values();
 
             // Log per debug (rimuovere in produzione)
@@ -236,6 +308,9 @@ class FreelanceCalendarController extends Controller
             'color' => 'nullable|string|max:7',
             'checklist_items' => 'nullable|array',
             'has_checklist' => 'nullable|boolean',
+            'participants' => 'nullable|array',
+            'participants.*.email' => 'required_with:participants|email|max:255',
+            'participants.*.name' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -249,16 +324,9 @@ class FreelanceCalendarController extends Controller
         try {
             $userId = Auth::id();
             
-            // Converti le date dal formato ISO 8601 al formato MySQL
-            $startTime = $request->start_time;
-            $endTime = $request->end_time;
-            
-            if (strpos($startTime, 'T') !== false) {
-                $startTime = date('Y-m-d H:i:s', strtotime($startTime));
-            }
-            if (strpos($endTime, 'T') !== false) {
-                $endTime = date('Y-m-d H:i:s', strtotime($endTime));
-            }
+            // Salva in UTC (il frontend invia ISO8601 UTC)
+            $startTime = CalendarDateTime::toStorage($request->start_time);
+            $endTime = CalendarDateTime::toStorage($request->end_time);
             
             $eventData = [
                 'user_id' => $userId,
@@ -327,11 +395,24 @@ class FreelanceCalendarController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
+                if ($request->has('participants')) {
+                    $this->callService->saveParticipants($eventId, $request->participants ?? []);
+                }
             }
 
             DB::commit();
 
+            if ($request->type === 'call') {
+                $this->callService->afterCallCreated($eventId, $userId);
+            }
+
             $event = DB::table('freelance_calendar_events')->where('id', $eventId)->first();
+            if ($event) {
+                $event = $event->type === 'call'
+                    ? $this->enrichCallEvent($event)
+                    : $this->formatEventTimesForApi($event);
+            }
 
             return response()->json([
                 'success' => true,
@@ -382,6 +463,9 @@ class FreelanceCalendarController extends Controller
             'color' => 'nullable|string|max:7',
             'checklist_items' => 'nullable|array',
             'has_checklist' => 'nullable|boolean',
+            'participants' => 'nullable|array',
+            'participants.*.email' => 'required_with:participants|email|max:255',
+            'participants.*.name' => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -402,9 +486,8 @@ class FreelanceCalendarController extends Controller
                 if ($request->has($field)) {
                     $value = $request->$field;
                     
-                    // Converti le date dal formato ISO 8601 al formato MySQL
-                    if (($field === 'start_time' || $field === 'end_time' || $field === 'completed_at') && strpos($value, 'T') !== false) {
-                        $value = date('Y-m-d H:i:s', strtotime($value));
+                    if (($field === 'start_time' || $field === 'end_time' || $field === 'completed_at') && $value) {
+                        $value = CalendarDateTime::toStorage($value);
                     }
                     
                     $updateData[$field] = $value;
@@ -428,9 +511,21 @@ class FreelanceCalendarController extends Controller
                 ->where('id', $itemId)
                 ->update($updateData);
 
+            if ($event->type === 'call' && $request->has('participants')) {
+                $this->callService->saveParticipants((int) $itemId, $request->participants ?? []);
+                $this->callService->afterCallUpdated((int) $itemId, $userId);
+            } elseif ($event->type === 'call') {
+                $this->callService->afterCallUpdated((int) $itemId, $userId);
+            }
+
             DB::commit();
 
             $updatedEvent = DB::table('freelance_calendar_events')->where('id', $itemId)->first();
+            if ($updatedEvent) {
+                $updatedEvent = $updatedEvent->type === 'call'
+                    ? $this->enrichCallEvent($updatedEvent)
+                    : $this->formatEventTimesForApi($updatedEvent);
+            }
 
             return response()->json([
                 'success' => true,
@@ -467,6 +562,10 @@ class FreelanceCalendarController extends Controller
                 'success' => false,
                 'message' => 'Item non trovato'
             ], 404);
+        }
+
+        if ($event->type === 'call' && !empty($event->google_event_id)) {
+            $this->callService->afterCallDeleted($userId, $event->google_event_id);
         }
 
         DB::table('freelance_calendar_events')
@@ -512,16 +611,8 @@ class FreelanceCalendarController extends Controller
             ], 422);
         }
 
-        // Converti le date dal formato ISO 8601 al formato MySQL
-        $startTime = $request->start_time;
-        $endTime = $request->end_time;
-        
-        if (strpos($startTime, 'T') !== false) {
-            $startTime = date('Y-m-d H:i:s', strtotime($startTime));
-        }
-        if (strpos($endTime, 'T') !== false) {
-            $endTime = date('Y-m-d H:i:s', strtotime($endTime));
-        }
+        $startTime = CalendarDateTime::toStorage($request->start_time);
+        $endTime = CalendarDateTime::toStorage($request->end_time);
         
         DB::table('freelance_calendar_events')
             ->where('id', $itemId)
@@ -531,7 +622,16 @@ class FreelanceCalendarController extends Controller
                 'updated_at' => now(),
             ]);
 
+        if ($event->type === 'call') {
+            $this->callService->afterCallUpdated((int) $itemId, $userId);
+        }
+
         $updatedEvent = DB::table('freelance_calendar_events')->where('id', $itemId)->first();
+        if ($updatedEvent) {
+            $updatedEvent = $updatedEvent->type === 'call'
+                ? $this->enrichCallEvent($updatedEvent)
+                : $this->formatEventTimesForApi($updatedEvent);
+        }
 
         return response()->json([
             'success' => true,

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { authApi } from '../../api/auth';
+import { getHomeRouteForUser } from '../../utils/userRoles';
 import { useNavigate } from 'react-router-dom';
 import StepLanguage from './StepLanguage';
 import StepAppearance from './StepAppearance';
@@ -149,19 +150,7 @@ const OnboardingWizard: React.FC = () => {
       // Use updated user if available, otherwise fallback to current user
       const finalUser = updatedUser || user;
       
-      // Determine the correct dashboard based on user role
-      const activeRole = finalUser?.current_role || finalUser?.role;
-      const isSeller = finalUser?.seller_id || activeRole === 'venditori' || activeRole === 'seller';
-      const isFreelance = activeRole === 'freelance' || finalUser?.roles?.includes('freelance');
-      
-      // Navigate to appropriate dashboard
-      if (isSeller) {
-        navigate('/seller', { replace: true });
-      } else if (isFreelance) {
-        navigate('/freelance', { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
+      navigate(getHomeRouteForUser(finalUser), { replace: true });
     } catch (error) {
       console.error('Error saving onboarding preferences:', error);
       // Still navigate to dashboard even if save fails
@@ -207,7 +196,7 @@ const OnboardingWizard: React.FC = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ 
                 duration: 0.3,
-                ease: [0.25, 0.1, 0.25, 1]
+                ease: [0.25, 0.1, 0.25, 1] as const
               }}
             >
               {currentStep === 1 && (

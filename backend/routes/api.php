@@ -16,9 +16,16 @@ use App\Http\Controllers\TaskRescheduleRequestController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SerbatoiController;
 use App\Http\Controllers\UsciteCocchiController;
+use App\Http\Controllers\WorkspaceController;
+use App\Http\Controllers\WorkspaceAgentController;
+use App\Http\Controllers\WorkspaceUserTaskController;
+use App\Http\Controllers\WorkspacePmController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+
+Route::get('/auth/google/callback', [App\Http\Controllers\GoogleOAuthController::class, 'callback']);
+Route::post('/internal/n8n/calendar-call-result', [App\Http\Controllers\N8nCalendarController::class, 'calendarCallResult']);
 
 // Signed routes for email actions
 Route::get('/reschedule-requests/{rescheduleRequest}/approve', [TaskRescheduleRequestController::class, 'approveFromEmail'])
@@ -28,13 +35,6 @@ Route::get('/reschedule-requests/{rescheduleRequest}/approve', [TaskRescheduleRe
 Route::get('/reschedule-requests/{rescheduleRequest}/reject', [TaskRescheduleRequestController::class, 'rejectFromEmail'])
     ->name('task.reschedule.reject')
     ->middleware('signed');
-
-// N8N → CRM: webhook automazione agente (header authbs o Bearer token)
-Route::middleware('n8n.webhook')->prefix('webhooks/n8n')->group(function () {
-    Route::post('/task-events', [App\Http\Controllers\N8nTaskWebhookController::class, 'taskEvent']);
-    Route::post('/status', [App\Http\Controllers\N8nTaskWebhookController::class, 'workInProgress']);
-    Route::post('/completed', [App\Http\Controllers\N8nTaskWebhookController::class, 'taskCompleted']);
-});
 
 // Public timeline view (no auth) — share link
 Route::get('/timelines/public/{token}', [App\Http\Controllers\TimelineController::class, 'showPublic']);
@@ -58,6 +58,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/change-role', [AuthController::class, 'changeRole']);
     Route::post('/change-crm-department', [AuthController::class, 'changeCrmDepartment']);
     Route::post('/onboarding-preferences', [AuthController::class, 'updateOnboardingPreferences']);
+
+    Route::prefix('auth/google')->group(function () {
+        Route::get('/connect', [App\Http\Controllers\GoogleOAuthController::class, 'connect']);
+        Route::get('/status', [App\Http\Controllers\GoogleOAuthController::class, 'status']);
+        Route::put('/preferences', [App\Http\Controllers\GoogleOAuthController::class, 'updatePreferences']);
+        Route::delete('/disconnect', [App\Http\Controllers\GoogleOAuthController::class, 'disconnect']);
+    });
+
     Route::post('/translate', [App\Http\Controllers\TranslateController::class]);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     
@@ -203,7 +211,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reschedule-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getRescheduleRequests']);
         Route::get('/deletion-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getDeletionRequests']);
         Route::get('/{taskId}/events', [App\Http\Controllers\CrmProjectTaskController::class, 'getEvents']);
-        Route::get('/{taskId}/n8n-steps', [App\Http\Controllers\CrmProjectTaskController::class, 'getN8nSteps']);
         Route::get('/{taskId}/notes', [App\Http\Controllers\CrmProjectTaskController::class, 'getNotes']);
         Route::post('/{taskId}/notes', [App\Http\Controllers\CrmProjectTaskController::class, 'createNote']);
         Route::get('/{taskId}/deletion-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getTaskDeletionRequests']);
@@ -214,6 +221,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{taskId}/reschedule-request', [App\Http\Controllers\CrmProjectTaskController::class, 'createRescheduleRequest']);
         Route::post('/{taskId}/deletion-request', [App\Http\Controllers\CrmProjectTaskController::class, 'createDeletionRequest']);
         Route::post('/{taskId}/reassign', [App\Http\Controllers\CrmProjectTaskController::class, 'reassign']);
+        Route::get('/{taskId}/n8n-steps', [App\Http\Controllers\CrmProjectTaskController::class, 'getN8nSteps']);
+        Route::post('/{taskId}/n8n-actions', [App\Http\Controllers\CrmProjectTaskController::class, 'n8nAction']);
     });
     Route::put('crm-projects/{id}/tasks/reschedule-requests/{requestId}/review', [App\Http\Controllers\CrmProjectTaskController::class, 'reviewRescheduleRequest']);
     Route::put('crm-projects/{id}/tasks/deletion-requests/{requestId}/review', [App\Http\Controllers\CrmProjectTaskController::class, 'reviewDeletionRequest']);
@@ -594,6 +603,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Freelance Calendar
     Route::prefix('freelance/calendar')->group(function () {
         Route::get('/items', [App\Http\Controllers\FreelanceCalendarController::class, 'getItems']);
+        Route::get('/items/{itemId}', [App\Http\Controllers\FreelanceCalendarController::class, 'getItem']);
         Route::post('/items', [App\Http\Controllers\FreelanceCalendarController::class, 'createItem']);
         Route::put('/items/{itemId}', [App\Http\Controllers\FreelanceCalendarController::class, 'updateItem']);
         Route::delete('/items/{itemId}', [App\Http\Controllers\FreelanceCalendarController::class, 'deleteItem']);
@@ -772,7 +782,68 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Richieste accesso BackClub (pagina richiedi-accesso)
         Route::get('/backclub-requests', [App\Http\Controllers\GestioneClientiController::class, 'getBackclubRequests']);
     });
+
+    // ============================================
+    // WORKSPACE MODULE
+    // ============================================
+
+    // User preferences
+    Route::get('/workspace/preferences', [App\Http\Controllers\WorkspaceController::class, 'getPreferences']);
+    Route::put('/workspace/preferences', [App\Http\Controllers\WorkspaceController::class, 'updatePreferences']);
+
+    // Developer workspace
+    Route::prefix('workspace/developer')->group(function () {
+        Route::get('/projects', [App\Http\Controllers\WorkspaceController::class, 'getDeveloperProjects']);
+        Route::get('/projects/{id}', [App\Http\Controllers\WorkspaceController::class, 'getDeveloperProject']);
+        Route::get('/projects/{id}/branches', [App\Http\Controllers\WorkspaceController::class, 'getProjectBranches']);
+        Route::post('/projects/{id}/publish', [App\Http\Controllers\WorkspaceController::class, 'publishProject']);
+
+        // Agents
+        Route::get('/projects/{projectId}/agents', [App\Http\Controllers\WorkspaceAgentController::class, 'index']);
+        Route::put('/projects/{projectId}/agents/queue/reorder', [App\Http\Controllers\WorkspaceAgentController::class, 'reorderQueue']);
+        Route::get('/projects/{projectId}/agents/{agentId}', [App\Http\Controllers\WorkspaceAgentController::class, 'show']);
+        Route::post('/projects/{projectId}/agents', [App\Http\Controllers\WorkspaceAgentController::class, 'store']);
+        Route::put('/projects/{projectId}/agents/{agentId}', [App\Http\Controllers\WorkspaceAgentController::class, 'update']);
+        Route::post('/projects/{projectId}/agents/{agentId}/actions', [App\Http\Controllers\WorkspaceAgentController::class, 'action']);
+        Route::post('/projects/{projectId}/agents/{agentId}/trash', [App\Http\Controllers\WorkspaceAgentController::class, 'trash']);
+        Route::post('/projects/{projectId}/agents/{agentId}/restore', [App\Http\Controllers\WorkspaceAgentController::class, 'restore']);
+        Route::delete('/projects/{projectId}/agents/{agentId}/force', [App\Http\Controllers\WorkspaceAgentController::class, 'forceDelete']);
+
+        // Tasks
+        Route::get('/projects/{projectId}/tasks', [App\Http\Controllers\WorkspaceUserTaskController::class, 'index']);
+        Route::post('/projects/{projectId}/tasks', [App\Http\Controllers\WorkspaceUserTaskController::class, 'store']);
+        Route::put('/projects/{projectId}/tasks/{taskId}', [App\Http\Controllers\WorkspaceUserTaskController::class, 'update']);
+    });
+
+    // PM workspace configuration
+    Route::prefix('crm-projects/{projectId}')->group(function () {
+        Route::get('/workspace-settings', [App\Http\Controllers\WorkspacePmController::class, 'getSettings']);
+        Route::put('/workspace-settings', [App\Http\Controllers\WorkspacePmController::class, 'updateSettings']);
+        Route::post('/workspace-branches', [App\Http\Controllers\WorkspacePmController::class, 'createBranch']);
+        Route::put('/workspace-branches/{branchId}', [App\Http\Controllers\WorkspacePmController::class, 'updateBranch']);
+        Route::delete('/workspace-branches/{branchId}', [App\Http\Controllers\WorkspacePmController::class, 'deleteBranch']);
+    });
 });
+
+// n8n callbacks (NO auth - webhook pubblico)
+Route::post('/workspace/agents/{agentId}/n8n-callback', [App\Http\Controllers\WorkspaceAgentController::class, 'n8nCallback'])
+    ->name('workspace.agent.n8n-callback');
+
+// N8N Task Webhooks (primary endpoints)
+Route::post('/webhooks/n8n/task-events', [App\Http\Controllers\N8nTaskWebhookController::class, 'taskEvents'])
+    ->name('webhooks.n8n.task-events');
+Route::post('/webhooks/n8n/status', [App\Http\Controllers\N8nTaskWebhookController::class, 'status'])
+    ->name('webhooks.n8n.status');
+Route::post('/webhooks/n8n/completed', [App\Http\Controllers\N8nTaskWebhookController::class, 'completed'])
+    ->name('webhooks.n8n.completed');
+Route::post('/webhooks/n8n/task-log', [App\Http\Controllers\N8nTaskWebhookController::class, 'taskLog'])
+    ->name('webhooks.n8n.task-log');
+Route::post('/webhooks/n8n/close-task', [App\Http\Controllers\N8nTaskWebhookController::class, 'closeTask'])
+    ->name('webhooks.n8n.close-task');
+
+// Legacy callback (still working as alias)
+Route::post('/crm-projects/{id}/tasks/{taskId}/n8n-callback', [App\Http\Controllers\CrmProjectTaskController::class, 'n8nCallback'])
+    ->name('crm.task.n8n-callback');
 
 // Portfolio Azienda – accesso con codice (token in header X-Portfolio-Token)
 Route::prefix('portfolio')->group(function () {

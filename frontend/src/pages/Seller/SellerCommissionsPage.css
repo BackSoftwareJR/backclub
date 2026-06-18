@@ -1,298 +1,238 @@
 /* ============================================================
-   COMMISSIONI - Design moderno (design system + fintech)
+   COMMISSIONI — Apple iOS 17 / macOS Sonoma
+   Seller Design System tokens only · No hardcoded colours
    ============================================================ */
 
 .commissions-page-fintech {
-  padding: var(--spacing-4);
+  padding: var(--seller-spacing-8) var(--seller-spacing-6);
   max-width: 1200px;
   margin: 0 auto;
-  background: var(--color-bg-primary);
+  background: var(--seller-bg);
   min-height: 100vh;
 }
 
-/* ---------- Loading ---------- */
-.commissions-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--color-border-primary);
-  border-top-color: var(--color-accent-emerald);
-  border-radius: 50%;
-  animation: commissions-spin 0.8s linear infinite;
-}
-
-@keyframes commissions-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ---------- Hero Card (Saldo disponibile) ---------- */
-.commissions-premium-card {
-  position: relative;
-  min-height: 180px;
-  border-radius: 20px;
-  padding: var(--spacing-6) var(--spacing-6);
-  color: white;
-  overflow: hidden;
-  margin-bottom: var(--spacing-5);
-  /* Gradient moderno: emerald → teal con profondità */
-  background: linear-gradient(135deg, #047857 0%, #0d9488 35%, #0f766e 70%, #134e4a 100%);
-  box-shadow:
-    0 25px 50px -12px rgba(4, 120, 87, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-}
-
-.commissions-premium-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -30%;
-  width: 120%;
-  height: 120%;
-  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.12) 0%, transparent 60%);
-  pointer-events: none;
-}
-
-.commissions-premium-card::after {
-  content: '';
-  position: absolute;
-  bottom: -20%;
-  left: -10%;
-  width: 60%;
-  height: 80%;
-  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
-  pointer-events: none;
-}
-
-.premium-card-label {
-  display: inline-block;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  opacity: 0.9;
-  margin-bottom: var(--spacing-3);
-  padding: 4px 10px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
-  backdrop-filter: blur(8px);
-}
-
-.premium-card-amount {
-  font-size: clamp(2rem, 6vw, 2.75rem);
-  font-weight: 700;
-  font-feature-settings: "tnum";
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  margin-bottom: var(--spacing-4);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.premium-card-mini-stats {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  opacity: 0.92;
-}
-
-.mini-stat-divider {
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  flex-shrink: 0;
-}
-
-.mini-stat.maturate { color: rgba(255, 255, 255, 0.98); }
-.mini-stat.pending { color: rgba(255, 255, 255, 0.8); }
-
-/* ---------- Inset Stats (Maturate, In attesa, Fee) ---------- */
-.commissions-inset-group {
+/* ── KPI Grid ─────────────────────────────────────────────── */
+.commissions-kpi-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  background: var(--color-bg-elevated);
-  border-radius: 16px;
-  overflow: hidden;
-  margin-bottom: var(--spacing-6);
-  border: 1px solid var(--color-border-primary);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: var(--seller-spacing-3);
+  margin-bottom: var(--seller-spacing-6);
 }
 
-.inset-group-item {
+.commissions-kpi-card {
+  padding: var(--seller-spacing-5);
+  border-radius: var(--seller-radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-2);
+  min-height: 100px;
+}
+
+/* Hero KPI — Saldo Disponibile */
+.commissions-kpi-hero {
+  padding: var(--seller-spacing-6);
+  min-height: 120px;
+  justify-content: space-between;
+}
+
+.kpi-label {
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--seller-text-tertiary);
+}
+
+.kpi-icon-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4) var(--spacing-5);
-  min-height: 64px;
-  border-right: 1px solid var(--color-border-primary);
+  gap: var(--seller-spacing-2);
 }
 
-.inset-group-item:last-child {
-  border-right: none;
+.kpi-icon-row .kpi-label {
+  margin: 0;
 }
 
-.inset-icon-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.kpi-icon {
   flex-shrink: 0;
 }
 
-.inset-group-item .inset-icon {
-  flex-shrink: 0;
-}
+.kpi-icon-success { color: var(--seller-success); }
+.kpi-icon-warning { color: var(--seller-warning); }
+.kpi-icon-muted   { color: var(--seller-text-tertiary); }
 
-.inset-icon-wrap.collected {
-  background: rgba(52, 199, 89, 0.12);
-}
-
-.inset-icon-wrap.collected .inset-icon {
-  color: var(--color-accent-emerald);
-}
-
-.inset-icon-wrap.pending {
-  background: rgba(255, 159, 10, 0.12);
-}
-
-.inset-icon-wrap.pending .inset-icon {
-  color: var(--color-accent-orange);
-}
-
-.inset-icon-wrap.rate {
-  background: var(--color-bg-tertiary);
-}
-
-.inset-icon-wrap.rate .inset-icon {
-  color: var(--color-text-tertiary);
-}
-
-.inset-label {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-secondary);
-}
-
-.inset-value {
-  font-feature-settings: "tnum";
+/* KPI values — large tabular numerals */
+.kpi-value {
+  font-size: var(--seller-font-2xl);
+  font-weight: var(--seller-weight-bold);
   font-variant-numeric: tabular-nums;
-  font-size: 1rem;
-  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--seller-text-primary);
 }
 
-.inset-value.collected { color: var(--color-accent-emerald); }
-.inset-value.pending { color: var(--color-text-tertiary); }
-.inset-value.rate { color: var(--color-text-primary); }
+.kpi-value-hero {
+  font-size: var(--seller-font-4xl);
+  letter-spacing: -0.04em;
+}
 
-/* ---------- Sezione Movimenti ---------- */
+.kpi-value-success { color: var(--seller-success); }
+.kpi-value-warning { color: var(--seller-warning); }
+
+.kpi-value-rate {
+  color: var(--seller-text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.kpi-value-unit {
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-secondary);
+}
+
+/* Delta badge */
+.kpi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  padding: 3px 8px;
+  border-radius: var(--seller-radius-full);
+  width: fit-content;
+}
+
+.kpi-badge-success {
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
+}
+
+/* Skeleton placeholders */
+.commissions-kpi-skeleton {
+  min-height: 100px;
+  background: var(--seller-bg-elevated);
+  border-color: var(--seller-border);
+  animation: commissions-pulse 1.4s ease-in-out infinite;
+}
+
+.commissions-kpi-grid-skeleton .commissions-kpi-card:first-child {
+  min-height: 120px;
+}
+
+@keyframes commissions-pulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* ── Movimenti section ────────────────────────────────────── */
 .commissions-movimenti-section {
-  margin-top: var(--spacing-2);
+  margin-top: var(--seller-spacing-2);
+}
+
+.commissions-movimenti-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--seller-spacing-4);
 }
 
 .movimenti-section-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--spacing-4) 0;
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  margin: 0;
   letter-spacing: -0.02em;
 }
 
-/* ---------- Search Bar ---------- */
+.movimenti-section-count {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-tertiary);
+}
+
+/* ── Search Bar ───────────────────────────────────────────── */
 .commissions-search-bar {
   position: relative;
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--seller-spacing-4);
 }
 
 .commissions-search-ios .search-icon {
   position: absolute;
-  left: var(--spacing-4);
+  left: var(--seller-spacing-4);
   top: 50%;
   transform: translateY(-50%);
-  color: var(--color-text-quaternary);
+  color: var(--seller-text-tertiary);
   pointer-events: none;
 }
 
 .commissions-search-ios .commissions-search-input {
   width: 100%;
-  padding: var(--spacing-3) var(--spacing-4) var(--spacing-3) 2.75rem;
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 14px;
-  font-size: 0.9375rem;
-  color: var(--color-text-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  padding: var(--seller-spacing-3) var(--seller-spacing-4) var(--seller-spacing-3) 2.75rem;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  font-size: var(--seller-font-base);
+  color: var(--seller-text-primary);
+  transition: border-color var(--seller-transition-base), box-shadow var(--seller-transition-base);
 }
 
 .commissions-search-ios .commissions-search-input::placeholder {
-  color: var(--color-text-quaternary);
+  color: var(--seller-text-tertiary);
 }
 
 .commissions-search-ios .commissions-search-input:hover {
-  border-color: var(--color-border-hover);
+  border-color: var(--seller-border-strong);
 }
 
 .commissions-search-ios .commissions-search-input:focus {
   outline: none;
-  border-color: var(--color-accent-blue);
-  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+  border-color: var(--seller-accent);
+  box-shadow: 0 0 0 3px var(--seller-accent-soft);
 }
 
-/* ---------- Lista movimenti ---------- */
+/* ── Lista movimenti ──────────────────────────────────────── */
 .commissions-movimenti-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
+  gap: var(--seller-spacing-2);
 }
 
 .movimenti-list-item {
-  background: var(--color-bg-elevated);
-  border-radius: 16px;
+  background: var(--seller-bg-elevated);
+  border-radius: var(--seller-radius-lg);
   overflow: hidden;
-  border: 1px solid var(--color-border-primary);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid var(--seller-border);
+  transition: border-color var(--seller-transition-base), box-shadow var(--seller-transition-base);
 }
 
 .movimenti-list-item:hover {
-  border-color: var(--color-border-hover);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: var(--seller-border-strong);
+  box-shadow: var(--seller-shadow-md);
 }
 
 .movimenti-item-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
+  gap: var(--seller-spacing-3);
   width: 100%;
-  padding: var(--spacing-4);
+  padding: var(--seller-spacing-4);
   text-align: left;
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background var(--seller-transition-fast);
   font: inherit;
   color: inherit;
 }
 
-.movimenti-item-row:hover {
-  background: var(--color-bg-secondary);
-}
-
+.movimenti-item-row:hover,
 .movimenti-item-row.expanded {
-  background: var(--color-bg-secondary);
+  background: var(--seller-bg-overlay);
 }
 
 .movimenti-item-left {
@@ -304,18 +244,18 @@
 }
 
 .movimenti-client-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .movimenti-contract-name {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--color-text-tertiary);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-tertiary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -324,31 +264,30 @@
 .movimenti-item-right {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
+  gap: var(--seller-spacing-3);
   flex-shrink: 0;
 }
 
 .movimenti-amount {
-  font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--color-text-secondary);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-secondary);
 }
 
 .movimenti-amount.positive {
-  color: var(--color-accent-emerald);
+  color: var(--seller-success);
 }
 
-/* Status badge pill (sostituisce il solo dot) */
+/* Status badge pill */
 .movimenti-status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
   white-space: nowrap;
 }
 
@@ -359,36 +298,28 @@
   flex-shrink: 0;
 }
 
-.movimenti-status-dot.status-liquidabile {
-  background: var(--color-accent-emerald);
-}
+.movimenti-status-dot.status-liquidabile  { background: var(--seller-success); }
+.movimenti-status-dot.status-maturazione  { background: var(--seller-warning); }
+.movimenti-status-dot.status-completato   { background: var(--seller-text-tertiary); }
 
 .movimenti-status-badge.status-liquidabile {
-  background: rgba(52, 199, 89, 0.14);
-  color: var(--color-accent-emerald);
-}
-
-.movimenti-status-dot.status-maturazione {
-  background: var(--color-accent-orange);
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
 }
 
 .movimenti-status-badge.status-maturazione {
-  background: rgba(255, 159, 10, 0.14);
-  color: var(--color-accent-orange);
-}
-
-.movimenti-status-dot.status-completato {
-  background: var(--color-text-quaternary);
+  background: var(--seller-warning-soft);
+  color: var(--seller-warning);
 }
 
 .movimenti-status-badge.status-completato {
-  background: var(--color-bg-tertiary);
-  color: var(--color-text-tertiary);
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-tertiary);
 }
 
 .movimenti-chevron {
-  color: var(--color-text-quaternary);
-  transition: transform 0.25s ease;
+  color: var(--seller-text-tertiary);
+  transition: transform var(--seller-transition-base);
   flex-shrink: 0;
 }
 
@@ -396,216 +327,208 @@
   transform: rotate(90deg);
 }
 
-/* Dettaglio espanso (accordion) */
+/* ── Accordion detail ─────────────────────────────────────── */
 .movimenti-item-details {
-  padding: var(--spacing-5);
-  border-top: 1px solid var(--color-border-primary);
-  background: var(--color-bg-secondary);
+  border-top: 1px solid var(--seller-border);
 }
 
-.movimenti-item-details .details-section {
-  margin-bottom: var(--spacing-5);
-}
-
-.movimenti-item-details .details-section:last-of-type {
-  margin-bottom: 0;
+.movimenti-item-details-inner {
+  padding: var(--seller-spacing-5);
+  background: var(--seller-bg-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-5);
 }
 
 .details-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--seller-spacing-3);
 }
 
 .details-title {
-  font-size: 0.75rem;
-  font-weight: 600;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--color-text-tertiary);
+  color: var(--seller-text-tertiary);
   margin: 0;
 }
 
 .details-calculation {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  gap: var(--seller-spacing-2);
   flex-wrap: wrap;
 }
 
 .calc-text {
-  font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  font-size: 1rem;
-  color: var(--color-text-primary);
+  font-size: var(--seller-font-base);
+  color: var(--seller-text-primary);
 }
 
 .calc-operator {
-  font-size: 1.125rem;
-  color: var(--color-text-tertiary);
-  font-weight: 400;
+  font-size: var(--seller-font-lg);
+  color: var(--seller-text-tertiary);
+  font-weight: var(--seller-weight-regular);
 }
 
 .calc-result {
-  font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-accent-emerald);
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-success);
 }
 
 .details-timeline {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
+  gap: var(--seller-spacing-2);
 }
 
 .timeline-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-2) 0;
+  padding: var(--seller-spacing-2) 0;
+  border-bottom: 1px solid var(--seller-border);
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
 }
 
 .timeline-label {
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
 }
 
 .timeline-value {
-  font-feature-settings: "tnum";
   font-variant-numeric: tabular-nums;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
 }
 
 .timeline-value.collected,
-.timeline-value.liquidabile {
-  color: var(--color-accent-emerald);
-}
-
+.timeline-value.liquidabile { color: var(--seller-success); }
 .timeline-value.pending,
-.timeline-value.expected {
-  color: var(--color-text-tertiary);
-}
+.timeline-value.expected    { color: var(--seller-text-tertiary); }
 
 .details-actions {
-  grid-column: 1 / -1;
-  padding-top: var(--spacing-4);
-  border-top: 1px solid var(--color-border-primary);
+  padding-top: var(--seller-spacing-2);
 }
 
 .btn-details {
-  padding: var(--spacing-3) var(--spacing-5);
-  background: var(--color-accent-emerald);
-  color: white;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+  padding: var(--seller-spacing-3) var(--seller-spacing-5);
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
   border: none;
-  border-radius: 12px;
-  font-size: 0.875rem;
-  font-weight: 600;
+  border-radius: var(--seller-radius-md);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.25);
-  min-width: 180px;
+  transition: background var(--seller-transition-base),
+              transform var(--seller-transition-fast),
+              box-shadow var(--seller-transition-base);
+  box-shadow: 0 2px 8px var(--seller-accent-soft);
 }
 
 .btn-details:hover {
-  background: var(--color-accent-emerald-dark);
+  background: var(--seller-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(52, 199, 89, 0.3);
+  box-shadow: 0 4px 16px var(--seller-accent-soft);
 }
 
 .btn-details:active {
   transform: translateY(0);
 }
 
-/* ---------- Empty State ---------- */
+/* ── Empty State ──────────────────────────────────────────── */
 .commissions-empty-state {
-  padding: var(--spacing-12) var(--spacing-6);
+  padding: var(--seller-spacing-12) var(--seller-spacing-6);
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--spacing-4);
-  background: var(--color-bg-elevated);
-  border-radius: 20px;
-  border: 1px dashed var(--color-border-primary);
+  gap: var(--seller-spacing-4);
+  background: var(--seller-bg-elevated);
+  border-radius: var(--seller-radius-xl);
+  border: 1px dashed var(--seller-border);
 }
 
 .commissions-empty-state .empty-state-icon {
-  color: var(--color-text-quaternary);
+  color: var(--seller-text-tertiary);
   opacity: 0.6;
-  flex-shrink: 0;
 }
 
 .empty-state-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
   margin: 0;
 }
 
 .empty-state-subtitle {
-  font-size: 0.9375rem;
-  font-weight: 400;
-  color: var(--color-text-secondary);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-regular);
+  color: var(--seller-text-secondary);
   margin: 0;
   max-width: 280px;
   line-height: 1.5;
 }
 
-/* ---------- Skeleton (loading) ---------- */
-.commissions-skeleton-premium {
-  background: var(--color-bg-elevated);
-  border: 1px solid var(--color-border-primary);
-  border-radius: 20px;
-}
-
+/* ── Skeleton ─────────────────────────────────────────────── */
 .commissions-skeleton-inset {
-  background: var(--color-bg-elevated);
-  border-radius: 16px;
-  border: 1px solid var(--color-border-primary);
+  background: var(--seller-bg-elevated);
+  border-radius: var(--seller-radius-lg);
+  border: 1px solid var(--seller-border);
   overflow: hidden;
+  margin-bottom: var(--seller-spacing-4);
 }
 
 .commissions-skeleton-table .movimenti-list-item {
   opacity: 0.7;
 }
 
-/* ---------- Responsive ---------- */
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .commissions-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .commissions-kpi-hero {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 768px) {
   .commissions-page-fintech {
-    padding: var(--spacing-3);
+    padding: var(--seller-spacing-4) var(--seller-spacing-3);
   }
 
-  .commissions-premium-card {
-    min-height: 160px;
-    padding: var(--spacing-5) var(--spacing-4);
+  .commissions-kpi-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--seller-spacing-2);
   }
 
-  .premium-card-amount {
-    font-size: 1.75rem;
+  .commissions-kpi-hero {
+    grid-column: 1 / -1;
   }
 
-  .commissions-inset-group {
-    grid-template-columns: 1fr;
-  }
-
-  .inset-group-item {
-    border-right: none;
-    border-bottom: 1px solid var(--color-border-primary);
-  }
-
-  .inset-group-item:last-child {
-    border-bottom: none;
+  .kpi-value-hero {
+    font-size: var(--seller-font-3xl);
   }
 
   .movimenti-item-row {
-    padding: var(--spacing-3);
+    padding: var(--seller-spacing-3);
   }
 
-  .movimenti-item-details {
-    padding: var(--spacing-4);
+  .movimenti-item-details-inner {
+    padding: var(--seller-spacing-4);
   }
 
   .movimenti-status-badge span:not(.movimenti-status-dot) {
@@ -618,7 +541,11 @@
 }
 
 @media (max-width: 480px) {
-  .premium-card-mini-stats {
-    flex-wrap: wrap;
+  .commissions-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commissions-kpi-hero {
+    grid-column: unset;
   }
 }

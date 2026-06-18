@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { priceListQuestionsApi, type PriceListItemQuestion } from '../../api/priceListQuestions';
 import type { QuestionAnswer } from '../../types/quotes';
 import './ServiceQuestionModal.css';
@@ -227,23 +228,41 @@ const ServiceQuestionModal: React.FC<ServiceQuestionModalProps> = ({
     });
   };
 
+  const overlayProps = {
+    className: "service-question-modal-overlay",
+    onClick: onClose,
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+    transition: { duration: 0.15 },
+  };
+
+  const modalProps = {
+    className: "service-question-modal-apple",
+    onClick: (e: React.MouseEvent) => e.stopPropagation(),
+    initial: { opacity: 0, scale: 0.96 as number, y: 8 as number },
+    animate: { opacity: 1, scale: 1 as number, y: 0 as number },
+    exit: { opacity: 0, scale: 0.96 as number, y: 8 as number },
+    transition: { duration: 0.2, ease: [0.4, 0, 0.2, 1] as const },
+  };
+
   if (loading) {
     return (
-      <div className="service-question-modal-overlay" onClick={onClose}>
-        <div className="service-question-modal-apple" onClick={(e) => e.stopPropagation()}>
+      <motion.div {...overlayProps}>
+        <motion.div {...modalProps}>
           <div className="modal-loading">
             <div className="loading-spinner"></div>
             <p>Caricamento domande...</p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
   if (questions.length === 0) {
     return (
-      <div className="service-question-modal-overlay" onClick={onClose}>
-        <div className="service-question-modal-apple" onClick={(e) => e.stopPropagation()}>
+      <motion.div {...overlayProps}>
+        <motion.div {...modalProps}>
           <div className="modal-header-apple">
             <div className="modal-header-top">
               <span className="modal-service-title">{serviceName.toUpperCase()}</span>
@@ -263,8 +282,8 @@ const ServiceQuestionModal: React.FC<ServiceQuestionModalProps> = ({
             </button>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
@@ -282,8 +301,8 @@ const ServiceQuestionModal: React.FC<ServiceQuestionModalProps> = ({
   };
 
   return (
-    <div className="service-question-modal-overlay" onClick={onClose}>
-      <div className="service-question-modal-apple" onClick={(e) => e.stopPropagation()}>
+    <motion.div {...overlayProps}>
+      <motion.div {...modalProps}>
         {/* Header - Minimalist */}
         <div className="modal-header-apple">
           <div className="modal-header-top">
@@ -420,8 +439,8 @@ const ServiceQuestionModal: React.FC<ServiceQuestionModalProps> = ({
           )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

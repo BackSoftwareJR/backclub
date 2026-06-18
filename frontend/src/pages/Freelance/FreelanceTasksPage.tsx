@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckSquare, Filter, Circle, Eye, ChevronRight, ChevronDown } from 'lucide-react';
+import {
+  ChevronRight,
+  Clock,
+  Calendar,
+  ListTodo,
+  CheckCheck,
+  Star,
+  Plus,
+  Circle,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useFreelanceCrm } from '../../context/FreelanceCrmContext';
 import { freelanceApi } from '../../api/freelance';
@@ -12,6 +22,27 @@ import GuideTour from '../../components/Guide/GuideTour';
 import { freelanceTaskTourSteps, freelanceCompleteTourSteps } from '../../config/freelanceGuideTours';
 import './FreelanceTasksPage.css';
 
+type SmartList = 'all' | 'today' | 'scheduled' | 'completed' | number;
+
+interface SmartListItemProps {
+  label: string;
+  count: number;
+  icon: React.ReactNode;
+  color: string;
+  selected: boolean;
+  onClick: () => void;
+}
+
+const SmartListItem: React.FC<SmartListItemProps> = ({ label, count, icon, color, selected, onClick }) => (
+  <button className={`reminders-smartlist-item${selected ? ' selected' : ''}`} onClick={onClick}>
+    <div className="reminders-smartlist-icon" style={{ backgroundColor: `${color}26`, color }}>
+      {icon}
+    </div>
+    <span className="reminders-smartlist-label">{label}</span>
+    {count > 0 && <span className="reminders-smartlist-count">{count}</span>}
+  </button>
+);
+
 const FreelanceTasksPage: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -20,9 +51,9 @@ const FreelanceTasksPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState<FreelanceTask[]>([]);
   const [projects, setProjects] = useState<FreelanceProject[]>([]);
-  const [selectedProject, setSelectedProject] = useState<number | 'all'>('all');
+  const [selectedList, setSelectedList] = useState<SmartList>('all');
   const [, setUpdatingTask] = useState<number | null>(null);
-  const [completedExpanded, setCompletedExpanded] = useState(false);
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
 
   const basePath = isCrmScoped && crmDepartmentCode
     ? `/freelance/crm/${encodeURIComponent(crmDepartmentCode)}`
@@ -77,17 +108,10 @@ const FreelanceTasksPage: React.FC = () => {
 
   const handleTaskStatusChange = async (task: FreelanceTask, newStatus: FreelanceTask['status']) => {
     if (!task.project) return;
-    
     setUpdatingTask(task.id);
     try {
       await freelanceApi.updateTaskStatus(task.project.id, task.id, newStatus);
-      
-      // Update local state
-      setTasks((prevTasks) =>
-        prevTasks.map((t) =>
-          t.id === task.id ? { ...t, status: newStatus } : t
-        )
-      );
+      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: newStatus } : t));
     } catch (error) {
       console.error('Error updating task status:', error);
       alert('Errore nell\'aggiornamento del task');
@@ -96,292 +120,324 @@ const FreelanceTasksPage: React.FC = () => {
     }
   };
 
-  const filteredTasks = selectedProject === 'all'
-    ? tasks
-    : tasks.filter((task) => task.project?.id === selectedProject);
-
-  const tasksByStatus = {
-    pending: filteredTasks.filter((t) => t.status === 'pending'),
-    in_progress: filteredTasks.filter((t) => t.status === 'in_progress'),
-    review: filteredTasks.filter((t) => t.status === 'review'),
-    completed: filteredTasks.filter((t) => t.status === 'completed'),
-    cancelled: filteredTasks.filter((t) => t.status === 'cancelled'),
-  };
-
-
-  const getPriorityColor = (priority: string) => {
-    const colorMap: Record<string, string> = {
-      urgent: '#FF453A',
-      high: '#FF9F0A',
-      medium: '#0A84FF',
-      low: '#8E8E93',
+  const getPriorityColor = (priority: string): string => {
+    const colors: Record<string, string> = {
+      urgent: '#FF3B30',
+      high: '#FF9500',
+      medium: '#007AFF',
+      normal: '#007AFF',
+      low: 'rgba(255,255,255,0.2)',
     };
-    return colorMap[priority] || '#8E8E93';
+    return colors[priority] ?? 'rgba(255,255,255,0.2)';
   };
 
-  const formatDate = (dateString: string | null) => {
+  const formatDate = (dateString: string | null): string | null => {
     if (!dateString) return null;
     const date = new Date(dateString);
     const today = new Date();
     const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === today.toDateString()) {
-      return 'Oggi';
-    } else if (date.toDateString() === tomorrow.toDateString()) {
-      return 'Domani';
-    } else {
-      // Format as "28 Gen" (day + short month with capitalized first letter)
-      const formatted = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-      const parts = formatted.split(' ');
-      if (parts.length === 2) {
-        // Capitalize first letter of month
-        return parts[0] + ' ' + parts[1].charAt(0).toUpperCase() + parts[1].slice(1);
-      }
-      return formatted;
-    }
+    tomorrow.setDate(today.getDate() + 1);
+    if (date.toDateString() === today.toDateString()) return 'Oggi';
+    if (date.toDateString() === tomorrow.toDateString()) return 'Domani';
+    const formatted = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+    const parts = formatted.split(' ');
+    if (parts.length === 2) return `${parts[0]} ${parts[1].charAt(0).toUpperCase()}${parts[1].slice(1)}`;
+    return formatted;
   };
 
-  const isDueSoon = (task: FreelanceTask) => {
-    if (!task.due_date || task.status === 'completed' || task.status === 'cancelled') {
-      return false;
-    }
-    const dueDate = new Date(task.due_date);
-    const now = new Date();
-    const diffHours = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60);
-    return diffHours > 0 && diffHours <= 24;
+  const isTodayDate = (dateString: string | null): boolean => {
+    if (!dateString) return false;
+    return new Date(dateString).toDateString() === new Date().toDateString();
   };
 
-  // Compact Task Row Component
-  const TaskRow: React.FC<{ task: FreelanceTask }> = ({ task }) => {
-    const dueDateFormatted = formatDate(task.due_date);
-    const dueSoon = isDueSoon(task);
-    
-    const handleRowClick = (e: React.MouseEvent) => {
-      // Prevent navigation if clicking on status icon/action area
-      const target = e.target as HTMLElement;
-      if (target.closest('.task-row-status-action')) {
-        return;
-      }
-      navigate(`${basePath}/task/${task.id}`);
-    };
+  const isTaskOverdue = (task: FreelanceTask): boolean => {
+    if (!task.due_date || task.status === 'completed' || task.status === 'cancelled') return false;
+    return new Date(task.due_date) < new Date();
+  };
 
-    const handleStatusAction = (e: React.MouseEvent) => {
+  const getSmartListTasks = (list: SmartList): FreelanceTask[] => {
+    const active = tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled');
+    if (list === 'all') return active;
+    if (list === 'today') return active.filter(t => isTodayDate(t.due_date));
+    if (list === 'scheduled') return active.filter(t => t.due_date && !isTodayDate(t.due_date));
+    if (list === 'completed') return tasks.filter(t => t.status === 'completed');
+    return active.filter(t => t.project?.id === list);
+  };
+
+  const getSmartListName = (list: SmartList): string => {
+    if (list === 'all') return 'Tutte';
+    if (list === 'today') return 'Oggi';
+    if (list === 'scheduled') return 'Programmati';
+    if (list === 'completed') return 'Completate';
+    return projects.find(p => p.id === list)?.name ?? 'Progetto';
+  };
+
+  const groupByProject = (taskList: FreelanceTask[]): Record<string, FreelanceTask[]> => {
+    const groups: Record<string, FreelanceTask[]> = {};
+    taskList.forEach(task => {
+      const key = task.project?.name ?? 'Senza Progetto';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(task);
+    });
+    return groups;
+  };
+
+  const toggleGroup = (key: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
+
+  // ── Inner components (closures over state/handlers) ──────────────────────
+
+  const TaskCheckbox: React.FC<{ task: FreelanceTask }> = ({ task }) => {
+    const isCompleted = task.status === 'completed';
+    const pColor = getPriorityColor(task.priority);
+
+    const handleClick = (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (task.status === 'pending') {
-        handleTaskStatusChange(task, 'in_progress');
-      } else if (task.status === 'in_progress') {
-        handleTaskStatusChange(task, 'pending');
-      } else if (task.status === 'completed') {
-        handleTaskStatusChange(task, 'pending');
-      }
-    };
-
-    const renderStatusIcon = () => {
-      if (task.status === 'pending') {
-        return (
-          <div 
-            className="task-row-status-action task-row-checkbox"
-            onClick={handleStatusAction}
-          >
-            <Circle size={18} strokeWidth={2} />
-          </div>
-        );
-      } else if (task.status === 'in_progress') {
-        return (
-          <div 
-            className="task-row-status-action task-row-pulse-dot"
-            onClick={handleStatusAction}
-            title="Pausa"
-          >
-            <div className="task-row-pulse-dot-inner" />
-          </div>
-        );
-      } else if (task.status === 'review') {
-        return (
-          <div className="task-row-status-action task-row-review-icon">
-            <Eye size={16} />
-          </div>
-        );
-      } else if (task.status === 'completed') {
-        return (
-          <div 
-            className="task-row-status-action task-row-checkbox"
-            onClick={handleStatusAction}
-          >
-            <CheckSquare size={18} strokeWidth={2} fill="currentColor" />
-          </div>
-        );
-      } else if (task.status === 'cancelled') {
-        return (
-          <div className="task-row-status-action task-row-checkbox">
-            <Circle size={18} strokeWidth={2} style={{ opacity: 0.3 }} />
-          </div>
-        );
-      }
-      return null;
+      handleTaskStatusChange(task, isCompleted ? 'pending' : 'completed');
     };
 
     return (
-      <div 
-        className="task-row"
-        onClick={handleRowClick}
+      <motion.button
+        className="reminders-checkbox"
+        onClick={handleClick}
+        whileTap={{ scale: 0.75 }}
+        animate={{
+          borderColor: isCompleted ? pColor : 'rgba(255,255,255,0.25)',
+          backgroundColor: isCompleted ? pColor : 'rgba(0,0,0,0)',
+        }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25, duration: 0.15 }}
       >
-        {/* Left: Status/Action */}
-        <div className="task-row-left">
-          {renderStatusIcon()}
-        </div>
-
-        {/* Middle: Identity */}
-        <div className="task-row-middle">
-          <div className="task-row-title">{task.title}</div>
-          {task.project && (
-            <div className="task-row-project">{task.project.name}</div>
-          )}
-        </div>
-
-        {/* Right: Meta */}
-        <div className="task-row-right">
-          <div className="task-row-meta">
-            <div
-              className="task-row-priority"
-              style={{ color: getPriorityColor(task.priority) }}
+        <AnimatePresence>
+          {isCompleted && (
+            <motion.div
+              key="checkmark"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 600, damping: 30 }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
             >
-              <Circle size={6} fill="currentColor" />
-            </div>
-            {dueDateFormatted && (
-              <div className={`task-row-date ${dueSoon ? 'due-soon' : ''} ${task.isOverdue ? 'overdue' : ''}`}>
-                {dueDateFormatted}
-              </div>
-            )}
-            <ChevronRight size={16} className="task-row-chevron" />
-          </div>
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path
+                  d="M1 4L3.5 6.5L9 1"
+                  stroke="white"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.button>
+    );
+  };
+
+  const TaskRow: React.FC<{ task: FreelanceTask; index: number }> = ({ task, index }) => {
+    const dueDateStr = formatDate(task.due_date);
+    const overdue = isTaskOverdue(task);
+    const isCompleted = task.status === 'completed';
+    const isInProgress = task.status === 'in_progress';
+    const showProjectPill = selectedList === 'all' || selectedList === 'today' || selectedList === 'scheduled';
+
+    return (
+      <motion.div
+        className={`reminders-task-row${isCompleted ? ' completed' : ''}`}
+        onClick={() => navigate(`${basePath}/task/${task.id}`)}
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: Math.min(index * 0.025, 0.2), duration: 0.18 }}
+      >
+        <TaskCheckbox task={task} />
+
+        <div
+          className="reminders-priority-dot"
+          style={{ backgroundColor: getPriorityColor(task.priority) }}
+        />
+
+        <span className={`reminders-task-title${isCompleted ? ' is-done' : ''}`}>
+          {task.title}
+        </span>
+
+        {isInProgress && (
+          <span className="reminders-in-progress-dot">
+            <Circle size={6} fill="#007AFF" color="#007AFF" className="reminders-pulse" />
+          </span>
+        )}
+
+        <div className="reminders-task-meta">
+          {showProjectPill && task.project && (
+            <span className="reminders-project-pill">{task.project.name}</span>
+          )}
+          {dueDateStr && (
+            <span
+              className={`reminders-due-date${overdue ? ' overdue' : ''}${dueDateStr === 'Oggi' ? ' today' : ''}`}
+            >
+              {dueDateStr}
+            </span>
+          )}
+          <ChevronRight size={13} className="reminders-row-chevron" />
         </div>
+      </motion.div>
+    );
+  };
+
+  const GroupSection: React.FC<{ name: string; taskList: FreelanceTask[] }> = ({ name, taskList }) => {
+    const isCollapsed = collapsedGroups.has(name);
+    return (
+      <div className="reminders-group">
+        <button className="reminders-group-header" onClick={() => toggleGroup(name)}>
+          <motion.span
+            className="reminders-group-chevron"
+            animate={{ rotate: isCollapsed ? 0 : 90 }}
+            transition={{ duration: 0.15, ease: 'easeInOut' }}
+            style={{ display: 'flex' }}
+          >
+            <ChevronRight size={13} />
+          </motion.span>
+          <span className="reminders-group-name">{name}</span>
+          <span className="reminders-group-count">{taskList.length}</span>
+        </button>
+
+        <AnimatePresence initial={false}>
+          {!isCollapsed && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
+              style={{ overflow: 'hidden' }}
+            >
+              {taskList.map((task, i) => (
+                <TaskRow key={task.id} task={task} index={i} />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   };
+
+  // ── Render ────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
       <div className="freelance-loading">
-        <div className="freelance-spinner"></div>
+        <div className="freelance-spinner" />
       </div>
     );
   }
 
+  const displayedTasks = getSmartListTasks(selectedList);
+  const grouped = groupByProject(displayedTasks);
+
+  const smartCounts = {
+    all:       tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled').length,
+    today:     tasks.filter(t => isTodayDate(t.due_date) && t.status !== 'completed' && t.status !== 'cancelled').length,
+    scheduled: tasks.filter(t => t.due_date && !isTodayDate(t.due_date) && t.status !== 'completed' && t.status !== 'cancelled').length,
+    completed: tasks.filter(t => t.status === 'completed').length,
+  };
+
   return (
-    <div className="freelance-tasks-page">
+    <div className="reminders-page">
       <GuideTour steps={freelanceTaskTourSteps} tourId="freelance-task-tour" />
       <GuideTour steps={freelanceCompleteTourSteps} tourId="freelance-complete-tour" />
-      <div className="freelance-tasks-header">
-        <div>
-          <h1 className="freelance-tasks-title">Task</h1>
-          <p className="freelance-tasks-subtitle">
-            {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'task'} totali
-          </p>
-        </div>
-        <div className="freelance-tasks-actions">
-          <div className="freelance-tasks-filter">
-            <Filter size={16} />
-            <select
-              value={selectedProject}
-              onChange={(e) => setSelectedProject(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-              className="freelance-tasks-filter-select"
-            >
-              <option value="all">Tutti i progetti</option>
-              {projects.map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
 
-      <div className="freelance-tasks-container">
-        {/* Da Fare */}
-        <div className="task-section">
-          <div className="task-section-header">
-            <h2 className="task-section-title">
-              DA FARE <span className="task-section-badge">• {tasksByStatus.pending.length}</span>
-            </h2>
-          </div>
-          <div className="task-section-content">
-            {tasksByStatus.pending.length > 0 ? (
-              tasksByStatus.pending.map((task) => (
-                <TaskRow key={task.id} task={task} />
-              ))
-            ) : (
-              <div className="task-section-empty">{t('freelance.no_active_tasks')}</div>
-            )}
-          </div>
+      {/* ── Left Sidebar ── */}
+      <aside className="reminders-sidebar">
+        <div className="reminders-sidebar-section">
+          <SmartListItem
+            label="Tutte"
+            count={smartCounts.all}
+            icon={<ListTodo size={16} />}
+            color="#007AFF"
+            selected={selectedList === 'all'}
+            onClick={() => setSelectedList('all')}
+          />
+          <SmartListItem
+            label="Oggi"
+            count={smartCounts.today}
+            icon={<Calendar size={16} />}
+            color="#FF9500"
+            selected={selectedList === 'today'}
+            onClick={() => setSelectedList('today')}
+          />
+          <SmartListItem
+            label="Programmati"
+            count={smartCounts.scheduled}
+            icon={<Clock size={16} />}
+            color="#34C759"
+            selected={selectedList === 'scheduled'}
+            onClick={() => setSelectedList('scheduled')}
+          />
+          <SmartListItem
+            label="Completate"
+            count={smartCounts.completed}
+            icon={<CheckCheck size={16} />}
+            color="#8E8E93"
+            selected={selectedList === 'completed'}
+            onClick={() => setSelectedList('completed')}
+          />
         </div>
 
-        {/* In Corso */}
-        <div className="task-section">
-          <div className="task-section-header">
-            <h2 className="task-section-title">
-              IN CORSO <span className="task-section-badge">• {tasksByStatus.in_progress.length}</span>
-            </h2>
-          </div>
-          <div className="task-section-content">
-            {tasksByStatus.in_progress.length > 0 ? (
-              tasksByStatus.in_progress.map((task) => (
-                <TaskRow key={task.id} task={task} />
-              ))
-            ) : (
-              <div className="task-section-empty">{t('freelance.no_active_tasks')}</div>
-            )}
-          </div>
-        </div>
-
-        {/* In Revisione */}
-        <div className="task-section">
-          <div className="task-section-header">
-            <h2 className="task-section-title">
-              IN REVISIONE <span className="task-section-badge">• {tasksByStatus.review.length}</span>
-            </h2>
-          </div>
-          <div className="task-section-content">
-            {tasksByStatus.review.length > 0 ? (
-              tasksByStatus.review.map((task) => (
-                <TaskRow key={task.id} task={task} />
-              ))
-            ) : (
-              <div className="task-section-empty">{t('freelance.no_active_tasks')}</div>
-            )}
-          </div>
-        </div>
-
-        {/* Completati - Collapsible */}
-        <div className="task-section">
-          <div 
-            className="task-section-header task-section-header-collapsible"
-            onClick={() => setCompletedExpanded(!completedExpanded)}
-          >
-            <h2 className="task-section-title">
-              COMPLETATI <span className="task-section-badge">• {tasksByStatus.completed.length}</span>
-            </h2>
-            {completedExpanded ? (
-              <ChevronDown size={16} className="task-section-chevron" />
-            ) : (
-              <ChevronRight size={16} className="task-section-chevron" />
-            )}
-          </div>
-          {completedExpanded && (
-            <div className="task-section-content">
-              {tasksByStatus.completed.length > 0 ? (
-                tasksByStatus.completed.map((task) => (
-                  <TaskRow key={task.id} task={task} />
-                ))
-              ) : (
-                <div className="task-section-empty">{t('freelance.no_tasks_completed')}</div>
-              )}
+        {projects.length > 0 && (
+          <>
+            <div className="reminders-sidebar-divider" />
+            <div className="reminders-sidebar-section">
+              <p className="reminders-sidebar-section-label">Progetti</p>
+              {projects.map(project => {
+                const cnt = tasks.filter(
+                  t => t.project?.id === project.id && t.status !== 'completed' && t.status !== 'cancelled'
+                ).length;
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const projectColor: string = (project as any).crmDepartment?.color ?? '#636366';
+                return (
+                  <SmartListItem
+                    key={project.id}
+                    label={project.name}
+                    count={cnt}
+                    icon={<Star size={15} />}
+                    color={projectColor}
+                    selected={selectedList === project.id}
+                    onClick={() => setSelectedList(project.id)}
+                  />
+                );
+              })}
             </div>
+          </>
+        )}
+      </aside>
+
+      {/* ── Right Content ── */}
+      <main className="reminders-content">
+        <div className="reminders-content-header">
+          <h1 className="reminders-content-title">{getSmartListName(selectedList)}</h1>
+        </div>
+
+        <div className="reminders-task-list">
+          {Object.keys(grouped).length === 0 ? (
+            <p className="reminders-empty">
+              {selectedList === 'completed'
+                ? t('freelance.no_tasks_completed')
+                : t('freelance.no_active_tasks')}
+            </p>
+          ) : (
+            Object.entries(grouped).map(([name, grpTasks]) => (
+              <GroupSection key={name} name={name} taskList={grpTasks} />
+            ))
           )}
         </div>
-      </div>
+
+        <button className="reminders-add-btn" type="button">
+          <Plus size={15} />
+          <span>Aggiungi Promemoria</span>
+        </button>
+      </main>
     </div>
   );
 };

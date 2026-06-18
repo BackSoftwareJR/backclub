@@ -23,27 +23,27 @@ import {
     User,
     Plus,
     Calendar as CalendarIcon,
-    Percent,
     Target,
     X,
     Image as ImageIcon,
-    Send,
     List,
     Grid,
-    Users as UsersIcon,
     AlertCircle,
     DollarSign as CocchiIcon,
     Edit,
     Trash2,
-    Filter,
     Receipt,
     CreditCard,
     MessageSquare,
     FolderOpen,
     ExternalLink,
     ChevronRight,
+    ArrowUp,
+    ArrowDown,
     Github,
-    Globe
+    Globe,
+    Monitor,
+    MoreHorizontal
 } from 'lucide-react';
 import { 
     crmProjectsApi, 
@@ -71,10 +71,61 @@ import AddExtraBudgetModal from '../AssegnaProgetto/AddExtraBudgetModal';
 import ProjectCalendar from '../../components/ProjectCalendar/ProjectCalendar';
 import FinancialCalendar from '../../components/FinancialCalendar/FinancialCalendar';
 import TaskExecutionModeSelector from '../../components/Tasks/TaskExecutionModeSelector';
-import TaskAgentChatPanel from '../../components/Tasks/TaskAgentChatPanel';
+import ExactPromptCheckbox from '../../components/Tasks/ExactPromptCheckbox';
+import TaskAgentControlPanel from '../../components/Tasks/TaskAgentControlPanel';
+import WorkspaceTab from './tabs/WorkspaceTab';
+import { motion, AnimatePresence } from 'framer-motion';
 import './ProjectDetailPage.css';
 
-type TabType = 'overview' | 'client' | 'contracts' | 'quotes' | 'documents' | 'team' | 'project_manager' | 'tasks' | 'calendar' | 'financial' | 'crm_involved' | 'expenses' | 'analytics' | 'cover_photo';
+type TabType = 'overview' | 'client' | 'contracts' | 'quotes' | 'documents' | 'team' | 'project_manager' | 'tasks' | 'calendar' | 'financial' | 'crm_involved' | 'expenses' | 'analytics' | 'cover_photo' | 'workspace';
+
+const bentoContainerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: { staggerChildren: 0.06 },
+    },
+};
+
+const bentoCardVariants = {
+    hidden: { opacity: 0, y: 14 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.26,
+            ease: [0.25, 0.46, 0.45, 0.94] as const,
+        },
+    },
+};
+
+const AVATAR_COLORS = [
+    '#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#5AC8FA',
+    '#007AFF', '#5856D6', '#FF2D55', '#AF52DE', '#FF6B35',
+];
+
+const getInitials = (name: string): string => {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+};
+
+const getInitialColor = (name: string): string => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+};
+
+const PAYMENT_LABELS: Record<string, string> = {
+    hourly: 'A Ore',
+    per_task: 'A Task',
+    per_project: 'A Progetto',
+    fixed: 'Fisso',
+    no_payment: 'Nessun Pagamento',
+};
 
 const ProjectDetailPage: React.FC = () => {
     const navigate = useNavigate();
@@ -92,6 +143,16 @@ const ProjectDetailPage: React.FC = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const [project, setProject] = useState<CrmProject | null>(null);
     const isPmInFreelanceContext = isFreelanceContext && project != null && user?.id === project.manager_id;
+
+    const handleOpenTaskDetail = (task: CrmProjectTask) => {
+        if (isPmInFreelanceContext && id) {
+            const returnTo = `${location.pathname}?tab=tasks`;
+            navigate(`/freelance/task/${task.id}?projectId=${id}`, { state: { returnTo } });
+            return;
+        }
+        setSelectedTask(task);
+        setShowTaskDetail(true);
+    };
     const [quotes, setQuotes] = useState<Quote[]>([]);
     const [contracts, setContracts] = useState<Contract[]>([]);
     const [loading, setLoading] = useState(true);
@@ -99,7 +160,7 @@ const ProjectDetailPage: React.FC = () => {
     // Leggi il tab dall'URL, altrimenti usa 'overview' come default
     const getTabFromUrl = (): TabType => {
         const tabParam = searchParams.get('tab');
-        const validTabs: TabType[] = ['overview', 'client', 'contracts', 'quotes', 'documents', 'team', 'project_manager', 'tasks', 'calendar', 'financial', 'crm_involved', 'expenses', 'analytics', 'cover_photo'];
+        const validTabs: TabType[] = ['overview', 'client', 'contracts', 'quotes', 'documents', 'team', 'project_manager', 'tasks', 'calendar', 'financial', 'crm_involved', 'expenses', 'analytics', 'cover_photo', 'workspace'];
         if (tabParam && validTabs.includes(tabParam as TabType)) {
             return tabParam as TabType;
         }
@@ -116,6 +177,7 @@ const ProjectDetailPage: React.FC = () => {
     const [documentExternalUrl, setDocumentExternalUrl] = useState('');
     const [documentNotes, setDocumentNotes] = useState('');
     const [uploadingDocument, setUploadingDocument] = useState(false);
+    const [openRowMenuId, setOpenRowMenuId] = useState<string | null>(null);
     
     // Team members state
     const [teamMembers, setTeamMembers] = useState<CrmProjectTeamMember[]>([]);
@@ -163,7 +225,8 @@ const ProjectDetailPage: React.FC = () => {
     const [taskFilterStatus, setTaskFilterStatus] = useState<string>('all');
     const [taskFilterUser, setTaskFilterUser] = useState<number | null>(null);
     const [taskFilterPriority, setTaskFilterPriority] = useState<string>('all');
-    const [showTaskFilters, setShowTaskFilters] = useState(false);
+    const [taskGroupBy, setTaskGroupBy] = useState<'none' | 'status' | 'assignee' | 'priority'>('none');
+    const [activeTaskRowMenu, setActiveTaskRowMenu] = useState<number | null>(null);
     
     // Financial transactions state
     const [financialTransactions, setFinancialTransactions] = useState<any[]>([]);
@@ -209,6 +272,7 @@ const ProjectDetailPage: React.FC = () => {
     const [taskDueDate, setTaskDueDate] = useState('');
     const [taskCrmLabelId, setTaskCrmLabelId] = useState<number | null>(null);
     const [taskExecutionMode, setTaskExecutionMode] = useState<TaskExecutionMode>('human');
+    const [taskExactPrompt, setTaskExactPrompt] = useState(false);
     const [taskAssignments, setTaskAssignments] = useState<Array<{
         user_id?: number;
         payment_method: 'hourly' | 'per_task' | 'per_project' | 'fixed' | 'no_payment';
@@ -218,6 +282,9 @@ const ProjectDetailPage: React.FC = () => {
         project_rate_cocchi?: number;
     }>>([]);
     const [creatingTask, setCreatingTask] = useState(false);
+
+    // Hero scroll tracking
+    const [heroScrolled, setHeroScrolled] = useState(false);
 
     // Cover photo state
     const [uploadingCover, setUploadingCover] = useState(false);
@@ -244,6 +311,12 @@ const ProjectDetailPage: React.FC = () => {
     }, [coverPreviewUrl]);
 
     useEffect(() => {
+        const onScroll = () => setHeroScrolled(window.scrollY > 160);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, []);
+
+    useEffect(() => {
         if (id) {
             loadProject();
         }
@@ -263,7 +336,7 @@ const ProjectDetailPage: React.FC = () => {
     // Sincronizza il tab con l'URL quando cambia l'URL (es. navigazione avanti/indietro)
     useEffect(() => {
         const tabParam = searchParams.get('tab');
-        const validTabs: TabType[] = ['overview', 'client', 'contracts', 'quotes', 'documents', 'team', 'project_manager', 'tasks', 'calendar', 'financial', 'crm_involved', 'expenses', 'analytics', 'cover_photo'];
+        const validTabs: TabType[] = ['overview', 'client', 'contracts', 'quotes', 'documents', 'team', 'project_manager', 'tasks', 'calendar', 'financial', 'crm_involved', 'expenses', 'analytics', 'cover_photo', 'workspace'];
         const tabFromUrl: TabType = (tabParam && validTabs.includes(tabParam as TabType)) ? (tabParam as TabType) : 'overview';
         
         setActiveTab(prevTab => {
@@ -297,14 +370,14 @@ const ProjectDetailPage: React.FC = () => {
         if (project && activeTab === 'documents') {
             loadQuotes();
         }
-        if (project && activeTab === 'team') {
+        if (project && (activeTab === 'team' || activeTab === 'overview')) {
             loadTeamMembers();
         }
         if (project && activeTab === 'project_manager') {
             loadPmChatMessages();
             loadPmManagerInfo();
         }
-        if (project && activeTab === 'tasks') {
+        if (project && (activeTab === 'tasks' || activeTab === 'overview')) {
             loadTasks();
             loadRescheduleRequests();
         }
@@ -860,6 +933,7 @@ const ProjectDetailPage: React.FC = () => {
         setTaskDueDate('');
         setTaskCrmLabelId(null);
         setTaskExecutionMode('human');
+        setTaskExactPrompt(false);
         setTaskAssignments([]);
         // Carica team members se non già caricati
         if (project && teamMembers.length === 0) {
@@ -878,6 +952,7 @@ const ProjectDetailPage: React.FC = () => {
         setTaskDueDate('');
         setTaskCrmLabelId(null);
         setTaskExecutionMode('human');
+        setTaskExactPrompt(false);
         setTaskAssignments([]);
     };
 
@@ -899,6 +974,19 @@ const ProjectDetailPage: React.FC = () => {
         })) || []);
         setShowEditTaskModal(true);
     };
+
+    useEffect(() => {
+        const editTaskId = searchParams.get('editTask');
+        if (!editTaskId || !id || activeTab !== 'tasks' || tasks.length === 0) return;
+        const taskIdNum = Number(editTaskId);
+        if (Number.isNaN(taskIdNum)) return;
+        const task = tasks.find((t) => t.id === taskIdNum);
+        if (!task) return;
+        handleOpenEditTaskModal(task);
+        const next = new URLSearchParams(searchParams);
+        next.delete('editTask');
+        setSearchParams(next, { replace: true });
+    }, [searchParams, tasks, activeTab, id]);
 
     const handleStartEditProjectName = () => {
         if (!project) return;
@@ -957,13 +1045,18 @@ const ProjectDetailPage: React.FC = () => {
         });
     };
 
+    const normalizeProjectUrl = (value: string): string | null => {
+        const trimmed = value.trim();
+        if (!trimmed) return null;
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return `https://${trimmed}`;
+    };
+
     const handleSaveProjectLinks = async () => {
         if (!id || !project) return;
-        const github = projectLinksEdit.github_url.trim();
-        const website = projectLinksEdit.website_url.trim();
         const payload = {
-            github_url: github || null,
-            website_url: website || null,
+            github_url: normalizeProjectUrl(projectLinksEdit.github_url),
+            website_url: normalizeProjectUrl(projectLinksEdit.website_url),
         };
         if (
             (payload.github_url === (project.github_url || null)) &&
@@ -1093,8 +1186,14 @@ const ProjectDetailPage: React.FC = () => {
             const taskResponse = await crmProjectTasksApi.getByProject(Number(id));
             const updatedTask = taskResponse.data.find(t => t.id === selectedTask.id);
             if (updatedTask) {
-                setSelectedTask(updatedTask);
-                setShowTaskDetail(true);
+                if (isPmInFreelanceContext) {
+                    navigate(`/freelance/task/${updatedTask.id}?projectId=${id}`, {
+                        state: { returnTo: `${location.pathname}?tab=tasks` },
+                    });
+                } else {
+                    setSelectedTask(updatedTask);
+                    setShowTaskDetail(true);
+                }
             }
         } catch (error: any) {
             console.error('Error reassigning task:', error);
@@ -1125,6 +1224,7 @@ const ProjectDetailPage: React.FC = () => {
                 title: taskTitle,
                 description: taskDescription || undefined,
                 execution_mode: taskExecutionMode,
+                exact_prompt: taskExecutionMode !== 'human' ? taskExactPrompt : false,
                 status: taskExecutionMode === 'agent' ? undefined : taskStatus,
                 priority: taskPriority,
                 start_date: taskStartDate || undefined,
@@ -1343,6 +1443,19 @@ const ProjectDetailPage: React.FC = () => {
         return total;
     };
 
+    const getProjectStatusColor = (status: string): string => {
+        const colors: Record<string, string> = {
+            in_attesa_presa_carico: '#FF9500',
+            preso_in_carico: '#0A84FF',
+            avviato: '#34C759',
+            active: '#34C759',
+            paused: '#FF9500',
+            completed: '#0A84FF',
+            archived: '#8E8E93',
+        };
+        return colors[status] || '#0A84FF';
+    };
+
     const getStatusBadge = (status: string) => {
         const statusConfig: Record<string, { label: string; color: string; icon: any }> = {
             in_attesa_presa_carico: { label: 'In Attesa Presa in Carico', color: '#FF9500', icon: Clock },
@@ -1360,24 +1473,6 @@ const ProjectDetailPage: React.FC = () => {
         return (
             <span className="status-badge" style={{ backgroundColor: `${config.color}15`, color: config.color }}>
                 <Icon size={14} />
-                {config.label}
-            </span>
-        );
-    };
-
-    const getQuoteStatusBadge = (status: string) => {
-        const statusConfig: Record<string, { label: string; color: string }> = {
-            pending: { label: 'In Attesa', color: '#FF9500' },
-            approved: { label: 'Approvato', color: '#34C759' },
-            rejected: { label: 'Rifiutato', color: '#FF2D55' },
-            started: { label: 'Avviato', color: '#0A84FF' },
-            completed: { label: 'Completato', color: '#5856D6' },
-        };
-        
-        const config = statusConfig[status] || { label: status, color: '#8E8E93' };
-        
-        return (
-            <span className="status-badge-small" style={{ backgroundColor: `${config.color}15`, color: config.color }}>
                 {config.label}
             </span>
         );
@@ -1524,7 +1619,7 @@ const ProjectDetailPage: React.FC = () => {
         );
     }
 
-    const tabs = [
+    const allTabs = [
         { id: 'overview' as TabType, label: 'Panoramica', icon: Briefcase },
         { id: 'client' as TabType, label: 'Cliente', icon: Building2 },
         { id: 'contracts' as TabType, label: 'Contratti', icon: FileText },
@@ -1539,473 +1634,549 @@ const ProjectDetailPage: React.FC = () => {
         { id: 'expenses' as TabType, label: 'Spese', icon: Receipt },
         { id: 'analytics' as TabType, label: 'Analitica', icon: BarChart3 },
         { id: 'cover_photo' as TabType, label: 'Foto copertina', icon: ImageIcon },
+        { id: 'workspace' as TabType, label: 'WorkSpace', icon: Monitor },
     ];
 
-    return (
-        <div className={`project-detail-page ${activeTab !== 'overview' ? 'minimal-mode' : ''} ${activeTab === 'calendar' ? 'calendar-mode' : ''} ${isFreelanceContext ? 'freelance-gestione' : ''}`}>
-            {/* Header - Minimizzato quando NON in Panoramica */}
-            {activeTab === 'overview' ? (
-                <div className="detail-header-section">
-                    {project.cover_photo_url && (
-                        <div className="detail-header-cover" style={{ backgroundImage: `url(${project.cover_photo_url})` }} />
-                    )}
-                    <button 
-                        className="btn-back"
-                        onClick={handleBack}
-                    >
-                        <ArrowLeft size={18} />
-                        Indietro
-                    </button>
-                    <div className="header-content">
-                        <div className="header-title-section">
-                            {!project.cover_photo_url && (
-                                <div className="header-icon-wrapper">
-                                    <Briefcase size={28} />
-                                </div>
-                            )}
-                            <div>
-                                {canEditProjectName && editingProjectName ? (
-                                    <div className="project-name-edit-row">
-                                        <input
-                                            ref={projectNameInputRef}
-                                            type="text"
-                                            value={projectNameEditValue}
-                                            onChange={(e) => setProjectNameEditValue(e.target.value)}
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') handleSaveProjectName();
-                                                if (e.key === 'Escape') handleCancelEditProjectName();
-                                            }}
-                                            onBlur={handleSaveProjectName}
-                                            className="project-name-edit-input"
-                                        />
-                                    </div>
-                                ) : (
-                                    <h1
-                                        className={canEditProjectName ? 'project-name-editable' : ''}
-                                        onClick={canEditProjectName ? handleStartEditProjectName : undefined}
-                                        title={canEditProjectName ? 'Clicca per modificare il nome' : undefined}
-                                    >
-                                        {project.name}
-                                        {canEditProjectName && <Edit size={16} style={{ marginLeft: '8px', opacity: 0.7, verticalAlign: 'middle' }} />}
-                                    </h1>
-                                )}
-                                <p className="header-subtitle">{project.description || 'Nessuna descrizione'}</p>
-                            </div>
-                            {getStatusBadge(project.status)}
-                        </div>
-                    </div>
-                </div>
-            ) : (
-                <div className="calendar-header-minimal">
-                    <button 
-                        className="btn-back-minimal"
-                        onClick={handleBack}
-                    >
-                        <ArrowLeft size={16} />
-                    </button>
-                    <div className="calendar-project-info">
-                        {canEditProjectName && editingProjectName ? (
-                            <input
-                                ref={projectNameInputRef}
-                                type="text"
-                                value={projectNameEditValue}
-                                onChange={(e) => setProjectNameEditValue(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') handleSaveProjectName();
-                                    if (e.key === 'Escape') handleCancelEditProjectName();
-                                }}
-                                onBlur={handleSaveProjectName}
-                                className="project-name-edit-input calendar-project-name-edit"
-                            />
-                        ) : (
-                            <span
-                                className={`calendar-project-name ${canEditProjectName ? 'project-name-editable' : ''}`}
-                                onClick={canEditProjectName ? handleStartEditProjectName : undefined}
-                                title={canEditProjectName ? 'Clicca per modificare il nome' : undefined}
-                            >
-                                {project.name}
-                                {canEditProjectName && <Edit size={14} style={{ marginLeft: '6px', opacity: 0.7, verticalAlign: 'middle' }} />}
-                            </span>
-                        )}
-                        <span className="calendar-project-stats">
-                            {formatCurrency(project.budget_cocchi || 0)} • {getProgressPercentage()}% • {formatDate(project.start_date)}
-                        </span>
-                    </div>
-                </div>
-            )}
+    // Filter tabs based on user permissions
+    const canAccessWorkspace = user?.role === 'admin' || (project && user?.id === project.manager_id);
+    const tabs = allTabs.filter(tab => {
+        if (tab.id === 'workspace') {
+            return canAccessWorkspace;
+        }
+        return true;
+    });
 
-            {/* Quick Stats - Nascosti quando NON in Panoramica */}
-            {activeTab === 'overview' && (
-            <div className="quick-stats-section">
-                <div className="quick-stats-grid">
-                    <div className="quick-stat-card">
-                        <div className="quick-stat-icon" style={{ backgroundColor: '#0A84FF15', color: '#0A84FF' }}>
-                            <DollarSign size={18} />
-                        </div>
-                        <div className="quick-stat-content">
-                            <div className="quick-stat-label">Budget</div>
-                            <div className="quick-stat-value">{formatCurrency(project.budget_cocchi || 0)}</div>
-                        </div>
-                    </div>
-                    <div className="quick-stat-card">
-                        <div className="quick-stat-icon" style={{ backgroundColor: '#FF2D5515', color: '#FF2D55' }}>
-                            <TrendingUp size={18} />
-                        </div>
-                        <div className="quick-stat-content">
-                            <div className="quick-stat-label">Speso</div>
-                            <div className="quick-stat-value">{formatCurrency(project.spent_cocchi || 0)}</div>
-                        </div>
-                    </div>
-                    <div className="quick-stat-card">
-                        <div className="quick-stat-icon" style={{ backgroundColor: '#34C75915', color: '#34C759' }}>
-                            <Percent size={18} />
-                        </div>
-                        <div className="quick-stat-content">
-                            <div className="quick-stat-label">Progresso Budget</div>
-                            <div className="quick-stat-value">{getProgressPercentage()}%</div>
-                        </div>
-                    </div>
-                    <div className="quick-stat-card">
-                        <div className="quick-stat-icon" style={{ backgroundColor: '#5856D615', color: '#5856D6' }}>
-                            <Calendar size={18} />
-                        </div>
-                        <div className="quick-stat-content">
-                            <div className="quick-stat-label">Data Inizio</div>
-                            <div className="quick-stat-value">{formatDate(project.start_date)}</div>
-                        </div>
-                    </div>
-                    {project.manager && (
-                        <div className="quick-stat-card">
-                            <div className="quick-stat-icon" style={{ backgroundColor: '#FF950015', color: '#FF9500' }}>
-                                <UserCheck size={18} />
-                            </div>
-                            <div className="quick-stat-content">
-                                <div className="quick-stat-label">Project Manager</div>
-                                <div className="quick-stat-value">{project.manager.name}</div>
-                            </div>
-                        </div>
+    return (
+        <div className={`project-detail-page pdp-shell ${activeTab !== 'overview' ? 'minimal-mode' : ''} ${activeTab === 'calendar' ? 'calendar-mode' : ''} ${isFreelanceContext ? 'freelance-gestione' : ''}`}>
+            {/* Cover Hero Header */}
+            <div className="pdp-hero">
+                {(coverPreviewUrl || project.cover_photo_url) ? (
+                    <img
+                        src={coverPreviewUrl || project.cover_photo_url!}
+                        alt="Copertina progetto"
+                        className="pdp-hero-img"
+                    />
+                ) : (
+                    <div
+                        className="pdp-hero-fallback"
+                        style={{ '--pdp-dept-color': project.crmDepartment?.color ?? getProjectStatusColor(project.status) } as React.CSSProperties}
+                    />
+                )}
+                <div className="pdp-hero-gradient" />
+
+                {/* Back button top-left */}
+                <button className="pdp-hero-back" onClick={handleBack}>
+                    <ArrowLeft size={15} />
+                    Indietro
+                </button>
+
+                {/* Action buttons top-right */}
+                <div className="pdp-hero-actions">
+                    <button
+                        className="pdp-hero-action-btn"
+                        onClick={() => handleTabChange('cover_photo')}
+                        title="Cambia foto copertina"
+                    >
+                        <ImageIcon size={15} />
+                    </button>
+                    {project.website_url && (
+                        <a
+                            href={project.website_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="pdp-hero-action-btn"
+                            title="Apri sito web"
+                        >
+                            <ExternalLink size={15} />
+                        </a>
+                    )}
+                    {project.github_url && (
+                        <a
+                            href={project.github_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="pdp-hero-action-btn"
+                            title="Repository GitHub"
+                        >
+                            <Github size={15} />
+                        </a>
+                    )}
+                </div>
+
+                {/* Project name bottom-left */}
+                <div className="pdp-hero-title-row">
+                    {canEditProjectName && editingProjectName ? (
+                        <input
+                            ref={projectNameInputRef}
+                            type="text"
+                            value={projectNameEditValue}
+                            onChange={(e) => setProjectNameEditValue(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleSaveProjectName();
+                                if (e.key === 'Escape') handleCancelEditProjectName();
+                            }}
+                            onBlur={handleSaveProjectName}
+                            className="pdp-hero-name-input"
+                        />
+                    ) : (
+                        <h1
+                            className={`pdp-hero-name${canEditProjectName ? ' pdp-hero-name--editable' : ''}`}
+                            onClick={canEditProjectName ? handleStartEditProjectName : undefined}
+                            title={canEditProjectName ? 'Clicca per modificare il nome' : undefined}
+                        >
+                            {project.name}
+                            {canEditProjectName && <Edit size={13} className="pdp-hero-name-edit-icon" />}
+                        </h1>
                     )}
                 </div>
             </div>
-            )}
 
-            {/* Tabs */}
-            <div className="tabs-section">
-                <div className="tabs-container">
-                    <div className="tabs">
-                        {tabs.map((tab) => {
-                            const Icon = tab.icon;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    className={`tab-btn ${activeTab === tab.id ? 'active' : ''}`}
-                                    onClick={() => handleTabChange(tab.id)}
-                                >
-                                    <Icon size={18} />
-                                    <span>{tab.label}</span>
-                                </button>
-                            );
-                        })}
+            {/* Metrics Bar */}
+            <motion.div
+                className={`pdp-metrics-bar${heroScrolled ? ' pdp-metrics-bar--stuck' : ''}`}
+                initial={{ opacity: 0, y: -6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+                <div className="pdp-metrics-inner">
+                    {getStatusBadge(project.status)}
+                    <span className="pdp-metrics-div" />
+                    <div className="pdp-metric">
+                        <span className="pdp-metric-label">Budget</span>
+                        <span className="pdp-metric-value">{formatCurrency(project.budget_cocchi || 0)}</span>
                     </div>
+                    <span className="pdp-metrics-div" />
+                    <div className="pdp-metric">
+                        <span className="pdp-metric-label">Speso</span>
+                        <span className="pdp-metric-value">{formatCurrency(project.spent_cocchi || 0)}</span>
+                    </div>
+                    <span className="pdp-metrics-div" />
+                    <div className="pdp-metric">
+                        <span className="pdp-metric-label">Avanzamento</span>
+                        <span className="pdp-metric-value">{getProgressPercentage()}%</span>
+                    </div>
+                    <span className="pdp-metrics-div" />
+                    <div className="pdp-metric">
+                        <span className="pdp-metric-label">Fine</span>
+                        <span className="pdp-metric-value">{formatDate(project.end_date)}</span>
+                    </div>
+                    {project.manager && (
+                        <>
+                            <span className="pdp-metrics-div" />
+                            <div className="pdp-metric pdp-metric--pm">
+                                <div className="pdp-pm-avatar pdp-pm-avatar--placeholder">
+                                    <User size={11} />
+                                </div>
+                                <div className="pdp-metric-stack">
+                                    <span className="pdp-metric-label">PM</span>
+                                    <span className="pdp-metric-value">{project.manager.name}</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </motion.div>
+
+            {/* Segmented Control Tab Bar */}
+            <div className={`pdp-tabs-bar${heroScrolled ? ' pdp-tabs-bar--stuck' : ''}`}>
+                <div className="pdp-segmented">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            className={`pdp-seg-btn${activeTab === tab.id ? ' pdp-seg-btn--active' : ''}`}
+                            onClick={() => handleTabChange(tab.id)}
+                        >
+                            {activeTab === tab.id && (
+                                <motion.span
+                                    layoutId="pdp-seg-active"
+                                    className="pdp-seg-bg"
+                                    transition={{ type: 'spring', stiffness: 420, damping: 38 }}
+                                />
+                            )}
+                            <span className="pdp-seg-label">{tab.label}</span>
+                        </button>
+                    ))}
                 </div>
             </div>
 
             {/* Tab Content */}
             <div className="tab-content-section">
                 <div className="tab-content">
-                    {/* PANORAMICA */}
+                    {/* PANORAMICA — Bento Grid */}
                     {activeTab === 'overview' && (
                         <div className="tab-panel overview-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Panoramica Progetto</h2>
-                            </div>
-                            
-                            {/* Main Info Cards Grid */}
-                            <div className="overview-main-grid">
-                                {/* Informazioni Generali */}
-                                <div className="overview-main-card">
-                                    <div className="card-header">
-                                        <div className="card-header-icon" style={{ backgroundColor: '#0A84FF15', color: '#0A84FF' }}>
-                                            <Briefcase size={20} />
-                                        </div>
-                                        <h3 className="card-title">Informazioni Generali</h3>
-                                    </div>
-                                    <div className="card-content">
-                                        <div className="info-row">
-                                            <div className="info-label-wrapper">
-                                                <span className="info-label">Nome Progetto</span>
-                                            </div>
-                                            <div className="info-value-wrapper">
-                                                <span className="info-value-large">{project.name}</span>
-                                            </div>
-                                        </div>
-                                        <div className="info-row">
-                                            <div className="info-label-wrapper">
-                                                <span className="info-label">Stato</span>
-                                            </div>
-                                            <div className="info-value-wrapper">
-                                                {getStatusBadge(project.status)}
-                                            </div>
-                                        </div>
-                                        <div className="info-row">
-                                            <div className="info-label-wrapper">
-                                                <Calendar size={16} />
-                                                <span className="info-label">Data Inizio</span>
-                                            </div>
-                                            <div className="info-value-wrapper">
-                                                <span className="info-value">{formatDate(project.start_date)}</span>
-                                            </div>
-                                        </div>
-                                        <div className="info-row">
-                                            <div className="info-label-wrapper">
-                                                <Calendar size={16} />
-                                                <span className="info-label">Data Fine Prevista</span>
-                                            </div>
-                                            <div className="info-value-wrapper">
-                                                <span className="info-value">{formatDate(project.end_date) || 'Non definita'}</span>
-                                            </div>
-                                        </div>
-                                        {project.crmDepartment && (
-                                            <div className="info-row">
-                                                <div className="info-label-wrapper">
-                                                    <span className="info-label">Dipartimento</span>
-                                                </div>
-                                                <div className="info-value-wrapper">
-                                                    <span className="info-value">{project.crmDepartment.name}</span>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                            <motion.div
+                                className="pd-bento-grid"
+                                variants={bentoContainerVariants}
+                                initial="hidden"
+                                animate="show"
+                            >
+                                {/* ── Row 1 ── */}
 
-                                {/* Collegamenti GitHub e sito web (passati a N8N) */}
-                                <div className="overview-main-card">
-                                    <div className="card-header" style={{ justifyContent: 'space-between' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                            <div className="card-header-icon" style={{ backgroundColor: '#5856D615', color: '#5856D6' }}>
-                                                <Globe size={20} />
-                                            </div>
-                                            <h3 className="card-title" style={{ margin: 0 }}>Collegamenti progetto</h3>
-                                        </div>
-                                        {canEditProjectLinks && !editingProjectLinks && (
-                                            <button
-                                                type="button"
-                                                className="btn-add-extra-budget-small"
-                                                onClick={handleStartEditProjectLinks}
-                                                title="Modifica collegamenti"
-                                            >
-                                                <Edit size={14} />
-                                                Modifica
+                                {/* 1. Descrizione (4 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-4" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">DESCRIZIONE</span>
+                                        {canEditProjectName && (
+                                            <button className="pd-bento-action-btn" onClick={handleStartEditProjectName} title="Modifica">
+                                                <Edit size={12} />
                                             </button>
                                         )}
                                     </div>
-                                    <div className="card-content">
-                                        {editingProjectLinks ? (
-                                            <>
-                                                <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-                                                    <label className="info-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                        <Github size={14} /> Repository GitHub
-                                                    </label>
-                                                    <input
-                                                        type="url"
-                                                        className="form-input"
-                                                        value={projectLinksEdit.github_url}
-                                                        onChange={(e) => setProjectLinksEdit((p) => ({ ...p, github_url: e.target.value }))}
-                                                        placeholder="https://github.com/organizzazione/repo"
+                                    {project.description ? (
+                                        <p className="pd-bento-desc-text">{project.description}</p>
+                                    ) : (
+                                        <div className="pd-bento-empty-state">
+                                            <Edit size={22} className="pd-bento-empty-icon" />
+                                            <p className="pd-bento-empty-msg">Nessuna descrizione</p>
+                                            {canEditProjectName && (
+                                                <button className="pd-bento-empty-cta" onClick={handleStartEditProjectName}>
+                                                    + Aggiungi descrizione
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </motion.div>
+
+                                {/* 2. Progresso Ring (2 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-2 pd-bento-card--center" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">PROGRESSO</span>
+                                    </div>
+                                    <div className="pd-bento-ring-wrapper">
+                                        {(() => {
+                                            const pct = getProgressPercentage();
+                                            const r = 42;
+                                            const circ = 2 * Math.PI * r;
+                                            const offset = circ * (1 - pct / 100);
+                                            const ringColor = pct >= 100 ? '#34C759' : pct >= 75 ? '#FF9500' : pct >= 40 ? '#007AFF' : '#FF3B30';
+                                            return (
+                                                <svg className="pd-bento-ring-svg" viewBox="0 0 96 96" width="96" height="96">
+                                                    <circle cx="48" cy="48" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="6" />
+                                                    <circle
+                                                        cx="48" cy="48" r={r}
+                                                        fill="none"
+                                                        stroke={ringColor}
+                                                        strokeWidth="6"
+                                                        strokeLinecap="round"
+                                                        strokeDasharray={`${circ}`}
+                                                        strokeDashoffset={`${offset}`}
+                                                        transform="rotate(-90 48 48)"
                                                     />
-                                                </div>
-                                                <div className="form-group" style={{ marginBottom: '0.75rem' }}>
-                                                    <label className="info-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                                        <Globe size={14} /> Sito web
-                                                    </label>
-                                                    <input
-                                                        type="url"
-                                                        className="form-input"
-                                                        value={projectLinksEdit.website_url}
-                                                        onChange={(e) => setProjectLinksEdit((p) => ({ ...p, website_url: e.target.value }))}
-                                                        placeholder="https://www.esempio.it"
-                                                    />
-                                                </div>
-                                                <p className="field-hint" style={{ marginBottom: '0.75rem', fontSize: '0.85rem', color: '#8E8E93' }}>
-                                                    Verranno inviati automaticamente a N8N con i task in modalità Agente.
-                                                </p>
-                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                                    <button
-                                                        type="button"
-                                                        className="btn-primary"
-                                                        onClick={handleSaveProjectLinks}
-                                                        disabled={savingProjectLinks}
-                                                    >
-                                                        {savingProjectLinks ? 'Salvataggio...' : 'Salva'}
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="btn-secondary"
-                                                        onClick={handleCancelEditProjectLinks}
-                                                        disabled={savingProjectLinks}
-                                                    >
-                                                        Annulla
-                                                    </button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div className="info-row">
-                                                    <div className="info-label-wrapper">
-                                                        <Github size={16} />
-                                                        <span className="info-label">GitHub</span>
-                                                    </div>
-                                                    <div className="info-value-wrapper">
-                                                        {project.github_url ? (
-                                                            <a
-                                                                href={project.github_url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="info-link"
-                                                            >
-                                                                {project.github_url}
-                                                                <ExternalLink size={14} />
-                                                            </a>
-                                                        ) : (
-                                                            <span className="info-value muted">Non impostato</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                                <div className="info-row">
-                                                    <div className="info-label-wrapper">
-                                                        <Globe size={16} />
-                                                        <span className="info-label">Sito web</span>
-                                                    </div>
-                                                    <div className="info-value-wrapper">
-                                                        {project.website_url ? (
-                                                            <a
-                                                                href={project.website_url}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="info-link"
-                                                            >
-                                                                {project.website_url}
-                                                                <ExternalLink size={14} />
-                                                            </a>
-                                                        ) : (
-                                                            <span className="info-value muted">Non impostato</span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </>
+                                                    <text x="48" y="44" textAnchor="middle" className="pd-bento-ring-num">{pct}%</text>
+                                                    <text x="48" y="58" textAnchor="middle" className="pd-bento-ring-sub-svg">completato</text>
+                                                </svg>
+                                            );
+                                        })()}
+                                    </div>
+                                </motion.div>
+
+                                {/* 3. Quick Links (2 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-2" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">COLLEGAMENTI</span>
+                                        {canEditProjectLinks && (
+                                            <button className="pd-bento-action-btn" onClick={handleStartEditProjectLinks} title="Modifica">
+                                                <Edit size={12} />
+                                            </button>
                                         )}
                                     </div>
-                                </div>
-
-                                {/* Budget e Finanze */}
-                                <div className="overview-main-card">
-                                    <div className="card-header">
-                                        <div className="card-header-icon" style={{ backgroundColor: '#34C75915', color: '#34C759' }}>
-                                            <DollarSign size={20} />
-                                        </div>
-                                        <h3 className="card-title">Budget e Finanze</h3>
-                                    </div>
-                                    <div className="card-content">
-                                        <div className="budget-summary">
-                                            <div className="budget-item-large">
-                                                <span className="budget-label">Budget Totale</span>
-                                                <span className="budget-value-large">{formatCurrency(project.budget_cocchi || 0)}</span>
+                                    {editingProjectLinks ? (
+                                        <div className="pd-bento-links-edit">
+                                            <input
+                                                type="text"
+                                                className="pd-bento-link-input"
+                                                value={projectLinksEdit.github_url}
+                                                onChange={(e) => setProjectLinksEdit((p) => ({ ...p, github_url: e.target.value }))}
+                                                placeholder="GitHub URL"
+                                            />
+                                            <input
+                                                type="text"
+                                                className="pd-bento-link-input"
+                                                value={projectLinksEdit.website_url}
+                                                onChange={(e) => setProjectLinksEdit((p) => ({ ...p, website_url: e.target.value }))}
+                                                placeholder="Sito web URL"
+                                            />
+                                            <div className="pd-bento-links-edit-actions">
+                                                <button className="pd-bento-save-btn" onClick={handleSaveProjectLinks} disabled={savingProjectLinks}>
+                                                    {savingProjectLinks ? '...' : 'Salva'}
+                                                </button>
+                                                <button className="pd-bento-cancel-btn" onClick={handleCancelEditProjectLinks} disabled={savingProjectLinks}>
+                                                    Annulla
+                                                </button>
                                             </div>
-                                            <div className="budget-progress-section">
-                                                <div className="budget-progress-header">
-                                                    <span className="budget-progress-label">Progresso Budget</span>
-                                                    <span className="budget-progress-percentage">{getProgressPercentage()}%</span>
-                                                </div>
-                                                <div className="budget-progress-bar-container">
-                                                    <div className="budget-progress-bar">
-                                                        <div 
-                                                            className="budget-progress-fill" 
-                                                            style={{ 
-                                                                width: `${Math.min(100, getProgressPercentage())}%`,
-                                                                backgroundColor: getProgressPercentage() > 100 ? '#FF2D55' : '#34C759'
-                                                            }}
+                                        </div>
+                                    ) : (project.github_url || project.website_url) ? (
+                                        <div className="pd-bento-links">
+                                            {project.github_url && (
+                                                <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="pd-bento-link-pill">
+                                                    <Github size={14} />
+                                                    GitHub
+                                                </a>
+                                            )}
+                                            {project.website_url && (
+                                                <a href={project.website_url} target="_blank" rel="noopener noreferrer" className="pd-bento-link-pill">
+                                                    <Globe size={14} />
+                                                    Sito Web
+                                                </a>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="pd-bento-empty-state">
+                                            <ExternalLink size={22} className="pd-bento-empty-icon" />
+                                            <p className="pd-bento-empty-msg">Nessun collegamento</p>
+                                            {canEditProjectLinks && (
+                                                <button className="pd-bento-empty-cta" onClick={handleStartEditProjectLinks}>
+                                                    + Aggiungi link
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </motion.div>
+
+                                {/* 4. Date Chiave (4 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-4" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">DATE CHIAVE</span>
+                                    </div>
+                                    <div className="pd-bento-timeline">
+                                        <div className="pd-bento-tl-item">
+                                            <div className="pd-bento-tl-dot" style={{ backgroundColor: '#34C759' }} />
+                                            <div className="pd-bento-tl-content">
+                                                <span className="pd-bento-tl-label">Inizio</span>
+                                                <span className="pd-bento-tl-date">{formatDate(project.start_date)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="pd-bento-tl-line" />
+                                        <div className="pd-bento-tl-item">
+                                            <div className="pd-bento-tl-dot" style={{ backgroundColor: '#007AFF' }} />
+                                            <div className="pd-bento-tl-content">
+                                                <span className="pd-bento-tl-label">Oggi</span>
+                                                <span className="pd-bento-tl-date">
+                                                    {new Date().toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="pd-bento-tl-line" />
+                                        <div className="pd-bento-tl-item">
+                                            {(() => {
+                                                const isOverdue = project.end_date && new Date(project.end_date) < new Date();
+                                                return (
+                                                    <>
+                                                        <div className="pd-bento-tl-dot" style={{ backgroundColor: isOverdue ? '#FF3B30' : '#FF9500' }} />
+                                                        <div className="pd-bento-tl-content">
+                                                            <span className="pd-bento-tl-label">Scadenza</span>
+                                                            <span className="pd-bento-tl-date" style={{ color: isOverdue ? '#FF3B30' : undefined }}>
+                                                                {project.end_date ? formatDate(project.end_date) : 'Non definita'}
+                                                            </span>
+                                                        </div>
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
+                                    </div>
+                                </motion.div>
+
+                                {/* ── Row 2 ── */}
+
+                                {/* 5. Ultimi Task (6 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-6" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">ULTIMI TASK</span>
+                                        <button className="pd-bento-action-btn" onClick={() => handleTabChange('tasks')} title="Vedi tutti">
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                    {tasks.length > 0 ? (
+                                        <>
+                                            <div className="pd-bento-task-list">
+                                                {tasks.slice(-3).reverse().map((task) => {
+                                                    const priorityColors: Record<string, string> = {
+                                                        low: '#34C759',
+                                                        medium: '#FF9500',
+                                                        high: '#FF3B30',
+                                                        urgent: '#AF52DE',
+                                                    };
+                                                    const statusColors: Record<string, string> = {
+                                                        pending: '#8E8E93',
+                                                        in_progress: '#007AFF',
+                                                        review: '#FF9500',
+                                                        completed: '#34C759',
+                                                        cancelled: '#FF3B30',
+                                                    };
+                                                    const statusLabels: Record<string, string> = {
+                                                        pending: 'Atteso',
+                                                        in_progress: 'In corso',
+                                                        review: 'Review',
+                                                        completed: 'Fatto',
+                                                        cancelled: 'Annullato',
+                                                    };
+                                                    const firstAssignee = task.assignments?.find((a) => a.is_active);
+                                                    const dotColor = priorityColors[task.priority] ?? '#8E8E93';
+                                                    const badgeColor = statusColors[task.status] ?? '#8E8E93';
+                                                    return (
+                                                        <div
+                                                            key={task.id}
+                                                            className="pd-bento-task-row"
+                                                            onClick={() => handleOpenTaskDetail(task)}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpenTaskDetail(task); } }}
+                                                        >
+                                                            <div className="pd-bento-task-dot" style={{ backgroundColor: dotColor }} />
+                                                            <span className="pd-bento-task-name">{task.title}</span>
+                                                            {firstAssignee?.user && (
+                                                                <div className="pd-bento-task-avatar" title={firstAssignee.user.name}>
+                                                                    {firstAssignee.user.avatar ? (
+                                                                        <img src={firstAssignee.user.avatar} alt={firstAssignee.user.name} />
+                                                                    ) : (
+                                                                        <span>{firstAssignee.user.name.charAt(0).toUpperCase()}</span>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            <span
+                                                                className="pd-bento-task-badge"
+                                                                style={{ backgroundColor: `${badgeColor}22`, color: badgeColor }}
+                                                            >
+                                                                {statusLabels[task.status] ?? task.status}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <button className="pd-bento-footer-link" onClick={() => handleTabChange('tasks')}>
+                                                Vedi tutti i task →
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <div className="pd-bento-empty-state">
+                                            <CheckSquare size={22} className="pd-bento-empty-icon" />
+                                            <p className="pd-bento-empty-msg">Nessun task</p>
+                                            {canCreateTask && (
+                                                <button className="pd-bento-empty-cta" onClick={() => handleTabChange('tasks')}>
+                                                    + Aggiungi task
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+                                </motion.div>
+
+                                {/* 6. Finanze (3 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-3" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">FINANZE</span>
+                                        <button className="pd-bento-action-btn" onClick={() => handleTabChange('financial')} title="Vedi finanze">
+                                            <ChevronRight size={14} />
+                                        </button>
+                                    </div>
+                                    {(() => {
+                                        const budget = project.budget_cocchi || 0;
+                                        const spent = project.spent_cocchi || 0;
+                                        const remaining = budget - spent;
+                                        const pct = getProgressPercentage();
+                                        const isOver = spent > budget && budget > 0;
+                                        const barColor = isOver ? '#FF3B30' : pct > 75 ? '#FF9500' : '#34C759';
+                                        return (
+                                            <div className="pd-bento-fin-content">
+                                                <div className="pd-bento-fin-bar-row">
+                                                    <div className="pd-bento-fin-bar">
+                                                        <div
+                                                            className="pd-bento-fin-bar-fill"
+                                                            style={{ width: `${Math.min(100, pct)}%`, backgroundColor: barColor }}
                                                         />
                                                     </div>
+                                                    <span className="pd-bento-fin-pct" style={{ color: barColor }}>{pct}%</span>
+                                                </div>
+                                                <div className="pd-bento-fin-rows">
+                                                    <div className="pd-bento-fin-row">
+                                                        <span className="pd-bento-fin-label">Budget</span>
+                                                        <span className="pd-bento-fin-val">{formatCurrency(budget)}</span>
+                                                    </div>
+                                                    <div className="pd-bento-fin-row">
+                                                        <span className="pd-bento-fin-label">Speso</span>
+                                                        <span className="pd-bento-fin-val" style={{ color: isOver ? '#FF3B30' : undefined }}>
+                                                            {formatCurrency(spent)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="pd-bento-fin-row">
+                                                        <span className="pd-bento-fin-label">Rimasto</span>
+                                                        <span className="pd-bento-fin-val" style={{ color: remaining < 0 ? '#FF3B30' : '#34C759' }}>
+                                                            {formatCurrency(remaining)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="pd-bento-fin-trend">
+                                                    <TrendingUp size={13} style={{ color: barColor, flexShrink: 0 }} />
+                                                    <span style={{ color: barColor }}>
+                                                        {isOver ? 'Sforamento budget' : pct > 75 ? 'Budget quasi esaurito' : 'Budget in ordine'}
+                                                    </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div className="budget-details">
-                                            <div className="budget-detail-item">
-                                                <div className="budget-detail-icon" style={{ backgroundColor: '#FF2D5515', color: '#FF2D55' }}>
-                                                    <TrendingUp size={16} />
-                                                </div>
-                                                <div className="budget-detail-content">
-                                                    <span className="budget-detail-label">Speso</span>
-                                                    <span className="budget-detail-value negative">{formatCurrency(project.spent_cocchi || 0)}</span>
-                                                </div>
-                                            </div>
-                                            <div className="budget-detail-item">
-                                                <div className="budget-detail-icon" style={{ backgroundColor: '#0A84FF15', color: '#0A84FF' }}>
-                                                    <Target size={16} />
-                                                </div>
-                                                <div className="budget-detail-content">
-                                                    <span className="budget-detail-label">Rimanente</span>
-                                                    <span className="budget-detail-value positive">{formatCurrency((project.budget_cocchi || 0) - (project.spent_cocchi || 0))}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                        );
+                                    })()}
+                                </motion.div>
 
-                            {/* Team Section */}
-                            <div className="overview-team-section">
-                                <div className="team-section-header">
-                                    <div className="team-header-icon" style={{ backgroundColor: '#5856D615', color: '#5856D6' }}>
-                                        <Users size={20} />
+                                {/* 7. Team Avatars (3 cols) */}
+                                <motion.div className="pd-bento-card pd-bento-col-3" variants={bentoCardVariants}>
+                                    <div className="pd-bento-header">
+                                        <span className="pd-bento-label">TEAM</span>
+                                        <button className="pd-bento-action-btn" onClick={() => handleTabChange('team')} title="Gestisci team">
+                                            <ChevronRight size={14} />
+                                        </button>
                                     </div>
-                                    <h3 className="team-section-title">Team e Responsabili</h3>
-                                </div>
-                                <div className="team-members-grid">
-                                    {project.manager && (
-                                        <div className="team-member-card-overview">
-                                            <div className="member-avatar-overview">
-                                                <UserCheck size={24} />
-                                            </div>
-                                            <div className="member-info-overview">
-                                                <span className="member-role-overview">Project Manager</span>
-                                                <span className="member-name-overview">{project.manager.name}</span>
-                                                {project.manager.email && (
-                                                    <span className="member-contact-overview">{project.manager.email}</span>
+                                    {(() => {
+                                        const allMembers: Array<{ name: string; avatar: string | null; role: string }> = [
+                                            ...(project.manager ? [{ name: project.manager.name, avatar: null, role: 'PM' }] : []),
+                                            ...teamMembers
+                                                .filter((m) => m.is_active && m.user)
+                                                .map((m) => ({ name: m.user!.name, avatar: m.user!.avatar, role: m.role })),
+                                        ];
+                                        const visibleMembers = allMembers.slice(0, 5);
+                                        const extraCount = allMembers.length > 5 ? allMembers.length - 5 : 0;
+                                        return (
+                                            <>
+                                                {allMembers.length > 0 ? (
+                                                    <>
+                                                        <div className="pd-bento-avatar-stack">
+                                                            {visibleMembers.map((m, i) => (
+                                                                <div
+                                                                    key={i}
+                                                                    className="pd-bento-avatar"
+                                                                    title={`${m.name} · ${m.role}`}
+                                                                    style={{ zIndex: 5 - i }}
+                                                                >
+                                                                    {m.avatar ? (
+                                                                        <img src={m.avatar} alt={m.name} />
+                                                                    ) : (
+                                                                        <span>{m.name.charAt(0).toUpperCase()}</span>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                            {extraCount > 0 && (
+                                                                <div className="pd-bento-avatar pd-bento-avatar-more">
+                                                                    +{extraCount}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <p className="pd-bento-team-names">
+                                                            {visibleMembers.slice(0, 2).map((m) => m.name).join(', ')}
+                                                            {visibleMembers.length > 2 && <span className="pd-bento-team-more"> e altri</span>}
+                                                        </p>
+                                                    </>
+                                                ) : (
+                                                    <div className="pd-bento-empty-state">
+                                                        <Users size={22} className="pd-bento-empty-icon" />
+                                                        <p className="pd-bento-empty-msg">Nessun membro</p>
+                                                    </div>
                                                 )}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {project.seller?.user && (
-                                        <div className="team-member-card-overview">
-                                            <div className="member-avatar-overview seller">
-                                                <User size={24} />
-                                            </div>
-                                            <div className="member-info-overview">
-                                                <span className="member-role-overview">Venditore</span>
-                                                <span className="member-name-overview">{project.seller.user.name}</span>
-                                                {project.seller.user.email && (
-                                                    <span className="member-contact-overview">{project.seller.user.email}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                    {project.client && (
-                                        <div className="team-member-card-overview">
-                                            <div className="member-avatar-overview client">
-                                                <Building2 size={24} />
-                                            </div>
-                                            <div className="member-info-overview">
-                                                <span className="member-role-overview">Cliente</span>
-                                                <span className="member-name-overview">{project.client.company_name}</span>
-                                                {project.client.contact_person && (
-                                                    <span className="member-contact-overview">{project.client.contact_person}</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                                                <button className="pd-bento-footer-link" onClick={() => handleTabChange('team')}>
+                                                    Gestisci team →
+                                                </button>
+                                            </>
+                                        );
+                                    })()}
+                                </motion.div>
+                            </motion.div>
                         </div>
                     )}
 
@@ -2091,590 +2262,485 @@ const ProjectDetailPage: React.FC = () => {
                     )}
 
                     {/* CONTRATTI */}
-                    {activeTab === 'contracts' && (
-                        <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Contratti</h2>
-                                <span className="section-count">{contracts.length} {contracts.length === 1 ? 'contratto' : 'contratti'}</span>
+                    {activeTab === 'contracts' && (() => {
+                        const contractGroups: Array<{ label: string; items: typeof contracts }> = [
+                            { label: 'Attivi', items: contracts.filter(c => c.status === 'active') },
+                            { label: 'In Attesa', items: contracts.filter(c => c.status === 'requested' || c.status === 'pending_signature' || c.status === 'draft') },
+                            { label: 'Completati', items: contracts.filter(c => c.status === 'completed') },
+                            { label: 'Archiviati', items: contracts.filter(c => c.status === 'terminated' || c.status === 'suspended') },
+                        ].filter(g => g.items.length > 0);
+                        return (
+                            <div className="tab-panel">
+                                <div className="pd-inset-section-header">
+                                    <h2 className="section-title">Contratti</h2>
+                                    <div className="pd-inset-section-actions">
+                                        <span className="pd-inset-total-count">{contracts.length} {contracts.length === 1 ? 'contratto' : 'contratti'}</span>
+                                    </div>
+                                </div>
+                                {contracts.length > 0 ? (
+                                    <div className="pd-inset-groups">
+                                        {contractGroups.map(group => (
+                                            <div key={group.label} className="pd-inset-group">
+                                                <div className="pd-inset-group-header">
+                                                    <span className="pd-inset-group-label">{group.label}</span>
+                                                    <span className="pd-inset-count-badge">{group.items.length}</span>
+                                                </div>
+                                                <div className="pd-inset-container">
+                                                    {group.items.map((contract, idx) => (
+                                                        <div
+                                                            key={contract.id}
+                                                            className={`pd-inset-row${idx === group.items.length - 1 ? ' pd-inset-row--last' : ''}`}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() => navigate(`/venditori/contratti/${contract.id}`)}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/contratti/${contract.id}`); } }}
+                                                        >
+                                                            <div className="pd-inset-row-icon" style={{ background: 'rgba(10,132,255,0.15)', color: '#0A84FF' }}>
+                                                                <FileText size={16} />
+                                                            </div>
+                                                            <div className="pd-inset-row-body">
+                                                                <span className="pd-inset-row-primary">{contract.title || contract.contract_number}</span>
+                                                                <span className="pd-inset-row-secondary">
+                                                                    <span className="pd-inset-row-mono">{contract.contract_number}</span>
+                                                                </span>
+                                                            </div>
+                                                            <div className="pd-inset-row-right">
+                                                                {getContractStatusBadge(contract.status)}
+                                                                <div className="pd-inset-more-wrap" onClick={(e) => e.stopPropagation()}>
+                                                                    <button
+                                                                        className="pd-inset-more-btn"
+                                                                        onBlur={() => setTimeout(() => setOpenRowMenuId(null), 120)}
+                                                                        onClick={() => setOpenRowMenuId(openRowMenuId === `contract-${contract.id}` ? null : `contract-${contract.id}`)}
+                                                                        aria-label="Altre azioni"
+                                                                    >
+                                                                        <MoreHorizontal size={16} />
+                                                                    </button>
+                                                                    {openRowMenuId === `contract-${contract.id}` && (
+                                                                        <div className="pd-inset-dropdown">
+                                                                            <button className="pd-inset-dropdown-item" onMouseDown={() => { navigate(`/venditori/contratti/${contract.id}`); setOpenRowMenuId(null); }}>
+                                                                                <Eye size={14} /> Visualizza
+                                                                            </button>
+                                                                            <button className="pd-inset-dropdown-item pd-inset-dropdown-item--danger" onMouseDown={() => setOpenRowMenuId(null)}>
+                                                                                <Trash2 size={14} /> Elimina
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="empty-state-card">
+                                        <FileText size={48} />
+                                        <p>Nessun contratto associato a questo progetto</p>
+                                    </div>
+                                )}
                             </div>
-                            {contracts.length > 0 ? (
-                                <div className="items-list">
-                                    {contracts.map((contract) => (
-                                        <div
-                                            key={contract.id}
-                                            className="item-card item-card-clickable"
-                                            role="button"
-                                            tabIndex={0}
-                                            onClick={() => navigate(`/venditori/contratti/${contract.id}`)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/contratti/${contract.id}`); } }}
-                                        >
-                                            <div className="item-header">
-                                                <div className="item-icon">
-                                                    <FileText size={20} />
-                                                </div>
-                                                <div className="item-info">
-                                                    <h4 className="item-title">{contract.title || contract.contract_number}</h4>
-                                                    <div className="item-meta">
-                                                        <span>{contract.contract_number}</span>
-                                                        {getContractStatusBadge(contract.status)}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="item-actions">
-                                                <button
-                                                    className="btn-secondary item-card-view-btn"
-                                                    onClick={(e) => { e.stopPropagation(); navigate(`/venditori/contratti/${contract.id}`); }}
-                                                >
-                                                    <Eye size={16} />
-                                                    Visualizza
-                                                </button>
-                                                <ChevronRight className="item-card-chevron" size={20} aria-hidden />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="empty-state-card">
-                                    <FileText size={48} />
-                                    <p>Nessun contratto associato a questo progetto</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* PREVENTIVI */}
-                    {activeTab === 'quotes' && (
-                        <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Preventivi</h2>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                                <span className="section-count">{quotes.length} {quotes.length === 1 ? 'preventivo' : 'preventivi'}</span>
-                                    <button 
-                                        className="btn-primary"
-                                        onClick={handleCreateQuote}
-                                    >
-                                        <Plus size={16} />
-                                        Crea Preventivo
-                                    </button>
+                    {activeTab === 'quotes' && (() => {
+                        const quoteGroups: Array<{ label: string; items: typeof quotes }> = [
+                            { label: 'In Attesa', items: quotes.filter(q => q.status === 'pending' || q.status === 'contract_requested') },
+                            { label: 'Attivi', items: quotes.filter(q => q.status === 'started') },
+                            { label: 'Accettati', items: quotes.filter(q => q.status === 'approved') },
+                            { label: 'Completati', items: quotes.filter(q => q.status === 'completed') },
+                            { label: 'Rifiutati', items: quotes.filter(q => q.status === 'rejected') },
+                        ].filter(g => g.items.length > 0);
+                        return (
+                            <div className="tab-panel">
+                                <div className="pd-inset-section-header">
+                                    <h2 className="section-title">Preventivi</h2>
+                                    <div className="pd-inset-section-actions">
+                                        <span className="pd-inset-total-count">{quotes.length} {quotes.length === 1 ? 'preventivo' : 'preventivi'}</span>
+                                        <button className="pd-inset-add-btn" onClick={handleCreateQuote}>
+                                            <Plus size={14} />
+                                            Aggiungi
+                                        </button>
+                                    </div>
                                 </div>
+                                {quotes.length > 0 ? (
+                                    <div className="pd-inset-groups">
+                                        {quoteGroups.map(group => (
+                                            <div key={group.label} className="pd-inset-group">
+                                                <div className="pd-inset-group-header">
+                                                    <span className="pd-inset-group-label">{group.label}</span>
+                                                    <span className="pd-inset-count-badge">{group.items.length}</span>
+                                                </div>
+                                                <div className="pd-inset-container">
+                                                    {group.items.map((quote, idx) => (
+                                                        <div
+                                                            key={quote.id}
+                                                            className={`pd-inset-row${idx === group.items.length - 1 ? ' pd-inset-row--last' : ''}`}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() => navigate(`/venditori/preventivi/${quote.id}`)}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/preventivi/${quote.id}`); } }}
+                                                        >
+                                                            <div className="pd-inset-row-icon" style={{ background: 'rgba(52,199,89,0.15)', color: '#34C759' }}>
+                                                                <Receipt size={16} />
+                                                            </div>
+                                                            <div className="pd-inset-row-body">
+                                                                <span className="pd-inset-row-primary">{quote.title || quote.quote_number}</span>
+                                                                <span className="pd-inset-row-secondary">
+                                                                    <span className="pd-inset-row-mono">{quote.quote_number}</span>
+                                                                    {quote.client && (
+                                                                        <span>{(quote.client as any).company_name || (quote.client as any).name || ''}</span>
+                                                                    )}
+                                                                </span>
+                                                            </div>
+                                                            <div className="pd-inset-row-right">
+                                                                <span className={`pd-inset-amount${quote.status === 'approved' || quote.status === 'started' ? ' pd-inset-amount--accepted' : ''}`}>
+                                                                    {formatCurrency(quote.total_amount || 0)}
+                                                                </span>
+                                                                <div className="pd-inset-more-wrap" onClick={(e) => e.stopPropagation()}>
+                                                                    <button
+                                                                        className="pd-inset-more-btn"
+                                                                        onBlur={() => setTimeout(() => setOpenRowMenuId(null), 120)}
+                                                                        onClick={() => setOpenRowMenuId(openRowMenuId === `quote-${quote.id}` ? null : `quote-${quote.id}`)}
+                                                                        aria-label="Altre azioni"
+                                                                    >
+                                                                        <MoreHorizontal size={16} />
+                                                                    </button>
+                                                                    {openRowMenuId === `quote-${quote.id}` && (
+                                                                        <div className="pd-inset-dropdown">
+                                                                            <button className="pd-inset-dropdown-item" onMouseDown={() => { navigate(`/venditori/preventivi/${quote.id}`); setOpenRowMenuId(null); }}>
+                                                                                <Eye size={14} /> Visualizza
+                                                                            </button>
+                                                                            <button className="pd-inset-dropdown-item pd-inset-dropdown-item--danger" onMouseDown={() => setOpenRowMenuId(null)}>
+                                                                                <Trash2 size={14} /> Elimina
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="empty-state-card">
+                                        <FileText size={48} />
+                                        <p>Nessun preventivo associato a questo progetto</p>
+                                    </div>
+                                )}
                             </div>
-                            {quotes.length > 0 ? (
-                                <div className="items-list">
-                                    {quotes.map((quote) => (
-                                        <div
-                                            key={quote.id}
-                                            className="item-card item-card-clickable"
-                                            role="button"
-                                            tabIndex={0}
-                                            onClick={() => navigate(`/venditori/preventivi/${quote.id}`)}
-                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/preventivi/${quote.id}`); } }}
-                                        >
-                                            <div className="item-header">
-                                                <div className="item-icon">
-                                                    <FileText size={20} />
-                                                </div>
-                                                <div className="item-info">
-                                                    <h4 className="item-title">{quote.title || quote.quote_number}</h4>
-                                                    <div className="item-meta">
-                                                        <span>{quote.quote_number}</span>
-                                                        {getQuoteStatusBadge(quote.status)}
-                                                        <span className="item-amount">{formatCurrency(quote.total_amount || 0)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="item-actions">
-                                                <button
-                                                    className="btn-secondary item-card-view-btn"
-                                                    onClick={(e) => { e.stopPropagation(); navigate(`/venditori/preventivi/${quote.id}`); }}
-                                                >
-                                                    <Eye size={16} />
-                                                    Visualizza
-                                                </button>
-                                                <ChevronRight className="item-card-chevron" size={20} aria-hidden />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="empty-state-card">
-                                    <FileText size={48} />
-                                    <p>Nessun preventivo associato a questo progetto</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* DOCUMENTI */}
-                    {activeTab === 'documents' && (
-                        <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Documenti</h2>
-                                <button 
-                                    className="btn-primary"
-                                    onClick={handleOpenDocumentModal}
-                                >
-                                    <Plus size={16} />
-                                    Aggiungi Documento
-                                </button>
-                            </div>
-                            <div className="documents-grid">
-                                {/* PREVENTIVI */}
-                                {quotes.length > 0 && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Preventivi</h3>
-                                        <div className="documents-list">
-                                            {quotes.map((quote) => (
-                                                <div
-                                                    key={quote.id}
-                                                    className="document-item document-item-clickable"
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onClick={() => navigate(`/venditori/preventivi/${quote.id}`)}
-                                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/preventivi/${quote.id}`); } }}
-                                                >
-                                                    <FileText size={20} />
-                                                    <div className="document-info">
-                                                        <span className="document-name">{quote.title || quote.quote_number}</span>
-                                                        <span className="document-meta">Preventivo • {formatDate(quote.created_at)}</span>
-                                                    </div>
-                                                    <button
-                                                        className="btn-secondary document-item-view-btn"
-                                                        onClick={(e) => { e.stopPropagation(); navigate(`/venditori/preventivi/${quote.id}`); }}
-                                                        title="Visualizza preventivo"
-                                                    >
-                                                        <Eye size={16} />
-                                                        Visualizza
-                                                    </button>
-                                                    <ChevronRight className="document-item-chevron" size={20} aria-hidden />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                    {activeTab === 'documents' && (() => {
+                        const getDocIcon = (name: string) => {
+                            const ext = (name.split('.').pop() || '').toLowerCase();
+                            if (ext === 'pdf') return { bg: 'rgba(255,59,48,0.15)', color: '#FF3B30' };
+                            if (['doc', 'docx'].includes(ext)) return { bg: 'rgba(0,122,255,0.15)', color: '#007AFF' };
+                            if (['xls', 'xlsx', 'csv'].includes(ext)) return { bg: 'rgba(52,199,89,0.15)', color: '#34C759' };
+                            if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) return { bg: 'rgba(255,149,0,0.15)', color: '#FF9500' };
+                            return { bg: 'rgba(142,142,147,0.15)', color: '#8E8E93' };
+                        };
 
-                                {/* CONTRATTI */}
-                                {project.contracts && project.contracts.length > 0 && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Contratti</h3>
-                                        <div className="documents-list">
-                                            {project.contracts.map((contract) => (
-                                                <div
-                                                    key={contract.id}
-                                                    className="document-item document-item-clickable"
-                                                    role="button"
-                                                    tabIndex={0}
-                                                    onClick={() => navigate(`/venditori/contratti/${contract.id}`)}
-                                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/contratti/${contract.id}`); } }}
-                                                >
-                                                    <FileText size={20} />
-                                                    <div className="document-info">
-                                                        <span className="document-name">{contract.title || contract.contract_number}</span>
-                                                        <span className="document-meta">Contratto • {formatDate((contract as any).created_at)}</span>
-                                                    </div>
-                                                    <button
-                                                        className="btn-secondary document-item-view-btn"
-                                                        onClick={(e) => { e.stopPropagation(); navigate(`/venditori/contratti/${contract.id}`); }}
-                                                        title="Visualizza contratto"
-                                                    >
-                                                        <Eye size={16} />
-                                                        Visualizza
-                                                    </button>
-                                                    <ChevronRight className="document-item-chevron" size={20} aria-hidden />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                        const handleDocDownload = async (contractId: number, doc: { id: number; document_name: string; file_path?: string; external_url?: string }) => {
+                            if (doc.external_url) {
+                                window.open(doc.external_url, '_blank');
+                            } else if (doc.file_path) {
+                                try {
+                                    const blob = await contractsApi.downloadSignedDocument(contractId, doc.id);
+                                    const url = window.URL.createObjectURL(blob);
+                                    const a = document.createElement('a');
+                                    a.href = url;
+                                    a.download = doc.document_name;
+                                    document.body.appendChild(a);
+                                    a.click();
+                                    window.URL.revokeObjectURL(url);
+                                    document.body.removeChild(a);
+                                } catch (error) {
+                                    console.error('Errore nel download:', error);
+                                    alert('Errore nel download del documento');
+                                }
+                            }
+                        };
 
-                                {/* DOCUMENTI FIRMATI: Privacy Policy */}
-                                {project.contracts && project.contracts.some(c => c.signedDocuments && c.signedDocuments.length > 0 && c.signedDocuments.some(d => d.document_type === 'privacy_policy')) && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Privacy Policy</h3>
-                                        <div className="documents-list">
-                                            {project.contracts.flatMap(contract => 
-                                                (contract.signedDocuments || [])
-                                                    .filter(doc => doc.document_type === 'privacy_policy')
-                                                    .map(doc => (
-                                                        <div key={doc.id} className="document-item">
-                                                            <FileText size={20} />
-                                                            <div className="document-info">
-                                                                <span className="document-name">{doc.document_name}</span>
-                                                                <span className="document-meta">
-                                                                    Privacy Policy • {formatDate(doc.created_at)}
-                                                                    {doc.signed_at && ` • Firmato il ${formatDate(doc.signed_at)}`}
-                                                                </span>
-                                                            </div>
-                                                            {doc.external_url ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={() => window.open(doc.external_url, '_blank')}
-                                                                    title="Apri link"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Apri Link
-                                                                </button>
-                                                            ) : doc.file_path ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={async () => {
-                                                                        try {
-                                                                            const blob = await contractsApi.downloadSignedDocument(contract.id, doc.id);
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = doc.document_name;
-                                                                            document.body.appendChild(a);
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                            document.body.removeChild(a);
-                                                                        } catch (error) {
-                                                                            console.error('Errore nel download:', error);
-                                                                            alert('Errore nel download del documento');
-                                                                        }
-                                                                    }}
-                                                                    title="Scarica documento"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Scarica
-                                                                </button>
-                                                            ) : null}
-                                                        </div>
-                                                    ))
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
+                        const hasAnyDocuments = quotes.length > 0 || (project.contracts && project.contracts.length > 0);
 
-                                {/* DOCUMENTI FIRMATI: Consenso Dati Personali */}
-                                {project.contracts && project.contracts.some(c => c.signedDocuments && c.signedDocuments.length > 0 && c.signedDocuments.some(d => d.document_type === 'consent_personal_data')) && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Consenso Dati Personali</h3>
-                                        <div className="documents-list">
-                                            {project.contracts.flatMap(contract => 
-                                                (contract.signedDocuments || [])
-                                                    .filter(doc => doc.document_type === 'consent_personal_data')
-                                                    .map(doc => (
-                                                        <div key={doc.id} className="document-item">
-                                                            <FileText size={20} />
-                                                            <div className="document-info">
-                                                                <span className="document-name">{doc.document_name}</span>
-                                                                <span className="document-meta">
-                                                                    Consenso Dati Personali • {formatDate(doc.created_at)}
-                                                                    {doc.signed_at && ` • Firmato il ${formatDate(doc.signed_at)}`}
-                                                                </span>
-                                                            </div>
-                                                            {doc.external_url ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={() => window.open(doc.external_url, '_blank')}
-                                                                    title="Apri link"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Apri Link
-                                                                </button>
-                                                            ) : doc.file_path ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={async () => {
-                                                                        try {
-                                                                            const blob = await contractsApi.downloadSignedDocument(contract.id, doc.id);
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = doc.document_name;
-                                                                            document.body.appendChild(a);
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                            document.body.removeChild(a);
-                                                                        } catch (error) {
-                                                                            console.error('Errore nel download:', error);
-                                                                            alert('Errore nel download del documento');
-                                                                        }
-                                                                    }}
-                                                                    title="Scarica documento"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Scarica
-                                                                </button>
-                                                            ) : null}
-                                                        </div>
-                                                    ))
-                                            )}
-                                        </div>
+                        return (
+                            <div className="tab-panel">
+                                <div className="pd-inset-section-header">
+                                    <h2 className="section-title">Documenti</h2>
+                                    <div className="pd-inset-section-actions">
+                                        <button className="pd-inset-add-btn" onClick={handleOpenDocumentModal}>
+                                            <Plus size={14} />
+                                            Aggiungi
+                                        </button>
                                     </div>
-                                )}
-
-                                {/* DOCUMENTI FIRMATI: Altri Documenti */}
-                                {project.contracts && project.contracts.some(c => c.signedDocuments && c.signedDocuments.length > 0 && c.signedDocuments.some(d => d.document_type === 'other')) && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Altri Documenti</h3>
-                                        <div className="documents-list">
-                                            {project.contracts.flatMap(contract => 
-                                                (contract.signedDocuments || [])
-                                                    .filter(doc => doc.document_type === 'other')
-                                                    .map(doc => (
-                                                        <div key={doc.id} className="document-item">
-                                                            <FileText size={20} />
-                                                            <div className="document-info">
-                                                                <span className="document-name">{doc.document_name}</span>
-                                                                <span className="document-meta">
-                                                                    Altro Documento • {formatDate(doc.created_at)}
-                                                                    {doc.signed_at && ` • Firmato il ${formatDate(doc.signed_at)}`}
-                                                                </span>
-                                                            </div>
-                                                            {doc.external_url ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={() => window.open(doc.external_url, '_blank')}
-                                                                    title="Apri link"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Apri Link
-                                                                </button>
-                                                            ) : doc.file_path ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={async () => {
-                                                                        try {
-                                                                            const blob = await contractsApi.downloadSignedDocument(contract.id, doc.id);
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = doc.document_name;
-                                                                            document.body.appendChild(a);
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                            document.body.removeChild(a);
-                                                                        } catch (error) {
-                                                                            console.error('Errore nel download:', error);
-                                                                            alert('Errore nel download del documento');
-                                                                        }
-                                                                    }}
-                                                                    title="Scarica documento"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Scarica
-                                                                </button>
-                                                            ) : null}
-                                                        </div>
-                                                    ))
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Debug: mostra tutti i documenti firmati per debug */}
-                                {project.contracts && project.contracts.some(c => c.signedDocuments && c.signedDocuments.length > 0) && (
-                                    <div className="document-category">
-                                        <h3 className="category-title">Tutti i Documenti Firmati (Debug)</h3>
-                                        <div className="documents-list">
-                                            {project.contracts.flatMap(contract => 
-                                                (contract.signedDocuments || [])
-                                                    .map(doc => (
-                                                        <div key={doc.id} className="document-item">
-                                                            <FileText size={20} />
-                                                            <div className="document-info">
-                                                                <span className="document-name">{doc.document_name}</span>
-                                                                <span className="document-meta">
-                                                                    Tipo: {doc.document_type} • {formatDate(doc.created_at)}
-                                                                    {doc.external_url && ` • URL: ${doc.external_url.substring(0, 50)}...`}
-                                                                    {doc.file_path && ` • File: ${doc.file_path}`}
-                                                                </span>
-                                                            </div>
-                                                            {doc.external_url ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={() => window.open(doc.external_url, '_blank')}
-                                                                    title="Apri link"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Apri Link
-                                                                </button>
-                                                            ) : doc.file_path ? (
-                                                                <button 
-                                                                    className="btn-secondary"
-                                                                    onClick={async () => {
-                                                                        try {
-                                                                            const blob = await contractsApi.downloadSignedDocument(contract.id, doc.id);
-                                                                            const url = window.URL.createObjectURL(blob);
-                                                                            const a = document.createElement('a');
-                                                                            a.href = url;
-                                                                            a.download = doc.document_name;
-                                                                            document.body.appendChild(a);
-                                                                            a.click();
-                                                                            window.URL.revokeObjectURL(url);
-                                                                            document.body.removeChild(a);
-                                                                        } catch (error) {
-                                                                            console.error('Errore nel download:', error);
-                                                                            alert('Errore nel download del documento');
-                                                                        }
-                                                                    }}
-                                                                    title="Scarica documento"
-                                                                >
-                                                                    <Download size={16} />
-                                                                    Scarica
-                                                                </button>
-                                                            ) : null}
-                                                        </div>
-                                                    ))
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Messaggio se non ci sono documenti */}
-                                {(!quotes || quotes.length === 0) && 
-                                 (!project.contracts || project.contracts.length === 0) && 
-                                 (!project.contracts || !project.contracts.some(c => c.signedDocuments && c.signedDocuments.length > 0)) && (
-                                <div className="empty-state-card">
-                                    <FileText size={48} />
-                                    <p>Nessun documento disponibile</p>
                                 </div>
+                                {hasAnyDocuments ? (
+                                    <div className="pd-inset-groups">
+                                        {/* Preventivi group */}
+                                        {quotes.length > 0 && (
+                                            <div className="pd-inset-group">
+                                                <div className="pd-inset-group-header">
+                                                    <span className="pd-inset-group-label">Preventivi</span>
+                                                    <span className="pd-inset-count-badge">{quotes.length}</span>
+                                                </div>
+                                                <div className="pd-inset-container">
+                                                    {quotes.map((quote, idx) => (
+                                                        <div
+                                                            key={quote.id}
+                                                            className={`pd-inset-row${idx === quotes.length - 1 ? ' pd-inset-row--last' : ''}`}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() => navigate(`/venditori/preventivi/${quote.id}`)}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/preventivi/${quote.id}`); } }}
+                                                        >
+                                                            <div className="pd-inset-row-icon" style={{ background: 'rgba(52,199,89,0.15)', color: '#34C759' }}>
+                                                                <Receipt size={16} />
+                                                            </div>
+                                                            <div className="pd-inset-row-body">
+                                                                <span className="pd-inset-row-primary">{quote.title || quote.quote_number}</span>
+                                                                <span className="pd-inset-row-secondary">Preventivo • {formatDate(quote.created_at)}</span>
+                                                            </div>
+                                                            <div className="pd-inset-row-right">
+                                                                <div className="pd-inset-more-wrap" onClick={(e) => e.stopPropagation()}>
+                                                                    <button
+                                                                        className="pd-inset-more-btn"
+                                                                        onBlur={() => setTimeout(() => setOpenRowMenuId(null), 120)}
+                                                                        onClick={() => setOpenRowMenuId(openRowMenuId === `doc-quote-${quote.id}` ? null : `doc-quote-${quote.id}`)}
+                                                                        aria-label="Altre azioni"
+                                                                    >
+                                                                        <MoreHorizontal size={16} />
+                                                                    </button>
+                                                                    {openRowMenuId === `doc-quote-${quote.id}` && (
+                                                                        <div className="pd-inset-dropdown">
+                                                                            <button className="pd-inset-dropdown-item" onMouseDown={() => { navigate(`/venditori/preventivi/${quote.id}`); setOpenRowMenuId(null); }}>
+                                                                                <Eye size={14} /> Visualizza
+                                                                            </button>
+                                                                            <button className="pd-inset-dropdown-item pd-inset-dropdown-item--danger" onMouseDown={() => setOpenRowMenuId(null)}>
+                                                                                <Trash2 size={14} /> Elimina
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Groups by contract name */}
+                                        {project.contracts && project.contracts.map((contract) => {
+                                            const signedDocs = contract.signedDocuments || [];
+                                            return (
+                                                <div key={contract.id} className="pd-inset-group">
+                                                    <div className="pd-inset-group-header">
+                                                        <span className="pd-inset-group-label">{contract.title || contract.contract_number}</span>
+                                                        <span className="pd-inset-count-badge">{1 + signedDocs.length}</span>
+                                                    </div>
+                                                    <div className="pd-inset-container">
+                                                        {/* Contract row */}
+                                                        <div
+                                                            className={`pd-inset-row${signedDocs.length === 0 ? ' pd-inset-row--last' : ''}`}
+                                                            role="button"
+                                                            tabIndex={0}
+                                                            onClick={() => navigate(`/venditori/contratti/${contract.id}`)}
+                                                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(`/venditori/contratti/${contract.id}`); } }}
+                                                        >
+                                                            <div className="pd-inset-row-icon" style={{ background: 'rgba(0,122,255,0.15)', color: '#007AFF' }}>
+                                                                <FileText size={16} />
+                                                            </div>
+                                                            <div className="pd-inset-row-body">
+                                                                <span className="pd-inset-row-primary">{contract.title || contract.contract_number}</span>
+                                                                <span className="pd-inset-row-secondary">Contratto • {formatDate((contract as any).created_at)}</span>
+                                                            </div>
+                                                            <div className="pd-inset-row-right">
+                                                                <div className="pd-inset-more-wrap" onClick={(e) => e.stopPropagation()}>
+                                                                    <button
+                                                                        className="pd-inset-more-btn"
+                                                                        onBlur={() => setTimeout(() => setOpenRowMenuId(null), 120)}
+                                                                        onClick={() => setOpenRowMenuId(openRowMenuId === `doc-contract-${contract.id}` ? null : `doc-contract-${contract.id}`)}
+                                                                        aria-label="Altre azioni"
+                                                                    >
+                                                                        <MoreHorizontal size={16} />
+                                                                    </button>
+                                                                    {openRowMenuId === `doc-contract-${contract.id}` && (
+                                                                        <div className="pd-inset-dropdown">
+                                                                            <button className="pd-inset-dropdown-item" onMouseDown={() => { navigate(`/venditori/contratti/${contract.id}`); setOpenRowMenuId(null); }}>
+                                                                                <Eye size={14} /> Visualizza
+                                                                            </button>
+                                                                            <button className="pd-inset-dropdown-item pd-inset-dropdown-item--danger" onMouseDown={() => setOpenRowMenuId(null)}>
+                                                                                <Trash2 size={14} /> Elimina
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        {/* Signed document rows */}
+                                                        {signedDocs.map((doc, idx) => {
+                                                            const iconStyle = getDocIcon(doc.document_name);
+                                                            const menuId = `doc-signed-${doc.id}`;
+                                                            const hasDownload = !!(doc.external_url || doc.file_path);
+                                                            return (
+                                                                <div
+                                                                    key={doc.id}
+                                                                    className={`pd-inset-row${idx === signedDocs.length - 1 ? ' pd-inset-row--last' : ''}`}
+                                                                    role="button"
+                                                                    tabIndex={0}
+                                                                    onClick={() => { if (hasDownload) handleDocDownload(contract.id, doc); }}
+                                                                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (hasDownload) handleDocDownload(contract.id, doc); } }}
+                                                                >
+                                                                    <div className="pd-inset-row-icon" style={{ background: iconStyle.bg, color: iconStyle.color }}>
+                                                                        <FileText size={16} />
+                                                                    </div>
+                                                                    <div className="pd-inset-row-body">
+                                                                        <span className="pd-inset-row-primary">{doc.document_name}</span>
+                                                                        <span className="pd-inset-row-secondary">
+                                                                            {formatDate(doc.created_at)}
+                                                                            {doc.signed_at && ` • Firmato ${formatDate(doc.signed_at)}`}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="pd-inset-row-right">
+                                                                        <div className="pd-inset-more-wrap" onClick={(e) => e.stopPropagation()}>
+                                                                            <button
+                                                                                className="pd-inset-more-btn"
+                                                                                onBlur={() => setTimeout(() => setOpenRowMenuId(null), 120)}
+                                                                                onClick={() => setOpenRowMenuId(openRowMenuId === menuId ? null : menuId)}
+                                                                                aria-label="Altre azioni"
+                                                                            >
+                                                                                <MoreHorizontal size={16} />
+                                                                            </button>
+                                                                            {openRowMenuId === menuId && (
+                                                                                <div className="pd-inset-dropdown">
+                                                                                    {hasDownload && (
+                                                                                        <button className="pd-inset-dropdown-item" onMouseDown={() => { handleDocDownload(contract.id, doc); setOpenRowMenuId(null); }}>
+                                                                                            <Download size={14} /> Scarica
+                                                                                        </button>
+                                                                                    )}
+                                                                                    <button className="pd-inset-dropdown-item pd-inset-dropdown-item--danger" onMouseDown={() => setOpenRowMenuId(null)}>
+                                                                                        <Trash2 size={14} /> Elimina
+                                                                                    </button>
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    <div className="empty-state-card">
+                                        <FileText size={48} />
+                                        <p>Nessun documento disponibile</p>
+                                    </div>
                                 )}
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
 
                     {/* TEAM */}
                     {activeTab === 'team' && (
                         <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Team</h2>
-                                <button 
-                                    className="btn-primary"
-                                    onClick={handleOpenTeamMemberModal}
-                                >
-                                    <Plus size={16} />
-                                    Aggiungi Membro
-                                </button>
-                            </div>
-                            <div className="team-grid">
+                            <div className="pd-team-grid">
                                 {project.manager && (
-                                    <div className="team-member-card">
-                                        <div className="member-avatar">
-                                            <User size={24} />
+                                    <div className="pd-team-card">
+                                        <div className="pd-team-avatar-wrap">
+                                            <div
+                                                className="pd-team-avatar pd-team-avatar--pm"
+                                                style={{ background: getInitialColor(project.manager.name) }}
+                                            >
+                                                <span className="pd-team-initials">{getInitials(project.manager.name)}</span>
+                                            </div>
                                         </div>
-                                        <div className="member-info">
-                                            <h4 className="member-name">{project.manager.name}</h4>
-                                            <span className="member-role">Project Manager</span>
-                                            {project.manager.email && (
-                                                <span className="member-email">{project.manager.email}</span>
-                                            )}
-                                        </div>
-                                        <div className="member-badge manager">PM</div>
+                                        <div className="pd-team-name">{project.manager.name}</div>
+                                        <div className="pd-team-role-badge">Project Manager</div>
                                     </div>
                                 )}
                                 {project.seller?.user && (
-                                    <div className="team-member-card">
-                                        <div className="member-avatar">
-                                            <User size={24} />
+                                    <div className="pd-team-card">
+                                        <div className="pd-team-avatar-wrap">
+                                            <div
+                                                className="pd-team-avatar"
+                                                style={{ background: getInitialColor(project.seller.user.name) }}
+                                            >
+                                                <span className="pd-team-initials">{getInitials(project.seller.user.name)}</span>
+                                            </div>
                                         </div>
-                                        <div className="member-info">
-                                            <h4 className="member-name">{project.seller.user.name}</h4>
-                                            <span className="member-role">Venditore</span>
-                                            {project.seller.user.email && (
-                                                <span className="member-email">{project.seller.user.email}</span>
-                                            )}
-                                        </div>
-                                        <div className="member-badge seller">V</div>
+                                        <div className="pd-team-name">{project.seller.user.name}</div>
+                                        <div className="pd-team-role-badge">Venditore</div>
                                     </div>
                                 )}
                                 {teamMembers.map((member) => (
-                                    <div key={member.id} className="team-member-card" style={{ position: 'relative' }}>
-                                        <div className="member-avatar">
+                                    <div key={member.id} className="pd-team-card">
+                                        <div className="pd-team-avatar-wrap">
                                             {member.user?.avatar ? (
-                                                <img src={member.user.avatar} alt={member.user.name} />
+                                                <img
+                                                    className="pd-team-avatar"
+                                                    src={member.user.avatar}
+                                                    alt={member.user.name}
+                                                />
                                             ) : (
-                                                <User size={24} />
-                                            )}
-                                        </div>
-                                        <div className="member-info">
-                                            <h4 className="member-name">{member.user?.name || 'Utente'}</h4>
-                                            <span className="member-role">{member.role}</span>
-                                            {member.user?.email && (
-                                                <span className="member-email">{member.user.email}</span>
-                                            )}
-                                            {member.payment_methods && member.payment_methods.length > 0 && (
-                                                <div style={{ marginTop: '4px', fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)' }}>
-                                                    Metodi: {member.payment_methods.map(m => {
-                                                        const labels: Record<string, string> = {
-                                                            'hourly': 'A Ore',
-                                                            'per_task': 'A Task',
-                                                            'per_project': 'A Progetto',
-                                                            'fixed': 'Fisso',
-                                                            'no_payment': 'Nessun Pagamento'
-                                                        };
-                                                        return labels[m];
-                                                    }).join(', ')}
+                                                <div
+                                                    className="pd-team-avatar"
+                                                    style={{ background: getInitialColor(member.user?.name || '') }}
+                                                >
+                                                    <span className="pd-team-initials">{getInitials(member.user?.name || 'U')}</span>
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="member-badge team">TM</div>
-                                        <div style={{ 
-                                            position: 'absolute', 
-                                            top: '12px', 
-                                            right: '12px', 
-                                            display: 'flex', 
-                                            gap: '8px',
-                                            zIndex: 10
-                                        }}>
+                                        <div className="pd-team-name">{member.user?.name || 'Utente'}</div>
+                                        <div className="pd-team-role-badge">{member.role}</div>
+                                        {(member.payment_methods?.length > 0 || member.project_rate_cocchi != null) && (
+                                            <div className="pd-team-payment-row">
+                                                {member.payment_methods?.slice(0, 1).map((m) => (
+                                                    <span key={m} className="pd-team-pay-method">{PAYMENT_LABELS[m] ?? m}</span>
+                                                ))}
+                                                {member.project_rate_cocchi != null && (
+                                                    <span className="pd-team-cocchi-rate">
+                                                        <CocchiIcon size={11} />
+                                                        {member.project_rate_cocchi}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                        <div className="pd-team-actions">
                                             <button
                                                 onClick={() => handleOpenEditTeamMemberModal(member)}
                                                 disabled={deletingMember}
-                                                style={{
-                                                    padding: '6px',
-                                                    background: 'rgba(10, 132, 255, 0.1)',
-                                                    border: '1px solid rgba(10, 132, 255, 0.3)',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(10, 132, 255, 0.2)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(10, 132, 255, 0.1)';
-                                                }}
+                                                className="pd-team-action-btn pd-team-action-btn--edit"
                                                 title="Modifica membro"
                                             >
-                                                <Edit size={14} color="#0A84FF" />
+                                                <Edit size={13} />
                                             </button>
                                             <button
                                                 onClick={() => handleDeleteTeamMember(member)}
                                                 disabled={deletingMember}
-                                                style={{
-                                                    padding: '6px',
-                                                    background: 'rgba(255, 59, 48, 0.1)',
-                                                    border: '1px solid rgba(255, 59, 48, 0.3)',
-                                                    borderRadius: '6px',
-                                                    cursor: 'pointer',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    transition: 'all 0.2s'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.background = 'rgba(255, 59, 48, 0.1)';
-                                                }}
+                                                className="pd-team-action-btn pd-team-action-btn--remove"
                                                 title="Rimuovi membro"
                                             >
-                                                <Trash2 size={14} color="#FF3B30" />
+                                                <Trash2 size={13} />
                                             </button>
                                         </div>
                                     </div>
                                 ))}
-                                {teamMembers.length === 0 && (
-                                <div className="empty-state-card">
-                                    <Users size={48} />
-                                    <p>Nessun altro membro del team</p>
-                                </div>
-                                )}
+                                <button
+                                    type="button"
+                                    className="pd-team-card pd-team-card--add"
+                                    onClick={handleOpenTeamMemberModal}
+                                >
+                                    <Plus size={22} className="pd-team-add-icon" />
+                                    <span className="pd-team-add-label">Aggiungi membro</span>
+                                </button>
                             </div>
                         </div>
                     )}
@@ -2682,55 +2748,51 @@ const ProjectDetailPage: React.FC = () => {
                     {/* PROJECT MANAGER - Un solo PM per progetto; i responsabili di reparto CRM si definiscono in Assegna progetto */}
                     {activeTab === 'project_manager' && (
                         <div className="tab-panel">
-                            <p className="tab-hint" style={{ marginBottom: '16px', color: 'var(--text-muted, #8E8E93)', fontSize: '14px' }}>
-                                Un solo Project Manager per progetto. I responsabili di reparto CRM si definiscono in &quot;Assegna progetto&quot; o nel tab Team.
-                            </p>
                             {!project?.manager ? (
-                                <div className="empty-state-card">
+                                <div className="pd-pmchat-empty-state">
                                     <UserCheck size={48} />
                                     <p>Nessun Project Manager assegnato</p>
-                                    <button 
+                                    <button
                                         className="btn-primary"
                                         onClick={() => {
                                             setShowAssignManagerModal(true);
                                             loadAvailableUsers();
                                         }}
-                                        style={{ marginTop: '16px' }}
                                     >
                                         <Plus size={16} />
                                         Assegna Project Manager
                                     </button>
                                 </div>
                             ) : (
-                                <div className="pm-chat-container">
-                                    {/* Header con info PM */}
-                                    <div className="pm-chat-header">
-                                        <div className="pm-info">
-                                            <div className="pm-avatar">
+                                <div className="pd-pmchat-container">
+                                    {/* Header */}
+                                    <div className="pd-pmchat-header">
+                                        <div className="pd-pmchat-header-info">
+                                            <div className="pd-pmchat-header-avatar">
                                                 {pmManagerInfo?.avatar ? (
                                                     <img src={pmManagerInfo.avatar} alt={pmManagerInfo.name} />
                                                 ) : (
-                                                    <User size={24} />
+                                                    <span>{getInitials(project.manager.name)}</span>
                                                 )}
                                             </div>
-                                            <div className="pm-details">
-                                                <h3 className="pm-name">{project.manager.name}</h3>
-                                                <span className="pm-status">
+                                            <div>
+                                                <div className="pd-pmchat-header-name">{project.manager.name}</div>
+                                                <div className="pd-pmchat-header-status">
                                                     {pmManagerInfo?.last_access ? (
                                                         <>
-                                                            <span className="status-dot online"></span>
+                                                            <span className="pd-pmchat-status-dot pd-pmchat-status-dot--online" />
                                                             Ultimo accesso: {formatLastAccess(pmManagerInfo.last_access)}
                                                         </>
                                                     ) : (
                                                         <>
-                                                            <span className="status-dot offline"></span>
+                                                            <span className="pd-pmchat-status-dot pd-pmchat-status-dot--offline" />
                                                             Mai connesso
                                                         </>
                                                     )}
-                                                </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <button 
+                                        <button
                                             className="btn-secondary"
                                             onClick={() => {
                                                 setShowAssignManagerModal(true);
@@ -2741,59 +2803,110 @@ const ProjectDetailPage: React.FC = () => {
                                         </button>
                                     </div>
 
-                                    {/* Chat Messages */}
-                                    <div className="pm-chat-messages">
+                                    {/* Messages */}
+                                    <div className="pd-pmchat-messages">
                                         {pmChatMessages.length === 0 ? (
-                                            <div className="chat-empty-state">
+                                            <div className="pd-pmchat-empty">
+                                                <MessageSquare size={40} />
                                                 <p>Nessun messaggio ancora</p>
                                                 <span>Inizia la conversazione con il Project Manager</span>
                                             </div>
                                         ) : (
-                                            pmChatMessages.map((msg) => {
-                                                const isMyMessage = msg.user_id === (project.manager_id || 0);
+                                            pmChatMessages.map((msg, index) => {
+                                                const isMyMessage = msg.user_id === user?.id;
+                                                const prevMsg = index > 0 ? pmChatMessages[index - 1] : null;
+                                                const nextMsg = index < pmChatMessages.length - 1 ? pmChatMessages[index + 1] : null;
+
+                                                const msgDate = new Date(msg.created_at);
+                                                const prevDate = prevMsg ? new Date(prevMsg.created_at) : null;
+                                                const showDateSep = !prevDate || msgDate.toDateString() !== prevDate.toDateString();
+
+                                                const prevIsSameSender = !!prevMsg && prevMsg.user_id === msg.user_id;
+                                                const prevWithin5Min = !!prevMsg && msgDate.getTime() - new Date(prevMsg.created_at).getTime() < 5 * 60 * 1000;
+                                                const isGrouped = prevIsSameSender && prevWithin5Min;
+
+                                                const nextIsSameSender = !!nextMsg && nextMsg.user_id === msg.user_id;
+                                                const nextWithin5Min = !!nextMsg && new Date(nextMsg.created_at).getTime() - msgDate.getTime() < 5 * 60 * 1000;
+                                                const isLastInGroup = !nextIsSameSender || !nextWithin5Min;
+
+                                                const today = new Date();
+                                                const yesterday = new Date(today);
+                                                yesterday.setDate(yesterday.getDate() - 1);
+                                                let dateLabel = '';
+                                                if (msgDate.toDateString() === today.toDateString()) dateLabel = 'Oggi';
+                                                else if (msgDate.toDateString() === yesterday.toDateString()) dateLabel = 'Ieri';
+                                                else dateLabel = msgDate.toLocaleDateString('it-IT', { day: '2-digit', month: 'long', year: 'numeric' });
+
                                                 return (
-                                                    <div 
-                                                        key={msg.id} 
-                                                        className={`chat-message ${isMyMessage ? 'message-sent' : 'message-received'}`}
-                                                    >
-                                                        <div className="message-content">
-                                                            {msg.message_type === 'image' && (msg.media_url || msg.media_path) && (
-                                                                <div className="message-image">
-                                                                    <img 
-                                                                        src={msg.media_url || `${window.location.origin}/storage/${msg.media_path}`} 
-                                                                        alt="Immagine" 
-                                                                        onClick={() => {
-                                                                            const imageUrl = msg.media_url || `${window.location.origin}/storage/${msg.media_path}`;
-                                                                            window.open(imageUrl, '_blank');
-                                                                        }}
-                                                                    />
+                                                    <React.Fragment key={msg.id}>
+                                                        {showDateSep && (
+                                                            <div className="pd-pmchat-date-sep">
+                                                                <span>{dateLabel}</span>
+                                                            </div>
+                                                        )}
+                                                        <motion.div
+                                                            className={`pd-pmchat-msg-row${isMyMessage ? ' pd-pmchat-msg-row--sent' : ' pd-pmchat-msg-row--recv'}${isGrouped ? ' pd-pmchat-msg-row--grouped' : ''}`}
+                                                            initial={{ opacity: 0, y: 6 }}
+                                                            animate={{ opacity: 1, y: 0 }}
+                                                            transition={{ duration: 0.18 }}
+                                                        >
+                                                            {!isMyMessage && (
+                                                                <div className={`pd-pmchat-bubble-avatar${isGrouped ? ' pd-pmchat-bubble-avatar--hidden' : ''}`}>
+                                                                    {!isGrouped && (
+                                                                        pmManagerInfo?.avatar ? (
+                                                                            <img src={pmManagerInfo.avatar} alt="" />
+                                                                        ) : (
+                                                                            <span>{getInitials(project.manager?.name || 'PM')}</span>
+                                                                        )
+                                                                    )}
                                                                 </div>
                                                             )}
-                                                            {msg.message && (
-                                                                <div className="message-text">{msg.message}</div>
-                                                            )}
-                                                            <div className="message-meta">
-                                                                <span className="message-time">{formatTime(msg.created_at)}</span>
-                                                                {isMyMessage && (
-                                                                    <span className="message-status">
-                                                                        {msg.is_read ? (
-                                                                            <span className="read-indicator">✓✓</span>
-                                                                        ) : (
-                                                                            <span className="sent-indicator">✓</span>
-                                                                        )}
-                                                                    </span>
+                                                            <div className="pd-pmchat-bubble-col">
+                                                                {!isMyMessage && !isGrouped && (
+                                                                    <div className="pd-pmchat-sender-name">{msg.user?.name || project.manager?.name}</div>
                                                                 )}
+                                                                <div className={`pd-pmchat-bubble${isMyMessage ? ' pd-pmchat-bubble--sent' : ' pd-pmchat-bubble--recv'}${isLastInGroup ? ' pd-pmchat-bubble--last' : ''}`}>
+                                                                    {msg.message_type === 'image' && (msg.media_url || msg.media_path) && (
+                                                                        <div
+                                                                            className="pd-pmchat-img-msg"
+                                                                            onClick={() => {
+                                                                                const imageUrl = msg.media_url || `${window.location.origin}/storage/${msg.media_path}`;
+                                                                                window.open(imageUrl, '_blank');
+                                                                            }}
+                                                                        >
+                                                                            <img
+                                                                                src={msg.media_url || `${window.location.origin}/storage/${msg.media_path}`}
+                                                                                alt="Immagine"
+                                                                            />
+                                                                        </div>
+                                                                    )}
+                                                                    {msg.message && (
+                                                                        <div className="pd-pmchat-bubble-text">{msg.message}</div>
+                                                                    )}
+                                                                    <div className="pd-pmchat-bubble-meta">
+                                                                        <span className="pd-pmchat-bubble-time">{formatTime(msg.created_at)}</span>
+                                                                        {isMyMessage && (
+                                                                            <span className="pd-pmchat-read-status">
+                                                                                {msg.is_read ? (
+                                                                                    <span style={{ color: '#4FC3F7' }}>✓✓</span>
+                                                                                ) : (
+                                                                                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>✓</span>
+                                                                                )}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    </div>
+                                                        </motion.div>
+                                                    </React.Fragment>
                                                 );
                                             })
                                         )}
                                         <div ref={chatMessagesEndRef} />
                                     </div>
 
-                                    {/* Chat Input */}
-                                    <div className="pm-chat-input">
+                                    {/* Input bar */}
+                                    <div className="pd-pmchat-input-bar">
                                         <input
                                             type="file"
                                             ref={chatImageInputRef}
@@ -2808,17 +2921,17 @@ const ProjectDetailPage: React.FC = () => {
                                             }}
                                         />
                                         <button
-                                            className="chat-attach-btn"
+                                            className="pd-pmchat-attach-btn"
                                             onClick={() => chatImageInputRef.current?.click()}
                                             title="Allega immagine"
                                         >
                                             <ImageIcon size={20} />
                                         </button>
                                         {chatImageFile && (
-                                            <div className="chat-image-preview">
+                                            <div className="pd-pmchat-img-preview">
                                                 <img src={URL.createObjectURL(chatImageFile)} alt="Preview" />
                                                 <button
-                                                    className="remove-image-btn"
+                                                    className="pd-pmchat-img-remove"
                                                     onClick={() => {
                                                         setChatImageFile(null);
                                                         if (chatImageInputRef.current) {
@@ -2826,31 +2939,44 @@ const ProjectDetailPage: React.FC = () => {
                                                         }
                                                     }}
                                                 >
-                                                    <X size={16} />
+                                                    <X size={12} />
                                                 </button>
                                             </div>
                                         )}
-                                        <input
-                                            type="text"
-                                            className="chat-input"
-                                            placeholder={chatImageFile ? "Aggiungi un messaggio (opzionale)..." : "Scrivi un messaggio..."}
+                                        <textarea
+                                            className="pd-pmchat-textarea"
+                                            placeholder={chatImageFile ? 'Aggiungi un messaggio (opzionale)...' : 'Scrivi un messaggio...'}
                                             value={pmChatMessage}
-                                            onChange={(e) => setPmChatMessage(e.target.value)}
-                                            onKeyPress={(e) => {
+                                            onChange={(e) => {
+                                                setPmChatMessage(e.target.value);
+                                                e.target.style.height = 'auto';
+                                                e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                                            }}
+                                            onKeyDown={(e) => {
                                                 if (e.key === 'Enter' && !e.shiftKey) {
                                                     e.preventDefault();
                                                     handleSendPmMessage();
                                                 }
                                             }}
                                             disabled={sendingMessage}
+                                            rows={1}
                                         />
-                                        <button
-                                            className="chat-send-btn"
-                                            onClick={handleSendPmMessage}
-                                            disabled={sendingMessage || (!pmChatMessage.trim() && !chatImageFile)}
-                                        >
-                                            <Send size={20} />
-                                        </button>
+                                        <AnimatePresence>
+                                            {(pmChatMessage.trim() || chatImageFile) && (
+                                                <motion.button
+                                                    type="button"
+                                                    className="pd-pmchat-send-btn"
+                                                    onClick={handleSendPmMessage}
+                                                    disabled={sendingMessage}
+                                                    initial={{ scale: 0, opacity: 0 }}
+                                                    animate={{ scale: 1, opacity: 1 }}
+                                                    exit={{ scale: 0, opacity: 0 }}
+                                                    transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                                                >
+                                                    <ArrowUp size={16} />
+                                                </motion.button>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
                                 </div>
                             )}
@@ -2860,230 +2986,100 @@ const ProjectDetailPage: React.FC = () => {
                     {/* TASK */}
                     {activeTab === 'tasks' && (
                         <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Task</h2>
-                                <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                    {/* View switcher */}
-                                    <div style={{ display: 'flex', gap: '4px', background: 'rgba(255, 255, 255, 0.05)', padding: '4px', borderRadius: '8px' }}>
-                                        <button
-                                            className={tasksView === 'users' ? 'btn-secondary active' : 'btn-secondary'}
-                                            onClick={() => setTasksView('users')}
-                                            style={{ padding: '8px 12px' }}
-                                            title="Vista per Utenti"
-                                        >
-                                            <UsersIcon size={16} />
-                                        </button>
-                                        <button
-                                            className={tasksView === 'table' ? 'btn-secondary active' : 'btn-secondary'}
-                                            onClick={() => setTasksView('table')}
-                                            style={{ padding: '8px 12px' }}
-                                            title="Vista Tabella"
-                                        >
-                                            <List size={16} />
-                                        </button>
-                                        <button
-                                            className={tasksView === 'cards' ? 'btn-secondary active' : 'btn-secondary'}
-                                            onClick={() => setTasksView('cards')}
-                                            style={{ padding: '8px 12px' }}
-                                            title="Vista Cards"
-                                        >
-                                            <Grid size={16} />
-                                        </button>
-                                    </div>
-                                    <button 
-                                        className="btn-secondary"
-                                        onClick={() => setShowTaskFilters(!showTaskFilters)}
-                                        style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                                    >
-                                        <Filter size={16} />
-                                        Filtri
-                                    </button>
+                            {/* ── TOOLBAR ── */}
+                            <div className="pd-tasks-toolbar">
+                                <div className="pd-tasks-toolbar-left">
+                                    <span className="pd-tasks-title">Task</span>
+                                    <span className="pd-tasks-count">{tasks.length}</span>
+                                </div>
+                                <div className="pd-tasks-filter-pills">
+                                    <button className={`pd-tasks-pill${taskFilterStatus === 'all' && taskFilterPriority === 'all' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('all'); setTaskFilterPriority('all'); setTaskFilterUser(null); }}>Tutti</button>
+                                    <button className={`pd-tasks-pill${taskFilterStatus === 'in_progress' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('in_progress'); setTaskFilterPriority('all'); }}>In Corso</button>
+                                    <button className={`pd-tasks-pill${taskFilterStatus === 'review' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('review'); setTaskFilterPriority('all'); }}>In Revisione</button>
+                                    <button className={`pd-tasks-pill${taskFilterStatus === 'completed' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('completed'); setTaskFilterPriority('all'); }}>Completati</button>
+                                    <button className={`pd-tasks-pill${taskFilterPriority === 'urgent' ? ' active' : ''}`} onClick={() => { setTaskFilterPriority(taskFilterPriority === 'urgent' ? 'all' : 'urgent'); setTaskFilterStatus('all'); }}>Urgenti</button>
+                                </div>
+                                <div className="pd-tasks-toolbar-right">
                                     {canCreateTask && (
-                                        <button 
-                                            className="btn-primary"
-                                            onClick={handleOpenTaskModal}
-                                        >
-                                            <Plus size={16} />
+                                        <button className="pd-tasks-new-btn" onClick={handleOpenTaskModal}>
+                                            <Plus size={14} />
                                             Nuovo Task
                                         </button>
                                     )}
-                            </div>
+                                    <div className="pd-tasks-view-toggle">
+                                        <button className={`pd-tasks-view-btn${tasksView === 'table' ? ' active' : ''}`} onClick={() => setTasksView('table')} title="Vista Lista"><List size={14} /></button>
+                                        <button className={`pd-tasks-view-btn${tasksView === 'cards' ? ' active' : ''}`} onClick={() => setTasksView('cards')} title="Vista Card"><Grid size={14} /></button>
+                                    </div>
+                                </div>
                             </div>
 
-                            {/* Task Filters */}
-                            {showTaskFilters && (
-                                <div style={{ 
-                                    background: 'rgba(255, 255, 255, 0.03)', 
-                                    border: '1px solid rgba(255, 255, 255, 0.1)', 
-                                    borderRadius: '12px', 
-                                    padding: '16px', 
-                                    marginBottom: '24px',
-                                    display: 'flex',
-                                    gap: '16px',
-                                    flexWrap: 'wrap',
-                                    alignItems: 'flex-end'
-                                }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '150px' }}>
-                                        <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>Stato</label>
-                                        <select
-                                            value={taskFilterStatus}
-                                            onChange={(e) => setTaskFilterStatus(e.target.value)}
-                                            style={{
-                                                background: 'rgba(255, 255, 255, 0.05)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                borderRadius: '8px',
-                                                padding: '8px 12px',
-                                                color: '#fff',
-                                                fontSize: '14px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <option value="all">Tutti</option>
-                                            <option value="pending">In Attesa</option>
-                                            <option value="in_progress">In Corso</option>
-                                            <option value="review">In Revisione</option>
-                                            <option value="completed">Completati</option>
-                                            <option value="cancelled">Annullati</option>
-                                        </select>
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '150px' }}>
-                                        <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>Utente</label>
-                                        <select
-                                            value={taskFilterUser || ''}
-                                            onChange={(e) => setTaskFilterUser(e.target.value ? Number(e.target.value) : null)}
-                                            style={{
-                                                background: 'rgba(255, 255, 255, 0.05)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                borderRadius: '8px',
-                                                padding: '8px 12px',
-                                                color: '#fff',
-                                                fontSize: '14px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <option value="">Tutti</option>
-                                            {getTeamUsers().map(user => (
-                                                <option key={user.id} value={user.id}>{user.name}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '150px' }}>
-                                        <label style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>Priorità</label>
-                                        <select
-                                            value={taskFilterPriority}
-                                            onChange={(e) => setTaskFilterPriority(e.target.value)}
-                                            style={{
-                                                background: 'rgba(255, 255, 255, 0.05)',
-                                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                borderRadius: '8px',
-                                                padding: '8px 12px',
-                                                color: '#fff',
-                                                fontSize: '14px',
-                                                cursor: 'pointer'
-                                            }}
-                                        >
-                                            <option value="all">Tutte</option>
-                                            <option value="low">Bassa</option>
-                                            <option value="medium">Media</option>
-                                            <option value="high">Alta</option>
-                                            <option value="urgent">Urgente</option>
-                                        </select>
-                                    </div>
-                                    <button
-                                        className="btn-secondary"
-                                        onClick={() => {
-                                            setTaskFilterStatus('all');
-                                            setTaskFilterUser(null);
-                                            setTaskFilterPriority('all');
-                                        }}
-                                        style={{ padding: '8px 16px' }}
-                                    >
-                                        Reset
-                                    </button>
+                            {/* ── ACTIVE FILTER CHIPS ── */}
+                            {(taskFilterStatus !== 'all' || taskFilterUser !== null || taskFilterPriority !== 'all') && (
+                                <div className="pd-tasks-active-filters">
+                                    {taskFilterStatus !== 'all' && (
+                                        <span className="pd-tasks-filter-chip">
+                                            {taskFilterStatus === 'in_progress' ? 'In Corso' : taskFilterStatus === 'completed' ? 'Completati' : taskFilterStatus === 'review' ? 'In Revisione' : taskFilterStatus === 'cancelled' ? 'Annullati' : 'In Attesa'}
+                                            <button className="pd-tasks-chip-remove" onClick={() => setTaskFilterStatus('all')}><X size={10} /></button>
+                                        </span>
+                                    )}
+                                    {taskFilterUser !== null && (
+                                        <span className="pd-tasks-filter-chip">
+                                            {getTeamUsers().find(u => u.id === taskFilterUser)?.name ?? `Utente #${taskFilterUser}`}
+                                            <button className="pd-tasks-chip-remove" onClick={() => setTaskFilterUser(null)}><X size={10} /></button>
+                                        </span>
+                                    )}
+                                    {taskFilterPriority !== 'all' && (
+                                        <span className="pd-tasks-filter-chip urgent">
+                                            {taskFilterPriority === 'urgent' ? 'Urgenti' : taskFilterPriority === 'high' ? 'Alta' : taskFilterPriority === 'medium' ? 'Media' : 'Bassa'}
+                                            <button className="pd-tasks-chip-remove" onClick={() => setTaskFilterPriority('all')}><X size={10} /></button>
+                                        </span>
+                                    )}
                                 </div>
                             )}
 
-                            {/* Reschedule Requests Section */}
+                            {/* ── RESCHEDULE REQUESTS ── */}
                             {rescheduleRequests.filter(r => r.status === 'pending').length > 0 && (
-                                <div style={{ 
-                                    background: 'rgba(255, 149, 0, 0.1)', 
-                                    border: '1px solid rgba(255, 149, 0, 0.3)', 
-                                    borderRadius: '12px', 
-                                    padding: '16px', 
-                                    marginBottom: '24px' 
-                                }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                                        <AlertCircle size={20} color="#FF9500" />
-                                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>Richieste di Spostamento Data</h3>
-                                        <span style={{ 
-                                            background: 'rgba(255, 149, 0, 0.2)', 
-                                            color: '#FF9500', 
-                                            padding: '2px 8px', 
-                                            borderRadius: '12px', 
-                                            fontSize: '12px' 
-                                        }}>
-                                            {rescheduleRequests.filter(r => r.status === 'pending').length}
-                                        </span>
+                                <div className="pd-tasks-reschedule-banner">
+                                    <div className="pd-tasks-reschedule-header">
+                                        <AlertCircle size={18} color="#FF9500" />
+                                        <span className="pd-tasks-reschedule-title">Richieste di Spostamento Data</span>
+                                        <span className="pd-tasks-reschedule-count">{rescheduleRequests.filter(r => r.status === 'pending').length}</span>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div className="pd-tasks-reschedule-list">
                                         {rescheduleRequests.filter(r => r.status === 'pending').map((req) => (
-                                            <div key={req.id} style={{ 
-                                                background: 'rgba(255, 255, 255, 0.05)', 
-                                                padding: '12px', 
-                                                borderRadius: '8px',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center'
-                                            }}>
+                                            <div key={req.id} className="pd-tasks-reschedule-item">
                                                 <div>
-                                                    <div style={{ fontWeight: 600, marginBottom: '4px' }}>
-                                                        {req.task?.title || 'Task #' + req.crm_project_task_id}
-                                                    </div>
-                                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                                                    <div className="pd-tasks-reschedule-task-title">{req.task?.title || 'Task #' + req.crm_project_task_id}</div>
+                                                    <div className="pd-tasks-reschedule-meta">
                                                         {req.user?.name} • Da {formatDate(req.current_due_date)} a {formatDate(req.requested_due_date)}
                                                         {req.reason && ` • ${req.reason}`}
                                                     </div>
                                                 </div>
-                                                <div style={{ display: 'flex', gap: '8px' }}>
-                                                    <button
-                                                        className="btn-secondary"
-                                                        onClick={async () => {
-                                                            if (confirm('Approvare questa richiesta?')) {
-                                                                try {
-                                                                    await crmProjectTasksApi.reviewRescheduleRequest(Number(id), req.id, { status: 'approved' });
-                                                                    alert('✓ Richiesta approvata');
-                                                                    await loadRescheduleRequests();
-                                                                    await loadTasks();
-                                                                } catch (error: any) {
-                                                                    alert('Errore: ' + (error.response?.data?.message || 'Errore sconosciuto'));
-                                                                }
+                                                <div className="pd-tasks-reschedule-actions">
+                                                    <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={async () => {
+                                                        if (confirm('Approvare questa richiesta?')) {
+                                                            try {
+                                                                await crmProjectTasksApi.reviewRescheduleRequest(Number(id), req.id, { status: 'approved' });
+                                                                alert('✓ Richiesta approvata');
+                                                                await loadRescheduleRequests();
+                                                                await loadTasks();
+                                                            } catch (error: any) {
+                                                                alert('Errore: ' + (error.response?.data?.message || 'Errore sconosciuto'));
                                                             }
-                                                        }}
-                                                        style={{ padding: '6px 12px', fontSize: '12px' }}
-                                                    >
-                                                        Approva
-                                                    </button>
-                                                    <button
-                                                        className="btn-secondary"
-                                                        onClick={async () => {
-                                                            const notes = prompt('Motivo del rifiuto (opzionale):');
-                                                            if (notes !== null) {
-                                                                try {
-                                                                    await crmProjectTasksApi.reviewRescheduleRequest(Number(id), req.id, { 
-                                                                        status: 'rejected',
-                                                                        review_notes: notes || undefined
-                                                                    });
-                                                                    alert('✓ Richiesta rifiutata');
-                                                                    await loadRescheduleRequests();
-                                                                } catch (error: any) {
-                                                                    alert('Errore: ' + (error.response?.data?.message || 'Errore sconosciuto'));
-                                                                }
+                                                        }
+                                                    }}>Approva</button>
+                                                    <button className="btn-secondary" style={{ padding: '6px 12px', fontSize: '12px' }} onClick={async () => {
+                                                        const notes = prompt('Motivo del rifiuto (opzionale):');
+                                                        if (notes !== null) {
+                                                            try {
+                                                                await crmProjectTasksApi.reviewRescheduleRequest(Number(id), req.id, { status: 'rejected', review_notes: notes || undefined });
+                                                                alert('✓ Richiesta rifiutata');
+                                                                await loadRescheduleRequests();
+                                                            } catch (error: any) {
+                                                                alert('Errore: ' + (error.response?.data?.message || 'Errore sconosciuto'));
                                                             }
-                                                        }}
-                                                        style={{ padding: '6px 12px', fontSize: '12px' }}
-                                                    >
-                                                        Rifiuta
-                                                    </button>
+                                                        }
+                                                    }}>Rifiuta</button>
                                                 </div>
                                             </div>
                                         ))}
@@ -3092,17 +3088,34 @@ const ProjectDetailPage: React.FC = () => {
                             )}
 
                             {loadingTasks ? (
-                                <div style={{ textAlign: 'center', padding: '40px' }}>
-                                    <p>Caricamento task...</p>
-                                </div>
+                                <div className="pd-tasks-loading"><p>Caricamento task...</p></div>
                             ) : filteredTasks.length === 0 ? (
-                            <div className="empty-state-card">
-                                <CheckSquare size={48} />
-                                <p>Nessun task disponibile</p>
-                                <p className="empty-subtitle">I task verranno visualizzati qui quando verranno aggiunti al progetto</p>
-                            </div>
+                                <div className="pd-tasks-empty">
+                                    <CheckSquare size={40} className="pd-tasks-empty-icon" />
+                                    <p className="pd-tasks-empty-title">Nessun task trovato</p>
+                                    {canCreateTask && (
+                                        <button className="pd-tasks-empty-btn" onClick={handleOpenTaskModal}>
+                                            <Plus size={14} />
+                                            Crea il primo task
+                                        </button>
+                                    )}
+                                </div>
                             ) : (
                                 <>
+                                    {/* ── GROUPING TOGGLE ── */}
+                                    <div className="pd-tasks-groupby-row">
+                                        <span className="pd-tasks-groupby-label">Raggruppa per:</span>
+                                        {(['none', 'status', 'assignee', 'priority'] as const).map(g => (
+                                            <button
+                                                key={g}
+                                                className={`pd-tasks-groupby-pill${taskGroupBy === g ? ' active' : ''}`}
+                                                onClick={() => setTaskGroupBy(g)}
+                                            >
+                                                {g === 'none' ? 'Nessuno' : g === 'status' ? 'Status' : g === 'assignee' ? 'Assegnato' : 'Priorità'}
+                                            </button>
+                                        ))}
+                                    </div>
+
                                     {tasksView === 'users' && (
                                         <div className="tasks-users-view">
                                             {/* Vista per Utenti - raggruppa per utente assegnato */}
@@ -3134,10 +3147,7 @@ const ProjectDetailPage: React.FC = () => {
                                                         </div>
                                                         <div className="user-tasks-list">
                                                             {userTasks.map(task => (
-                                                                <div key={task.id} className="task-item" onClick={() => {
-                                                                    setSelectedTask(task);
-                                                                    setShowTaskDetail(true);
-                                                                }}>
+                                                                <div key={task.id} className="task-item" onClick={() => handleOpenTaskDetail(task)}>
                                                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                                                                         <div style={{ flex: 1 }}>
                                                                             <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 600 }}>
@@ -3231,436 +3241,237 @@ const ProjectDetailPage: React.FC = () => {
                                     )}
 
                                     {tasksView === 'table' && (
-                                        <div className="tasks-table-view">
-                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                                <thead>
-                                                    <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Task</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Assegnato a</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Stato</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Priorità</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Scadenza</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Budget</th>
-                                                        <th style={{ textAlign: 'left', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Progresso</th>
-                                                        <th style={{ textAlign: 'right', padding: '12px', fontSize: '12px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.6)' }}>Azioni</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {filteredTasks.map(task => (
-                                                        <tr key={task.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', cursor: 'pointer' }} onClick={() => {
-                                                            setSelectedTask(task);
-                                                            setShowTaskDetail(true);
-                                                        }}>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <div style={{ fontWeight: 600, marginBottom: '4px' }}>{task.title}</div>
-                                                                {task.description && (
-                                                                    <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.5)', maxWidth: '300px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                                        {task.description}
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                                                                    {task.assignments?.filter(a => a.is_active).map(assignment => (
-                                                                        <div key={assignment.id} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
-                                                                            {assignment.user?.avatar ? (
-                                                                                <img src={assignment.user.avatar} alt={assignment.user.name} style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
-                                                                            ) : (
-                                                                                <User size={16} />
-                                                                            )}
-                                                                            <span>{assignment.user?.name}</span>
-                                                                        </div>
-                                                                    ))}
-                                                                    {(!task.assignments || task.assignments.filter(a => a.is_active).length === 0) && (
-                                                                        <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.4)' }}>Non assegnato</span>
-                                                                    )}
-                                                                </div>
-                                                            </td>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <span style={{ 
-                                                                    padding: '4px 8px', 
-                                                                    borderRadius: '4px', 
-                                                                    fontSize: '12px',
-                                                                    background: getStatusColor(task.status) + '20',
-                                                                    color: getStatusColor(task.status)
-                                                                }}>
-                                                                    {task.status === 'in_progress' ? 'In Corso' : 
-                                                                     task.status === 'completed' ? 'Completato' :
-                                                                     task.status === 'review' ? 'In Revisione' :
-                                                                     task.status === 'cancelled' ? 'Cancellato' : 'In Attesa'}
-                                                                </span>
-                                                            </td>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <span style={{ 
-                                                                    padding: '4px 8px', 
-                                                                    borderRadius: '4px', 
-                                                                    fontSize: '12px',
-                                                                    background: getPriorityColor(task.priority) + '20',
-                                                                    color: getPriorityColor(task.priority)
-                                                                }}>
-                                                                    {task.priority === 'urgent' ? 'Urgente' :
-                                                                     task.priority === 'high' ? 'Alta' :
-                                                                     task.priority === 'medium' ? 'Media' : 'Bassa'}
-                                                                </span>
-                                                            </td>
-                                                            <td style={{ padding: '12px', fontSize: '12px' }}>
-                                                                {task.due_date ? formatDate(task.due_date) : '-'}
-                                                            </td>
-                                                            <td style={{ padding: '12px', fontSize: '12px' }}>
-                                                                {task.budget_cocchi ? `${(Number(task.budget_cocchi) || 0).toFixed(2)} ¢` : '-'}
-                                                            </td>
-                                                            <td style={{ padding: '12px' }}>
-                                                                <div style={{ 
-                                                                    width: '100%', 
-                                                                    height: '8px', 
-                                                                    background: 'rgba(255, 255, 255, 0.1)', 
-                                                                    borderRadius: '4px',
-                                                                    overflow: 'hidden'
-                                                                }}>
-                                                                    <div style={{ 
-                                                                        width: `${task.progress}%`, 
-                                                                        height: '100%', 
-                                                                        background: getStatusColor(task.status),
-                                                                        transition: 'width 0.3s'
-                                                                    }} />
-                                                                </div>
-                                                                <span style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '4px', display: 'block' }}>
-                                                                    {task.progress}%
-                                                                </span>
-                                                            </td>
-                                                            <td style={{ padding: '12px', textAlign: 'right' }}>
-                                                                <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
-                                                                    {isPmInFreelanceContext && task.status !== 'completed' && task.status !== 'cancelled' && (
-                                                                        <button
-                                                                            className="btn-secondary"
-                                                                            onClick={(e) => {
-                                                                                e.stopPropagation();
-                                                                                handleMarkTaskCompleted(task);
-                                                                            }}
-                                                                            style={{ padding: '6px', color: 'var(--color-success, #34C759)' }}
-                                                                            title="Segna completata"
-                                                                            disabled={completingTaskId === task.id}
-                                                                        >
-                                                                            {completingTaskId === task.id ? (
-                                                                                <span style={{ fontSize: '12px' }}>...</span>
-                                                                            ) : (
-                                                                                <CheckCircle2 size={14} />
-                                                                            )}
-                                                                        </button>
-                                                                    )}
+                                        <div className="pd-tasks-grid-container" onClick={() => setActiveTaskRowMenu(null)}>
+                                            {/* ── GRID HEADER ── */}
+                                            <div className="pd-tasks-grid-header">
+                                                <div className="pd-tasks-col pd-tasks-col-checkbox" />
+                                                <div className="pd-tasks-col pd-tasks-col-priority">Priorità</div>
+                                                <div className="pd-tasks-col pd-tasks-col-title">Titolo</div>
+                                                <div className="pd-tasks-col pd-tasks-col-assignee">Assegnato</div>
+                                                <div className="pd-tasks-col pd-tasks-col-status">Status</div>
+                                                <div className="pd-tasks-col pd-tasks-col-due">Scadenza</div>
+                                                <div className="pd-tasks-col pd-tasks-col-actions" />
+                                            </div>
+                                            {/* ── GRID BODY (with optional grouping) ── */}
+                                            {(() => {
+                                                const computeGroups = () => {
+                                                    if (taskGroupBy === 'status') {
+                                                        const order = ['pending', 'in_progress', 'review', 'completed', 'cancelled'] as const;
+                                                        const labels: Record<string, string> = { pending: 'In Attesa', in_progress: 'In Corso', review: 'In Revisione', completed: 'Completati', cancelled: 'Annullati' };
+                                                        return order.map(s => ({ key: s as string, label: labels[s] as string | null, tasks: filteredTasks.filter(t => t.status === s) })).filter(g => g.tasks.length > 0);
+                                                    }
+                                                    if (taskGroupBy === 'priority') {
+                                                        const order = ['urgent', 'high', 'medium', 'low'] as const;
+                                                        const labels: Record<string, string> = { urgent: 'Urgente', high: 'Alta', medium: 'Media', low: 'Bassa' };
+                                                        return order.map(p => ({ key: p as string, label: labels[p] as string | null, tasks: filteredTasks.filter(t => t.priority === p) })).filter(g => g.tasks.length > 0);
+                                                    }
+                                                    if (taskGroupBy === 'assignee') {
+                                                        const m = new Map<string, { label: string; tasks: CrmProjectTask[] }>();
+                                                        filteredTasks.forEach(task => {
+                                                            const active = task.assignments?.filter(a => a.is_active) ?? [];
+                                                            if (active.length === 0) {
+                                                                if (!m.has('__none')) m.set('__none', { label: 'Non assegnato', tasks: [] });
+                                                                m.get('__none')!.tasks.push(task);
+                                                            } else {
+                                                                active.forEach(a => {
+                                                                    const key = `u${a.user_id}`;
+                                                                    if (!m.has(key)) m.set(key, { label: a.user?.name ?? `#${a.user_id}`, tasks: [] });
+                                                                    m.get(key)!.tasks.push(task);
+                                                                });
+                                                            }
+                                                        });
+                                                        return Array.from(m.entries()).map(([k, v]) => ({ key: k, label: v.label as string | null, tasks: v.tasks }));
+                                                    }
+                                                    return [{ key: 'all', label: null as string | null, tasks: filteredTasks }];
+                                                };
+                                                return computeGroups().map((group) => (
+                                                    <React.Fragment key={group.key}>
+                                                        {group.label !== null && (
+                                                            <div className="pd-tasks-group-header-row">
+                                                                <span className="pd-tasks-group-name">{group.label}</span>
+                                                                <span className="pd-tasks-group-badge">{group.tasks.length}</span>
+                                                            </div>
+                                                        )}
+                                                        {group.tasks.map((task, idx) => (
+                                                            <div
+                                                                key={task.id}
+                                                                className={`pd-tasks-grid-row${task.status === 'completed' ? ' completed' : ''}${idx === group.tasks.length - 1 ? ' last' : ''}`}
+                                                                onClick={() => handleOpenTaskDetail(task)}
+                                                            >
+                                                                {/* Checkbox */}
+                                                                <div className="pd-tasks-col pd-tasks-col-checkbox" onClick={(e) => e.stopPropagation()}>
                                                                     <button
-                                                                        className="btn-secondary"
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setSelectedTask(task);
-                                                                            setShowTaskDetail(true);
-                                                                        }}
-                                                                        style={{ padding: '6px' }}
-                                                                        title="Dettagli"
+                                                                        className={`pd-tasks-checkbox${task.status === 'completed' ? ' checked' : ''}`}
+                                                                        onClick={() => { if (task.status !== 'completed') handleMarkTaskCompleted(task); }}
+                                                                        disabled={completingTaskId === task.id}
+                                                                        title={task.status === 'completed' ? 'Completato' : 'Segna completato'}
                                                                     >
-                                                                        <Eye size={14} />
+                                                                        {task.status === 'completed' && <CheckCircle2 size={10} />}
                                                                     </button>
-                                                                    <a
-                                                                        href={`/freelance/task/${task.id}?projectId=${id}`}
-                                                                        target="_blank"
-                                                                        rel="noopener noreferrer"
-                                                                        className="btn-secondary"
-                                                                        style={{ padding: '6px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-                                                                        title="Visualizza in un'altra pagina"
-                                                                        onClick={(e) => e.stopPropagation()}
-                                                                    >
-                                                                        <ExternalLink size={14} />
-                                                                    </a>
-                                                                    {(!isFreelanceContext || isPmInFreelanceContext) && (
-                                                                        <>
-                                                                            <button
-                                                                                className="btn-secondary"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleOpenEditTaskModal(task);
-                                                                                }}
-                                                                                style={{ padding: '6px' }}
-                                                                                title="Modifica"
-                                                                            >
-                                                                                <Edit size={14} />
-                                                                            </button>
-                                                                            <button
-                                                                                className="btn-secondary"
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleDeleteTask(task);
-                                                                                }}
-                                                                                style={{ padding: '6px' }}
-                                                                                title="Elimina"
-                                                                            >
-                                                                                <Trash2 size={14} />
-                                                                            </button>
-                                                                        </>
+                                                                </div>
+                                                                {/* Priority dot */}
+                                                                <div className="pd-tasks-col pd-tasks-col-priority">
+                                                                    <span
+                                                                        className="pd-tasks-priority-dot"
+                                                                        style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }}
+                                                                        title={task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Bassa'}
+                                                                    />
+                                                                </div>
+                                                                {/* Title */}
+                                                                <div className="pd-tasks-col pd-tasks-col-title">
+                                                                    <span className={`pd-tasks-task-title${task.status === 'completed' ? ' completed' : ''}`}>
+                                                                        {task.title}
+                                                                    </span>
+                                                                </div>
+                                                                {/* Assignee */}
+                                                                <div className="pd-tasks-col pd-tasks-col-assignee">
+                                                                    {task.assignments && task.assignments.filter(a => a.is_active).length > 0 ? (
+                                                                        <div className="pd-tasks-avatar-stack">
+                                                                            {task.assignments.filter(a => a.is_active).slice(0, 3).map((assignment, aIdx) => (
+                                                                                <div
+                                                                                    key={assignment.id}
+                                                                                    className="pd-tasks-avatar"
+                                                                                    style={{ zIndex: 10 - aIdx, marginLeft: aIdx > 0 ? '-4px' : '0' }}
+                                                                                    title={assignment.user?.name}
+                                                                                >
+                                                                                    {assignment.user?.avatar ? (
+                                                                                        <img src={assignment.user.avatar} alt={assignment.user.name} />
+                                                                                    ) : (
+                                                                                        <span>{assignment.user?.name?.charAt(0) ?? '?'}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                            ))}
+                                                                            {task.assignments.filter(a => a.is_active).length === 1 && (
+                                                                                <span className="pd-tasks-assignee-name">
+                                                                                    {task.assignments.find(a => a.is_active)?.user?.name}
+                                                                                </span>
+                                                                            )}
+                                                                            {task.assignments.filter(a => a.is_active).length > 3 && (
+                                                                                <span className="pd-tasks-avatar-more">+{task.assignments.filter(a => a.is_active).length - 3}</span>
+                                                                            )}
+                                                                        </div>
+                                                                    ) : (
+                                                                        <span className="pd-tasks-unassigned">—</span>
                                                                     )}
                                                                 </div>
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
+                                                                {/* Status badge */}
+                                                                <div className="pd-tasks-col pd-tasks-col-status">
+                                                                    <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
+                                                                        {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
+                                                                    </span>
+                                                                </div>
+                                                                {/* Due date */}
+                                                                <div className="pd-tasks-col pd-tasks-col-due">
+                                                                    {task.due_date ? (
+                                                                        <span style={{ fontSize: '12px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
+                                                                            {formatDate(task.due_date)}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>—</span>
+                                                                    )}
+                                                                </div>
+                                                                {/* Row actions (three-dot menu) */}
+                                                                <div className="pd-tasks-col pd-tasks-col-actions" onClick={(e) => e.stopPropagation()}>
+                                                                    <div className="pd-tasks-actions-wrap">
+                                                                        <button
+                                                                            className="pd-tasks-more-btn"
+                                                                            onClick={() => setActiveTaskRowMenu(activeTaskRowMenu === task.id ? null : task.id)}
+                                                                            title="Azioni"
+                                                                        >
+                                                                            <MoreHorizontal size={14} />
+                                                                        </button>
+                                                                        {activeTaskRowMenu === task.id && (
+                                                                            <div className="pd-tasks-row-menu">
+                                                                                <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenTaskDetail(task); setActiveTaskRowMenu(null); }}>
+                                                                                    <Eye size={13} /> Visualizza
+                                                                                </button>
+                                                                                {(!isFreelanceContext || isPmInFreelanceContext) && (
+                                                                                    <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenEditTaskModal(task); setActiveTaskRowMenu(null); }}>
+                                                                                        <Edit size={13} /> Riassegna
+                                                                                    </button>
+                                                                                )}
+                                                                                {(!isFreelanceContext || isPmInFreelanceContext) && (
+                                                                                    <button className="pd-tasks-row-menu-item danger" onClick={() => { handleDeleteTask(task); setActiveTaskRowMenu(null); }}>
+                                                                                        <Trash2 size={13} /> Elimina
+                                                                                    </button>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </React.Fragment>
+                                                ));
+                                            })()}
                                         </div>
                                     )}
 
                                     {tasksView === 'cards' && (
-                                        <div className="tasks-cards-view" style={{ 
-                                            display: 'grid', 
-                                            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', 
-                                            gap: '16px' 
-                                        }}>
+                                        <div className="pd-tasks-cards-view">
                                             {filteredTasks.map(task => (
-                                                <div 
-                                                    key={task.id} 
-                                                    className="task-card"
-                                                    onClick={() => {
-                                                        setSelectedTask(task);
-                                                        setShowTaskDetail(true);
-                                                    }}
-                                                    style={{
-                                                        background: 'rgba(255, 255, 255, 0.03)',
-                                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                                        borderRadius: '12px',
-                                                        padding: '16px',
-                                                        cursor: 'pointer',
-                                                        transition: 'all 0.2s'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)';
-                                                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                                                    }}
-                                                >
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-                                                        <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600, flex: 1 }}>
-                                                            {task.title}
-                                                        </h3>
-                                                        <span style={{ 
-                                                            padding: '4px 8px', 
-                                                            borderRadius: '4px', 
-                                                            fontSize: '11px',
-                                                            background: getPriorityColor(task.priority) + '20',
-                                                            color: getPriorityColor(task.priority),
-                                                            fontWeight: 600
-                                                        }}>
-                                                            {task.priority === 'urgent' ? 'Urgente' :
-                                                             task.priority === 'high' ? 'Alta' :
-                                                             task.priority === 'medium' ? 'Media' : 'Bassa'}
+                                                <div key={task.id} className="pd-tasks-card" onClick={() => handleOpenTaskDetail(task)}>
+                                                    <div className="pd-tasks-card-header">
+                                                        <h3 className={`pd-tasks-card-title${task.status === 'completed' ? ' completed' : ''}`}>{task.title}</h3>
+                                                        <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
+                                                            {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
                                                         </span>
                                                     </div>
-                                                    
                                                     {task.description && (
-                                                        <p style={{ 
-                                                            fontSize: '13px', 
-                                                            color: 'rgba(255, 255, 255, 0.6)', 
-                                                            margin: '0 0 12px 0',
-                                                            display: '-webkit-box',
-                                                            WebkitLineClamp: 2,
-                                                            WebkitBoxOrient: 'vertical',
-                                                            overflow: 'hidden'
-                                                        }}>
-                                                            {task.description}
-                                                        </p>
+                                                        <p className="pd-tasks-card-desc">{task.description}</p>
                                                     )}
-
-                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
-                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px' }}>
-                                                            <span style={{ 
-                                                                padding: '4px 8px', 
-                                                                borderRadius: '4px', 
-                                                                background: getStatusColor(task.status) + '20',
-                                                                color: getStatusColor(task.status)
-                                                            }}>
-                                                                {task.status === 'in_progress' ? 'In Corso' : 
-                                                                 task.status === 'completed' ? 'Completato' :
-                                                                 task.status === 'review' ? 'In Revisione' :
-                                                                 task.status === 'cancelled' ? 'Cancellato' : 'In Attesa'}
-                                                            </span>
-                                                        </div>
-
-                                                        {task.assignments && task.assignments.filter(a => a.is_active).length > 0 && (
-                                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                                                {task.assignments.filter(a => a.is_active).map(assignment => (
-                                                                    <div key={assignment.id} style={{ 
-                                                                        display: 'flex', 
-                                                                        alignItems: 'center', 
-                                                                        gap: '6px',
-                                                                        fontSize: '12px',
-                                                                        color: 'rgba(255, 255, 255, 0.7)'
-                                                                    }}>
-                                                                        {assignment.user?.avatar ? (
-                                                                            <img src={assignment.user.avatar} alt={assignment.user.name} style={{ width: '20px', height: '20px', borderRadius: '50%' }} />
-                                                                        ) : (
-                                                                            <User size={16} />
-                                                                        )}
-                                                                        <span>{assignment.user?.name}</span>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
-
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', flexWrap: 'wrap', gap: '8px' }}>
-                                                            <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>
-                                                                {task.due_date && (
-                                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                                        <CalendarIcon size={14} />
-                                                                        {formatDate(task.due_date)}
-                                                                </span>
-                                                            )}
-                                                            {task.budget_cocchi && (
-                                                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                                                    <CocchiIcon size={14} />
-                                                                    {(Number(task.budget_cocchi) || 0).toFixed(2)} ¢
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                                                            <a
-                                                                href={`/freelance/task/${task.id}?projectId=${id}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                onClick={(e) => e.stopPropagation()}
-                                                                style={{
-                                                                    padding: '6px 12px',
-                                                                    background: 'rgba(10, 132, 255, 0.2)',
-                                                                    border: '1px solid rgba(10, 132, 255, 0.3)',
-                                                                    borderRadius: '6px',
-                                                                    color: '#0A84FF',
-                                                                    cursor: 'pointer',
-                                                                    fontSize: '12px',
-                                                                    display: 'inline-flex',
-                                                                    alignItems: 'center',
-                                                                    gap: '6px',
-                                                                    textDecoration: 'none',
-                                                                    transition: 'all 0.2s'
-                                                                }}
-                                                                title="Visualizza in un'altra pagina"
-                                                            >
-                                                                <ExternalLink size={14} />
-                                                                Apri in nuova scheda
-                                                            </a>
-                                                            {isPmInFreelanceContext && task.status !== 'completed' && task.status !== 'cancelled' && (
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleMarkTaskCompleted(task);
-                                                                    }}
-                                                                    disabled={completingTaskId === task.id}
-                                                                    style={{
-                                                                        padding: '6px 12px',
-                                                                        background: 'rgba(52, 199, 89, 0.2)',
-                                                                        border: '1px solid rgba(52, 199, 89, 0.3)',
-                                                                        borderRadius: '6px',
-                                                                        color: '#34C759',
-                                                                        cursor: completingTaskId === task.id ? 'wait' : 'pointer',
-                                                                        fontSize: '12px',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '6px',
-                                                                        transition: 'all 0.2s'
-                                                                    }}
-                                                                >
-                                                                    {completingTaskId === task.id ? '...' : <CheckCircle2 size={14} />}
-                                                                    Segna completata
-                                                                </button>
-                                                            )}
-                                                            {(!isFreelanceContext || isPmInFreelanceContext) && (
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleDeleteTask(task);
-                                                                    }}
-                                                                    style={{
-                                                                        padding: '6px 12px',
-                                                                        background: 'rgba(255, 59, 48, 0.2)',
-                                                                        border: '1px solid rgba(255, 59, 48, 0.3)',
-                                                                        borderRadius: '6px',
-                                                                        color: '#FF3B30',
-                                                                        cursor: 'pointer',
-                                                                        fontSize: '12px',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '6px',
-                                                                        transition: 'all 0.2s'
-                                                                    }}
-                                                                    onMouseEnter={(e) => {
-                                                                        e.currentTarget.style.background = 'rgba(255, 59, 48, 0.3)';
-                                                                    }}
-                                                                    onMouseLeave={(e) => {
-                                                                        e.currentTarget.style.background = 'rgba(255, 59, 48, 0.2)';
-                                                                    }}
-                                                                >
-                                                                    <Trash2 size={14} />
-                                                                    Elimina
-                                                                </button>
-                                                            )}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div style={{ marginTop: '12px' }}>
-                                                        <div style={{ 
-                                                            width: '100%', 
-                                                            height: '6px', 
-                                                            background: 'rgba(255, 255, 255, 0.1)', 
-                                                            borderRadius: '3px',
-                                                            overflow: 'hidden',
-                                                            marginBottom: '4px'
-                                                        }}>
-                                                            <div style={{ 
-                                                                width: `${task.progress}%`, 
-                                                                height: '100%', 
-                                                                background: getStatusColor(task.status),
-                                                                transition: 'width 0.3s'
-                                                            }} />
-                                                        </div>
-                                                        <span style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)' }}>
-                                                            {task.progress}% completato
+                                                    <div className="pd-tasks-card-meta">
+                                                        <span className="pd-tasks-card-priority">
+                                                            <span className="pd-tasks-priority-dot" style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }} />
+                                                            {task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Bassa'}
                                                         </span>
+                                                        {task.due_date && (
+                                                            <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
+                                                                <CalendarIcon size={12} />{formatDate(task.due_date)}
+                                                            </span>
+                                                        )}
                                                     </div>
-
-                                                    <div style={{ display: 'flex', gap: '8px', marginTop: '12px', justifyContent: 'flex-end' }}>
-                                                        <button
-                                                            className="btn-secondary"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setSelectedTask(task);
-                                                                setShowTaskDetail(true);
-                                                            }}
-                                                            style={{ padding: '6px 12px', fontSize: '12px' }}
-                                                        >
-                                                            <Eye size={14} style={{ marginRight: '4px' }} />
-                                                            Dettagli
+                                                    {task.assignments && task.assignments.filter(a => a.is_active).length > 0 && (
+                                                        <div className="pd-tasks-avatar-stack" style={{ marginTop: '10px' }}>
+                                                            {task.assignments.filter(a => a.is_active).slice(0, 3).map((assignment, aIdx) => (
+                                                                <div key={assignment.id} className="pd-tasks-avatar" style={{ zIndex: 10 - aIdx, marginLeft: aIdx > 0 ? '-4px' : '0' }} title={assignment.user?.name}>
+                                                                    {assignment.user?.avatar ? (
+                                                                        <img src={assignment.user.avatar} alt={assignment.user.name} />
+                                                                    ) : (
+                                                                        <span>{assignment.user?.name?.charAt(0) ?? '?'}</span>
+                                                                    )}
+                                                                </div>
+                                                            ))}
+                                                            {task.assignments.filter(a => a.is_active).length === 1 && (
+                                                                <span className="pd-tasks-assignee-name">{task.assignments.find(a => a.is_active)?.user?.name}</span>
+                                                            )}
+                                                            {task.assignments.filter(a => a.is_active).length > 3 && (
+                                                                <span className="pd-tasks-avatar-more">+{task.assignments.filter(a => a.is_active).length - 3}</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    <div className="pd-tasks-card-progress">
+                                                        <div className="pd-tasks-card-progress-bar">
+                                                            <div className="pd-tasks-card-progress-fill" style={{ width: `${task.progress}%`, background: getStatusColor(task.status) }} />
+                                                        </div>
+                                                        <span className="pd-tasks-card-progress-label">{task.progress}%</span>
+                                                    </div>
+                                                    <div className="pd-tasks-card-actions" onClick={(e) => e.stopPropagation()}>
+                                                        <button className="pd-tasks-card-btn" onClick={() => handleOpenTaskDetail(task)}>
+                                                            <Eye size={13} /> Dettagli
                                                         </button>
+                                                        {isPmInFreelanceContext && task.status !== 'completed' && task.status !== 'cancelled' && (
+                                                            <button className="pd-tasks-card-btn success" onClick={() => handleMarkTaskCompleted(task)} disabled={completingTaskId === task.id}>
+                                                                <CheckCircle2 size={13} /> {completingTaskId === task.id ? '...' : 'Completata'}
+                                                            </button>
+                                                        )}
                                                         {(!isFreelanceContext || isPmInFreelanceContext) && (
                                                             <>
-                                                                <button
-                                                                    className="btn-secondary"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleOpenEditTaskModal(task);
-                                                                    }}
-                                                                    style={{ padding: '6px 12px', fontSize: '12px' }}
-                                                                >
-                                                                    <Edit size={14} style={{ marginRight: '4px' }} />
-                                                                    Modifica
+                                                                <button className="pd-tasks-card-btn" onClick={() => handleOpenEditTaskModal(task)}>
+                                                                    <Edit size={13} /> Modifica
                                                                 </button>
-                                                                <button
-                                                                    className="btn-secondary"
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleDeleteTask(task);
-                                                                    }}
-                                                                    style={{ padding: '6px 12px', fontSize: '12px' }}
-                                                                >
-                                                                    <Trash2 size={14} style={{ marginRight: '4px' }} />
-                                                                    Elimina
+                                                                <button className="pd-tasks-card-btn danger" onClick={() => handleDeleteTask(task)}>
+                                                                    <Trash2 size={13} /> Elimina
                                                                 </button>
                                                             </>
                                                         )}
@@ -3685,69 +3496,172 @@ const ProjectDetailPage: React.FC = () => {
                     )}
 
                     {/* FINANZIARIO */}
-                    {activeTab === 'financial' && (
+                    {activeTab === 'financial' && (() => {
+                        const _budget   = project.budget_cocchi || 0;
+                        const _spent    = project.spent_cocchi  || 0;
+                        const _avail    = _budget - _spent;
+                        const _pct      = _budget > 0 ? Math.min((_spent / _budget) * 100, 100) : 0;
+                        const _barColor = _pct >= 90 ? '#FF3B30' : _pct >= 70 ? '#FF9500' : '#34C759';
+                        return (
                         <div className="tab-panel">
-                            <div className="section-header">
-                                <h2 className="section-title">Calendario Entrate e Uscite</h2>
-                            </div>
-                            <div className="financial-grid">
-                                <div className="financial-card">
-                                    <div className="card-header-with-action">
-                                        <h3 className="card-title">Riepilogo Finanziario</h3>
-                                        <button
-                                            className="btn-add-extra-budget-small"
-                                            onClick={() => setShowExtraBudgetModal(true)}
-                                            title="Aggiungi budget extra"
-                                        >
-                                            <Plus size={16} />
-                                            Budget Extra
-                                        </button>
-                                    </div>
-                                    <div className="financial-summary">
-                                        <div className="financial-item">
-                                            <span className="financial-label">Budget Totale</span>
-                                            <span className="financial-value positive">{formatCurrency(project.budget_cocchi || 0)}</span>
+                            <div className="pd-fin-layout">
+
+                                {/* ── LEFT COLUMN: Financial Summary ── */}
+                                <div className="pd-fin-left">
+
+                                    {/* 1. Riepilogo Principale */}
+                                    <div className="pd-fin-section-label">Riepilogo Principale</div>
+                                    <div className="pd-fin-card pd-fin-summary-card">
+                                        <div className="pd-fin-card-header">
+                                            <span className="pd-fin-card-title">Budget &amp; Spese</span>
+                                            <button
+                                                className="pd-fin-extra-budget-btn"
+                                                onClick={() => setShowExtraBudgetModal(true)}
+                                                title="Aggiungi budget extra"
+                                            >
+                                                <Plus size={13} />
+                                                Budget Extra
+                                            </button>
                                         </div>
-                                        {project.settings?.extra_budget && project.settings.extra_budget.length > 0 && (
-                                            <div className="financial-item">
-                                                <span className="financial-label">Budget Extra</span>
-                                                <span className="financial-value positive" style={{ fontSize: '0.95rem' }}>
-                                                    + {formatCurrency(
-                                                        project.settings.extra_budget.reduce(
-                                                            (sum: number, item: any) => sum + (item.amount || 0),
-                                                            0
-                                                        )
-                                                    )}
+
+                                        {/* 3 stat tiles */}
+                                        <div className="pd-fin-stat-tiles-row">
+                                            <div className="pd-fin-stat-tile">
+                                                <div className="pd-fin-stat-trend pd-fin-trend-blue">
+                                                    <TrendingUp size={11} />
+                                                </div>
+                                                <div className="pd-fin-stat-value">{formatCurrency(_budget)}</div>
+                                                <div className="pd-fin-stat-label">Budget Totale</div>
+                                            </div>
+                                            <div className="pd-fin-stat-tile">
+                                                <div className="pd-fin-stat-trend pd-fin-trend-orange">
+                                                    <ArrowUp size={11} />
+                                                </div>
+                                                <div className="pd-fin-stat-value">{formatCurrency(_spent)}</div>
+                                                <div className="pd-fin-stat-label">Speso</div>
+                                            </div>
+                                            <div className="pd-fin-stat-tile">
+                                                <div className={`pd-fin-stat-trend ${_avail < 0 ? 'pd-fin-trend-red' : 'pd-fin-trend-green'}`}>
+                                                    {_avail < 0 ? <ArrowDown size={11} /> : <ArrowUp size={11} />}
+                                                </div>
+                                                <div className={`pd-fin-stat-value ${_avail < 0 ? 'pd-fin-negative' : 'pd-fin-positive'}`}>
+                                                    {formatCurrency(_avail)}
+                                                </div>
+                                                <div className="pd-fin-stat-label">Disponibile</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Budget utilization bar */}
+                                        <div className="pd-fin-utilization">
+                                            <div className="pd-fin-util-header">
+                                                <span className="pd-fin-util-label">Utilizzo Budget</span>
+                                                <span className="pd-fin-util-pct" style={{ color: _barColor }}>
+                                                    {_pct.toFixed(1)}%
                                                 </span>
                                             </div>
-                                        )}
-                                        <div className="financial-item">
-                                            <span className="financial-label">Speso</span>
-                                            <span className="financial-value negative">{formatCurrency(project.spent_cocchi || 0)}</span>
-                                        </div>
-                                        <div className="financial-item">
-                                            <span className="financial-label">Rimanente</span>
-                                            <span className="financial-value positive">{formatCurrency((project.budget_cocchi || 0) - (project.spent_cocchi || 0))}</span>
+                                            <div className="pd-fin-progress-track">
+                                                <div
+                                                    className="pd-fin-progress-fill"
+                                                    style={{ width: `${_pct}%`, backgroundColor: _barColor }}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
+
+                                    {/* 2. Transazioni Recenti */}
+                                    <div className="pd-fin-section-label">Transazioni Recenti</div>
+                                    <div className="pd-fin-card pd-fin-inset-card">
+                                        {financialTransactions.length === 0 ? (
+                                            <div className="pd-fin-empty-row">Nessuna transazione</div>
+                                        ) : (
+                                            <>
+                                                {financialTransactions.slice(0, 5).map((t: any, idx: number) => {
+                                                    const isIncome = t.type === 'entrata';
+                                                    const amt = parseFloat(t.amount_cocchi || t.amount || 0);
+                                                    const rawDate = t.transaction_date || t.date || t.created_at || null;
+                                                    return (
+                                                        <div key={t.id ?? idx} className="pd-fin-tx-row">
+                                                            <div className={`pd-fin-tx-icon ${isIncome ? 'pd-fin-icon-green' : 'pd-fin-icon-red'}`}>
+                                                                {isIncome ? <TrendingUp size={14} /> : <Receipt size={14} />}
+                                                            </div>
+                                                            <div className="pd-fin-tx-info">
+                                                                <span className="pd-fin-tx-desc">
+                                                                    {t.description || t.category || (isIncome ? 'Entrata' : 'Uscita')}
+                                                                </span>
+                                                            </div>
+                                                            <div className="pd-fin-tx-meta">
+                                                                <span className="pd-fin-tx-date">{formatDate(rawDate)}</span>
+                                                                <span className={`pd-fin-tx-amount ${isIncome ? 'pd-fin-positive' : 'pd-fin-negative'}`}>
+                                                                    {isIncome ? '+' : '-'}{formatCurrency(Math.abs(amt))}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                                {financialTransactions.length > 5 && (
+                                                    <div className="pd-fin-footer-link">
+                                                        Vedi tutte le transazioni →
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+
+                                    {/* 3. Spese Progetto */}
+                                    <div className="pd-fin-section-label">Spese Progetto</div>
+                                    <div className="pd-fin-card pd-fin-inset-card">
+                                        {projectExpenses.length === 0 ? (
+                                            <div className="pd-fin-empty-row">Nessuna spesa di progetto</div>
+                                        ) : (
+                                            <>
+                                                {projectExpenses.slice(0, 5).map((exp, idx) => (
+                                                    <div key={exp.id ?? idx} className="pd-fin-tx-row">
+                                                        <div className="pd-fin-tx-icon pd-fin-icon-orange">
+                                                            <Receipt size={14} />
+                                                        </div>
+                                                        <div className="pd-fin-tx-info">
+                                                            <span className="pd-fin-tx-desc">{exp.title}</span>
+                                                        </div>
+                                                        <div className="pd-fin-tx-meta">
+                                                            <span className="pd-fin-tx-date">{formatDate(exp.expense_date)}</span>
+                                                            <span className="pd-fin-tx-amount pd-fin-negative">
+                                                                -{formatCurrency(exp.amount_cocchi)}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                {projectExpenses.length > 5 && (
+                                                    <div className="pd-fin-footer-link">
+                                                        Vedi tutte le spese →
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="financial-card">
-                                    <h3 className="card-title">Calendario Finanziario</h3>
-                                    <FinancialCalendar 
-                                        projectId={Number(id)}
-                                        transactions={financialTransactions.map(t => ({
-                                            id: t.id,
-                                            type: t.type,
-                                            amount: parseFloat(t.amount_cocchi || t.amount || 0),
-                                            description: t.description || '',
-                                            date: new Date(t.transaction_date || t.date || t.created_at),
-                                            category: t.category
-                                        }))}
-                                    />
+
+                                {/* ── RIGHT COLUMN: Calendar ── */}
+                                <div className="pd-fin-right">
+                                    <div className="pd-fin-section-label">Calendario Finanziario</div>
+                                    <div className="pd-fin-card pd-fin-calendar-wrap">
+                                        <FinancialCalendar
+                                            projectId={Number(id)}
+                                            transactions={financialTransactions.map((t: any) => ({
+                                                id: t.id,
+                                                type: t.type,
+                                                amount: parseFloat(t.amount_cocchi || t.amount || 0),
+                                                description: t.description || '',
+                                                date: new Date(t.transaction_date || t.date || t.created_at),
+                                                category: t.category
+                                            }))}
+                                        />
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
-                    )}
+                        );
+                    })()}
 
                     {/* CRM COINVOLTI */}
                     {activeTab === 'crm_involved' && (
@@ -4063,6 +3977,11 @@ const ProjectDetailPage: React.FC = () => {
                                 )}
                             </div>
                         </div>
+                    )}
+
+                    {/* WORKSPACE */}
+                    {activeTab === 'workspace' && project && (
+                        <WorkspaceTab projectId={project.id} project={project} />
                     )}
                 </div>
             </div>
@@ -4530,6 +4449,15 @@ const ProjectDetailPage: React.FC = () => {
                                 </div>
                             )}
 
+                            {(taskExecutionMode === 'agent' || taskExecutionMode === 'agent_human') && (
+                                <ExactPromptCheckbox
+                                    checked={taskExactPrompt}
+                                    onChange={setTaskExactPrompt}
+                                    disabled={creatingTask}
+                                    id="task-exact-prompt"
+                                />
+                            )}
+
                             <div style={{ display: 'grid', gridTemplateColumns: taskExecutionMode !== 'agent' ? '1fr 1fr' : '1fr', gap: '16px' }}>
                                 {taskExecutionMode !== 'agent' && (
                                 <div className="form-group">
@@ -4939,8 +4867,8 @@ const ProjectDetailPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Modal Dettaglio Task */}
-            {showTaskDetail && selectedTask && (
+            {/* Modal Dettaglio Task (non usato per PM in contesto freelance — apre pagina dedicata) */}
+            {showTaskDetail && selectedTask && !isPmInFreelanceContext && (
                 <div className="modal-overlay" onClick={() => setShowTaskDetail(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '900px', maxHeight: '90vh', overflowY: 'auto' }}>
                         <div className="modal-header">
@@ -4996,12 +4924,20 @@ const ProjectDetailPage: React.FC = () => {
                                 </div>
                             )}
 
-                            {id && selectedTask && (
-                                <TaskAgentChatPanel
+                            {id && selectedTask && selectedTask.execution_mode && selectedTask.execution_mode !== 'human' && (
+                                <TaskAgentControlPanel
                                     projectId={Number(id)}
                                     taskId={selectedTask.id}
-                                    executionMode={selectedTask.execution_mode}
-                                    initialN8nStatus={selectedTask.n8n_status}
+                                    task={selectedTask}
+                                    onTaskUpdate={async () => {
+                                        await loadTasks();
+                                        // Refresh selectedTask data
+                                        const updatedTasks = await crmProjectTasksApi.getByProject(Number(id));
+                                        const updatedTask = updatedTasks.data.find(t => t.id === selectedTask.id);
+                                        if (updatedTask) {
+                                            setSelectedTask(updatedTask);
+                                        }
+                                    }}
                                 />
                             )}
 

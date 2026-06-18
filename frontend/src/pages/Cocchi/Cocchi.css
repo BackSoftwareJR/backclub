@@ -1,11 +1,12 @@
-/* Cocchi - Ultra Minimal + 2-Column Layout */
+/* Cocchi - Minimal Apple Style */
 
 .cocchi-minimal {
+    padding: 20px;
     max-width: 1000px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-10);
+    gap: 20px;
 }
 
 /* === HEADER === */
@@ -16,70 +17,72 @@
 }
 
 .minimal-header h1 {
-    font-size: 32px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
+    font-size: 18px;
+    font-weight: 600;
     color: var(--color-text-primary);
     margin: 0;
 }
 
 .subtitle {
-    font-size: 15px;
-    color: var(--color-text-tertiary);
-    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--color-text-quaternary);
+    margin: 2px 0 0 0;
 }
 
 .header-actions {
     display: flex;
-    gap: var(--spacing-3);
+    gap: 8px;
 }
 
 .btn-add {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
+    padding: 7px 14px;
     background: var(--color-accent-blue);
     color: white;
     border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    transition: transform 0.2s;
+    font-family: inherit;
+    transition: background 180ms;
 }
 
 .btn-add:hover {
-    transform: scale(1.02);
+    background: #0070e0;
 }
 
 .btn-secondary-small {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 14px;
-    background: var(--color-bg-secondary);
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.06);
     color: var(--color-text-primary);
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition: background 0.2s;
+    font-family: inherit;
+    transition: background 180ms;
 }
 
 .btn-secondary-small:hover {
-    background: var(--color-bg-tertiary);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-/* === BALANCE ROW === */
+/* === BALANCE ROW (Summary KPI) === */
 .balance-row {
     display: flex;
     align-items: center;
-    gap: var(--spacing-8);
-    padding: var(--spacing-6);
+    gap: 0;
     background: var(--color-bg-secondary);
-    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .balance-item {
@@ -87,24 +90,26 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
+    padding: 14px 16px;
 }
 
 .balance-label {
     font-size: 11px;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-quaternary);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     font-weight: 600;
 }
 
 .balance-value {
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 700;
     letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .balance-value.positive {
-    color: var(--color-success);
+    color: var(--color-accent-emerald);
 }
 
 .balance-value.negative {
@@ -113,28 +118,34 @@
 
 .balance-divider {
     width: 1px;
-    height: 40px;
-    background: var(--color-border-secondary);
+    height: 44px;
+    background: rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
 }
 
 /* === SEARCH === */
 .search-section {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-3);
+    gap: 8px;
 }
 
 .search-input-wrapper {
     display: flex;
     align-items: center;
-    gap: var(--spacing-2);
-    padding: 10px 14px;
+    gap: 8px;
+    padding: 8px 12px;
     background: var(--color-bg-secondary);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 7px;
+    color: var(--color-text-quaternary);
+}
+
+.search-input-wrapper:focus-within {
+    border-color: rgba(10, 132, 255, 0.4);
 }
 
 .search-input-wrapper svg {
-    color: var(--color-text-quaternary);
     flex-shrink: 0;
 }
 
@@ -143,8 +154,9 @@
     background: transparent;
     border: none;
     outline: none;
-    font-size: 14px;
+    font-size: 13px;
     color: var(--color-text-primary);
+    font-family: inherit;
 }
 
 .search-input-clean::placeholder {
@@ -154,15 +166,16 @@
 .search-results {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .project-result-card {
-    padding: var(--spacing-4);
+    padding: 12px 14px;
     background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 180ms;
 }
 
 .project-result-card:hover {
@@ -170,24 +183,25 @@
 }
 
 .project-result-name {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
 }
 
 .project-result-stats {
     display: flex;
-    gap: var(--spacing-3);
+    gap: 12px;
     font-size: 12px;
 }
 
 .stat-mini {
     font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 .stat-mini.positive {
-    color: var(--color-success);
+    color: var(--color-accent-emerald);
 }
 
 .stat-mini.negative {
@@ -198,15 +212,16 @@
 .section-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-4);
+    gap: 12px;
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--color-text-primary);
+    color: var(--color-text-quaternary);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
     margin: 0;
-    letter-spacing: -0.01em;
 }
 
 .section-header-inline {
@@ -215,20 +230,21 @@
     justify-content: space-between;
 }
 
-/* === RISERVE === */
+/* === RISERVE (Summary Card Grid) === */
 .riserve-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-3);
+    gap: 10px;
 }
 
 .riserva-card {
-    padding: var(--spacing-4);
+    padding: 14px 16px;
     background: var(--color-bg-secondary);
-    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-2);
+    gap: 6px;
 }
 
 .riserva-header {
@@ -239,9 +255,9 @@
 
 .riserva-name {
     font-size: 11px;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-quaternary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
     font-weight: 600;
 }
 
@@ -255,71 +271,76 @@
     font-size: 20px;
     font-weight: 700;
     color: var(--color-text-primary);
-    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
 }
 
 /* === FORECAST === */
 .time-range-toggle {
     display: flex;
-    gap: 6px;
+    gap: 4px;
+    padding: 3px;
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 7px;
 }
 
 .time-range-toggle button {
-    padding: 5px 12px;
+    padding: 4px 12px;
     background: transparent;
-    border: 1px solid var(--color-border-secondary);
-    border-radius: 6px;
+    border: none;
+    border-radius: 5px;
     font-size: 12px;
     font-weight: 500;
-    color: var(--color-text-secondary);
+    color: var(--color-text-tertiary);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 180ms;
+    font-family: inherit;
 }
 
 .time-range-toggle button:hover {
-    border-color: var(--color-border-hover);
     color: var(--color-text-primary);
 }
 
 .time-range-toggle button.active {
     background: var(--color-accent-blue);
-    border-color: var(--color-accent-blue);
     color: white;
 }
 
 .chart-container {
-    padding: var(--spacing-5);
+    padding: 16px;
     background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 10px;
 }
 
-/* === 2-COLUMN TRANSACTIONS (iPhone Style) === */
+/* === 2-COLUMN TRANSACTIONS === */
 .transactions-two-column {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--spacing-4);
+    gap: 10px;
 }
 
 .transaction-column {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    background: var(--color-border-secondary);
-    border-radius: 8px;
+    background: var(--color-bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 10px;
     overflow: hidden;
 }
 
 .column-header {
-    padding: 10px 14px;
+    padding: 8px 14px;
     font-size: 11px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    background: var(--color-bg-secondary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .column-header.entrate {
-    color: var(--color-success);
+    color: var(--color-accent-emerald);
 }
 
 .column-header.uscite {
@@ -329,41 +350,44 @@
 .transaction-items {
     display: flex;
     flex-direction: column;
-    gap: 1px;
 }
 
 .transaction-item-compact {
-    padding: 12px 14px;
-    background: var(--color-bg-primary);
+    padding: 10px 14px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 180ms;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.transaction-item-compact:last-child {
+    border-bottom: none;
 }
 
 .transaction-item-compact:hover {
-    background: var(--color-bg-secondary);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .transaction-compact-desc {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .transaction-compact-meta {
     font-size: 11px;
-    color: var(--color-text-tertiary);
-    margin-bottom: 6px;
+    color: var(--color-text-quaternary);
+    margin-bottom: 4px;
 }
 
 .transaction-compact-amount {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
 
 .transaction-compact-amount.positive {
-    color: var(--color-success);
+    color: var(--color-accent-emerald);
 }
 
 .transaction-compact-amount.negative {
@@ -373,12 +397,13 @@
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
     .cocchi-minimal {
-        gap: var(--spacing-8);
+        padding: 16px;
+        gap: 16px;
     }
 
     .balance-row {
         flex-direction: column;
-        gap: var(--spacing-4);
+        gap: 0;
     }
 
     .balance-divider {

@@ -1,19 +1,285 @@
-/* Seller Projects Page - Stile Venditori */
-@import '../Venditori/VenditoriLayout.css';
+/* ============================================================
+   Seller Projects Page — Apple iOS 17 / macOS Sonoma style
+   Uses --seller-* design system variables exclusively
+   ============================================================ */
 
-.progetti-venditori-page {
+.sp-page {
+  min-height: 100vh;
+  background: var(--seller-bg);
+  color: var(--seller-text-primary);
+  padding: var(--seller-spacing-8) var(--seller-spacing-6);
   max-width: 1400px;
   margin: 0 auto;
-  padding: var(--spacing-6);
 }
 
-.projects-table-wrapper {
-  overflow-x: auto;
+/* ── Header ─────────────────────────────────────────────── */
+.sp-header {
+  margin-bottom: var(--seller-spacing-6);
 }
 
-.project-name-cell {
+.sp-title {
+  font-size: var(--seller-font-2xl);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0 0 var(--seller-spacing-1);
+  letter-spacing: -0.02em;
+}
+
+.sp-subtitle {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  margin: 0;
+}
+
+/* ── Toolbar: search + pills ─────────────────────────────── */
+.sp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--seller-spacing-3);
+  align-items: center;
+  margin-bottom: var(--seller-spacing-6);
+}
+
+.sp-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 180px;
+  max-width: 320px;
+}
+
+.sp-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--seller-text-tertiary);
+  pointer-events: none;
+}
+
+.sp-search {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
+  color: var(--seller-text-primary);
+  font-size: var(--seller-font-sm);
+  outline: none;
+  transition: border-color var(--seller-transition-fast);
+  box-sizing: border-box;
+}
+
+.sp-search::placeholder {
+  color: var(--seller-text-tertiary);
+}
+
+.sp-search:focus {
+  border-color: var(--seller-accent);
+}
+
+.sp-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--seller-spacing-2);
+}
+
+.sp-filter-pill {
+  padding: 5px 14px;
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  border: 1px solid var(--seller-border);
+  background: var(--seller-bg-elevated);
+  color: var(--seller-text-secondary);
+  cursor: pointer;
+  transition: all var(--seller-transition-fast);
+  white-space: nowrap;
+}
+
+.sp-filter-pill:hover {
+  border-color: var(--seller-border-strong);
+  color: var(--seller-text-primary);
+}
+
+.sp-filter-pill.active {
+  background: var(--seller-accent-soft);
+  border-color: var(--seller-accent);
+  color: var(--seller-accent);
+  font-weight: var(--seller-weight-semibold);
+}
+
+/* ── Cards grid ──────────────────────────────────────────── */
+.sp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: var(--seller-spacing-4);
+}
+
+/* ── Individual card ─────────────────────────────────────── */
+.sp-card {
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-5);
+  cursor: pointer;
+  transition:
+    border-color var(--seller-transition-fast),
+    box-shadow var(--seller-transition-fast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+  user-select: none;
+}
+
+.sp-card:hover {
+  border-color: var(--seller-border-strong);
+  box-shadow: var(--seller-shadow-md);
+}
+
+.sp-card-top {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
+  justify-content: space-between;
 }
 
+.sp-card-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--seller-radius-sm);
+  background: var(--seller-accent-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sp-card-icon {
+  color: var(--seller-accent);
+}
+
+.sp-card-name {
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.sp-card-client {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  margin: 0;
+}
+
+/* ── Progress bar ────────────────────────────────────────── */
+.sp-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+}
+
+.sp-progress-bar {
+  flex: 1;
+  height: 3px;
+  background: var(--seller-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sp-progress-fill {
+  height: 100%;
+  background: var(--seller-accent);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.sp-progress-label {
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ── Card meta row ───────────────────────────────────────── */
+.sp-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+  flex-wrap: wrap;
+}
+
+.sp-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--seller-font-xs);
+  color: var(--seller-text-tertiary);
+}
+
+/* ── Card footer ─────────────────────────────────────────── */
+.sp-card-footer {
+  margin-top: auto;
+  padding-top: var(--seller-spacing-3);
+  border-top: 1px solid var(--seller-border);
+}
+
+.sp-card-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-accent);
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.sp-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-16) var(--seller-spacing-6);
+  text-align: center;
+}
+
+.sp-empty-icon {
+  color: var(--seller-text-tertiary);
+  opacity: 0.5;
+}
+
+.sp-empty-title {
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0;
+}
+
+.sp-empty-subtitle {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  margin: 0;
+}
+
+/* ── Skeleton ────────────────────────────────────────────── */
+.sp-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: var(--seller-spacing-4);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sp-page {
+    padding: var(--seller-spacing-5) var(--seller-spacing-4);
+  }
+
+  .sp-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sp-search-wrap {
+    max-width: 100%;
+  }
+}

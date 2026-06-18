@@ -16,6 +16,7 @@ import {
   DollarSign,
   User
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import contractsApi from '../../api/contracts';
 import type { Contract } from '../../types/sellers';
 import { sellerCache } from '../../utils/sellerCache';
@@ -75,16 +76,16 @@ const SellerContractDetailPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { label: string; class: string; icon: any; color: string }> = {
-      draft: { label: 'Bozza', class: 'warning', icon: FileText, color: '#f59e0b' },
-      requested: { label: 'Richiesta', class: 'info', icon: Clock, color: '#3b82f6' },
-      pending_signature: { label: 'In Attesa di Firma', class: 'warning', icon: AlertCircle, color: '#f59e0b' },
-      active: { label: 'Attivo', class: 'success', icon: CheckCircle2, color: '#10b981' },
-      suspended: { label: 'Sospeso', class: 'danger', icon: XCircle, color: '#ef4444' },
-      completed: { label: 'Completato', class: 'info', icon: CheckCircle2, color: '#3b82f6' },
-      terminated: { label: 'Terminato', class: 'danger', icon: XCircle, color: '#ef4444' },
+    const badges: Record<string, { label: string; badgeClass: string; icon: any }> = {
+      draft: { label: 'Bozza', badgeClass: 'seller-badge seller-badge-draft', icon: FileText },
+      requested: { label: 'Richiesta', badgeClass: 'seller-badge seller-badge-primary', icon: Clock },
+      pending_signature: { label: 'In Attesa di Firma', badgeClass: 'seller-badge seller-badge-pending', icon: AlertCircle },
+      active: { label: 'Attivo', badgeClass: 'seller-badge seller-badge-active', icon: CheckCircle2 },
+      suspended: { label: 'Sospeso', badgeClass: 'seller-badge seller-badge-cancelled', icon: XCircle },
+      completed: { label: 'Completato', badgeClass: 'seller-badge seller-badge-active', icon: CheckCircle2 },
+      terminated: { label: 'Terminato', badgeClass: 'seller-badge seller-badge-cancelled', icon: XCircle },
     };
-    return badges[status] || { label: status, class: '', icon: FileText, color: '#6b7280' };
+    return badges[status] || { label: status, badgeClass: 'seller-badge seller-badge-secondary', icon: FileText };
   };
 
   const getInitials = (name: string): string => {
@@ -355,7 +356,6 @@ const SellerContractDetailPage: React.FC = () => {
   }
 
   const statusBadge = getStatusBadge(contract.status);
-  const StatusIcon = statusBadge.icon;
   
   // Verifica documenti obbligatori
   const hasContractSigned = !!contract.signed_file;
@@ -388,11 +388,7 @@ const SellerContractDetailPage: React.FC = () => {
             <h1 className="seller-contract-detail-title">{contract.title || contract.contract_number}</h1>
             <div className="seller-contract-detail-header-meta">
               <span className="seller-contract-detail-id-badge">{contract.contract_number}</span>
-              <span 
-                className="seller-contract-detail-status-badge"
-                style={{ backgroundColor: `${statusBadge.color}20`, color: statusBadge.color }}
-              >
-                <StatusIcon size={12} />
+              <span className={statusBadge.badgeClass}>
                 {statusBadge.label}
               </span>
             </div>
@@ -742,9 +738,24 @@ const SellerContractDetailPage: React.FC = () => {
       </div>
 
       {/* Upload Modal */}
+      <AnimatePresence>
       {showUploadModal && (
-        <div className="seller-contract-detail-upload-modal" onClick={() => setShowUploadModal(false)}>
-          <div className="seller-contract-detail-upload-modal-content" onClick={(e) => e.stopPropagation()}>
+        <motion.div
+          className="seller-contract-detail-upload-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          onClick={() => setShowUploadModal(false)}
+        >
+          <motion.div
+            className="seller-contract-detail-upload-modal-content"
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ duration: 0.15 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="seller-contract-detail-upload-modal-header">
               <h3 className="seller-contract-detail-upload-modal-title">Aggiungi Documento</h3>
               <button
@@ -804,9 +815,10 @@ const SellerContractDetailPage: React.FC = () => {
                 {uploadingDocument ? 'Caricamento...' : 'Carica Documento'}
               </button>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       )}
+      </AnimatePresence>
     </div>
   );
 };

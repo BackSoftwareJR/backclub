@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, UserCircle, ChevronRight, Mail, Phone, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { getClients } from '../../api/clients';
@@ -70,28 +71,15 @@ const SellerClientsPage: React.FC = () => {
     return name.substring(0, 2).toUpperCase();
   };
 
-  // Generate consistent avatar color based on name
-  const getAvatarColor = (name: string | undefined): string => {
-    if (!name) return 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)';
-    
-    // Pastel color palette
-    const colors = [
-      'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', // Indigo
-      'linear-gradient(135deg, #14b8a6 0%, #06b6d4 100%)', // Teal
-      'linear-gradient(135deg, #f59e0b 0%, #f97316 100%)', // Amber
-      'linear-gradient(135deg, #ec4899 0%, #f43f5e 100%)', // Pink
-      'linear-gradient(135deg, #10b981 0%, #059669 100%)', // Emerald
-      'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', // Blue
-      'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)', // Purple
-      'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', // Cyan
-    ];
-    
-    // Simple hash function for consistent color assignment
+  // HSL avatar style — deterministic hue from name hash
+  const getAvatarStyle = (name: string | undefined): React.CSSProperties => {
+    if (!name) return { background: 'hsl(240, 70%, 45%)', color: '#ffffff' };
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    return colors[Math.abs(hash) % colors.length];
+    const hue = Math.abs(hash) % 360;
+    return { background: `hsl(${hue}, 70%, 45%)`, color: '#ffffff' };
   };
 
   // Format date: "20 Gen 2026"
@@ -193,23 +181,26 @@ const SellerClientsPage: React.FC = () => {
         </div>
       ) : (
         <div className="seller-clients-list">
-          {clients.map((client) => {
+          {clients.map((client, index) => {
             const clientAny = client as any;
             const lastQuoteDate = clientAny.last_quote_date;
             const initials = getInitials(client.company_name);
-            const avatarColor = getAvatarColor(client.company_name);
+            const avatarStyle = getAvatarStyle(client.company_name);
             
             return (
-              <div
+              <motion.div
                 key={client.id}
                 className="seller-clients-row"
                 onClick={() => navigate(`/seller/clienti/${client.id}`)}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.03, duration: 0.18, ease: 'easeOut' }}
               >
                 {/* Column 1: Identity (The Hero) */}
                 <div className="seller-clients-col-identity">
                   <div 
                     className="seller-clients-avatar"
-                    style={{ background: avatarColor }}
+                    style={avatarStyle}
                   >
                     {initials}
                   </div>
@@ -267,11 +258,31 @@ const SellerClientsPage: React.FC = () => {
                   )}
                 </div>
 
-                {/* Column 5: Action (Chevron) */}
+                {/* Column 5: Quick Actions — revealed on hover */}
                 <div className="seller-clients-col-action">
-                  <ChevronRight size={20} className="seller-clients-chevron" />
+                  <div className="seller-clients-quick-actions">
+                    {client.phone && (
+                      <button
+                        className="seller-clients-action-btn"
+                        onClick={(e) => { e.stopPropagation(); window.location.href = `tel:${client.phone}`; }}
+                        title={`Chiama ${client.phone}`}
+                      >
+                        <Phone size={16} />
+                      </button>
+                    )}
+                    {client.email && (
+                      <button
+                        className="seller-clients-action-btn"
+                        onClick={(e) => { e.stopPropagation(); window.location.href = `mailto:${client.email}`; }}
+                        title={`Email ${client.email}`}
+                      >
+                        <Mail size={16} />
+                      </button>
+                    )}
+                    <ChevronRight size={16} className="seller-clients-chevron" />
+                  </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

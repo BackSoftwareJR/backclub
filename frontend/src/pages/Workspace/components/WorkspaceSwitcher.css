@@ -1,0 +1,133 @@
+/* Workspace Switcher — popover menu */
+.workspace-switcher {
+  position: relative;
+  display: inline-block;
+}
+
+.workspace-switcher-trigger {
+  background: var(--ws-surface-hover);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-sm);
+  padding: var(--ws-spacing-xs) var(--ws-spacing-sm);
+  cursor: pointer;
+  transition: all var(--ws-transition);
+}
+
+.workspace-switcher-trigger:hover {
+  border-color: var(--ws-border-strong);
+  background: var(--ws-surface-active);
+}
+
+.workspace-switcher-trigger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.workspace-switcher-current {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing-sm);
+}
+
+.workspace-switcher-badge {
+  color: var(--ws-text-inverse);
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-semibold);
+  padding: 2px var(--ws-spacing-sm);
+  border-radius: var(--ws-radius-pill);
+  line-height: 1.2;
+}
+
+.workspace-switcher-chevron {
+  color: var(--ws-text-secondary);
+  transition: transform var(--ws-transition);
+}
+
+.workspace-switcher-chevron.open {
+  transform: rotate(180deg);
+}
+
+.workspace-switcher-dropdown {
+  position: absolute;
+  top: calc(100% + var(--ws-spacing-xs));
+  left: 0;
+  right: 0;
+  min-width: 200px;
+  background: var(--ws-surface-glass);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  box-shadow: var(--ws-shadow-lg);
+  z-index: 1000;
+  overflow: hidden;
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  animation: ws-menu-enter 0.18s ease;
+}
+
+.workspace-switcher-header {
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  border-bottom: 1px solid var(--ws-border);
+  background: var(--ws-surface-subtle);
+}
+
+.workspace-switcher-header span {
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.workspace-switcher-options {
+  padding: var(--ws-spacing-xs) 0;
+}
+
+.workspace-switcher-option {
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--ws-transition);
+}
+
+.workspace-switcher-option:hover:not(.disabled) {
+  background: var(--ws-surface-hover);
+}
+
+.workspace-switcher-option.active {
+  background: var(--ws-surface-active);
+}
+
+.workspace-switcher-option.disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.workspace-switcher-option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ws-spacing-md);
+}
+
+.workspace-switcher-option-badge {
+  color: var(--ws-text-inverse);
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-semibold);
+  padding: 2px var(--ws-spacing-sm);
+  border-radius: var(--ws-radius-pill);
+}
+
+.workspace-switcher-coming-soon {
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-tertiary);
+  font-style: italic;
+}
+
+.workspace-switcher-option-check {
+  color: var(--ws-success);
+  font-weight: var(--ws-weight-semibold);
+  font-size: var(--ws-font-sm);
+}

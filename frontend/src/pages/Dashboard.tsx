@@ -6,11 +6,16 @@ import {
     Pin,
     Plus,
     X,
-    Loader
+    Loader,
+    CheckCircle2,
+    AlertCircle,
+    Coins,
+    TrendingUp,
 } from 'lucide-react';
 import { dashboardApi } from '../api/dashboard';
 import { agendaApi } from '../api/agenda';
 import type { DashboardStats } from '../types/api';
+import KPICard from '../components/Dashboard/KPICard';
 import '../styles/pages/Dashboard.css';
 
 interface Appunto {
@@ -31,35 +36,23 @@ const Dashboard: React.FC = () => {
     const [appunti, setAppunti] = useState<Appunto[]>([]);
     const [timeRange, setTimeRange] = useState<'7G' | '30G' | '90G' | '1A'>('30G');
 
-    // Redirect sellers to their dashboard
-    // Usa current_role per verificare il ruolo corrente
-    // IMPORTANT: Don't redirect if user is on role-selection page or role selection is in progress
     useEffect(() => {
-        // Prevent redirect if we're on role-selection page or role selection is in progress
         if (window.location.pathname === '/role-selection') {
             return;
         }
-        
-        // Check if role selection is in progress
         const roleSelectionInProgress = sessionStorage.getItem('role_selection_in_progress') === 'true';
         if (roleSelectionInProgress) {
-            console.log('Role selection in progress, skipping redirect');
             return;
         }
-        
         if (user) {
             const activeRole = user.current_role || user.role;
-            // Solo reindirizza se il ruolo corrente è effettivamente venditore
-            // E se c'è seller_id (per evitare redirect se il ruolo è cambiato)
             const isSeller = (activeRole === 'venditori' || activeRole === 'seller') && user.seller_id;
-            
             if (isSeller) {
                 navigate('/seller', { replace: true });
             }
         }
     }, [user?.current_role, user?.role, user?.seller_id, navigate, user]);
 
-    // Load dashboard data
     useEffect(() => {
         loadDashboardData();
     }, []);
@@ -69,8 +62,6 @@ const Dashboard: React.FC = () => {
             setLoading(true);
             const data = await dashboardApi.getStats();
             setDashboardData(data);
-            
-            // Set agenda items
             if (data.agenda_items) {
                 setAppunti(data.agenda_items);
             }
@@ -84,7 +75,6 @@ const Dashboard: React.FC = () => {
     const togglePin = async (id: number) => {
         try {
             await agendaApi.togglePin(id);
-            // Update local state
             setAppunti(prev => prev.map(a =>
                 a.id === id ? { ...a, pinnato: !a.pinnato } : a
             ));
@@ -105,22 +95,42 @@ const Dashboard: React.FC = () => {
     const formatCurrency = (amount: number) => {
         return '¢ ' + new Intl.NumberFormat('it-IT', {
             minimumFractionDigits: 2,
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2,
         }).format(amount);
     };
 
+    const currentDate = new Date().toLocaleDateString('it-IT', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+
     if (loading) {
         return (
-            <div className="dashboard-three-section" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-                <Loader className="spinner" size={40} />
+            <div className="dashboard-page">
+                <div className="dashboard-header">
+                    <h1 className="dashboard-title">Dashboard</h1>
+                    <p className="dashboard-subtitle">{currentDate}</p>
+                </div>
+                <div className="kpi-grid">
+                    {[...Array(4)].map((_, i) => (
+                        <KPICard key={i} title="" value="" loading />
+                    ))}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                    <Loader className="spinner" size={32} />
+                </div>
             </div>
         );
     }
 
     if (!dashboardData) {
         return (
-            <div className="dashboard-three-section">
-                <p>Errore nel caricamento dei dati</p>
+            <div className="dashboard-page">
+                <p style={{ color: 'var(--color-text-tertiary)', padding: '40px', textAlign: 'center' }}>
+                    Errore nel caricamento dei dati
+                </p>
             </div>
         );
     }
@@ -128,8 +138,44 @@ const Dashboard: React.FC = () => {
     const { task_performance, payment_analytics, team_efficiency, notifications } = dashboardData;
 
     return (
-        <div className="dashboard-three-section">
-            {/* Quick Actions Bar */}
+        <div className="dashboard-page">
+            {/* Header */}
+            <div className="dashboard-header">
+                <h1 className="dashboard-title">Dashboard</h1>
+                <p className="dashboard-subtitle">{currentDate}</p>
+            </div>
+
+            {/* KPI Grid */}
+            <div className="kpi-grid">
+                <KPICard
+                    title="Task Completate"
+                    value={task_performance.completed_30d}
+                    delta={task_performance.increment_percentage}
+                    deltaLabel="vs mese scorso"
+                    icon={<CheckCircle2 size={14} />}
+                    accentColor="#0A84FF"
+                />
+                <KPICard
+                    title="Task in Ritardo"
+                    value={task_performance.overdue}
+                    icon={<AlertCircle size={14} />}
+                    accentColor="#FF453A"
+                />
+                <KPICard
+                    title="Cocchi Pagati"
+                    value={formatCurrency(payment_analytics.cocchi_paid_30d)}
+                    icon={<Coins size={14} />}
+                    accentColor="#34C759"
+                />
+                <KPICard
+                    title="Settimana"
+                    value={task_performance.completed_this_week}
+                    delta={task_performance.increment_percentage}
+                    deltaLabel="incremento"
+                    icon={<TrendingUp size={14} />}
+                    accentColor="#FF9F0A"
+                />
+            </div>
 
             {/* Analytics & Performance Panel */}
             <div className="analytics-panel">
@@ -142,7 +188,7 @@ const Dashboard: React.FC = () => {
                         {(['7G', '30G', '90G', '1A'] as const).map(range => (
                             <button
                                 key={range}
-                                className={`range-btn ${timeRange === range ? 'active' : ''}`}
+                                className={`range-btn${timeRange === range ? ' active' : ''}`}
                                 onClick={() => setTimeRange(range)}
                             >
                                 {range}
@@ -217,8 +263,8 @@ const Dashboard: React.FC = () => {
                                             <div className="member-name">{member.name}</div>
                                             <div className="member-stats">
                                                 <span className="completate">{member.completed} completate</span>
-                                                <span className="separator">•</span>
-                                                <span className={`percentuale ${member.percentage >= 90 ? 'high' : ''}`}>
+                                                <span className="separator">·</span>
+                                                <span className={`percentuale${member.percentage >= 90 ? ' high' : ''}`}>
                                                     {member.percentage}% totale
                                                 </span>
                                             </div>
@@ -226,7 +272,9 @@ const Dashboard: React.FC = () => {
                                     </div>
                                 ))
                             ) : (
-                                <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Nessun dato disponibile</p>
+                                <p style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-quaternary)' }}>
+                                    Nessun dato disponibile
+                                </p>
                             )}
                         </div>
                     </div>
@@ -235,7 +283,7 @@ const Dashboard: React.FC = () => {
 
             {/* Two Column Layout */}
             <div className="two-column-layout">
-                {/* Left: Notifications */}
+                {/* Notifications */}
                 <div className="notifications-column">
                     <div className="column-header">
                         <h2>Notifiche</h2>
@@ -244,7 +292,7 @@ const Dashboard: React.FC = () => {
                             onClick={() => navigate('/notifiche')}
                         >
                             Tutte
-                            <ChevronRight size={16} />
+                            <ChevronRight size={14} />
                         </button>
                     </div>
 
@@ -253,7 +301,7 @@ const Dashboard: React.FC = () => {
                             notifications.map(notifica => (
                                 <div
                                     key={notifica.id}
-                                    className={`notifica-item-clean ${!notifica.read ? 'unread' : ''} ${notifica.urgent ? 'urgent' : ''}`}
+                                    className={`notifica-item-clean${!notifica.read ? ' unread' : ''}${notifica.urgent ? ' urgent' : ''}`}
                                     onClick={() => navigate(`/notifiche/${notifica.id}`)}
                                 >
                                     <div className="notifica-avatar-clean">{notifica.avatar}</div>
@@ -268,64 +316,68 @@ const Dashboard: React.FC = () => {
                                 </div>
                             ))
                         ) : (
-                            <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Nessuna notifica</p>
+                            <p style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-quaternary)' }}>
+                                Nessuna notifica
+                            </p>
                         )}
                     </div>
                 </div>
 
-                {/* Right: Interactive Board */}
+                {/* Board */}
                 <div className="board-column">
                     <div className="column-header">
                         <h2>Bacheca</h2>
-                        <button 
+                        <button
                             className="btn-add-small"
                             onClick={() => navigate('/agenda')}
                         >
-                            <Plus size={16} />
+                            <Plus size={14} />
                             Nuovo
                         </button>
                     </div>
 
                     <div className="board-items-list">
                         {appunti.length > 0 ? (
-                            appunti.sort((a, b) => (b.pinnato ? 1 : 0) - (a.pinnato ? 1 : 0)).map(appunto => (
-                                <div key={appunto.id} className={`board-item ${appunto.tipo}`}>
-                                    <div className="board-item-header">
-                                        <div className="board-item-type-badge">{appunto.tipo}</div>
-                                        <div className="board-item-actions">
-                                            <button
-                                                className={`pin-btn ${appunto.pinnato ? 'pinned' : ''}`}
-                                                onClick={() => togglePin(appunto.id)}
-                                                title={appunto.pinnato ? 'Rimuovi pin' : 'Appunta'}
-                                            >
-                                                <Pin size={14} />
-                                            </button>
-                                            <button
-                                                className="delete-btn"
-                                                onClick={() => deleteAppunto(appunto.id)}
-                                                title="Elimina"
-                                            >
-                                                <X size={14} />
-                                            </button>
+                            appunti
+                                .sort((a, b) => (b.pinnato ? 1 : 0) - (a.pinnato ? 1 : 0))
+                                .map(appunto => (
+                                    <div key={appunto.id} className={`board-item ${appunto.tipo}`}>
+                                        <div className="board-item-header">
+                                            <div className="board-item-type-badge">{appunto.tipo}</div>
+                                            <div className="board-item-actions">
+                                                <button
+                                                    className={`pin-btn${appunto.pinnato ? ' pinned' : ''}`}
+                                                    onClick={() => togglePin(appunto.id)}
+                                                    title={appunto.pinnato ? 'Rimuovi pin' : 'Appunta'}
+                                                >
+                                                    <Pin size={13} />
+                                                </button>
+                                                <button
+                                                    className="delete-btn"
+                                                    onClick={() => deleteAppunto(appunto.id)}
+                                                    title="Elimina"
+                                                >
+                                                    <X size={13} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <h3 className="board-item-title">{appunto.titolo}</h3>
+                                        <p className="board-item-content">{appunto.contenuto}</p>
+                                        <div className="board-item-footer">
+                                            <span className="board-item-author">{appunto.autore}</span>
+                                            <span className="board-item-date">
+                                                {new Date(appunto.data).toLocaleDateString('it-IT', {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                })}
+                                            </span>
                                         </div>
                                     </div>
-
-                                    <h3 className="board-item-title">{appunto.titolo}</h3>
-                                    <p className="board-item-content">{appunto.contenuto}</p>
-
-                                    <div className="board-item-footer">
-                                        <span className="board-item-author">{appunto.autore}</span>
-                                        <span className="board-item-date">
-                                            {new Date(appunto.data).toLocaleDateString('it-IT', {
-                                                day: 'numeric',
-                                                month: 'short'
-                                            })}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
+                                ))
                         ) : (
-                            <p style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Nessun appunto nella bacheca</p>
+                            <p style={{ padding: '20px', textAlign: 'center', color: 'var(--color-text-quaternary)' }}>
+                                Nessun appunto nella bacheca
+                            </p>
                         )}
                     </div>
                 </div>

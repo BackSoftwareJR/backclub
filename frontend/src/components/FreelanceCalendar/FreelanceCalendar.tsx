@@ -20,12 +20,15 @@ import {
     freelanceCalendarApi,
     type FreelanceCalendarItem,
     type CreateFreelanceCalendarItemData,
-    type ChecklistItem
+    type ChecklistItem,
+    type CallParticipant
 } from '../../api/freelanceCalendar';
 import { freelanceApi } from '../../api/freelance';
 import { freelanceCrmApi } from '../../api/freelanceCrm';
+import { freelanceIntegrationsApi } from '../../api/freelanceIntegrations';
 import { crmProjectTasksApi, projectCalendarApi, type CrmProjectTaskRescheduleRequest } from '../../api/crmProjects';
 import type { FreelanceProject } from '../../types/freelance';
+import { parseApiDateTime, formatDateTimeLocalValue } from '../../utils/dateTime';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -190,7 +193,9 @@ export interface CalendarItem {
     // Call specific
     callLink?: string;
     callNotes?: string;
-    // Per i freelance non serve gestire partecipanti call separatamente
+    callParticipants?: CallParticipant[];
+    syncStatus?: 'pending' | 'synced' | 'failed' | 'skipped';
+    syncError?: string;
     // Event specific
     eventLocation?: string;
     checklistItems?: ChecklistItem[];
@@ -337,6 +342,55 @@ const MiniCalendar: React.FC<{
     );
 };
 
+const mapApiEventToCalendarItem = (event: any): CalendarItem => {
+    const isPersonal = event.is_personal === true || event.is_personal === 1;
+    const item: CalendarItem = {
+        id: event.id,
+        itemKey: isPersonal ? `personal-${event.id}` : `project-${event.id}`,
+        type: event.type as CalendarItemType,
+        title: event.title,
+        description: event.description || undefined,
+        startTime: parseApiDateTime(event.start_time),
+        endTime: parseApiDateTime(event.end_time),
+        color: event.color || event.project_color || undefined,
+        eventLocation: event.location || undefined,
+        callLink: event.google_meet_link || event.call_link || undefined,
+        callNotes: event.call_notes || undefined,
+        callParticipants: event.participants || [],
+        syncStatus: event.sync_status || undefined,
+        syncError: event.sync_error || undefined,
+        deadlineType: event.deadline_type || undefined,
+        isAllDay: false,
+        createdBy: event.created_by,
+        originalEvent: event,
+        projectId: event.project_id || null,
+        projectName: event.project_name || null,
+        projectColor: event.project_color || null,
+        isPersonal,
+        isCompleted: !!event.completed_at,
+    };
+
+    if (event.checklist_items) {
+        try {
+            const checklist = typeof event.checklist_items === 'string'
+                ? JSON.parse(event.checklist_items)
+                : event.checklist_items;
+            item.checklistItems = Array.isArray(checklist) ? checklist : [];
+            item.hasChecklist = item.checklistItems.length > 0;
+        } catch {
+            item.checklistItems = [];
+            item.hasChecklist = false;
+        }
+    }
+
+    if (event.completed_at) {
+        item.completedAt = new Date(event.completed_at);
+        item.completedBy = event.completed_by || undefined;
+    }
+
+    return item;
+};
+
 const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true, crmCode = null }) => {
     const { user } = useAuth();
     const { resolvedTheme } = useTheme();
@@ -358,6 +412,7 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
             if (!isNaN(d.getTime())) setCurrentDate(d);
         }
     }, [location.state]);
+
     const [calendarItems, setCalendarItems] = useState<CalendarItem[]>([]);
     const [contextMenu, setContextMenu] = useState<{ x: number; y: number; timeSlot: Date } | null>(null);
     const [draggedItem, setDraggedItem] = useState<CalendarItem | null>(null);
@@ -418,6 +473,37 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
     });
     const [formChecklist, setFormChecklist] = useState<ChecklistItem[]>([]);
     const [newFormChecklistItem, setNewFormChecklistItem] = useState('');
+    const [callParticipants, setCallParticipants] = useState<CallParticipant[]>([]);
+    const [participantEmailInput, setParticipantEmailInput] = useState('');
+    const [editCallParticipants, setEditCallParticipants] = useState<CallParticipant[]>([]);
+    const [editParticipantEmailInput, setEditParticipantEmailInput] = useState('');
+    const [googleCalendarConnected, setGoogleCalendarConnected] = useState(false);
+
+    useEffect(() => {
+        freelanceIntegrationsApi.getGoogleStatus()
+            .then((res) => setGoogleCalendarConnected(!!res.data.connected))
+            .catch(() => setGoogleCalendarConnected(false));
+    }, []);
+
+    useEffect(() => {
+        if (!showItemDetailsModal || !selectedItem || selectedItem.type !== 'call') return;
+        if (selectedItem.syncStatus !== 'pending') return;
+
+        const interval = window.setInterval(async () => {
+            try {
+                const response = await freelanceCalendarApi.getItem(selectedItem.id);
+                const updated = mapApiEventToCalendarItem(response.data);
+                setSelectedItem(updated);
+                setCalendarItems((prev) => prev.map((item) =>
+                    (item.itemKey ?? String(item.id)) === (updated.itemKey ?? String(updated.id)) ? updated : item
+                ));
+            } catch (error) {
+                console.error('Error polling call sync status:', error);
+            }
+        }, 2000);
+
+        return () => window.clearInterval(interval);
+    }, [showItemDetailsModal, selectedItem?.id, selectedItem?.type, selectedItem?.syncStatus]);
 
     // Form state per task
     const [taskFormData, setTaskFormData] = useState({
@@ -593,64 +679,16 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
             }
 
             // Converti gli eventi dal formato API al formato CalendarItem
-            const eventItems: CalendarItem[] = (response.data.events || []).map((event: any) => {
-                const isPersonal = event.is_personal === true || event.is_personal === 1;
-                const item: CalendarItem = {
-                    id: event.id,
-                    itemKey: isPersonal ? `personal-${event.id}` : `project-${event.id}`,
-                    type: event.type as CalendarItemType,
-                    title: event.title,
-                    description: event.description || undefined,
-                    startTime: new Date(event.start_time),
-                    endTime: new Date(event.end_time),
-                    color: event.color || event.project_color || undefined,
-                    eventLocation: event.location || undefined,
-                    callLink: event.call_link || undefined,
-                    callNotes: event.call_notes || undefined,
-                    deadlineType: event.deadline_type || undefined,
-                    isAllDay: false,
-                    createdBy: event.created_by,
-                    originalEvent: event,
-                    projectId: event.project_id || null,
-                    projectName: event.project_name || null,
-                    projectColor: event.project_color || null,
-                    isPersonal
-                };
-                
-                // Carica checklist se presente
-                if (event.checklist_items) {
-                    try {
-                        const checklist = typeof event.checklist_items === 'string' 
-                            ? JSON.parse(event.checklist_items) 
-                            : event.checklist_items;
-                        item.checklistItems = Array.isArray(checklist) ? checklist : [];
-                        item.hasChecklist = item.checklistItems.length > 0;
-                    } catch (e) {
-                        item.checklistItems = [];
-                        item.hasChecklist = false;
-                    }
-                }
-                
-                // Carica stato completamento
-                if (event.completed_at) {
-                    item.isCompleted = true;
-                    item.completedAt = new Date(event.completed_at);
-                    item.completedBy = event.completed_by || undefined;
-                } else {
-                    item.isCompleted = false;
-                }
-                
-                return item;
-            });
+            const eventItems: CalendarItem[] = (response.data.events || []).map((event: any) => mapApiEventToCalendarItem(event));
 
             // Converti le task dal formato API al formato CalendarItem
             const taskItems: CalendarItem[] = (response.data.tasks || []).map((task: any) => {
                 // Il backend restituisce start_time e end_time (non start_date/due_date)
                 const startDate = task.start_time 
-                    ? new Date(task.start_time) 
+                    ? parseApiDateTime(task.start_time) 
                     : (task.start_date ? new Date(task.start_date) : new Date());
                 const endDate = task.end_time 
-                    ? new Date(task.end_time) 
+                    ? parseApiDateTime(task.end_time) 
                     : (task.due_date ? new Date(task.due_date) : startDate);
                 
                 return {
@@ -745,7 +783,11 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
     const handleCreateItem = (type: CalendarItemType, timeSlot?: Date) => {
         const startTime = timeSlot || contextMenu?.timeSlot || new Date();
         const endTime = new Date(startTime);
-        endTime.setHours(endTime.getHours() + 1); // Default 1 ora
+        if (type === 'call') {
+            endTime.setMinutes(endTime.getMinutes() + 30);
+        } else {
+            endTime.setHours(endTime.getHours() + 1);
+        }
 
         // Formatta date per input datetime-local
         const formatDateTimeLocal = (date: Date): string => {
@@ -810,7 +852,44 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
     };
 
     const handleFormChange = (field: keyof CreateFreelanceCalendarItemData, value: any) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        setFormData(prev => {
+            const next = { ...prev, [field]: value };
+            if (field === 'start_time' && prev.type === 'call' && typeof value === 'string' && value) {
+                const start = new Date(value);
+                const end = prev.end_time ? new Date(prev.end_time) : new Date(start);
+                if (isNaN(end.getTime()) || end <= start) {
+                    const adjustedEnd = new Date(start);
+                    adjustedEnd.setMinutes(adjustedEnd.getMinutes() + 30);
+                    next.end_time = formatDateTimeLocalValue(adjustedEnd);
+                }
+            }
+            return next;
+        });
+    };
+
+    const openCallDetail = (event: FreelanceCalendarItem) => {
+        const item = mapApiEventToCalendarItem(event);
+        setSelectedItem(item);
+        setShowItemDetailsModal(true);
+        setIsEditingItem(false);
+    };
+
+    const addParticipant = (emailRaw: string, participants: CallParticipant[], setter: (value: CallParticipant[]) => void, inputSetter: (value: string) => void) => {
+        const email = emailRaw.trim().toLowerCase();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Inserisci un indirizzo email valido');
+            return;
+        }
+        if (participants.some((p) => p.email.toLowerCase() === email)) {
+            inputSetter('');
+            return;
+        }
+        setter([...participants, { email }]);
+        inputSetter('');
+    };
+
+    const removeParticipant = (email: string, participants: CallParticipant[], setter: (value: CallParticipant[]) => void) => {
+        setter(participants.filter((p) => p.email !== email));
     };
 
     const handleSubmitEvent = async (e: React.FormEvent) => {
@@ -863,7 +942,9 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                 if (formData.call_notes?.trim()) {
                     submitData.call_notes = formData.call_notes.trim();
                 }
-                // Per i freelance non serve gestire partecipanti
+                if (callParticipants.length > 0) {
+                    submitData.participants = callParticipants;
+                }
             }
 
             if (formData.type === 'deadline' && formData.deadline_type?.trim()) {
@@ -878,15 +959,21 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                 submitData.has_checklist = true;
             }
 
-            await freelanceCalendarApi.createItem(submitData);
+            const response = await freelanceCalendarApi.createItem(submitData);
             
-            // Ricarica gli eventi
             await loadCalendarItems();
+
+            if (formData.type === 'call' && response.data) {
+                setShowCreateModal(false);
+                setCreateType(null);
+                setCreateStartTime(null);
+                openCallDetail(response.data);
+            } else {
+                setShowCreateModal(false);
+                setCreateType(null);
+                setCreateStartTime(null);
+            }
             
-            // Chiudi modal e reset form
-            setShowCreateModal(false);
-            setCreateType(null);
-            setCreateStartTime(null);
             setFormData({
                 type: 'event',
                 title: '',
@@ -901,8 +988,10 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                 checklist_items: [],
                 has_checklist: false
             });
-        setFormChecklist([]);
+            setFormChecklist([]);
         setNewFormChecklistItem('');
+        setCallParticipants([]);
+        setParticipantEmailInput('');
         } catch (error: any) {
             console.error('Error creating calendar item:', error);
             const msg = error.response?.status === 504
@@ -1313,6 +1402,8 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
             has_checklist: selectedItem.hasChecklist || false
         });
         setEditingChecklist(selectedItem.checklistItems ? [...selectedItem.checklistItems] : []);
+        setEditCallParticipants(selectedItem.callParticipants ? [...selectedItem.callParticipants] : []);
+        setEditParticipantEmailInput('');
         setIsEditingItem(true);
     };
 
@@ -1380,8 +1471,8 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                     type: updatedItem.type as CalendarItemType,
                     title: updatedItem.title,
                     description: updatedItem.description || undefined,
-                    startTime: new Date(updatedItem.start_time),
-                    endTime: new Date(updatedItem.end_time),
+                    startTime: parseApiDateTime(updatedItem.start_time),
+                    endTime: parseApiDateTime(updatedItem.end_time),
                     color: updatedItem.color || undefined,
                     // Per i freelance non serve visibility
                     eventLocation: updatedItem.location || undefined,
@@ -1609,6 +1700,7 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                 if (editFormData.call_notes?.trim()) {
                     submitData.call_notes = editFormData.call_notes.trim();
                 }
+                submitData.participants = editCallParticipants;
             }
 
             if (editFormData.type === 'deadline' && editFormData.deadline_type?.trim()) {
@@ -3175,16 +3267,48 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                                     {/* Call Link e Note (solo per call) */}
                                     {formData.type === 'call' && (
                                         <>
+                                            {googleCalendarConnected && (
+                                                <div className="call-google-hint">
+                                                    Google Calendar collegato: il link Meet verrà generato automaticamente.
+                                                </div>
+                                            )}
                                             <div className="form-group">
-                                                <label className="form-label-minimal">Link Call *</label>
-                                                <input
-                                                    type="url"
-                                                    value={formData.call_link || ''}
-                                                    onChange={(e) => handleFormChange('call_link', e.target.value)}
-                                                    className="form-input"
-                                                    placeholder="https://..."
-                                                    required
-                                                />
+                                                <label className="form-label-minimal">Partecipanti (email)</label>
+                                                <p className="form-hint-minimal">
+                                                    Riceveranno un invito via email{user?.email ? ` (incluso ${user.email})` : ''}.
+                                                </p>
+                                                <div className="participants-input-row">
+                                                    <input
+                                                        type="email"
+                                                        value={participantEmailInput}
+                                                        onChange={(e) => setParticipantEmailInput(e.target.value)}
+                                                        className="form-input"
+                                                        placeholder="cliente@email.com"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                addParticipant(participantEmailInput, callParticipants, setCallParticipants, setParticipantEmailInput);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="btn-add-participant"
+                                                        onClick={() => addParticipant(participantEmailInput, callParticipants, setCallParticipants, setParticipantEmailInput)}
+                                                    >
+                                                        Aggiungi
+                                                    </button>
+                                                </div>
+                                                {callParticipants.length > 0 && (
+                                                    <div className="participants-chip-list">
+                                                        {callParticipants.map((participant) => (
+                                                            <span key={participant.email} className="participant-chip">
+                                                                {participant.email}
+                                                                <button type="button" onClick={() => removeParticipant(participant.email, callParticipants, setCallParticipants)}>×</button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="form-group">
                                                 <label className="form-label-minimal">Note Call</label>
@@ -3193,15 +3317,21 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                                                     onChange={(e) => handleFormChange('call_notes', e.target.value)}
                                                     className="form-input-description"
                                                     rows={3}
-                                                    placeholder="Note sulla call (opzionale)"
+                                                    placeholder="Agenda, argomenti da trattare..."
                                                 />
                                             </div>
-                                            <div className="form-group">
-                                                <label className="form-label-minimal">Partecipanti CRM *</label>
-                                                <div className="users-checkbox-list-minimal">
-                                                    <div className="no-users-minimal">Per i seller non serve selezionare partecipanti</div>
+                                            {!googleCalendarConnected && (
+                                                <div className="form-group">
+                                                    <label className="form-label-minimal">Link Call (opzionale)</label>
+                                                    <input
+                                                        type="url"
+                                                        value={formData.call_link || ''}
+                                                        onChange={(e) => handleFormChange('call_link', e.target.value)}
+                                                        className="form-input"
+                                                        placeholder="https://meet.google.com/..."
+                                                    />
                                                 </div>
-                                            </div>
+                                            )}
                                         </>
                                     )}
 
@@ -3452,6 +3582,41 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                                                     placeholder="Note sulla call (opzionale)"
                                                 />
                                             </div>
+                                            <div className="form-group">
+                                                <label className="form-label-minimal">Partecipanti (email)</label>
+                                                <div className="participants-input-row">
+                                                    <input
+                                                        type="email"
+                                                        value={editParticipantEmailInput}
+                                                        onChange={(e) => setEditParticipantEmailInput(e.target.value)}
+                                                        className="form-input"
+                                                        placeholder="cliente@email.com"
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') {
+                                                                e.preventDefault();
+                                                                addParticipant(editParticipantEmailInput, editCallParticipants, setEditCallParticipants, setEditParticipantEmailInput);
+                                                            }
+                                                        }}
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        className="btn-add-participant"
+                                                        onClick={() => addParticipant(editParticipantEmailInput, editCallParticipants, setEditCallParticipants, setEditParticipantEmailInput)}
+                                                    >
+                                                        Aggiungi
+                                                    </button>
+                                                </div>
+                                                {editCallParticipants.length > 0 && (
+                                                    <div className="participants-chip-list">
+                                                        {editCallParticipants.map((participant) => (
+                                                            <span key={participant.email} className="participant-chip">
+                                                                {participant.email}
+                                                                <button type="button" onClick={() => removeParticipant(participant.email, editCallParticipants, setEditCallParticipants)}>×</button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </>
                                     )}
 
@@ -3611,17 +3776,36 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                                     </div>
                                 )}
                                 
-                                {selectedItem.type === 'call' && selectedItem.callLink && (
-                                    <div className="item-detail-section">
-                                        <label className="item-detail-label">Link Call</label>
-                                        <a 
-                                            href={selectedItem.callLink} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="item-detail-link"
-                                        >
-                                            {selectedItem.callLink}
-                                        </a>
+                                {selectedItem.type === 'call' && (
+                                    <div className="item-detail-section call-meet-section">
+                                        <label className="item-detail-label">Google Meet</label>
+                                        {selectedItem.callLink ? (
+                                            <div className="call-meet-box">
+                                                <a
+                                                    href={selectedItem.callLink}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="item-detail-link call-meet-link"
+                                                >
+                                                    {selectedItem.callLink}
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    className="btn-copy-meet-link"
+                                                    onClick={() => {
+                                                        navigator.clipboard.writeText(selectedItem.callLink || '');
+                                                    }}
+                                                >
+                                                    Copia link
+                                                </button>
+                                            </div>
+                                        ) : selectedItem.syncStatus === 'pending' ? (
+                                            <p className="item-detail-value call-sync-pending">Generazione link Meet in corso...</p>
+                                        ) : selectedItem.syncStatus === 'failed' ? (
+                                            <p className="item-detail-value call-sync-error">Sync Google fallita: {selectedItem.syncError || 'errore sconosciuto'}</p>
+                                        ) : (
+                                            <p className="item-detail-value">Nessun link Meet disponibile. Collega Google Calendar dalle impostazioni.</p>
+                                        )}
                                     </div>
                                 )}
                                 
@@ -3631,8 +3815,27 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                                         <p className="item-detail-value">{selectedItem.callNotes}</p>
                                     </div>
                                 )}
-                                
-                                {/* Per i seller non serve mostrare partecipanti */}
+
+                                {selectedItem.type === 'call' && selectedItem.callParticipants && selectedItem.callParticipants.length > 0 && (
+                                    <div className="item-detail-section">
+                                        <label className="item-detail-label">Partecipanti</label>
+                                        <p className="item-detail-value">
+                                            {selectedItem.callParticipants.map((p) => p.email).join(', ')}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {selectedItem.type === 'call' && selectedItem.syncStatus && (
+                                    <div className="item-detail-section">
+                                        <label className="item-detail-label">Sincronizzazione Google</label>
+                                        <p className="item-detail-value">
+                                            {selectedItem.syncStatus === 'synced' && 'Sincronizzato'}
+                                            {selectedItem.syncStatus === 'pending' && 'In corso...'}
+                                            {selectedItem.syncStatus === 'failed' && `Errore: ${selectedItem.syncError || 'sync fallita'}`}
+                                            {selectedItem.syncStatus === 'skipped' && 'Non sincronizzato (Google non collegato)'}
+                                        </p>
+                                    </div>
+                                )}
                                 
                                 {/* Checklist (solo per eventi) */}
                                 {selectedItem.type === 'event' && (

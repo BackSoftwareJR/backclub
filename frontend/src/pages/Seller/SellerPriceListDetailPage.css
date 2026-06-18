@@ -1,133 +1,384 @@
-/* Price List Detail Page - Desktop */
+/* ============================================================
+   Seller Price List Detail — Apple iOS 17 style
+   Uses seller-design-system.css tokens exclusively
+   ============================================================ */
 
-.seller-price-list-detail-page {
-  max-width: 1200px;
+/* ── Page ────────────────────────────────────────────────── */
+.pld-page {
+  max-width: 900px;
   margin: 0 auto;
-  padding: var(--spacing-6);
+  padding: var(--seller-spacing-8) var(--seller-spacing-6);
+  background: var(--seller-bg);
+  min-height: 100%;
 }
 
-.detail-header {
-  margin-bottom: var(--spacing-6);
+/* ── Header ──────────────────────────────────────────────── */
+.pld-header {
+  margin-bottom: var(--seller-spacing-8);
 }
 
-.detail-header-content {
+.pld-header--skeleton {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+}
+
+.pld-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: var(--seller-spacing-4);
+}
+
+.pld-breadcrumb-link {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  transition: opacity var(--seller-transition-fast);
+}
+
+.pld-breadcrumb-link:hover {
+  opacity: 0.75;
+}
+
+.pld-breadcrumb-sep {
+  color: var(--seller-text-tertiary);
+  flex-shrink: 0;
+}
+
+.pld-breadcrumb-current {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+.pld-header-row {
+  display: flex;
   align-items: flex-start;
-  margin-top: var(--spacing-4);
+  gap: var(--seller-spacing-4);
 }
 
-.detail-content-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-6);
+.pld-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-secondary);
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color var(--seller-transition-fast),
+              color var(--seller-transition-fast);
+  flex-shrink: 0;
+  margin-top: 4px;
 }
 
-.detail-card {
-  background: var(--color-bg-card);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-6);
-  box-shadow: var(--shadow-sm);
+.pld-back-btn:hover {
+  border-color: var(--seller-border-strong);
+  color: var(--seller-text-primary);
 }
 
-.card-title {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-4);
+.pld-header-info {
+  flex: 1;
+  min-width: 0;
 }
 
-.description-content {
-  color: var(--color-text-primary);
-  line-height: 1.6;
+.pld-title {
+  font-size: 28px;
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  margin: 0 0 var(--seller-spacing-2) 0;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
 }
 
-.price-display {
+.pld-header-badges {
   display: flex;
-  align-items: baseline;
-  gap: var(--spacing-2);
+  align-items: center;
+  gap: var(--seller-spacing-2);
   flex-wrap: wrap;
 }
 
-.price-amount-large {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--ios-system-blue);
+.pld-badge-dept {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--seller-bg-overlay);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-secondary);
 }
 
-.price-type-badge {
-  padding: 4px 12px;
-  border-radius: 8px;
-  background-color: rgba(10, 132, 255, 0.1);
-  color: var(--ios-system-blue);
-  font-size: 14px;
-  font-weight: 600;
+.pld-badge-inactive {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--seller-danger-soft);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-danger);
 }
 
-.actions-grid {
+/* ── Grid ────────────────────────────────────────────────── */
+.pld-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--seller-spacing-4);
+}
+
+/* ── Card ────────────────────────────────────────────────── */
+.pld-card {
+  padding: var(--seller-spacing-6);
+}
+
+.pld-card-title {
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 var(--seller-spacing-4) 0;
+}
+
+/* ── Price display ───────────────────────────────────────── */
+.pld-price-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--seller-spacing-3);
+  flex-wrap: wrap;
+}
+
+.pld-price-amount {
+  font-size: 36px;
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.pld-price-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: var(--seller-accent-soft);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: var(--seller-radius-full);
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-accent);
+}
+
+.pld-price-contact {
+  font-size: var(--seller-font-lg);
+  color: var(--seller-text-secondary);
+  font-style: italic;
+}
+
+/* ── Description ─────────────────────────────────────────── */
+.pld-description {
+  font-size: var(--seller-font-base);
+  color: var(--seller-text-primary);
+  line-height: 1.65;
+}
+
+.pld-description p,
+.pld-description ul,
+.pld-description ol {
+  margin: 0 0 var(--seller-spacing-3) 0;
+}
+
+.pld-description ul,
+.pld-description ol {
+  padding-left: var(--seller-spacing-5);
+}
+
+.pld-description li {
+  margin-bottom: var(--seller-spacing-1);
+  color: var(--seller-text-secondary);
+}
+
+.pld-text-muted {
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* ── Actions ─────────────────────────────────────────────── */
+.pld-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-3);
+  gap: var(--seller-spacing-2);
 }
 
-.action-button {
-  display: flex;
+.pld-action-btn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-4);
-  border-radius: var(--border-radius-md);
-  border: none;
+  gap: var(--seller-spacing-3);
+  padding: 11px var(--seller-spacing-4);
+  border-radius: var(--seller-radius-sm);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
   cursor: pointer;
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  transition: all 0.2s ease;
   text-decoration: none;
+  font-family: inherit;
+  transition: background var(--seller-transition-fast),
+              border-color var(--seller-transition-fast),
+              color var(--seller-transition-fast);
+  border: 1px solid transparent;
 }
 
-.action-button-primary {
-  background-color: var(--ios-system-blue);
-  color: #FFFFFF;
+.pld-action-btn--accent {
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
+  border-color: var(--seller-accent);
 }
 
-.action-button-primary:hover {
-  background-color: #0071E3;
+.pld-action-btn--accent:hover:not(:disabled) {
+  background: var(--seller-accent-hover);
+  border-color: var(--seller-accent-hover);
 }
 
-.action-button-secondary {
-  background-color: var(--ios-tertiary-system-grouped-background);
-  color: var(--ios-label);
-  border: 1px solid var(--ios-separator);
-}
-
-.action-button-secondary:hover {
-  background-color: var(--ios-quaternary-system-grouped-background);
-}
-
-.action-button:disabled {
+.pld-action-btn--accent:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.features-list {
+.pld-action-btn--outline {
+  background: transparent;
+  color: var(--seller-text-secondary);
+  border-color: var(--seller-border-strong);
+}
+
+.pld-action-btn--outline:hover {
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-primary);
+}
+
+.pld-action-external {
+  margin-left: auto;
+  color: var(--seller-text-tertiary);
+  flex-shrink: 0;
+}
+
+/* ── Features list ───────────────────────────────────────── */
+.pld-features {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-2);
 }
 
-.features-list li {
-  padding-left: var(--spacing-4);
-  position: relative;
-  color: var(--color-text-primary);
-  line-height: 1.6;
+.pld-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-3) 0;
+  border-bottom: 1px solid var(--seller-border);
+  font-size: var(--seller-font-base);
+  color: var(--seller-text-primary);
+  line-height: 1.5;
 }
 
-.features-list li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: var(--ios-system-blue);
-  font-weight: bold;
+.pld-feature-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.pld-feature-item::before {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--seller-accent);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+/* ── Empty state ─────────────────────────────────────────── */
+.pld-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-16);
+  text-align: center;
+}
+
+.pld-empty-icon {
+  color: var(--seller-text-tertiary);
+  opacity: 0.4;
+}
+
+.pld-empty-title {
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-primary);
+  margin: 0;
+}
+
+/* ── Skeleton animation ──────────────────────────────────── */
+@keyframes pld-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.pld-card--skeleton {
+  animation: pld-pulse 1.8s ease-in-out infinite;
+  display: flex;
+  flex-direction: column;
+  gap: var(--seller-spacing-3);
+}
+
+.pld-skeleton-line {
+  height: 12px;
+  background: var(--seller-bg-overlay);
+  border-radius: 6px;
+  animation: pld-pulse 1.8s ease-in-out infinite;
+}
+
+.pld-skeleton-line--breadcrumb {
+  width: 200px;
+  height: 12px;
+}
+
+.pld-skeleton-line--title {
+  width: 60%;
+  height: 28px;
+}
+
+.pld-skeleton-line--badge {
+  width: 100px;
+  height: 20px;
+  border-radius: var(--seller-radius-full);
+}
+
+.pld-skeleton-line--card-title {
+  width: 30%;
+  height: 10px;
+}
+
+.pld-skeleton-line--card-body {
+  width: 85%;
+}
+
+.pld-skeleton-line--short {
+  width: 55%;
 }

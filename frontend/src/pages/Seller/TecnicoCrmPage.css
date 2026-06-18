@@ -1,29 +1,67 @@
-/* ========== Tecnico & CRM – Pagina dedicata ========== */
+/* ========================================================================
+   Tecnico & CRM — Apple-style restyling
+   Design tokens defined here; zero hardcoded colors outside declarations
+   ======================================================================== */
 
+/* ── Page-level design tokens (dark default) ──────────────────────────── */
 .tecnico-crm-page {
+  --tech-bg:             #09090b;
+  --tech-bg-elevated:    #111113;
+  --tech-accent:         #f97316;
+  --tech-accent-hover:   #ea580c;
+  --tech-accent-soft:    rgba(249, 115, 22, 0.10);
+  --tech-accent-border:  rgba(249, 115, 22, 0.22);
+  --tech-text-primary:   #f4f4f5;
+  --tech-text-secondary: #a1a1aa;
+  --tech-text-tertiary:  #71717a;
+  --tech-border:         rgba(255, 255, 255, 0.08);
+  --tech-border-strong:  rgba(255, 255, 255, 0.14);
+  --tech-shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.32);
+  --tech-shadow-md:      0 4px 16px rgba(0, 0, 0, 0.44);
+  --tech-success:        #22c55e;
+  --tech-success-soft:   rgba(34, 197, 94, 0.12);
+  --tech-success-border: rgba(34, 197, 94, 0.22);
+  --tech-warning:        #f59e0b;
+  --tech-warning-soft:   rgba(245, 158, 11, 0.12);
+  --tech-warning-border: rgba(245, 158, 11, 0.22);
+  --tech-blue:           #3b82f6;
+  --tech-blue-soft:      rgba(59, 130, 246, 0.12);
+  --tech-blue-border:    rgba(59, 130, 246, 0.22);
+  --tech-danger:         #ef4444;
+  --tech-danger-soft:    rgba(239, 68, 68, 0.12);
+  --tech-danger-border:  rgba(239, 68, 68, 0.22);
+
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  background: var(--tech-bg);
+  color: var(--tech-text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Light mode overrides ─────────────────────────────────────────────── */
 .tecnico-crm-page.theme-light {
-  background: #F5F5F7;
-  color: #1D1D1F;
+  --tech-bg:             #fafafa;
+  --tech-bg-elevated:    #ffffff;
+  --tech-accent:         #ea580c;
+  --tech-accent-hover:   #c2410c;
+  --tech-accent-soft:    rgba(234, 88, 12, 0.07);
+  --tech-accent-border:  rgba(234, 88, 12, 0.18);
+  --tech-text-primary:   #09090b;
+  --tech-text-secondary: #52525b;
+  --tech-text-tertiary:  #a1a1aa;
+  --tech-border:         rgba(0, 0, 0, 0.08);
+  --tech-border-strong:  rgba(0, 0, 0, 0.14);
+  --tech-shadow-sm:      0 1px 2px rgba(0, 0, 0, 0.06);
+  --tech-shadow-md:      0 4px 16px rgba(0, 0, 0, 0.10);
 }
 
-.tecnico-crm-page.theme-dark {
-  background: #000000;
-  color: #FFFFFF;
-}
-
-/* ========== Back link ========== */
-
+/* ── Back link ────────────────────────────────────────────────────────── */
 .tech-back-wrap {
   position: relative;
   z-index: 2;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 16px 24px 0;
 }
@@ -31,8 +69,8 @@
 .tech-back-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 7px 12px;
   border: none;
   background: none;
   font-size: 0.9375rem;
@@ -40,24 +78,15 @@
   font-family: inherit;
   cursor: pointer;
   border-radius: 10px;
-  transition: background 0.2s ease;
-  color: #EA580C;
+  color: var(--tech-accent);
+  transition: background 0.18s ease;
 }
 
 .tech-back-btn:hover {
-  background: rgba(234, 88, 12, 0.1);
+  background: var(--tech-accent-soft);
 }
 
-.tecnico-crm-page.theme-dark .tech-back-btn {
-  color: #F97316;
-}
-
-.tecnico-crm-page.theme-dark .tech-back-btn:hover {
-  background: rgba(234, 88, 12, 0.15);
-}
-
-/* ========== Decorative background ========== */
-
+/* ── Decorative background ────────────────────────────────────────────── */
 .tech-hero-bg {
   position: absolute;
   inset: 0;
@@ -69,70 +98,50 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.35;
-  animation: tech-float 12s ease-in-out infinite;
+  opacity: 0.24;
+  animation: tech-float 14s ease-in-out infinite;
 }
 
 .tech-hero-orb-1 {
-  width: 320px;
-  height: 320px;
-  top: -80px;
-  right: -60px;
-  background: linear-gradient(135deg, #F97316 0%, #FB923C 50%, transparent 100%);
+  width: 360px;
+  height: 360px;
+  top: -100px;
+  right: -80px;
+  background: radial-gradient(circle, var(--tech-accent) 0%, transparent 70%);
   animation-delay: 0s;
 }
 
 .tech-hero-orb-2 {
-  width: 240px;
-  height: 240px;
-  bottom: 20%;
-  left: -40px;
-  background: linear-gradient(135deg, #EA580C 0%, #F97316 40%, transparent 100%);
-  animation-delay: -4s;
-}
-
-.tecnico-crm-page.theme-dark .tech-hero-orb {
-  opacity: 0.25;
+  width: 260px;
+  height: 260px;
+  bottom: 18%;
+  left: -60px;
+  background: radial-gradient(circle, var(--tech-accent-hover) 0%, transparent 70%);
+  animation-delay: -5s;
 }
 
 .tech-hero-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(234, 88, 12, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(234, 88, 12, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--tech-accent-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tech-accent-soft) 1px, transparent 1px);
   background-size: 32px 32px;
-  mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
-  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
+  mask-image: linear-gradient(to bottom, black 0%, transparent 65%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 65%);
 }
 
 @keyframes tech-float {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10px, -15px) scale(1.05); }
+  50%       { transform: translate(12px, -18px) scale(1.06); }
 }
 
-/* ========== Animations ========== */
-
-.tech-anim-in {
-  opacity: 0;
-  transform: translateY(16px);
-  animation: tech-fadeUp 0.6s ease forwards;
-}
-
-@keyframes tech-fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========== Hero ========== */
-
+/* ── Hero ─────────────────────────────────────────────────────────────── */
 .tech-hero {
   position: relative;
   z-index: 1;
-  padding: clamp(32px, 6vw, 56px) 24px clamp(20px, 3vw, 28px);
-  max-width: 720px;
+  padding: clamp(32px, 6vw, 56px) 24px clamp(20px, 3vw, 32px);
+  max-width: 960px;
   margin: 0 auto;
 }
 
@@ -145,77 +154,65 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(234, 88, 12, 0.2) 0%, rgba(234, 88, 12, 0.08) 100%);
-  border: 1px solid rgba(234, 88, 12, 0.2);
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  background: var(--tech-accent-soft);
+  border: 1px solid var(--tech-accent-border);
   margin-bottom: 20px;
-  animation: tech-fadeUp 0.5s ease 0.1s both;
 }
 
 .tech-hero-icon {
-  color: #EA580C;
+  color: var(--tech-accent);
 }
 
 .tech-hero-title {
-  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
   margin: 0 0 12px 0;
-  animation: tech-fadeUp 0.5s ease 0.15s both;
+  color: var(--tech-text-primary);
 }
 
 .tech-hero-subtitle {
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: 1.0625rem;
+  line-height: 1.6;
   margin: 0;
-  opacity: 0.85;
-  animation: tech-fadeUp 0.5s ease 0.2s both;
+  color: var(--tech-text-secondary);
+  max-width: 580px;
 }
 
-.tecnico-crm-page.theme-light .tech-hero-subtitle {
-  color: #4B5563;
-}
-
-.tecnico-crm-page.theme-dark .tech-hero-subtitle {
-  color: #98989D;
-}
-
-/* ========== CTA Apri Segnalazione (in evidenza) ========== */
-
+/* ── CTA Apri Segnalazione (in evidenza) ─────────────────────────────── */
 .tech-cta-segnalazione {
   position: relative;
   z-index: 1;
-  max-width: 720px;
-  margin: 0 auto 28px;
+  max-width: 960px;
+  margin: 0 auto 32px;
   padding: 0 24px;
 }
 
 .tech-cta-segnalazione-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 400px;
-  justify-content: center;
-  padding: 18px 24px;
+  gap: 10px;
+  padding: 16px 26px;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(145deg, #EA580C 0%, #C2410C 100%);
-  color: #FFFFFF;
-  font-size: 1.0625rem;
+  background: var(--tech-accent);
+  color: var(--seller-text-inverse);
+  font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px var(--tech-accent-soft);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tech-cta-segnalazione-btn:hover {
+  background: var(--tech-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(234, 88, 12, 0.4);
+  box-shadow: var(--tech-shadow-md);
 }
 
 .tech-cta-segnalazione-btn:active {
@@ -224,26 +221,17 @@
 
 .tech-cta-segnalazione-note {
   font-size: 0.875rem;
-  line-height: 1.5;
+  line-height: 1.55;
   margin: 10px 0 0 0;
-  opacity: 0.85;
+  color: var(--tech-text-secondary);
 }
 
-.tecnico-crm-page.theme-light .tech-cta-segnalazione-note {
-  color: #6B7280;
-}
-
-.tecnico-crm-page.theme-dark .tech-cta-segnalazione-note {
-  color: #98989D;
-}
-
-/* ========== Section ========== */
-
+/* ── Sections ─────────────────────────────────────────────────────────── */
 .tech-section {
   position: relative;
   z-index: 1;
-  max-width: 720px;
-  margin: 0 auto 32px;
+  max-width: 960px;
+  margin: 0 auto 36px;
   padding: 0 24px;
 }
 
@@ -251,43 +239,100 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.25rem;
+  font-size: 1.1875rem;
   font-weight: 600;
-  margin: 0 0 18px 0;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px 0;
+  color: var(--tech-text-primary);
 }
 
 .tech-section-heading svg {
-  color: #EA580C;
+  color: var(--tech-accent);
   flex-shrink: 0;
 }
 
-/* ========== Guide list ========== */
+/* ── System info grid (two-column) ───────────────────────────────────── */
+.tech-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
 
+.tech-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--tech-bg-elevated);
+  border: 1px solid var(--tech-border);
+  transition: border-color 0.18s ease;
+}
+
+.tech-info-item:hover {
+  border-color: var(--tech-border-strong);
+}
+
+.tech-info-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--tech-text-tertiary);
+}
+
+.tech-info-value-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tech-info-status-icon {
+  flex-shrink: 0;
+}
+
+.tech-status-ok {
+  color: var(--tech-success);
+}
+
+.tech-status-warning {
+  color: var(--tech-warning);
+}
+
+.tech-status-info {
+  color: var(--tech-blue);
+}
+
+.tech-info-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--tech-text-primary);
+  line-height: 1.35;
+}
+
+/* ── Guide accordion ──────────────────────────────────────────────────── */
 .tech-guide-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tech-guide-item {
   border-radius: 16px;
   overflow: hidden;
-  transition: box-shadow 0.25s ease;
+  background: var(--tech-bg-elevated);
+  border: 1px solid var(--tech-border);
+  transition: border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
-.tecnico-crm-page.theme-light .tech-guide-item {
-  background: #FFFFFF;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+.tech-guide-item:hover {
+  border-color: var(--tech-border-strong);
+  box-shadow: var(--tech-shadow-sm);
 }
 
-.tecnico-crm-page.theme-dark .tech-guide-item {
-  background: #1C1C1E;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.tech-guide-item:focus-within,
-.tech-guide-trigger:hover {
-  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.12);
+.tech-guide-item:focus-within {
+  border-color: var(--tech-accent-border);
+  box-shadow: 0 0 0 3px var(--tech-accent-soft);
 }
 
 .tech-guide-trigger {
@@ -295,38 +340,68 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px;
+  gap: 10px;
+  padding: 16px 20px;
   border: none;
   background: none;
   cursor: pointer;
   text-align: left;
-  font-size: 1rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   font-family: inherit;
-  transition: background 0.2s ease;
-}
-
-.tecnico-crm-page.theme-light .tech-guide-trigger {
-  color: #1D1D1F;
-}
-
-.tecnico-crm-page.theme-dark .tech-guide-trigger {
-  color: #FFFFFF;
+  color: var(--tech-text-primary);
+  transition: background 0.18s ease;
 }
 
 .tech-guide-trigger:hover {
-  background: rgba(234, 88, 12, 0.06);
+  background: var(--tech-accent-soft);
 }
 
 .tech-guide-trigger-text {
   flex: 1;
   min-width: 0;
+  line-height: 1.4;
+}
+
+/* Guide section badge */
+.tech-guide-badge {
+  flex-shrink: 0;
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.tech-guide-badge--info {
+  background: var(--tech-blue-soft);
+  color: var(--tech-blue);
+  border: 1px solid var(--tech-blue-border);
+}
+
+.tech-guide-badge--warning {
+  background: var(--tech-warning-soft);
+  color: var(--tech-warning);
+  border: 1px solid var(--tech-warning-border);
+}
+
+.tech-guide-badge--success {
+  background: var(--tech-success-soft);
+  color: var(--tech-success);
+  border: 1px solid var(--tech-success-border);
+}
+
+.tech-guide-badge--default {
+  background: var(--tech-border);
+  color: var(--tech-text-tertiary);
+  border: 1px solid var(--tech-border-strong);
 }
 
 .tech-guide-chevron {
   flex-shrink: 0;
-  color: #EA580C;
+  color: var(--tech-accent);
   transition: transform 0.25s ease;
 }
 
@@ -341,40 +416,33 @@
 }
 
 .tech-guide-body.expanded {
-  max-height: 700px;
-  transition: max-height 0.4s ease-in;
+  max-height: 800px;
+  transition: max-height 0.45s ease-in;
 }
 
 .tech-guide-body-inner {
   padding: 0 20px 20px 20px;
+  border-top: 1px solid var(--tech-border);
 }
 
 .tech-guide-body-inner p {
   font-size: 0.9375rem;
-  line-height: 1.65;
-  margin: 0;
+  line-height: 1.7;
+  margin: 14px 0 0 0;
+  color: var(--tech-text-secondary);
 }
 
-.tecnico-crm-page.theme-light .tech-guide-body-inner p {
-  color: #4B5563;
-}
-
-.tecnico-crm-page.theme-dark .tech-guide-body-inner p {
-  color: #98989D;
-}
-
-/* ========== Summary strip ========== */
-
+/* ── Summary strip ────────────────────────────────────────────────────── */
 .tech-summary-strip {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto 32px;
   padding: 0 24px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 24px;
 }
 
 .tech-summary-item {
@@ -386,8 +454,8 @@
 }
 
 .tech-summary-icon-wrap {
-  width: 48px;
-  height: 48px;
+  width: 50px;
+  height: 50px;
   border-radius: 14px;
   display: flex;
   align-items: center;
@@ -396,125 +464,117 @@
 }
 
 .tech-summary-item:hover .tech-summary-icon-wrap {
-  transform: scale(1.08);
+  transform: scale(1.1);
 }
 
 .tech-summary-icon-login {
-  background: rgba(234, 88, 12, 0.2);
-  color: #EA580C;
+  background: var(--tech-accent-soft);
+  color: var(--tech-accent);
+  border: 1px solid var(--tech-accent-border);
 }
 
 .tech-summary-icon-crm {
-  background: rgba(59, 130, 246, 0.2);
-  color: #2563EB;
+  background: var(--tech-blue-soft);
+  color: var(--tech-blue);
+  border: 1px solid var(--tech-blue-border);
 }
 
 .tech-summary-icon-bug {
-  background: rgba(239, 68, 68, 0.2);
-  color: #DC2626;
+  background: var(--tech-danger-soft);
+  color: var(--tech-danger);
+  border: 1px solid var(--tech-danger-border);
 }
 
 .tech-summary-icon-ticket {
-  background: rgba(34, 197, 94, 0.2);
-  color: #16A34A;
+  background: var(--tech-success-soft);
+  color: var(--tech-success);
+  border: 1px solid var(--tech-success-border);
 }
 
 .tech-summary-label {
   font-size: 0.8125rem;
   font-weight: 600;
   text-align: center;
+  color: var(--tech-text-secondary);
 }
 
-.tecnico-crm-page.theme-light .tech-summary-label {
-  color: #4B5563;
-}
-
-.tecnico-crm-page.theme-dark .tech-summary-label {
-  color: #98989D;
-}
-
-/* ========== CTA (ripetuto in fondo) ========== */
-
+/* ── CTA (ripetuto in fondo) ─────────────────────────────────────────── */
 .tech-cta {
   position: relative;
   z-index: 1;
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 0 24px 48px;
+  padding: 0 24px 52px;
 }
 
 .tech-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
+  gap: 10px;
+  padding: 15px 26px;
   border-radius: 14px;
   border: none;
-  background: linear-gradient(145deg, #EA580C 0%, #C2410C 100%);
-  color: #FFFFFF;
+  background: var(--tech-accent);
+  color: var(--seller-text-inverse);
   font-size: 1rem;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(234, 88, 12, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px var(--tech-accent-soft);
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tech-cta-btn:hover {
+  background: var(--tech-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(234, 88, 12, 0.4);
+  box-shadow: var(--tech-shadow-md);
 }
 
 .tech-cta-btn:active {
   transform: translateY(0);
 }
 
-/* ========== Mobile overrides ========== */
-
-.tecnico-crm-page[data-mobile="true"] .tech-back-wrap {
-  padding: 16px 16px 0;
+/* ── Mobile overrides ─────────────────────────────────────────────────── */
+.tecnico-crm-page[data-mobile='true'] .tech-back-wrap,
+.tecnico-crm-page[data-mobile='true'] .tech-cta-segnalazione,
+.tecnico-crm-page[data-mobile='true'] .tech-section,
+.tecnico-crm-page[data-mobile='true'] .tech-summary-strip,
+.tecnico-crm-page[data-mobile='true'] .tech-cta {
+  padding-left: 16px;
+  padding-right: 16px;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-hero {
+.tecnico-crm-page[data-mobile='true'] .tech-hero {
   padding: 24px 16px 16px;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-hero-title {
+.tecnico-crm-page[data-mobile='true'] .tech-hero-title {
   font-size: 1.75rem;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-cta-segnalazione {
-  padding: 0 16px 24px;
+.tecnico-crm-page[data-mobile='true'] .tech-info-grid {
+  grid-template-columns: 1fr;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-cta-segnalazione-btn {
-  max-width: none;
-}
-
-.tecnico-crm-page[data-mobile="true"] .tech-section {
-  padding: 0 16px 24px;
-}
-
-.tecnico-crm-page[data-mobile="true"] .tech-guide-trigger {
-  padding: 16px 18px;
+.tecnico-crm-page[data-mobile='true'] .tech-guide-trigger {
+  padding: 14px 16px;
   font-size: 0.9375rem;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-guide-body-inner {
-  padding: 0 18px 18px 18px;
+.tecnico-crm-page[data-mobile='true'] .tech-guide-badge {
+  display: none;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-summary-strip {
-  padding: 0 16px 28px;
-  gap: 16px;
+.tecnico-crm-page[data-mobile='true'] .tech-guide-body-inner {
+  padding: 0 16px 16px;
 }
 
-.tecnico-crm-page[data-mobile="true"] .tech-cta {
-  padding: 0 16px 40px;
-}
-
-.tecnico-crm-page[data-mobile="true"] .tech-cta-btn {
+.tecnico-crm-page[data-mobile='true'] .tech-cta-segnalazione-btn {
   width: 100%;
   justify-content: center;
-  padding: 16px 20px;
+}
+
+.tecnico-crm-page[data-mobile='true'] .tech-cta-btn {
+  width: 100%;
+  justify-content: center;
 }

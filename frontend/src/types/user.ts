@@ -4,7 +4,7 @@ export interface User {
   nome?: string;
   name?: string;
   email: string;
-  role: 'admin' | 'manager' | 'freelancer' | 'client' | 'seller' | 'venditori' | 'freelance';
+  role: 'admin' | 'manager' | 'freelance' | 'freelancer' | 'client' | 'seller' | 'venditori' | 'developer' | 'segreteria' | 'project_manager' | 'project_master' | 'dipendente' | 'risorse_umane' | 'commercialista';
   current_role?: string;
   roles?: string[]; // Array of roles for multi-role support
   crm_departments?: Array<{

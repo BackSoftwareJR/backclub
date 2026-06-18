@@ -1,24 +1,16 @@
-/* ========== Amministrazione & Provvigioni – Pagina dedicata ========== */
+/* ========== Amministrazione & Provvigioni — Seller Design System ==========
+   Zero hardcoded colours. All values from --seller-* tokens.
+   ============================================================================ */
 
 .amministrazione-provvigioni-page {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
+  background: var(--seller-bg);
+  color: var(--seller-text-primary);
 }
 
-.amministrazione-provvigioni-page.theme-light {
-  background: #F5F5F7;
-  color: #1D1D1F;
-}
-
-.amministrazione-provvigioni-page.theme-dark {
-  background: #000000;
-  color: #FFFFFF;
-}
-
-/* ========== Decorative background ========== */
+/* ── Decorative background ──────────────────────────────────── */
 
 .ammin-hero-bg {
   position: absolute;
@@ -31,8 +23,7 @@
   position: absolute;
   border-radius: 50%;
   filter: blur(80px);
-  opacity: 0.35;
-  animation: ammin-float 12s ease-in-out infinite;
+  opacity: 0.18;
 }
 
 .ammin-hero-orb-1 {
@@ -40,8 +31,7 @@
   height: 320px;
   top: -80px;
   right: -60px;
-  background: linear-gradient(135deg, #8B5CF6 0%, #A78BFA 50%, transparent 100%);
-  animation-delay: 0s;
+  background: var(--seller-accent-soft);
 }
 
 .ammin-hero-orb-2 {
@@ -49,96 +39,55 @@
   height: 240px;
   bottom: 20%;
   left: -40px;
-  background: linear-gradient(135deg, #7C3AED 0%, #8B5CF6 40%, transparent 100%);
-  animation-delay: -4s;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-hero-orb {
-  opacity: 0.25;
-}
-
-/* Back link */
-.ammin-back-wrap {
-  position: relative;
-  z-index: 2;
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 16px 24px 0;
-}
-
-.ammin-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border: none;
-  background: none;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  font-family: inherit;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: background 0.2s ease;
-  color: #8B5CF6;
-}
-
-.ammin-back-btn:hover {
-  background: rgba(139, 92, 246, 0.1);
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-back-btn {
-  color: #A78BFA;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-back-btn:hover {
-  background: rgba(139, 92, 246, 0.15);
+  background: var(--seller-success-soft);
 }
 
 .ammin-hero-grid {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--seller-accent) 3%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--seller-accent) 3%, transparent) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
   -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 70%);
 }
 
-@keyframes ammin-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(10px, -15px) scale(1.05); }
+/* ── Back link ──────────────────────────────────────────────── */
+
+.ammin-back-wrap {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--seller-spacing-4) var(--seller-spacing-6) 0;
 }
 
-/* ========== Animations ========== */
-
-.ammin-anim-in {
-  opacity: 0;
-  transform: translateY(16px);
-  animation: ammin-fadeUp 0.6s ease forwards;
+.ammin-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--seller-spacing-2);
+  padding: var(--seller-spacing-2) var(--seller-spacing-3);
+  border: none;
+  background: none;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: var(--seller-radius-sm);
+  transition: background var(--seller-transition-base);
+  color: var(--seller-accent);
 }
 
-.ammin-anim-in:nth-child(1) { animation-delay: 0.05s; }
-.ammin-anim-in:nth-child(2) { animation-delay: 0.12s; }
-.ammin-anim-in:nth-child(3) { animation-delay: 0.19s; }
-.ammin-anim-in:nth-child(4) { animation-delay: 0.26s; }
-.ammin-anim-in:nth-child(5) { animation-delay: 0.33s; }
-.ammin-anim-in:nth-child(6) { animation-delay: 0.4s; }
-.ammin-anim-in:nth-child(7) { animation-delay: 0.47s; }
-.ammin-anim-in:nth-child(8) { animation-delay: 0.54s; }
-
-@keyframes ammin-fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.ammin-back-btn:hover {
+  background: var(--seller-accent-soft);
 }
 
-/* ========== Hero ========== */
+/* ── Hero ───────────────────────────────────────────────────── */
 
 .ammin-hero {
   position: relative;
-  padding: clamp(32px, 6vw, 56px) 24px clamp(24px, 4vw, 40px);
+  padding: clamp(32px, 6vw, 56px) var(--seller-spacing-6) clamp(24px, 4vw, 40px);
   max-width: 720px;
   margin: 0 auto;
 }
@@ -154,71 +103,53 @@
   justify-content: center;
   width: 64px;
   height: 64px;
-  border-radius: 18px;
-  background: linear-gradient(145deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.08) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  margin-bottom: 20px;
-  animation: ammin-fadeUp 0.5s ease 0.1s both;
+  border-radius: var(--seller-radius-lg);
+  background: var(--seller-accent-soft);
+  border: 1px solid var(--seller-border);
+  margin-bottom: var(--seller-spacing-5);
 }
 
 .ammin-hero-icon {
-  color: #8B5CF6;
+  color: var(--seller-accent);
 }
 
 .ammin-hero-title {
   font-size: clamp(1.75rem, 5vw, 2.25rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  margin: 0 0 12px 0;
-  animation: ammin-fadeUp 0.5s ease 0.15s both;
+  font-weight: var(--seller-weight-bold);
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 var(--seller-spacing-3) 0;
+  color: var(--seller-text-primary);
 }
 
 .ammin-hero-subtitle {
-  font-size: 1rem;
-  line-height: 1.55;
+  font-size: var(--seller-font-base);
+  line-height: 1.6;
   margin: 0;
-  opacity: 0.85;
-  animation: ammin-fadeUp 0.5s ease 0.2s both;
+  color: var(--seller-text-secondary);
 }
 
-.amministrazione-provvigioni-page.theme-light .ammin-hero-subtitle {
-  color: #4B5563;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-hero-subtitle {
-  color: #98989D;
-}
-
-/* ========== Commission card ========== */
+/* ── Commission card ────────────────────────────────────────── */
 
 .ammin-commission-card {
   position: relative;
   max-width: 480px;
-  margin: 0 auto 32px;
-  padding: 24px;
-  border-radius: 20px;
+  margin: 0 auto var(--seller-spacing-8);
+  padding: var(--seller-spacing-6);
+  border-radius: var(--seller-radius-xl);
   overflow: hidden;
   z-index: 1;
 }
 
-.ammin-commission-card-glow {
+/* Subtle left accent line */
+.ammin-commission-card-accent {
   position: absolute;
-  inset: -1px;
-  border-radius: 21px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(124, 58, 237, 0.2) 50%, transparent 100%);
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.amministrazione-provvigioni-page.theme-light .ammin-commission-card {
-  background: #FFFFFF;
-  box-shadow: 0 4px 24px rgba(139, 92, 246, 0.12), 0 0 0 1px rgba(139, 92, 246, 0.08);
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-commission-card {
-  background: #1C1C1E;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(139, 92, 246, 0.15);
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--seller-accent), var(--seller-success));
+  border-radius: 3px 0 0 3px;
 }
 
 .ammin-commission-content {
@@ -229,132 +160,100 @@
 .ammin-commission-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 8px;
+  gap: var(--seller-spacing-2);
+  margin-bottom: var(--seller-spacing-2);
 }
 
 .ammin-commission-icon {
-  color: #8B5CF6;
+  color: var(--seller-accent);
   flex-shrink: 0;
 }
 
 .ammin-commission-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #8B5CF6;
+  letter-spacing: 0.08em;
+  color: var(--seller-accent);
 }
 
 .ammin-commission-value-wrap {
-  margin-bottom: 4px;
+  margin-bottom: var(--seller-spacing-1);
 }
 
 .ammin-commission-value {
   font-size: clamp(2rem, 6vw, 2.75rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: var(--seller-weight-bold);
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
+  color: var(--seller-text-primary);
 }
 
-.amministrazione-provvigioni-page.theme-light .ammin-commission-value {
-  color: #1D1D1F;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-commission-value {
-  color: #FFFFFF;
-}
-
+/* Skeleton shimmer */
 .ammin-commission-value.ammin-skeleton {
   display: inline-block;
   width: 80px;
   height: 1.2em;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #E5E7EB 25%, #F3F4F6 50%, #E5E7EB 75%);
-  background-size: 200% 100%;
+  border-radius: var(--seller-radius-sm);
+  background: var(--seller-border);
   animation: ammin-shimmer 1.2s ease-in-out infinite;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-commission-value.ammin-skeleton {
-  background: linear-gradient(90deg, #2C2C2E 25%, #3A3A3C 50%, #2C2C2E 75%);
   background-size: 200% 100%;
 }
 
 @keyframes ammin-shimmer {
-  to { background-position: 200% 0; }
+  0%   { opacity: 0.5; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.5; }
 }
 
 .ammin-commission-fallback {
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0 0 4px 0;
-  opacity: 0.8;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
+  margin: 0 0 var(--seller-spacing-1) 0;
+  color: var(--seller-text-secondary);
 }
 
 .ammin-commission-note {
-  font-size: 0.875rem;
+  font-size: var(--seller-font-sm);
   line-height: 1.5;
   margin: 0;
-  opacity: 0.8;
+  color: var(--seller-text-tertiary);
 }
 
-.amministrazione-provvigioni-page.theme-light .ammin-commission-note {
-  color: #6B7280;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-commission-note {
-  color: #98989D;
-}
-
-/* ========== Guide ========== */
+/* ── Guide ──────────────────────────────────────────────────── */
 
 .ammin-guide {
   position: relative;
   z-index: 1;
   max-width: 720px;
-  margin: 0 auto 40px;
-  padding: 0 24px;
+  margin: 0 auto var(--seller-spacing-10);
+  padding: 0 var(--seller-spacing-6);
 }
 
 .ammin-guide-heading {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 20px 0;
+  gap: var(--seller-spacing-2);
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-semibold);
+  margin: 0 0 var(--seller-spacing-5) 0;
+  color: var(--seller-text-primary);
 }
 
 .ammin-guide-heading svg {
-  color: #8B5CF6;
+  color: var(--seller-accent);
   flex-shrink: 0;
 }
 
 .ammin-guide-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--seller-spacing-3);
 }
 
 .ammin-guide-item {
-  border-radius: 16px;
+  border-radius: var(--seller-radius-md);
   overflow: hidden;
-  transition: box-shadow 0.25s ease;
-}
-
-.amministrazione-provvigioni-page.theme-light .ammin-guide-item {
-  background: #FFFFFF;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-guide-item {
-  background: #1C1C1E;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
-.ammin-guide-item:focus-within,
-.ammin-guide-trigger:hover {
-  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.12);
 }
 
 .ammin-guide-trigger {
@@ -362,28 +261,21 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 18px 20px;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-4) var(--seller-spacing-5);
   border: none;
   background: none;
   cursor: pointer;
   text-align: left;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
   font-family: inherit;
-  transition: background 0.2s ease;
-}
-
-.amministrazione-provvigioni-page.theme-light .ammin-guide-trigger {
-  color: #1D1D1F;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-guide-trigger {
-  color: #FFFFFF;
+  color: var(--seller-text-primary);
+  transition: background var(--seller-transition-base);
 }
 
 .ammin-guide-trigger:hover {
-  background: rgba(139, 92, 246, 0.06);
+  background: var(--seller-bg-overlay);
 }
 
 .ammin-guide-trigger-text {
@@ -393,8 +285,8 @@
 
 .ammin-guide-chevron {
   flex-shrink: 0;
-  color: #8B5CF6;
-  transition: transform 0.25s ease;
+  color: var(--seller-accent);
+  transition: transform var(--seller-transition-base);
 }
 
 .ammin-guide-trigger.expanded .ammin-guide-chevron {
@@ -413,53 +305,46 @@
 }
 
 .ammin-guide-body-inner {
-  padding: 0 20px 20px 20px;
+  padding: 0 var(--seller-spacing-5) var(--seller-spacing-5);
 }
 
 .ammin-guide-body-inner p {
-  font-size: 0.9375rem;
+  font-size: var(--seller-font-base);
   line-height: 1.65;
   margin: 0;
+  color: var(--seller-text-secondary);
 }
 
-.amministrazione-provvigioni-page.theme-light .ammin-guide-body-inner p {
-  color: #4B5563;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-guide-body-inner p {
-  color: #98989D;
-}
-
-/* ========== Summary strip (visual icons) ========== */
+/* ── Summary strip ──────────────────────────────────────────── */
 
 .ammin-summary-strip {
   position: relative;
   z-index: 1;
   max-width: 720px;
-  margin: 0 auto 40px;
-  padding: 0 24px;
+  margin: 0 auto var(--seller-spacing-10);
+  padding: 0 var(--seller-spacing-6);
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
+  gap: var(--seller-spacing-6);
 }
 
 .ammin-summary-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--seller-spacing-2);
   min-width: 80px;
 }
 
 .ammin-summary-icon-wrap {
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: var(--seller-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease;
+  transition: transform var(--seller-transition-base);
 }
 
 .ammin-summary-item:hover .ammin-summary-icon-wrap {
@@ -467,120 +352,114 @@
 }
 
 .ammin-summary-icon-pending {
-  background: rgba(156, 163, 175, 0.2);
-  color: #6B7280;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-summary-icon-pending {
-  background: rgba(156, 163, 175, 0.15);
-  color: #9CA3AF;
+  background: var(--seller-bg-overlay);
+  color: var(--seller-text-tertiary);
+  border: 1px solid var(--seller-border);
 }
 
 .ammin-summary-icon-ready {
-  background: rgba(139, 92, 246, 0.2);
-  color: #8B5CF6;
+  background: var(--seller-accent-soft);
+  color: var(--seller-accent);
+  border: 1px solid var(--seller-border);
 }
 
 .ammin-summary-icon-done {
-  background: rgba(34, 197, 94, 0.2);
-  color: #16A34A;
+  background: var(--seller-success-soft);
+  color: var(--seller-success);
+  border: 1px solid var(--seller-border);
 }
 
 .ammin-summary-label {
-  font-size: 0.8125rem;
-  font-weight: 600;
+  font-size: var(--seller-font-sm);
+  font-weight: var(--seller-weight-semibold);
   text-align: center;
+  color: var(--seller-text-secondary);
 }
 
-.amministrazione-provvigioni-page.theme-light .ammin-summary-label {
-  color: #4B5563;
-}
-
-.amministrazione-provvigioni-page.theme-dark .ammin-summary-label {
-  color: #98989D;
-}
-
-/* ========== CTA ========== */
+/* ── CTA ────────────────────────────────────────────────────── */
 
 .ammin-cta {
   position: relative;
   z-index: 1;
   max-width: 720px;
   margin: 0 auto;
-  padding: 0 24px 48px;
+  padding: 0 var(--seller-spacing-6) var(--seller-spacing-12);
 }
 
 .ammin-cta-btn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 24px;
-  border-radius: 14px;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-4) var(--seller-spacing-6);
+  border-radius: var(--seller-radius-md);
   border: none;
-  background: linear-gradient(145deg, #8B5CF6 0%, #7C3AED 100%);
-  color: #FFFFFF;
-  font-size: 1rem;
-  font-weight: 600;
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
   font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 20px var(--seller-accent-soft);
+  transition: background var(--seller-transition-base),
+              transform var(--seller-transition-fast),
+              box-shadow var(--seller-transition-base);
 }
 
 .ammin-cta-btn:hover {
+  background: var(--seller-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 8px 28px var(--seller-accent-soft);
 }
 
 .ammin-cta-btn:active {
   transform: translateY(0);
 }
 
-/* ========== Mobile overrides ========== */
+/* ── Mobile overrides ───────────────────────────────────────── */
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-back-wrap {
-  padding: 16px 16px 0;
-}
+@media (max-width: 768px) {
+  .ammin-back-wrap {
+    padding: var(--seller-spacing-4) var(--seller-spacing-4) 0;
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-hero {
-  padding: 24px 16px 20px;
-}
+  .ammin-hero {
+    padding: var(--seller-spacing-6) var(--seller-spacing-4) var(--seller-spacing-5);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-hero-title {
-  font-size: 1.75rem;
-}
+  .ammin-hero-title {
+    font-size: 1.75rem;
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-commission-card {
-  margin-left: 16px;
-  margin-right: 16px;
-  padding: 20px;
-  border-radius: 16px;
-}
+  .ammin-commission-card {
+    margin-left: var(--seller-spacing-4);
+    margin-right: var(--seller-spacing-4);
+    padding: var(--seller-spacing-5);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-guide {
-  padding: 0 16px 32px;
-}
+  .ammin-guide {
+    padding: 0 var(--seller-spacing-4) var(--seller-spacing-8);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-guide-trigger {
-  padding: 16px 18px;
-  font-size: 0.9375rem;
-}
+  .ammin-guide-trigger {
+    padding: var(--seller-spacing-4) var(--seller-spacing-4);
+    font-size: var(--seller-font-sm);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-guide-body-inner {
-  padding: 0 18px 18px 18px;
-}
+  .ammin-guide-body-inner {
+    padding: 0 var(--seller-spacing-4) var(--seller-spacing-4);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-summary-strip {
-  padding: 0 16px 32px;
-  gap: 20px;
-}
+  .ammin-summary-strip {
+    padding: 0 var(--seller-spacing-4) var(--seller-spacing-8);
+    gap: var(--seller-spacing-5);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-cta {
-  padding: 0 16px 40px;
-}
+  .ammin-cta {
+    padding: 0 var(--seller-spacing-4) var(--seller-spacing-10);
+  }
 
-.amministrazione-provvigioni-page[data-mobile="true"] .ammin-cta-btn {
-  width: 100%;
-  justify-content: center;
-  padding: 16px 20px;
+  .ammin-cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

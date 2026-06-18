@@ -449,7 +449,7 @@
 }
 
 .quote-detail-action-btn-contract {
-  color: #30D158 !important;
+  color: var(--seller-success) !important;
 }
 
 /* Richiedi contratto - in alto (mobile) */
@@ -469,7 +469,7 @@
   background-color: rgba(48, 209, 88, 0.15);
   border: 1px solid rgba(48, 209, 88, 0.35);
   border-radius: 12px;
-  color: #30D158;
+  color: var(--seller-success);
   font-family: var(--ios-font-family);
   font-size: 17px;
   font-weight: 600;

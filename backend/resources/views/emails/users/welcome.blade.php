@@ -2,7 +2,7 @@
 
 @section('content')
     <h1>Benvenuto</h1>
-    <p>Il tuo account Sunlight Marketing CRM è pronto.</p>
+    <p>Il tuo account Backclub CRM è pronto.</p>
     
     <table class="data-table">
         <tr>

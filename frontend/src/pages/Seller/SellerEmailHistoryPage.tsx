@@ -1,10 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Mail, ChevronRight, Paperclip } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Mail, ChevronRight, Paperclip, PenSquare } from 'lucide-react';
 import leadsApi from '../../api/leads';
 import type { LeadActivity } from '../../types/sellers';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
 import './SellerEmailHistoryPage.css';
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.04, duration: 0.28 },
+  }),
+};
+
+function getInitials(name?: string): string {
+  if (!name) return '?';
+  return name
+    .split(' ')
+    .map(p => p[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase();
+}
 
 const SellerEmailHistoryPage: React.FC = () => {
   const navigate = useNavigate();
@@ -13,9 +33,7 @@ const SellerEmailHistoryPage: React.FC = () => {
   const [emailActivities, setEmailActivities] = useState<LeadActivity[]>([]);
 
   useEffect(() => {
-    if (id) {
-      loadData();
-    }
+    if (id) loadData();
   }, [id]);
 
   const loadData = async () => {
@@ -23,14 +41,11 @@ const SellerEmailHistoryPage: React.FC = () => {
       setLoading(true);
       const [, activitiesData] = await Promise.all([
         leadsApi.getById(Number(id)),
-        leadsApi.getActivities(Number(id))
+        leadsApi.getActivities(Number(id)),
       ]);
-      
-      // Filtra solo le attività email con dettagli
-      const emails = activitiesData.filter(
-        a => a.activity_type === 'email' && a.email_details
+      setEmailActivities(
+        activitiesData.filter((a: LeadActivity) => a.activity_type === 'email' && a.email_details)
       );
-      setEmailActivities(emails);
     } catch (error) {
       console.error('Errore nel caricamento:', error);
       alert('Errore nel caricamento dei dati');
@@ -40,25 +55,14 @@ const SellerEmailHistoryPage: React.FC = () => {
   };
 
   const formatDate = (date: string) => {
-    const activityDate = new Date(date);
+    const d = new Date(date);
     const now = new Date();
-    const diffInMs = now.getTime() - activityDate.getTime();
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-    if (diffInDays === 0) {
-      return activityDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffInDays === 1) {
-      return 'Ieri';
-    } else if (diffInDays < 7) {
-      return activityDate.toLocaleDateString('it-IT', { weekday: 'short' });
-    } else {
-      return activityDate.toLocaleDateString('it-IT', {
-        day: '2-digit',
-        month: '2-digit',
-      });
-    }
+    const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
+    if (diffDays === 0) return d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+    if (diffDays === 1) return 'Ieri';
+    if (diffDays < 7) return d.toLocaleDateString('it-IT', { weekday: 'short' });
+    return d.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
   };
-
 
   const handleEmailClick = (activityId: number) => {
     navigate(`/seller/contatti/${id}/email/${activityId}`);
@@ -66,11 +70,11 @@ const SellerEmailHistoryPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="email-history-mobile-ios email-history-skeleton">
-        <div className="email-history-mobile-header">
-          <div className="skeleton-line skeleton-pulse-fill w-1/4 short" style={{ height: 24 }} />
+      <div className="email-history-page">
+        <div className="email-history-header">
+          <div style={{ height: 24, width: '20%', borderRadius: 6, background: 'var(--seller-bg-overlay)' }} />
         </div>
-        <div className="email-history-skeleton-content">
+        <div style={{ padding: 16 }}>
           <SkeletonLoader type="list" count={6} />
         </div>
       </div>
@@ -78,82 +82,92 @@ const SellerEmailHistoryPage: React.FC = () => {
   }
 
   return (
-    <div className="email-history-mobile-ios">
-      {/* Navigation Bar */}
-      <div className="email-history-mobile-header">
+    <div className="email-history-page">
+      {/* Navigation bar */}
+      <div className="email-history-header">
         <button
-          className="email-history-mobile-back"
+          className="email-history-back"
           onClick={() => navigate(`/seller/contatti/${id}`)}
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} />
           <span>Contatto</span>
         </button>
-        <h1 className="email-history-mobile-title">Storico Email</h1>
+        <h1 className="email-history-title">Email</h1>
+        <button
+          className="email-history-compose-btn"
+          onClick={() => navigate(`/seller/contatti/${id}/email`)}
+          aria-label="Nuova email"
+        >
+          <PenSquare size={18} />
+        </button>
       </div>
 
-      {/* Email List - Inset Grouped */}
-      <div className="email-history-mobile-content">
-        {emailActivities.length === 0 ? (
-          <div className="email-history-mobile-empty">
-            <Mail size={64} style={{ color: 'var(--ios-tertiary-label)', marginBottom: '16px' }} />
-            <h3 className="ios-title-2" style={{ marginBottom: '8px' }}>Nessuna email inviata</h3>
-            <p className="ios-body" style={{ color: 'var(--ios-secondary-label)' }}>
-              Non ci sono email inviate a questo contatto tramite il sistema.
-            </p>
-          </div>
-        ) : (
-          <div className="ios-inset-grouped">
-            <ul className="ios-inset-grouped-list">
+      {/* Email list */}
+      <div className="email-history-content">
+        <AnimatePresence>
+          {emailActivities.length === 0 ? (
+            <motion.div
+              className="email-history-empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <Mail size={56} className="email-history-empty-icon" />
+              <h3>Nessuna email inviata</h3>
+              <p>Non ci sono email inviate a questo contatto tramite il sistema.</p>
+              <button
+                className="email-history-empty-cta"
+                onClick={() => navigate(`/seller/contatti/${id}/email`)}
+              >
+                <PenSquare size={16} />
+                Scrivi email
+              </button>
+            </motion.div>
+          ) : (
+            <ul className="email-history-list">
               {emailActivities.map((activity, index) => {
                 const emailDetails = activity.email_details!;
-                const isLast = index === emailActivities.length - 1;
                 const hasAttachments = emailDetails.attachments && emailDetails.attachments.length > 0;
+                const senderName = activity.user?.name || 'Venditore';
 
                 return (
-                  <li
+                  <motion.li
                     key={activity.id}
-                    className={`ios-inset-grouped-cell email-history-mobile-item ${isLast ? '' : ''}`}
+                    className="email-history-item"
+                    custom={index}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
                     onClick={() => handleEmailClick(activity.id)}
+                    whileHover={{ backgroundColor: 'var(--seller-bg-overlay)' }}
                   >
-                    <div className="email-history-mobile-cell-content">
-                      {/* Riga Superiore: Oggetto + Data + Allegato */}
-                      <div className="email-history-mobile-row-top">
-                        <h3 className="email-history-mobile-subject">
-                          {emailDetails.subject || '(Senza oggetto)'}
-                        </h3>
-                        <div className="email-history-mobile-meta">
-                          {hasAttachments && (
-                            <Paperclip size={14} style={{ color: 'var(--ios-secondary-label)', marginRight: '6px', flexShrink: 0 }} />
-                          )}
-                          <span className="email-history-mobile-date">
-                            {formatDate(activity.created_at)}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Riga Centrale: Destinatario */}
-                      <div className="email-history-mobile-row-middle">
-                        <span className="email-history-mobile-to">
-                          A: {emailDetails.to_name || emailDetails.to}
-                        </span>
-                      </div>
-
-                      {/* Riga Inferiore: Oggetto (ripetuto per chiarezza) */}
-                      {emailDetails.subject && (
-                        <div className="email-history-mobile-row-bottom">
-                          <p className="email-history-mobile-preview">{emailDetails.subject}</p>
-                        </div>
-                      )}
-
-                      {/* Chevron Right */}
-                      <ChevronRight size={20} className="ios-chevron-right email-history-mobile-chevron" />
+                    {/* Avatar */}
+                    <div className="email-history-avatar">
+                      {getInitials(senderName)}
                     </div>
-                  </li>
+
+                    {/* Content */}
+                    <div className="email-history-cell">
+                      <div className="email-history-row-top">
+                        <span className="email-history-sender">{senderName}</span>
+                        <div className="email-history-meta">
+                          {hasAttachments && <Paperclip size={12} className="email-history-paperclip" />}
+                          <span className="email-history-date">{formatDate(activity.created_at)}</span>
+                          <ChevronRight size={14} className="email-history-chevron" />
+                        </div>
+                      </div>
+                      <p className="email-history-subject">
+                        {emailDetails.subject || '(Senza oggetto)'}
+                      </p>
+                      <p className="email-history-preview">
+                        A: {emailDetails.to_name || emailDetails.to}
+                      </p>
+                    </div>
+                  </motion.li>
                 );
               })}
             </ul>
-          </div>
-        )}
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

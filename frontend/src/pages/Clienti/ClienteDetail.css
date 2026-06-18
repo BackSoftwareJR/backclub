@@ -1,66 +1,66 @@
 .cliente-venditori-detail-page {
   max-width: 1400px;
+  padding: 20px;
 }
 
 .detail-header-section {
-  background: var(--color-bg-secondary, #ffffff);
-  border-radius: 16px;
-  padding: 28px;
-  margin-bottom: 24px;
-  border: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  background: var(--color-bg-secondary, #111111);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
 }
 
 .btn-back {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   background: transparent;
   border: none;
-  color: var(--color-text-secondary, #86868b);
-  font-size: 14px;
+  color: var(--color-text-quaternary, #8E8E93);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 8px;
-  transition: all 0.25s ease;
-  margin-bottom: 24px;
+  padding: 6px 10px;
+  border-radius: 7px;
+  transition: all 180ms;
+  margin-bottom: 16px;
+  font-family: inherit;
 }
 
 .btn-back:hover {
-  background: var(--color-bg-tertiary, #f5f5f7);
-  color: var(--color-text-primary, #1d1d1f);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary, #F5F5F7);
 }
 
 .cliente-header-main {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 32px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
 .cliente-header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
   flex: 1;
   min-width: 0;
 }
 
 .cliente-avatar-large {
-  width: 72px;
-  height: 72px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366F1, #8B5CF6);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 32px;
+  font-weight: 600;
+  font-size: 18px;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
 }
 
 .cliente-header-details {
@@ -69,17 +69,17 @@
 }
 
 .cliente-header-details h1 {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--color-text-primary, #1d1d1f);
-  margin: 0 0 6px 0;
-  letter-spacing: -0.5px;
-  line-height: 1.2;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #F5F5F7);
+  margin: 0 0 2px 0;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
 }
 
 .azienda-name {
-  font-size: 16px;
-  color: var(--color-text-secondary, #86868b);
+  font-size: 12px;
+  color: var(--color-text-quaternary, #8E8E93);
   margin: 0;
   line-height: 1.4;
 }
@@ -87,31 +87,25 @@
 .quick-stats-horizontal {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .quick-stat-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px 20px;
-  background: var(--color-bg-tertiary, #f5f5f7);
-  border-radius: 12px;
-  border: none;
-  transition: all 0.25s ease;
-  min-width: 120px;
-}
-
-.quick-stat-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--color-bg-tertiary, #1C1C1E);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  min-width: 100px;
 }
 
 .stat-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,62 +130,77 @@
 .stat-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
   min-width: 0;
 }
 
 .stat-value {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 700;
-  color: var(--color-text-primary, #1d1d1f);
+  color: var(--color-text-primary, #F5F5F7);
   line-height: 1.2;
-  letter-spacing: -0.3px;
 }
 
 .stat-label {
-  font-size: 12px;
-  color: var(--color-text-secondary, #86868b);
+  font-size: 11px;
+  color: var(--color-text-quaternary, #8E8E93);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.06em;
 }
 
 .tabs-navigation {
   display: flex;
-  gap: var(--spacing-2);
-  border-bottom: 1px solid var(--color-border-primary);
-  margin-bottom: var(--spacing-6);
+  gap: 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 16px;
   overflow-x: auto;
+  scrollbar-width: none;
+  background: var(--color-bg-secondary, #111111);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px 10px 0 0;
+  padding: 0 20px;
+}
+
+.tabs-navigation::-webkit-scrollbar {
+  display: none;
 }
 
 .tab-btn {
   display: flex;
   align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-3) var(--spacing-4);
+  gap: 6px;
+  padding: 10px 14px;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
-  color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
+  color: var(--color-text-tertiary, #AEAEB2);
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all var(--transition-base);
+  transition: all 180ms;
   white-space: nowrap;
+  font-family: inherit;
+  margin-bottom: -1px;
 }
 
-.tab-btn:hover {
-  color: var(--color-text-primary);
-  background: var(--color-bg-tertiary);
+.tab-btn:hover:not(.active) {
+  color: var(--color-text-primary, #F5F5F7);
 }
 
 .tab-btn.active {
-  color: var(--color-accent-blue);
-  border-bottom-color: var(--color-accent-blue);
+  color: var(--color-accent-blue, #0A84FF);
+  border-bottom-color: var(--color-accent-blue, #0A84FF);
 }
 
 .tab-content {
   min-height: 400px;
+  background: var(--color-bg-secondary, #111111);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 20px;
+  margin-bottom: 16px;
 }
 
 .anagrafica-section h2,
@@ -199,22 +208,28 @@
 .contratti-section h2,
 .preventivi-section h2,
 .pagamenti-section h2 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
-  margin-bottom: var(--spacing-5);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-primary, #F5F5F7);
+  margin: 0 0 16px 0;
 }
 
 .info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: var(--spacing-4);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0;
 }
 
 .info-item {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1);
+  gap: 3px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.info-item:last-child {
+  border-bottom: none;
 }
 
 .info-item.full-width {
@@ -222,14 +237,16 @@
 }
 
 .info-item label {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--color-text-tertiary);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-quaternary, #8E8E93);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .info-item p {
-  font-size: var(--font-size-base);
-  color: var(--color-text-primary);
+  font-size: 13px;
+  color: var(--color-text-primary, #F5F5F7);
   margin: 0;
 }
 

@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ArrowLeft, CheckCircle, Clock } from 'lucide-react';
 import { sellerCommissionsApi } from '../../api/sellerCommissions';
 import type { SellerCommissionDetail } from '../../types/sellerCommissions';
 import SkeletonLoader from '../../components/Mobile/SkeletonLoader';
 import './SellerCommissionDetailPage.css';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const, delay: i * 0.08 },
+  }),
+};
 
 const SellerCommissionDetailPage: React.FC = () => {
   const { contractId } = useParams<{ contractId: string }>();
@@ -20,7 +30,7 @@ const SellerCommissionDetailPage: React.FC = () => {
 
   const loadDetail = async () => {
     if (!contractId) return;
-    
+
     try {
       setLoading(true);
       const response = await sellerCommissionsApi.getByContract(parseInt(contractId));
@@ -36,7 +46,7 @@ const SellerCommissionDetailPage: React.FC = () => {
     return new Intl.NumberFormat('it-IT', {
       style: 'currency',
       currency: 'EUR',
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -44,20 +54,19 @@ const SellerCommissionDetailPage: React.FC = () => {
     return new Date(date).toLocaleDateString('it-IT', {
       day: '2-digit',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
     });
   };
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, { label: string; class: string }> = {
-      pending: { label: 'In Attesa', class: 'status-pending' },
-      pending_collection: { label: 'In Attesa di Riscossione', class: 'status-pending-collection' },
-      collected: { label: 'Riscossa', class: 'status-collected' },
+      pending:            { label: 'In Attesa',                   class: 'status-pending' },
+      pending_collection: { label: 'In Attesa di Riscossione',    class: 'status-pending-collection' },
+      collected:          { label: 'Riscossa',                    class: 'status-collected' },
     };
     return badges[status] || { label: status, class: 'status-default' };
   };
 
-  // Generate client avatar initials
   const getClientInitials = (companyName: string | undefined): string => {
     if (!companyName) return '?';
     const parts = companyName.trim().split(' ');
@@ -67,12 +76,11 @@ const SellerCommissionDetailPage: React.FC = () => {
     return companyName.substring(0, 2).toUpperCase();
   };
 
-  // Generate consistent avatar color
   const getAvatarColor = (name: string | undefined): string => {
-    if (!name) return '#0A84FF';
+    if (!name) return 'var(--seller-accent)';
     const colors = [
-      '#0A84FF', '#5E5CE6', '#34C759', '#FF9F0A', '#FF453A',
-      '#AF52DE', '#FF2D55', '#30D158', '#64D2FF', '#FF9500'
+      '#3b82f6', '#8b5cf6', '#22c55e', '#f59e0b', '#ef4444',
+      '#a855f7', '#ec4899', '#14b8a6', '#06b6d4', '#f97316',
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -103,54 +111,63 @@ const SellerCommissionDetailPage: React.FC = () => {
     );
   }
 
-  const totalPending = detail.commissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0);
+  const totalPending           = detail.commissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + c.amount, 0);
   const totalPendingCollection = detail.commissions.filter(c => c.status === 'pending_collection').reduce((sum, c) => sum + c.amount, 0);
-  const totalCollected = detail.commissions.filter(c => c.status === 'collected').reduce((sum, c) => sum + c.amount, 0);
-  const totalCommission = totalPending + totalPendingCollection + totalCollected;
-  
-  // Calculate progress: paid installments / total installments
+  const totalCollected         = detail.commissions.filter(c => c.status === 'collected').reduce((sum, c) => sum + c.amount, 0);
+  const totalCommission        = totalPending + totalPendingCollection + totalCollected;
+
   const totalInstallments = detail.timeline?.length || 0;
-  const paidInstallments = detail.timeline?.filter(item => 
-    item.commission?.status === 'collected' || 
+  const paidInstallments  = detail.timeline?.filter(item =>
+    item.commission?.status === 'collected' ||
     (item.invoice?.status === 'paid' && item.commission)
   ).length || 0;
   const progressPercentage = totalInstallments > 0 ? (paidInstallments / totalInstallments) * 100 : 0;
 
-  // Get contract status from payment plan or default to active
   const contractStatus = detail.payment_plan?.status || 'active';
   const getContractStatusLabel = (status: string) => {
     const statusMap: Record<string, string> = {
-      'active': 'Attivo',
-      'completed': 'Completato',
-      'cancelled': 'Annullato',
-      'pending': 'In Attesa',
-      'paid': 'Pagato',
-      'overdue': 'Scaduto',
+      active:    'Attivo',
+      completed: 'Completato',
+      cancelled: 'Annullato',
+      pending:   'In Attesa',
+      paid:      'Pagato',
+      overdue:   'Scaduto',
     };
     return statusMap[status] || status;
   };
 
-  const clientName = detail.contract.client?.company_name || 'Cliente non specificato';
+  const clientName     = detail.contract.client?.company_name || 'Cliente non specificato';
   const clientInitials = getClientInitials(detail.contract.client?.company_name);
-  const avatarColor = getAvatarColor(detail.contract.client?.company_name);
+  const avatarColor    = getAvatarColor(detail.contract.client?.company_name);
 
   return (
     <div className="commission-detail-page">
-      {/* Back Button */}
-      <button className="commission-detail-back-btn" onClick={() => navigate('/seller/commissioni')}>
+      <motion.button
+        className="commission-detail-back-btn"
+        onClick={() => navigate('/seller/commissioni')}
+        initial={{ opacity: 0, x: -8 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }}
+      >
         <ArrowLeft size={18} />
         Indietro
-      </button>
+      </motion.button>
 
-      {/* Statement Header - Single Full-Width Card */}
-      <div className="commission-statement-header">
+      {/* Statement Header */}
+      <motion.div
+        className="commission-statement-header"
+        custom={0}
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+      >
         {/* Column 1: Identity */}
         <div className="statement-col-identity">
           <h1 className="statement-contract-title">
             {detail.contract.title || detail.contract.contract_number}
           </h1>
           <div className="statement-client-info">
-            <div 
+            <div
               className="statement-client-avatar"
               style={{ background: avatarColor }}
             >
@@ -167,7 +184,7 @@ const SellerCommissionDetailPage: React.FC = () => {
         <div className="statement-col-progress">
           <div className="statement-progress-label">Avanzamento Incassi</div>
           <div className="statement-progress-bar-container">
-            <div 
+            <div
               className="statement-progress-bar"
               style={{ width: `${progressPercentage}%` }}
             />
@@ -177,7 +194,7 @@ const SellerCommissionDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Column 3: The Money - HERO */}
+        {/* Column 3: The Money */}
         <div className="statement-col-money">
           <div className="statement-total-commission">
             {formatCurrency(totalCommission)}
@@ -193,12 +210,18 @@ const SellerCommissionDetailPage: React.FC = () => {
             </span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Transactions Table - Replacing Timeline */}
+      {/* Transactions Table */}
       {detail.timeline && detail.timeline.length > 0 && (
-        <div className="commission-transactions-card">
-          <h2 className="transactions-card-title">Piano Rateale & Commissioni</h2>
+        <motion.div
+          className="commission-transactions-card"
+          custom={1}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+        >
+          <h2 className="transactions-card-title">Piano Rateale &amp; Commissioni</h2>
           <div className="transactions-table-container">
             <table className="transactions-table">
               <thead>
@@ -213,9 +236,9 @@ const SellerCommissionDetailPage: React.FC = () => {
               <tbody>
                 {detail.timeline.map((item) => {
                   const installment = item.installment;
-                  const commission = item.commission;
+                  const commission  = item.commission;
                   const statusBadge = commission ? getStatusBadge(commission.status) : null;
-                  const isPaid = commission?.status === 'collected' || item.invoice?.status === 'paid';
+                  const isPaid      = commission?.status === 'collected' || item.invoice?.status === 'paid';
 
                   return (
                     <tr key={installment.id} className="transaction-row">
@@ -260,7 +283,7 @@ const SellerCommissionDetailPage: React.FC = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

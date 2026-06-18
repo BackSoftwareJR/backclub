@@ -22,7 +22,7 @@ const Home: React.FC = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            transition={{ duration: 1, delay: 0.3, ease: [0.4, 0, 0.2, 1] as const }}
             style={{ opacity }}
           >
             <h1 className="backclub-h1 backclub-serif" style={{ textAlign: 'center' }}>
@@ -90,7 +90,7 @@ const Home: React.FC = () => {
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] as const }}
           className="backclub-container-center"
         >
           <h2 className="backclub-h2 backclub-serif" style={{ textAlign: 'center', marginBottom: '2rem' }}>

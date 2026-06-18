@@ -228,68 +228,68 @@
 
 /* Light Mode Overrides */
 [data-theme="light"] .seller-clients-mobile-ios {
-  background-color: #F2F2F7;
+  background-color: var(--seller-bg);
 }
 
 [data-theme="light"] .seller-clients-header {
-  background-color: #F2F2F7;
+  background-color: var(--seller-bg);
 }
 
 [data-theme="light"] .seller-clients-list {
-  background-color: #FFFFFF;
+  background-color: var(--seller-bg-elevated);
 }
 
 [data-theme="light"] .seller-clients-item {
-  border-bottom-color: #C6C6C8;
+  border-bottom-color: var(--seller-border);
 }
 
 [data-theme="light"] .seller-clients-item:active {
-  background-color: #F2F2F7;
+  background-color: var(--seller-bg);
 }
 
 [data-theme="light"] .seller-clients-avatar {
-  background-color: #E5E5EA;
-  color: #000000;
+  background-color: var(--seller-border);
+  color: var(--seller-text-primary);
 }
 
 [data-theme="light"] .seller-clients-search-input {
-  background-color: #E5E5EA;
+  background-color: var(--seller-border);
 }
 
 [data-theme="light"] .seller-clients-search-input:focus {
-  background-color: #D1D1D6;
+  background-color: var(--seller-border-strong);
 }
 
 /* Dark Mode Overrides */
 [data-theme="dark"] .seller-clients-mobile-ios {
-  background-color: #000000;
+  background-color: var(--seller-bg);
 }
 
 [data-theme="dark"] .seller-clients-header {
-  background-color: #000000;
+  background-color: var(--seller-bg);
 }
 
 [data-theme="dark"] .seller-clients-list {
-  background-color: #1C1C1E;
+  background-color: var(--seller-bg-elevated);
 }
 
 [data-theme="dark"] .seller-clients-item {
-  border-bottom-color: #38383A;
+  border-bottom-color: var(--seller-border-strong);
 }
 
 [data-theme="dark"] .seller-clients-item:active {
-  background-color: #2C2C2E;
+  background-color: var(--seller-bg-elevated);
 }
 
 [data-theme="dark"] .seller-clients-avatar {
-  background-color: #38383A;
-  color: #FFFFFF;
+  background-color: var(--seller-border-strong);
+  color: var(--seller-text-primary);
 }
 
 [data-theme="dark"] .seller-clients-search-input {
-  background-color: #1C1C1E;
+  background-color: var(--seller-bg-elevated);
 }
 
 [data-theme="dark"] .seller-clients-search-input:focus {
-  background-color: #2C2C2E;
+  background-color: var(--seller-bg-elevated);
 }

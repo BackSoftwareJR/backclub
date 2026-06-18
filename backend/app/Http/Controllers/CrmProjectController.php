@@ -290,8 +290,6 @@ class CrmProjectController extends Controller
             'end_date' => 'nullable|date|after:start_date',
             'budget_cocchi' => 'nullable|numeric|min:0',
             'settings' => 'nullable|array',
-            'github_url' => 'nullable|url|max:500',
-            'website_url' => 'nullable|url|max:500',
         ]);
 
         if ($validator->fails()) {
@@ -345,7 +343,23 @@ class CrmProjectController extends Controller
             ], 422);
         }
 
-        $project->update($request->all());
+        $project->update($request->only([
+            'name',
+            'description',
+            'client_id',
+            'seller_id',
+            'crm_department_id',
+            'manager_id',
+            'status',
+            'start_date',
+            'end_date',
+            'budget_cocchi',
+            'spent_cocchi',
+            'settings',
+            'cover_photo',
+            'github_url',
+            'website_url',
+        ]));
         $project->load(['client', 'seller.user', 'manager', 'crmDepartment']);
         $this->appendCoverPhotoUrl($project);
 

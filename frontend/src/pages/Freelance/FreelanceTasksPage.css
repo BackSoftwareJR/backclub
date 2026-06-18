@@ -1,461 +1,509 @@
 /* ============================================================
-   FREELANCE TASKS - Grouped List View (Linear/Apple Reminders Style)
+   FREELANCE TASKS — Apple Reminders / macOS Dark Mode Style
    ============================================================ */
 
-.freelance-tasks-page {
+/* ── Page Shell ── */
+.reminders-page {
+  display: flex;
   min-height: 100vh;
-  padding: var(--spacing-6) var(--spacing-4);
-  transition: background-color var(--transition-base);
+  background: #09090b;
+  overflow: hidden;
 }
 
-[data-theme="light"] .freelance-tasks-page {
-  background: #F5F5F7;
+[data-theme="light"] .reminders-page {
+  background: #f2f2f7;
 }
 
-[data-theme="dark"] .freelance-tasks-page {
-  background: #000000;
-}
-
-.freelance-tasks-header {
-  max-width: 80rem; /* max-w-5xl */
-  margin: 0 auto var(--spacing-6);
+/* ── Left Sidebar ── */
+.reminders-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #101012;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 20px 10px 32px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-4);
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
 }
 
-.freelance-tasks-title {
-  font-size: var(--font-size-4xl);
-  font-weight: var(--font-weight-semibold);
-  margin: 0 0 var(--spacing-2) 0;
-  letter-spacing: -0.03em;
-  line-height: 1.1;
-  transition: color var(--transition-base);
+[data-theme="light"] .reminders-sidebar {
+  background: #e5e5ea;
+  border-right-color: rgba(0, 0, 0, 0.07);
 }
 
-[data-theme="dark"] .freelance-tasks-title {
-  color: #F5F5F7;
+.reminders-sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
 }
 
-[data-theme="light"] .freelance-tasks-title {
-  color: #1D1D1F;
+.reminders-sidebar-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.07);
+  margin: 14px 6px;
 }
 
-.freelance-tasks-subtitle {
-  font-size: var(--font-size-base);
+[data-theme="light"] .reminders-sidebar-divider {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.reminders-sidebar-section-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 6px 12px 5px;
   margin: 0;
-  transition: color var(--transition-base);
 }
 
-[data-theme="dark"] .freelance-tasks-subtitle {
-  color: rgba(245, 245, 247, 0.6);
+[data-theme="light"] .reminders-sidebar-section-label {
+  color: rgba(0, 0, 0, 0.35);
 }
 
-[data-theme="light"] .freelance-tasks-subtitle {
-  color: rgba(29, 29, 31, 0.6);
-}
-
-.freelance-tasks-actions {
+/* Smart List Items */
+.reminders-smartlist-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-}
-
-.freelance-tasks-filter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-3);
-  border-radius: var(--radius-lg);
-  border: 1px solid;
-  background: var(--color-bg-elevated);
-  transition: all var(--transition-base);
-}
-
-[data-theme="dark"] .freelance-tasks-filter {
-  border-color: rgba(255, 255, 255, 0.1);
-  color: rgba(245, 245, 247, 0.8);
-}
-
-[data-theme="light"] .freelance-tasks-filter {
-  border-color: rgba(0, 0, 0, 0.1);
-  color: rgba(29, 29, 31, 0.8);
-}
-
-.freelance-tasks-filter-select {
+  gap: 10px;
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 9px;
   border: none;
   background: transparent;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
   cursor: pointer;
-  outline: none;
-  transition: color var(--transition-base);
+  transition: background 0.12s ease;
+  text-align: left;
 }
 
-[data-theme="dark"] .freelance-tasks-filter-select {
-  color: #F5F5F7;
+.reminders-smartlist-item:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="light"] .freelance-tasks-filter-select {
-  color: #1D1D1F;
+.reminders-smartlist-item.selected {
+  background: rgba(255, 255, 255, 0.09);
 }
 
-/* Main Container - Centered Column */
-.freelance-tasks-container {
-  max-width: 80rem; /* max-w-5xl */
-  margin: 0 auto;
+[data-theme="light"] .reminders-smartlist-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .reminders-smartlist-item.selected {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.reminders-smartlist-icon {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-6);
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
-/* Task Section */
-.task-section {
-  background: var(--color-bg-elevated);
-  border-radius: var(--radius-xl);
-  border: 1px solid;
+.reminders-smartlist-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  min-width: 0;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.12s;
 }
 
-[data-theme="dark"] .task-section {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+.reminders-smartlist-item.selected .reminders-smartlist-label {
+  color: #ffffff;
+  font-weight: 600;
 }
 
-[data-theme="light"] .task-section {
-  background: #FFFFFF;
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+[data-theme="light"] .reminders-smartlist-label {
+  color: rgba(0, 0, 0, 0.72);
 }
 
-/* Section Header - Sticky */
-.task-section-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  padding: var(--spacing-3) var(--spacing-5);
-  border-bottom: 1px solid;
-  background: var(--color-bg-elevated);
-  backdrop-filter: blur(10px);
-  transition: all var(--transition-base);
+[data-theme="light"] .reminders-smartlist-item.selected .reminders-smartlist-label {
+  color: #000000;
 }
 
-[data-theme="dark"] .task-section-header {
-  background: rgba(28, 28, 30, 0.95);
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="light"] .task-section-header {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(0, 0, 0, 0.05);
-}
-
-.task-section-header-collapsible {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  user-select: none;
-}
-
-.task-section-header-collapsible:hover {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-[data-theme="light"] .task-section-header-collapsible:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-.task-section-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin: 0;
-  transition: color var(--transition-base);
-}
-
-[data-theme="dark"] .task-section-title {
-  color: rgba(245, 245, 247, 0.8);
-}
-
-[data-theme="light"] .task-section-title {
-  color: rgba(29, 29, 31, 0.8);
-}
-
-.task-section-badge {
-  font-weight: var(--font-weight-semibold);
-  opacity: 0.6;
-}
-
-.task-section-chevron {
-  transition: color var(--transition-base);
+.reminders-smartlist-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 1px 7px;
+  border-radius: 10px;
   flex-shrink: 0;
-}
-
-[data-theme="dark"] .task-section-chevron {
-  color: rgba(245, 245, 247, 0.5);
-}
-
-[data-theme="light"] .task-section-chevron {
-  color: rgba(29, 29, 31, 0.5);
-}
-
-/* Section Content */
-.task-section-content {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Empty State */
-.task-section-empty {
-  padding: var(--spacing-4) var(--spacing-5);
-  font-size: var(--font-size-sm);
+  min-width: 22px;
   text-align: center;
-  transition: color var(--transition-base);
+  letter-spacing: -0.01em;
 }
 
-[data-theme="dark"] .task-section-empty {
-  color: rgba(245, 245, 247, 0.4);
+[data-theme="light"] .reminders-smartlist-count {
+  color: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.07);
 }
 
-[data-theme="light"] .task-section-empty {
-  color: rgba(29, 29, 31, 0.4);
-}
-
-/* Task Row - Compact (h-14 or h-16) */
-.task-row {
-  display: flex;
-  align-items: center;
-  height: 3.5rem; /* h-14 */
-  padding: 0 var(--spacing-5);
-  border-bottom: 1px solid;
-  cursor: pointer;
-  transition: background-color var(--transition-base);
-  gap: var(--spacing-4);
-}
-
-[data-theme="dark"] .task-row {
-  border-color: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="light"] .task-row {
-  border-color: rgba(0, 0, 0, 0.05);
-}
-
-.task-row:last-child {
-  border-bottom: none;
-}
-
-.task-row:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-[data-theme="light"] .task-row:hover {
-  background: rgba(0, 0, 0, 0.02);
-}
-
-/* Left: Status/Action */
-.task-row-left {
-  flex-shrink: 0;
-  width: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.task-row-status-action {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-base);
-}
-
-.task-row-checkbox {
-  cursor: pointer;
-  transition: color var(--transition-base);
-}
-
-[data-theme="dark"] .task-row-checkbox {
-  color: rgba(245, 245, 247, 0.4);
-}
-
-[data-theme="light"] .task-row-checkbox {
-  color: rgba(29, 29, 31, 0.4);
-}
-
-.task-row-checkbox:hover {
-  color: var(--color-accent-blue);
-}
-
-/* Pulsing Blue Dot for "In Corso" */
-.task-row-pulse-dot {
-  width: 12px;
-  height: 12px;
-  position: relative;
-  cursor: pointer;
-}
-
-.task-row-pulse-dot-inner {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: var(--color-accent-blue);
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-/* Review Icon (Orange Eye) */
-.task-row-review-icon {
-  color: var(--color-accent-orange);
-}
-
-/* Middle: Identity */
-.task-row-middle {
+/* ── Right Content Area ── */
+.reminders-content {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1);
+  padding: 32px 40px 48px;
+  overflow-y: auto;
 }
 
-.task-row-title {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-medium);
-  line-height: 1.4;
-  transition: color var(--transition-base);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.reminders-content-header {
+  margin-bottom: 20px;
 }
 
-[data-theme="dark"] .task-row-title {
-  color: #F5F5F7;
+.reminders-content-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.025em;
+  margin: 0;
 }
 
-[data-theme="light"] .task-row-title {
-  color: #1D1D1F;
+[data-theme="light"] .reminders-content-title {
+  color: #1d1d1f;
 }
 
-.task-row-project {
-  font-size: var(--font-size-sm);
-  transition: color var(--transition-base);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+/* ── Task List ── */
+.reminders-task-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-[data-theme="dark"] .task-row-project {
-  color: rgba(245, 245, 247, 0.6);
+/* ── Group ── */
+.reminders-group {
+  margin-bottom: 20px;
 }
 
-[data-theme="light"] .task-row-project {
-  color: rgba(29, 29, 31, 0.6);
+.reminders-group-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  padding: 4px 0 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.12s;
 }
 
-/* Right: Meta */
-.task-row-right {
+.reminders-group-header:hover {
+  opacity: 0.75;
+}
+
+.reminders-group-chevron {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.28);
   flex-shrink: 0;
 }
 
-.task-row-meta {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-3);
+[data-theme="light"] .reminders-group-chevron {
+  color: rgba(0, 0, 0, 0.28);
 }
 
-.task-row-priority {
-  display: flex;
-  align-items: center;
+.reminders-group-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.28);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex: 1;
+  text-align: left;
 }
 
-.task-row-date {
-  font-size: var(--font-size-sm);
-  transition: color var(--transition-base);
+[data-theme="light"] .reminders-group-name {
+  color: rgba(0, 0, 0, 0.32);
+}
+
+.reminders-group-count {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.22);
+  margin-right: 4px;
+}
+
+[data-theme="light"] .reminders-group-count {
+  color: rgba(0, 0, 0, 0.22);
+}
+
+/* ── Task Row ── */
+.reminders-task-row {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 6px 0 2px;
+  gap: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  transition: background 0.1s ease;
+}
+
+.reminders-task-row:last-child {
+  border-bottom: none;
+}
+
+.reminders-task-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .reminders-task-row {
+  border-bottom-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .reminders-task-row:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ── Circular Checkbox ── */
+.reminders-checkbox {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  outline: none;
+}
+
+/* ── Priority Dot ── */
+.reminders-priority-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Task Title ── */
+.reminders-task-title {
+  flex: 1;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.88);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.15s, text-decoration 0.15s;
+  user-select: none;
+}
+
+.reminders-task-title.is-done {
+  text-decoration: line-through;
+  color: rgba(255, 255, 255, 0.28);
+}
+
+[data-theme="light"] .reminders-task-title {
+  color: rgba(0, 0, 0, 0.84);
+}
+
+[data-theme="light"] .reminders-task-title.is-done {
+  color: rgba(0, 0, 0, 0.28);
+}
+
+/* In-progress pulse dot */
+.reminders-in-progress-dot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.reminders-pulse {
+  animation: reminders-pulse-anim 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes reminders-pulse-anim {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Task Meta (right side) ── */
+.reminders-task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.reminders-project-pill {
+  font-size: 11px;
+  font-family: ui-monospace, 'SF Mono', 'Menlo', monospace;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.07);
+  padding: 2px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="light"] .reminders-project-pill {
+  color: rgba(0, 0, 0, 0.45);
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.reminders-due-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.38);
   white-space: nowrap;
 }
 
-[data-theme="dark"] .task-row-date {
-  color: rgba(245, 245, 247, 0.6);
+.reminders-due-date.today {
+  color: #FF9500;
+  font-weight: 600;
 }
 
-[data-theme="light"] .task-row-date {
-  color: rgba(29, 29, 31, 0.6);
+.reminders-due-date.overdue {
+  color: #FF3B30;
+  font-weight: 600;
 }
 
-.task-row-date.due-soon {
-  color: var(--color-accent-orange);
-  font-weight: var(--font-weight-semibold);
+[data-theme="light"] .reminders-due-date {
+  color: rgba(0, 0, 0, 0.38);
 }
 
-.task-row-date.overdue {
-  color: #FF453A;
-  font-weight: var(--font-weight-semibold);
-}
-
-.task-row-chevron {
-  transition: color var(--transition-base);
+.reminders-row-chevron {
+  color: rgba(255, 255, 255, 0.18);
   flex-shrink: 0;
-  opacity: 0.4;
 }
 
-[data-theme="dark"] .task-row-chevron {
-  color: rgba(245, 245, 247, 0.4);
+[data-theme="light"] .reminders-row-chevron {
+  color: rgba(0, 0, 0, 0.18);
 }
 
-[data-theme="light"] .task-row-chevron {
-  color: rgba(29, 29, 31, 0.4);
+/* ── Empty State ── */
+.reminders-empty {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.28);
+  padding: 40px 0;
+  text-align: center;
+  margin: 0;
 }
 
-/* Responsive */
+[data-theme="light"] .reminders-empty {
+  color: rgba(0, 0, 0, 0.28);
+}
+
+/* ── Add Button ── */
+.reminders-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  margin-top: 12px;
+  transition: color 0.15s;
+  font-family: inherit;
+}
+
+.reminders-add-btn:hover {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+[data-theme="light"] .reminders-add-btn {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] .reminders-add-btn:hover {
+  color: rgba(0, 0, 0, 0.58);
+}
+
+/* ── Responsive ── */
 @media (max-width: 768px) {
-  .freelance-tasks-page {
-    padding: var(--spacing-4) var(--spacing-3);
-  }
-
-  .freelance-tasks-header {
+  .reminders-page {
     flex-direction: column;
   }
 
-  .freelance-tasks-actions {
+  .reminders-sidebar {
     width: 100%;
-    justify-content: space-between;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 12px 14px;
+    gap: 6px;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    scrollbar-width: none;
   }
 
-  .task-row {
-    height: 4rem; /* h-16 on mobile for better touch targets */
-    padding: 0 var(--spacing-4);
+  .reminders-sidebar::-webkit-scrollbar {
+    display: none;
   }
 
-  .task-row-middle {
-    gap: 2px;
+  [data-theme="light"] .reminders-sidebar {
+    border-bottom-color: rgba(0, 0, 0, 0.07);
   }
 
-  .task-row-title {
-    font-size: var(--font-size-sm);
+  .reminders-sidebar-section {
+    flex-direction: row;
+    gap: 4px;
+    flex-shrink: 0;
   }
 
-  .task-row-project {
-    font-size: var(--font-size-xs);
+  .reminders-sidebar-divider {
+    display: none;
   }
 
-  .task-row-meta {
-    gap: var(--spacing-2);
+  .reminders-sidebar-section-label {
+    display: none;
   }
 
-  .task-row-date {
-    font-size: var(--font-size-xs);
+  .reminders-smartlist-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 7px 10px;
+    min-width: 60px;
+    border-radius: 10px;
+  }
+
+  .reminders-smartlist-count {
+    display: none;
+  }
+
+  .reminders-smartlist-label {
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .reminders-content {
+    padding: 20px 18px 40px;
+  }
+
+  .reminders-task-row {
+    height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .reminders-content {
+    padding: 16px 14px 32px;
+  }
+
+  .reminders-content-title {
+    font-size: 20px;
+  }
+
+  .reminders-project-pill {
+    display: none;
   }
 }

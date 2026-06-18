@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { X, AlertCircle } from 'lucide-react';
 import { invoicesApi } from '../api/invoices';
 import { getClients } from '../api/clients';
@@ -155,8 +156,22 @@ const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({ onClose, onSucc
     new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', minimumFractionDigits: 2 }).format(value);
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-invoice-issue" onClick={e => e.stopPropagation()}>
+    <motion.div
+      className="modal-overlay"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+    >
+      <motion.div
+        className="modal-invoice-issue"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 8 }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+      >
         <div className="modal-header">
           <h2>Crea Fattura al volo</h2>
           <button type="button" className="btn-close-modal" onClick={onClose}>
@@ -337,8 +352,8 @@ const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = ({ onClose, onSucc
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

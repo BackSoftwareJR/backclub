@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Eye, Search, Grid, List, Download } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import contractsApi from '../../api/contracts';
@@ -64,16 +65,16 @@ const SellerContractsPage: React.FC = () => {
   });
 
   const getStatusBadge = (status: string) => {
-    const badges: Record<string, { label: string; class: string }> = {
-      draft: { label: 'Bozza', class: 'status-draft' },
-      requested: { label: 'Richiesta', class: 'status-requested' },
-      pending_signature: { label: 'In Attesa di Firma', class: 'status-pending-signature' },
-      active: { label: 'Attivo', class: 'status-active' },
-      suspended: { label: 'Sospeso', class: 'status-suspended' },
-      completed: { label: 'Completato', class: 'status-completed' },
-      terminated: { label: 'Terminato', class: 'status-terminated' },
+    const badges: Record<string, { label: string; badgeClass: string }> = {
+      draft: { label: 'Bozza', badgeClass: 'seller-badge seller-badge-draft' },
+      requested: { label: 'Richiesta', badgeClass: 'seller-badge seller-badge-primary' },
+      pending_signature: { label: 'In Attesa di Firma', badgeClass: 'seller-badge seller-badge-pending' },
+      active: { label: 'Attivo', badgeClass: 'seller-badge seller-badge-active' },
+      suspended: { label: 'Sospeso', badgeClass: 'seller-badge seller-badge-cancelled' },
+      completed: { label: 'Completato', badgeClass: 'seller-badge seller-badge-active' },
+      terminated: { label: 'Terminato', badgeClass: 'seller-badge seller-badge-cancelled' },
     };
-    return badges[status] || { label: status, class: 'status-default' };
+    return badges[status] || { label: status, badgeClass: 'seller-badge seller-badge-secondary' };
   };
 
   const getInitials = (name: string): string => {
@@ -203,15 +204,23 @@ const SellerContractsPage: React.FC = () => {
           <p>{t('contracts.no_contracts_desc', 'I tuoi contratti appariranno qui')}</p>
         </div>
       ) : viewMode === 'list' ? (
-        <div className="seller-contracts-list">
-          {filteredContracts.map((contract) => {
+        <motion.div
+          className="seller-contracts-list"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          {filteredContracts.map((contract, idx) => {
             const statusBadge = getStatusBadge(contract.status);
             const clientInitials = getInitials(contract.client?.company_name || 'Cliente');
             
             return (
-              <div
+              <motion.div
                 key={contract.id}
                 className="seller-contracts-row"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.15, delay: idx * 0.03 }}
                 onMouseEnter={() => setHoveredRow(contract.id)}
                 onMouseLeave={() => setHoveredRow(null)}
               >
@@ -245,9 +254,7 @@ const SellerContractsPage: React.FC = () => {
 
                 {/* Column 4: Status */}
                 <div className="seller-contracts-col-status">
-                  <span 
-                    className={`seller-contracts-status-badge seller-contracts-status-badge-${statusBadge.class}`}
-                  >
+                  <span className={statusBadge.badgeClass}>
                     {statusBadge.label}
                   </span>
                 </div>
@@ -284,10 +291,10 @@ const SellerContractsPage: React.FC = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       ) : (
         <div className="seller-contracts-card-grid">
           {filteredContracts.map((contract) => {
@@ -299,9 +306,7 @@ const SellerContractsPage: React.FC = () => {
                     <div className="seller-contracts-card-number">{contract.contract_number}</div>
                     <div className="seller-contracts-card-title">{contract.title || 'Senza titolo'}</div>
                   </div>
-                  <span 
-                    className={`seller-contracts-card-status seller-contracts-status-badge-${statusBadge.class}`}
-                  >
+                  <span className={statusBadge.badgeClass}>
                     {statusBadge.label}
                   </span>
                 </div>

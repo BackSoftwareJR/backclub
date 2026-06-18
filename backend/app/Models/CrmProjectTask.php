@@ -11,22 +11,14 @@ class CrmProjectTask extends Model
 {
     use HasFactory;
 
-    public const EXECUTION_AGENT = 'agent';
-    public const EXECUTION_AGENT_HUMAN = 'agent_human';
-    public const EXECUTION_HUMAN = 'human';
-
-    public const N8N_PENDING = 'pending';
-    public const N8N_PROCESSING = 'processing';
-    public const N8N_COMPLETED = 'completed';
-    public const N8N_FAILED = 'failed';
-    public const N8N_SKIPPED = 'skipped';
-
     protected $fillable = [
         'crm_project_id',
         'crm_label_id',
         'title',
         'description',
         'status',
+        'execution_mode',
+        'exact_prompt',
         'priority',
         'start_date',
         'due_date',
@@ -37,8 +29,9 @@ class CrmProjectTask extends Model
         'budget_cocchi',
         'parent_task_id',
         'created_by',
-        'execution_mode',
         'n8n_status',
+        'n8n_execution_id',
+        'n8n_queue_position',
         'n8n_response',
         'n8n_response_format',
         'n8n_error',
@@ -49,23 +42,15 @@ class CrmProjectTask extends Model
         'start_date' => 'date',
         'due_date' => 'date',
         'completed_date' => 'date',
+        'n8n_completed_at' => 'datetime',
+        'exact_prompt' => 'boolean',
         'progress' => 'integer',
+        'n8n_queue_position' => 'integer',
         'estimated_hours' => 'decimal:2',
         'actual_hours' => 'decimal:2',
         'budget_cocchi' => 'decimal:2',
         'n8n_response' => 'array',
-        'n8n_completed_at' => 'datetime',
     ];
-
-    public function requiresHumanCompletion(): bool
-    {
-        return in_array($this->execution_mode, [self::EXECUTION_AGENT_HUMAN, self::EXECUTION_HUMAN], true);
-    }
-
-    public function usesN8nAutomation(): bool
-    {
-        return in_array($this->execution_mode, [self::EXECUTION_AGENT, self::EXECUTION_AGENT_HUMAN], true);
-    }
 
     /**
      * Relazione con CrmProject
@@ -158,13 +143,11 @@ class CrmProjectTask extends Model
     }
 
     /**
-     * Step / messaggi chat dell'agente N8N
+     * Relazione con step N8N
      */
     public function n8nSteps(): HasMany
     {
-        return $this->hasMany(CrmProjectTaskN8nStep::class, 'crm_project_task_id')
-            ->orderBy('step_index')
-            ->orderBy('created_at');
+        return $this->hasMany(CrmProjectTaskN8nStep::class, 'crm_project_task_id');
     }
 
     /**

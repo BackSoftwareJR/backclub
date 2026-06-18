@@ -1,0 +1,248 @@
+/**
+ * WorkSpace Design Tokens — Apple Developer IDE dark aesthetic
+ * Primary: Xcode dark / macOS Instruments inspired
+ * Scope: .workspace-theme-scope[data-theme="light|dark"]
+ */
+
+/* ── Shared structural tokens ── */
+.workspace-theme-scope {
+  --ws-font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Segoe UI', sans-serif;
+  --ws-font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', Menlo, 'Courier New', monospace;
+
+  --ws-font-xs: 11px;
+  --ws-font-sm: 12px;
+  --ws-font-base: 13px;
+  --ws-font-md: 14px;
+  --ws-font-lg: 15px;
+  --ws-font-title: 18px;
+  --ws-font-heading: 22px;
+
+  --ws-weight-regular: 400;
+  --ws-weight-medium: 500;
+  --ws-weight-semibold: 600;
+
+  --ws-spacing-xs: 4px;
+  --ws-spacing-sm: 6px;
+  --ws-spacing: 8px;
+  --ws-spacing-md: 12px;
+  --ws-spacing-lg: 16px;
+  --ws-spacing-xl: 24px;
+
+  --ws-radius-sm: 5px;
+  --ws-radius: 10px;
+  --ws-radius-md: 10px;
+  --ws-radius-lg: 12px;
+  --ws-radius-xl: 16px;
+  --ws-radius-pill: 999px;
+
+  --ws-sidebar-width: 200px;
+  --ws-sidebar-collapsed: 48px;
+
+  --ws-transition: 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ws-transition-theme: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+
+  font-family: var(--ws-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Light theme ── */
+.workspace-theme-scope[data-theme="light"] {
+  --ws-bg: #f2f2f5;
+  --ws-bg-secondary: #e8e8ed;
+  --ws-surface: rgba(255, 255, 255, 0.75);
+  --ws-surface-elevated: #ffffff;
+  --ws-surface-hover: rgba(0, 0, 0, 0.04);
+  --ws-surface-active: rgba(0, 122, 255, 0.09);
+  --ws-surface-subtle: rgba(0, 0, 0, 0.015);
+  --ws-surface-glass: rgba(255, 255, 255, 0.78);
+
+  --ws-text: #1d1d1f;
+  --ws-text-secondary: #6e6e73;
+  --ws-text-tertiary: #aeaeb2;
+  --ws-text-inverse: #ffffff;
+
+  --ws-border: rgba(0, 0, 0, 0.07);
+  --ws-border-strong: rgba(0, 0, 0, 0.12);
+  --ws-border-active: rgba(0, 0, 0, 0.22);
+  --ws-border-focus: rgba(0, 122, 255, 0.5);
+
+  --ws-accent: #007AFF;
+  --ws-accent-hover: #0056cc;
+  --ws-accent-muted: rgba(0, 122, 255, 0.12);
+  --ws-accent-rgb: 0, 122, 255;
+
+  --ws-green: #34C759;
+  --ws-orange: #FF9500;
+  --ws-red: #FF3B30;
+  --ws-purple: #AF52DE;
+  --ws-yellow: #FFD60A;
+  --ws-teal: #5AC8FA;
+
+  --ws-success: var(--ws-green);
+  --ws-success-hover: #28a745;
+  --ws-warning: var(--ws-orange);
+  --ws-warning-hover: #e08600;
+  --ws-danger: var(--ws-red);
+  --ws-danger-hover: #d93025;
+  --ws-danger-muted: rgba(255, 59, 48, 0.1);
+  --ws-danger-rgb: 255, 59, 48;
+
+  --ws-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --ws-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --ws-shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --ws-shadow-card: 0 1px 4px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --ws-shadow-card-hover: 0 6px 20px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  --ws-overlay: rgba(0, 0, 0, 0.3);
+  --ws-sidebar-bg: rgba(240, 240, 244, 0.95);
+  --ws-code-bg: #1c1c1e;
+  --ws-code-text: #e5e5ea;
+  --ws-bg-elevated: rgba(0, 0, 0, 0.02);
+}
+
+/* ── Dark theme — Xcode dark / near-pure black ── */
+.workspace-theme-scope[data-theme="dark"] {
+  --ws-bg: #0a0a0a;
+  --ws-bg-secondary: #111111;
+  --ws-surface: rgba(255, 255, 255, 0.03);
+  --ws-surface-elevated: rgba(255, 255, 255, 0.06);
+  --ws-surface-hover: rgba(255, 255, 255, 0.06);
+  --ws-surface-active: rgba(0, 122, 255, 0.15);
+  --ws-surface-subtle: rgba(255, 255, 255, 0.02);
+  --ws-surface-glass: rgba(10, 10, 10, 0.9);
+
+  --ws-text: rgba(255, 255, 255, 0.92);
+  --ws-text-secondary: rgba(255, 255, 255, 0.45);
+  --ws-text-tertiary: rgba(255, 255, 255, 0.25);
+  --ws-text-inverse: #000000;
+
+  --ws-border: rgba(255, 255, 255, 0.07);
+  --ws-border-strong: rgba(255, 255, 255, 0.12);
+  --ws-border-active: rgba(255, 255, 255, 0.15);
+  --ws-border-focus: rgba(0, 122, 255, 0.65);
+
+  --ws-accent: #007AFF;
+  --ws-accent-hover: #3395ff;
+  --ws-accent-muted: rgba(0, 122, 255, 0.18);
+  --ws-accent-rgb: 0, 122, 255;
+
+  --ws-green: #30D158;
+  --ws-orange: #FF9F0A;
+  --ws-red: #FF453A;
+  --ws-purple: #BF5AF2;
+  --ws-yellow: #FFD60A;
+  --ws-teal: #5AC8FA;
+
+  --ws-success: var(--ws-green);
+  --ws-success-hover: #28bd4e;
+  --ws-warning: var(--ws-orange);
+  --ws-warning-hover: #e68f09;
+  --ws-danger: var(--ws-red);
+  --ws-danger-hover: #ff6961;
+  --ws-danger-muted: rgba(255, 69, 58, 0.15);
+  --ws-danger-rgb: 255, 69, 58;
+
+  --ws-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.55);
+  --ws-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.65);
+  --ws-shadow-lg: 0 10px 36px rgba(0, 0, 0, 0.75);
+  --ws-shadow-card: 0 2px 8px rgba(0, 0, 0, 0.45);
+  --ws-shadow-card-hover: 0 8px 28px rgba(0, 0, 0, 0.65);
+
+  --ws-overlay: rgba(0, 0, 0, 0.7);
+  --ws-sidebar-bg: rgba(12, 12, 12, 0.97);
+  --ws-code-bg: #0d0d0d;
+  --ws-code-text: rgba(255, 255, 255, 0.85);
+  --ws-bg-elevated: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Legacy aliases (scoped — required by child components) ── */
+.workspace-theme-scope {
+  --color-primary: var(--ws-accent);
+  --color-primary-dark: var(--ws-accent-hover);
+  --color-primary-light: var(--ws-border-focus);
+  --color-primary-rgb: var(--ws-accent-rgb);
+  --color-danger-rgb: var(--ws-danger-rgb);
+
+  --color-text: var(--ws-text);
+  --color-text-primary: var(--ws-text);
+  --color-text-secondary: var(--ws-text-secondary);
+  --color-text-tertiary: var(--ws-text-tertiary);
+
+  --color-bg-primary: var(--ws-bg);
+  --color-bg-secondary: var(--ws-surface);
+  --color-bg-tertiary: var(--ws-bg-secondary);
+  --color-bg-elevated: var(--ws-surface-elevated);
+  --color-bg-hover: var(--ws-surface-hover);
+  --color-bg-accent: var(--ws-surface-active);
+  --color-bg-quaternary: var(--ws-surface-subtle);
+
+  --color-background: var(--ws-surface);
+  --color-background-card: var(--ws-surface);
+  --color-background-subtle: var(--ws-surface-subtle);
+  --color-background-hover: var(--ws-surface-hover);
+  --color-background-secondary: var(--ws-bg-secondary);
+  --color-background-tertiary: var(--ws-surface-elevated);
+  --color-surface: var(--ws-surface);
+
+  --color-border: var(--ws-border);
+  --color-border-light: var(--ws-border);
+  --color-border-primary: var(--ws-border-strong);
+  --color-border-hover: var(--ws-border-strong);
+  --color-border-secondary: var(--ws-border);
+
+  --color-accent-blue: var(--ws-accent);
+  --color-accent-blue-hover: var(--ws-accent-hover);
+  --color-accent-blue-dark: var(--ws-accent-hover);
+
+  --color-success: var(--ws-success);
+  --color-success-dark: var(--ws-success-hover);
+  --color-warning: var(--ws-warning);
+  --color-warning-dark: var(--ws-warning-hover);
+  --color-danger: var(--ws-danger);
+  --color-danger-dark: var(--ws-danger-hover);
+  --color-danger-light: var(--ws-danger-muted);
+  --color-error: var(--ws-danger);
+  --color-info: var(--ws-accent);
+}
+
+/* ── Shared utilities ── */
+.workspace-theme-scope .ws-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--ws-surface-subtle) 0%,
+    var(--ws-surface-hover) 50%,
+    var(--ws-surface-subtle) 100%
+  );
+  background-size: 200% 100%;
+  animation: ws-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--ws-radius-sm);
+}
+
+@keyframes ws-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes ws-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: scale(0.96) translateY(12px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes ws-status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes ws-status-ping {
+  0% { transform: scale(1); opacity: 0.75; }
+  75%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+.workspace-theme-scope .ws-spin {
+  animation: ws-spin 0.8s linear infinite;
+}

@@ -1,15 +1,15 @@
-/* Digital Receipt Design - Apple Style - Split View */
+/* Quote Step 7 Summary — Dark Apple-style design system */
 
 .quote-step-content.summary-split-view {
-  background: #f5f5f7;
+  background: var(--color-bg-primary);
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
 .summary-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 2rem;
+  gap: 1.5rem;
   max-width: 80rem;
   margin: 0 auto;
 }
@@ -20,42 +20,41 @@
   }
 }
 
-/* Left Column - Services List (The Receipt) */
+/* Left Column */
 .summary-left-column {
   display: flex;
   flex-direction: column;
 }
 
 .summary-services-card {
-  background: #FFFFFF;
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 8rem);
+  height: calc(100vh - 6rem);
   max-height: 900px;
   overflow: hidden;
 }
 
 .summary-services-header {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 1);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
 }
 
 .summary-services-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
   margin: 0;
   letter-spacing: -0.02em;
 }
 
-/* Document Header - Title & Date (Top Priority) */
+/* Document Header */
 .summary-document-header {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 1);
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -65,7 +64,7 @@
 @media (min-width: 768px) {
   .summary-document-header {
     flex-direction: row;
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 }
 
@@ -85,27 +84,27 @@
 }
 
 .summary-input-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 500;
 }
 
 .summary-input-error {
-  border-color: #dc2626 !important;
-  box-shadow: 0 0 0 1px #dc2626, 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 1px var(--color-error), 0 0 0 3px rgba(255, 69, 58, 0.15) !important;
 }
 
 .summary-input-error-message {
   display: block;
-  font-size: 0.75rem;
-  color: #dc2626;
-  margin-top: 0.5rem;
+  font-size: 12px;
+  color: var(--color-error);
+  margin-top: 5px;
   font-weight: 500;
 }
 
 .summary-services-list-scrollable {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 2rem;
+  padding: 1rem 1.5rem;
   min-height: 0;
 }
 
@@ -113,7 +112,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 0.75rem 0;
+  padding: 10px 0;
 }
 
 .summary-service-info-compact {
@@ -122,43 +121,37 @@
 }
 
 .summary-service-name-compact {
-  font-size: 0.9375rem;
+  font-size: 14px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 0.125rem;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
 }
 
 .summary-service-category-compact {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 11px;
+  color: var(--color-text-quaternary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .summary-service-price-compact {
   font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
-  font-size: 0.9375rem;
+  font-size: 14px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin-left: 1rem;
 }
 
 .summary-divider-compact {
   height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent 8px,
-    rgba(229, 231, 235, 1) 8px,
-    rgba(229, 231, 235, 1) 16px
-  );
-  margin: 0.25rem 0;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 3px 0;
 }
 
 .summary-services-footer {
-  padding: 1.5rem 2rem;
-  border-top: 1px solid rgba(229, 231, 235, 1);
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -168,40 +161,40 @@
 .summary-input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 5px;
 }
 
 .summary-input-label {
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-quaternary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .summary-input {
-  height: 2.5rem;
-  padding: 0 1rem;
-  border: 1px solid rgba(209, 213, 219, 1);
-  border-radius: 0.75rem;
-  font-size: 0.9375rem;
-  color: #1d1d1f;
-  background: #FFFFFF;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
   transition: all 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
 }
 
 .summary-input:focus {
   outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  border-color: rgba(10, 132, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
 }
 
 .summary-input::placeholder {
-  color: #9ca3af;
+  color: var(--color-text-quaternary);
 }
 
-/* Right Column - Deal Closer (Sticky) */
+/* Right Column */
 .summary-right-column {
   display: flex;
   flex-direction: column;
@@ -212,41 +205,41 @@
   top: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-/* Header */
+/* Receipt Header */
 .receipt-header {
   text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(229, 231, 235, 1);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .receipt-title {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #1d1d1f;
-  margin: 0 0 0.5rem 0;
+  color: var(--color-text-primary);
+  margin: 0 0 5px 0;
   letter-spacing: -0.02em;
 }
 
 .receipt-validity {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 13px;
+  color: var(--color-text-quaternary);
   margin: 0;
 }
 
-/* Services List - Compact */
+/* Services List */
 .receipt-services-list {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .receipt-service-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1rem 0;
+  padding: 10px 0;
 }
 
 .receipt-service-info {
@@ -255,125 +248,119 @@
 }
 
 .receipt-service-name {
-  font-size: 1rem;
+  font-size: 14px;
   font-weight: 600;
-  color: #1d1d1f;
-  margin-bottom: 0.25rem;
+  color: var(--color-text-primary);
+  margin-bottom: 3px;
 }
 
 .receipt-service-category {
-  font-size: 0.75rem;
-  color: #6b7280;
+  font-size: 11px;
+  color: var(--color-text-quaternary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
 }
 
 .receipt-service-price {
   font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
-  font-size: 1rem;
+  font-size: 14px;
   font-weight: 500;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
   white-space: nowrap;
   margin-left: 1rem;
 }
 
 .receipt-divider {
   height: 1px;
-  background: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent 8px,
-    rgba(229, 231, 235, 1) 8px,
-    rgba(229, 231, 235, 1) 16px
-  );
-  margin: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.06);
+  margin: 5px 0;
 }
 
-/* Commission Hero Section - Compact */
+/* Commission Hero */
 .summary-commission-hero {
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  border-radius: 1rem;
-  padding: 1.5rem;
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+  border-radius: 10px;
+  padding: 1.25rem;
   text-align: center;
 }
 
 .summary-commission-label {
-  font-size: 0.75rem;
+  font-size: 11px;
   font-weight: 600;
-  color: #059669;
+  color: #34C759;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
 }
 
 .summary-commission-value {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #047857;
-  margin-bottom: 0.5rem;
+  color: #34C759;
+  margin-bottom: 5px;
   letter-spacing: -0.02em;
 }
 
 .summary-commission-hint {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 12px;
+  color: var(--color-text-quaternary);
 }
 
-/* Margin/Discount Controls - Compact */
+/* Margin/Discount Controls */
 .summary-controls-compact {
-  padding: 1.25rem;
-  background: #f9fafb;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(229, 231, 235, 1);
+  padding: 1rem;
+  background: var(--color-bg-tertiary);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .summary-control-row-compact {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
 .summary-control-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
+  gap: 6px;
+  padding: 7px 14px;
   border: none;
-  border-radius: 9999px;
-  font-size: 0.875rem;
+  border-radius: 100px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+  font-family: inherit;
 }
 
 .summary-control-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
 .summary-control-btn-discount {
-  background: #fee2e2;
-  color: #dc2626;
+  background: rgba(255, 69, 58, 0.12);
+  color: #FF453A;
 }
 
 .summary-control-btn-discount:hover:not(:disabled) {
-  background: #fecaca;
+  background: rgba(255, 69, 58, 0.2);
 }
 
 .summary-control-btn-margin {
-  background: #dcfce7;
-  color: #16a34a;
+  background: rgba(52, 199, 89, 0.12);
+  color: #34C759;
 }
 
 .summary-control-btn-margin:hover:not(:disabled) {
-  background: #bbf7d0;
+  background: rgba(52, 199, 89, 0.2);
 }
 
 .summary-control-display-compact {
-  min-width: 4rem;
+  min-width: 3.5rem;
   text-align: center;
 }
 
@@ -384,203 +371,76 @@
 }
 
 .summary-control-value.discount {
-  color: #dc2626;
+  color: #FF453A;
 }
 
 .summary-control-value.margin {
-  color: #16a34a;
+  color: #34C759;
 }
 
 .summary-control-value.neutral {
-  color: #6b7280;
+  color: var(--color-text-quaternary);
 }
 
-/* Totals Section - Compact */
+/* Totals Section */
 .summary-total-section {
-  background: #FFFFFF;
-  border: 1px solid rgba(229, 231, 235, 1);
-  border-radius: 1rem;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 1.25rem;
 }
 
 .summary-total-row-compact {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 0;
+  padding: 8px 0;
 }
 
 .summary-total-label-compact {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 13px;
+  color: var(--color-text-quaternary);
   font-weight: 500;
 }
 
 .summary-total-value-compact {
   font-family: 'SF Mono', 'Monaco', 'Menlo', monospace;
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
 }
 
 .summary-total-final-compact {
-  margin-top: 1rem;
-  padding-top: 1.5rem;
-  border-top: 2px solid rgba(229, 231, 235, 1);
+  margin-top: 10px;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .summary-total-label-final-compact {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
 }
 
 .summary-total-value-final-compact {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
-  color: #1d1d1f;
+  color: var(--color-text-primary);
   letter-spacing: -0.03em;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
-}
-
-
-/* Dark Mode Support */
-[data-theme="dark"] .quote-step-content.summary-split-view {
-  background: #000000;
-}
-
-[data-theme="dark"] .summary-services-card {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-services-title {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-services-validity {
-  color: #9ca3af;
-}
-
-[data-theme="dark"] .summary-services-header {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-service-name-compact {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-service-price-compact {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-divider-compact {
-  background: repeating-linear-gradient(
-    to right,
-    transparent,
-    transparent 8px,
-    rgba(255, 255, 255, 0.1) 8px,
-    rgba(255, 255, 255, 0.1) 16px
-  );
-}
-
-[data-theme="dark"] .summary-services-footer {
-  border-top-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-input {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-input:focus {
-  border-color: #5ac8fa;
-  box-shadow: 0 0 0 3px rgba(90, 200, 250, 0.1);
-}
-
-[data-theme="dark"] .summary-commission-hero {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-}
-
-[data-theme="dark"] .summary-commission-label {
-  color: #10b981;
-}
-
-[data-theme="dark"] .summary-commission-value {
-  color: #10b981;
-}
-
-[data-theme="dark"] .summary-controls-compact {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-total-section {
-  background: #1C1C1E;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-total-label-compact {
-  color: #9ca3af;
-}
-
-[data-theme="dark"] .summary-total-value-compact {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-total-label-final-compact {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-total-value-final-compact {
-  color: #f5f5f7;
-}
-
-[data-theme="dark"] .summary-total-final-compact {
-  border-top-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-document-header {
-  border-bottom-color: rgba(255, 255, 255, 0.1);
-}
-
-[data-theme="dark"] .summary-input-error {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 1px #ef4444, 0 0 0 3px rgba(239, 68, 68, 0.2) !important;
-}
-
-[data-theme="dark"] .summary-input-error-message {
-  color: #fca5a5;
+  font-family: inherit;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .summary-receipt-card {
-    padding: 1.5rem;
+  .quote-step-content.summary-split-view {
+    padding: 1rem;
   }
 
-  .receipt-total-value-final {
-    font-size: 2rem;
-  }
-
-  .commission-hero-value {
-    font-size: 1.5rem;
-  }
-
-  .receipt-control-row {
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-
-  .receipt-control-btn {
-    width: 100%;
-    justify-content: center;
+  .summary-services-card {
+    height: auto;
+    max-height: none;
   }
 }
-

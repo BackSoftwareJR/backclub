@@ -274,8 +274,10 @@ const Clienti: React.FC = () => {
                                 <tr key={client.id} onClick={() => handleClientClick(client)}>
                                     <td className="cliente-name">
                                         <div className="name-cell">
-                                            <Building size={16} />
-                                            <span>{client.company_name}</span>
+                                            <div className="client-avatar">
+                                                {client.company_name?.charAt(0).toUpperCase() || 'C'}
+                                            </div>
+                                            <span className="client-name-text">{client.company_name}</span>
                                         </div>
                                     </td>
                                     <td>{client.ragione_sociale || '-'}</td>

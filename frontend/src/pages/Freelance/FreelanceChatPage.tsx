@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
   Send,
@@ -8,6 +9,7 @@ import {
   Search,
   Plus,
   Briefcase,
+  Info,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useFreelanceCrm } from '../../context/FreelanceCrmContext';
@@ -22,6 +24,109 @@ import { freelanceChatTourSteps, freelanceCompleteTourSteps } from '../../config
 import BottomSheet from '../../components/Mobile/BottomSheet';
 import { hapticButtonPress } from '../../utils/hapticFeedback';
 import './FreelanceChatPage.css';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const formatListTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const isToday = date.toDateString() === now.toDateString();
+  const isYesterday =
+    new Date(now.getTime() - 86400000).toDateString() === date.toDateString();
+  if (isToday) return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+  if (isYesterday) return 'Ieri';
+  return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+};
+
+const formatMessageTime = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+};
+
+const formatDateSeparator = (dateString: string): string => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const yesterday = new Date(now.getTime() - 86400000);
+  if (date.toDateString() === now.toDateString()) return 'Oggi';
+  if (date.toDateString() === yesterday.toDateString()) return 'Ieri';
+  return date.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
+};
+
+const isSameDay = (a: string, b: string): boolean =>
+  new Date(a).toDateString() === new Date(b).toDateString();
+
+const isSameGroup = (a: CrmProjectPmChatMessage, b: CrmProjectPmChatMessage): boolean => {
+  if (a.user_id !== b.user_id) return false;
+  const diff = Math.abs(new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  return diff < 5 * 60 * 1000; // 5 minutes
+};
+
+// ─── Avatar ───────────────────────────────────────────────────────────────────
+
+const Avatar: React.FC<{ name?: string; size?: number }> = ({ name, size = 28 }) => {
+  const initial = name?.charAt(0).toUpperCase() ?? 'U';
+  const colors = [
+    '#5856D6', '#AF52DE', '#FF2D55', '#FF9500', '#34C759',
+    '#007AFF', '#5AC8FA', '#FFCC00', '#FF6B6B', '#6BCB77',
+  ];
+  const color = colors[(name?.charCodeAt(0) ?? 0) % colors.length];
+  return (
+    <div
+      className="fcp-avatar"
+      style={{ width: size, height: size, background: color, fontSize: size * 0.43 }}
+    >
+      {initial}
+    </div>
+  );
+};
+
+// ─── Message Bubble ───────────────────────────────────────────────────────────
+
+interface MessageBubbleProps {
+  message: CrmProjectPmChatMessage;
+  isMine: boolean;
+  showMeta: boolean;
+}
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isMine, showMeta }) => (
+  <motion.div
+    className={`fcp-msg-wrap ${isMine ? 'fcp-msg-wrap--sent' : 'fcp-msg-wrap--received'}`}
+    initial={{ opacity: 0, y: 10 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.18, ease: 'easeOut' }}
+  >
+    {!isMine && (
+      <div className="fcp-msg-avatar-slot">
+        {showMeta ? <Avatar name={message.user?.name} /> : <div style={{ width: 28 }} />}
+      </div>
+    )}
+    <div className={`fcp-msg-content ${isMine ? 'fcp-msg-content--sent' : ''}`}>
+      {!isMine && showMeta && message.user?.name && (
+        <span className="fcp-msg-sender">{message.user.name}</span>
+      )}
+      <div className={`fcp-bubble ${isMine ? 'fcp-bubble--sent' : 'fcp-bubble--received'}`}>
+        {message.message && (
+          <p className="fcp-bubble-text">{message.message}</p>
+        )}
+        {message.media_path && (
+          <div className="fcp-bubble-media">
+            <a
+              href={message.media_url || message.media_path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fcp-bubble-media-link"
+            >
+              📎 {message.media_name || 'Allegato'}
+            </a>
+          </div>
+        )}
+      </div>
+      <span className="fcp-msg-time">{formatMessageTime(message.created_at)}</span>
+    </div>
+  </motion.div>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 
 const FreelanceChatPage: React.FC = () => {
   const { t } = useTranslation();
@@ -40,23 +145,21 @@ const FreelanceChatPage: React.FC = () => {
   const [projectsForNewChat, setProjectsForNewChat] = useState<FreelanceProject[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
 
-  /** Su mobile: 'list' = lista chat, 'conversation' = conversazione aperta */
   const [mobileView, setMobileView] = useState<'list' | 'conversation'>('list');
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // ── Fetch channels ──────────────────────────────────────────────────────────
 
   useEffect(() => {
     const fetchChannels = async () => {
-      if (!user?.id) {
-        setLoading(false);
-        return;
-      }
+      if (!user?.id) { setLoading(false); return; }
       try {
-        const data =
-          isCrmScoped && crmDepartmentCode
-            ? await freelanceCrmApi.getChatChannels(crmDepartmentCode)
-            : await freelanceApi.getChatChannels();
+        const data = isCrmScoped && crmDepartmentCode
+          ? await freelanceCrmApi.getChatChannels(crmDepartmentCode)
+          : await freelanceApi.getChatChannels();
         setChannels(data);
         if (data.length > 0 && !selectedChannel) {
           setSelectedChannel(data[0].projectId);
@@ -69,31 +172,42 @@ const FreelanceChatPage: React.FC = () => {
       }
     };
     fetchChannels();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, isCrmScoped, crmDepartmentCode]);
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      if (!selectedChannel) return;
-      try {
-        const response = await crmProjectPmChatApi.getMessages(selectedChannel);
-        setMessages(response.data || []);
-      } catch (error) {
-        console.error('Error loading messages:', error);
-        setMessages([]);
-      }
-    };
-    fetchMessages();
-    const interval = setInterval(fetchMessages, 5000);
-    return () => clearInterval(interval);
+  // ── Fetch + poll messages ───────────────────────────────────────────────────
+
+  const fetchMessages = useCallback(async () => {
+    if (!selectedChannel) return;
+    try {
+      const response = await crmProjectPmChatApi.getMessages(selectedChannel);
+      setMessages(response.data || []);
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      setMessages([]);
+    }
   }, [selectedChannel]);
 
   useEffect(() => {
-    scrollToBottom();
+    fetchMessages();
+    const interval = setInterval(fetchMessages, 5000);
+    return () => clearInterval(interval);
+  }, [fetchMessages]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // ── Auto-resize textarea ────────────────────────────────────────────────────
+
+  const autoResize = () => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   };
+
+  // ── Send message ────────────────────────────────────────────────────────────
 
   const handleSendMessage = async () => {
     if (!selectedChannel || !messageText.trim() || sending) return;
@@ -104,6 +218,9 @@ const FreelanceChatPage: React.FC = () => {
         message_type: 'text',
       });
       setMessageText('');
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto';
+      }
       const response = await crmProjectPmChatApi.getMessages(selectedChannel);
       setMessages(response.data || []);
       setChannels((prev) =>
@@ -119,58 +236,21 @@ const FreelanceChatPage: React.FC = () => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const formatMessageTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-    if (diffMins < 1) return 'Adesso';
-    if (diffMins < 60) return `${diffMins}m fa`;
-    if (diffHours < 24) return `${diffHours}h fa`;
-    if (diffDays < 7) return `${diffDays}g fa`;
-    return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-  };
-
-  const formatListTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const isToday = date.toDateString() === now.toDateString();
-    const isYesterday = new Date(now.getTime() - 86400000).toDateString() === date.toDateString();
-    if (isToday) return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-    if (isYesterday) return 'Ieri';
-    return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
-  };
-
-  const currentChannel = channels.find((ch) => ch.projectId === selectedChannel);
-
-  /** Canali filtrati per ricerca (nome progetto) */
-  const filteredChannels = searchQuery.trim()
-    ? channels.filter((ch) =>
-        ch.projectName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : channels;
+  // ── New chat project ────────────────────────────────────────────────────────
 
   const openNewChatProject = (project: FreelanceProject) => {
     hapticButtonPress();
     const exists = channels.some((c) => c.projectId === project.id);
     if (!exists) {
       setChannels((prev) => [
-        {
-          projectId: project.id,
-          projectName: project.name,
-          lastMessage: undefined,
-          unreadCount: 0,
-          manager: undefined,
-        },
+        { projectId: project.id, projectName: project.name, lastMessage: undefined, unreadCount: 0, manager: undefined },
         ...prev,
       ]);
     }
@@ -194,229 +274,339 @@ const FreelanceChatPage: React.FC = () => {
     }
   };
 
+  // ── Derived ─────────────────────────────────────────────────────────────────
+
+  const currentChannel = channels.find((ch) => ch.projectId === selectedChannel);
+
+  const filteredChannels = searchQuery.trim()
+    ? channels.filter((ch) =>
+        ch.projectName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : channels;
+
+  // ── Loading ─────────────────────────────────────────────────────────────────
+
   if (loading) {
     return (
-      <div className="freelance-chat freelance-chat-loading">
-        <div className="freelance-spinner" />
+      <div className="fcp-root fcp-loading">
+        <div className="fcp-spinner" />
       </div>
     );
   }
 
-  // ---------- Mobile: vista lista (stile WhatsApp) ----------
+  // ── Render: messages list ───────────────────────────────────────────────────
+
+  const renderMessages = () => (
+    <div className="fcp-messages" ref={messagesContainerRef}>
+      {messages.length === 0 ? (
+        <div className="fcp-messages-empty">
+          <MessageSquare size={40} strokeWidth={1.2} />
+          <p>{t('freelance.no_message')}</p>
+          <span>Invia un messaggio per iniziare</span>
+        </div>
+      ) : (
+        messages.map((message, index) => {
+          const isMine = message.user_id === user?.id;
+          const isFirst = index === 0;
+          const prevMsg = isFirst ? null : messages[index - 1];
+          const showDateSep = isFirst || !isSameDay(messages[index - 1].created_at, message.created_at);
+          const isGroupStart = isFirst || !prevMsg || !isSameGroup(prevMsg, message);
+
+          return (
+            <React.Fragment key={message.id}>
+              {showDateSep && (
+                <div className="fcp-date-sep">
+                  <span>{formatDateSeparator(message.created_at)}</span>
+                </div>
+              )}
+              <MessageBubble
+                message={message}
+                isMine={isMine}
+                showMeta={isGroupStart}
+              />
+            </React.Fragment>
+          );
+        })
+      )}
+      <div ref={messagesEndRef} />
+    </div>
+  );
+
+  // ── Render: input bar ───────────────────────────────────────────────────────
+
+  const renderInputBar = () => (
+    <div className="fcp-input-bar">
+      <button
+        type="button"
+        className="fcp-input-attach"
+        title="Allega file"
+        aria-label="Allega"
+      >
+        <Paperclip size={20} />
+      </button>
+      <textarea
+        ref={textareaRef}
+        className="fcp-input"
+        placeholder="Messaggio"
+        value={messageText}
+        onChange={(e) => { setMessageText(e.target.value); autoResize(); }}
+        onKeyDown={handleKeyDown}
+        rows={1}
+        disabled={sending}
+      />
+      <AnimatePresence>
+        {messageText.trim() && (
+          <motion.button
+            type="button"
+            className="fcp-input-send"
+            onClick={handleSendMessage}
+            disabled={sending}
+            aria-label="Invia"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0, opacity: 0 }}
+            transition={{ duration: 0.15, type: 'spring', stiffness: 400, damping: 20 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Send size={16} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
+  // ── Mobile: list view ───────────────────────────────────────────────────────
+
   const renderMobileList = () => (
-    <div className="freelance-chat-mobile-list">
-      <div className="freelance-chat-mobile-list-header">
-        <h1 className="freelance-chat-mobile-list-title">Chat</h1>
+    <div className="fcp-mobile-list">
+      <div className="fcp-mobile-list-header">
+        <h1 className="fcp-mobile-list-title">Chat</h1>
         <button
           type="button"
-          className="freelance-chat-mobile-new-btn"
-          onClick={() => {
-            hapticButtonPress();
-            setShowNewChatSheet(true);
-            loadProjectsForNewChat();
-          }}
+          className="fcp-mobile-new-btn"
+          onClick={() => { hapticButtonPress(); setShowNewChatSheet(true); loadProjectsForNewChat(); }}
           aria-label="Nuova chat"
         >
           <Plus size={24} />
         </button>
       </div>
-      <div className="freelance-chat-mobile-search-wrap">
-        <Search size={18} className="freelance-chat-mobile-search-icon" />
+
+      <div className="fcp-search-wrap">
+        <Search size={15} className="fcp-search-icon" />
         <input
           type="search"
-          className="freelance-chat-mobile-search"
-          placeholder={t('freelance.search_chat')}
+          className="fcp-search-input"
+          placeholder="Cerca..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          aria-label="Cerca"
         />
       </div>
-      <div className="freelance-chat-mobile-channels">
-        {filteredChannels.length > 0 ? (
-          filteredChannels.map((channel) => (
-            <button
-              key={channel.projectId}
-              type="button"
-              className="freelance-chat-mobile-channel"
-              onClick={() => {
-                hapticButtonPress();
-                setSelectedChannel(channel.projectId);
-                setMobileView('conversation');
-              }}
-            >
-              <div className="freelance-chat-mobile-channel-avatar">
-                <Briefcase size={20} />
-              </div>
-              <div className="freelance-chat-mobile-channel-body">
-                <div className="freelance-chat-mobile-channel-row">
-                  <span className="freelance-chat-mobile-channel-name">{channel.projectName}</span>
-                  {channel.lastMessage && (
-                    <span className="freelance-chat-mobile-channel-time">
-                      {formatListTime(channel.lastMessage.created_at)}
-                    </span>
-                  )}
-                </div>
-                {channel.lastMessage ? (
-                  <p className="freelance-chat-mobile-channel-preview">
-                    {channel.lastMessage.user_id === user?.id ? 'Tu: ' : ''}
-                    {channel.lastMessage.message?.substring(0, 60) || 'Messaggio'}
-                    {(channel.lastMessage.message?.length ?? 0) > 60 ? '...' : ''}
-                  </p>
-                ) : (
-                  <p className="freelance-chat-mobile-channel-preview freelance-chat-mobile-channel-preview-empty">
-                    {t('freelance.no_message')}
-                  </p>
-                )}
-              </div>
-              {channel.unreadCount > 0 && (
-                <span className="freelance-chat-mobile-channel-badge">{channel.unreadCount}</span>
-              )}
-            </button>
-          ))
-        ) : (
-          <div className="freelance-chat-mobile-empty-list">
-            <MessageSquare size={48} />
-            <p>
-              {searchQuery.trim() ? t('freelance.no_chat_found') : t('freelance.no_chat_yet')}
-            </p>
+
+      <div className="fcp-channel-list">
+        {filteredChannels.length === 0 ? (
+          <div className="fcp-channel-list-empty">
+            <MessageSquare size={48} strokeWidth={1.2} />
+            <p>{searchQuery.trim() ? t('freelance.no_chat_found') : t('freelance.no_chat_yet')}</p>
             {!searchQuery.trim() && (
               <button
                 type="button"
-                className="freelance-chat-mobile-empty-new"
-                onClick={() => {
-                  setShowNewChatSheet(true);
-                  loadProjectsForNewChat();
-                }}
+                className="fcp-channel-list-empty-btn"
+                onClick={() => { setShowNewChatSheet(true); loadProjectsForNewChat(); }}
               >
                 Nuova chat
               </button>
             )}
           </div>
+        ) : (
+          filteredChannels.map((channel) => (
+            <button
+              key={channel.projectId}
+              type="button"
+              className="fcp-channel-item"
+              onClick={() => { hapticButtonPress(); setSelectedChannel(channel.projectId); setMobileView('conversation'); }}
+            >
+              <div className="fcp-channel-item-icon">
+                <Briefcase size={18} />
+              </div>
+              <div className="fcp-channel-item-body">
+                <div className="fcp-channel-item-row">
+                  <span className="fcp-channel-item-name">{channel.projectName}</span>
+                  {channel.lastMessage && (
+                    <span className="fcp-channel-item-time">
+                      {formatListTime(channel.lastMessage.created_at)}
+                    </span>
+                  )}
+                </div>
+                <p className="fcp-channel-item-preview">
+                  {channel.lastMessage
+                    ? `${channel.lastMessage.user_id === user?.id ? 'Tu: ' : ''}${(channel.lastMessage.message ?? 'Messaggio').substring(0, 55)}${(channel.lastMessage.message?.length ?? 0) > 55 ? '…' : ''}`
+                    : <em>{t('freelance.no_message')}</em>}
+                </p>
+              </div>
+              {channel.unreadCount > 0 && (
+                <span className="fcp-badge">{channel.unreadCount}</span>
+              )}
+            </button>
+          ))
         )}
       </div>
     </div>
   );
 
-  // ---------- Mobile: vista conversazione ----------
+  // ── Mobile: conversation view ───────────────────────────────────────────────
+
   const renderMobileConversation = () => {
     if (!selectedChannel || !currentChannel) return null;
     return (
-      <div className="freelance-chat-mobile-conv">
-        <header className="freelance-chat-mobile-conv-header">
+      <div className="fcp-mobile-conv">
+        <header className="fcp-conv-header">
           <button
             type="button"
-            className="freelance-chat-mobile-conv-back"
-            onClick={() => {
-              hapticButtonPress();
-              setMobileView('list');
-            }}
+            className="fcp-conv-back"
+            onClick={() => { hapticButtonPress(); setMobileView('list'); }}
             aria-label="Indietro"
           >
-            <ChevronLeft size={24} />
+            <ChevronLeft size={22} />
           </button>
-          <div className="freelance-chat-mobile-conv-info">
-            <h2 className="freelance-chat-mobile-conv-title">{currentChannel.projectName}</h2>
+          <div className="fcp-conv-info">
+            <h2 className="fcp-conv-title">{currentChannel.projectName}</h2>
             {currentChannel.manager && (
-              <p className="freelance-chat-mobile-conv-subtitle">
-                {currentChannel.manager.name}
-              </p>
+              <p className="fcp-conv-subtitle">{currentChannel.manager.name}</p>
             )}
           </div>
+          <button type="button" className="fcp-conv-action" aria-label="Info">
+            <Info size={20} />
+          </button>
         </header>
-        <div
-          className="freelance-chat-mobile-messages"
-          ref={messagesContainerRef}
-        >
-          {messages.length > 0 ? (
-            messages.map((message, index) => {
-              const isMyMessage = message.user_id === user?.id;
-              const showAvatar =
-                index === 0 || messages[index - 1].user_id !== message.user_id;
-              return (
-                <div
-                  key={message.id}
-                  className={`freelance-chat-bubble-wrap ${isMyMessage ? 'sent' : 'received'}`}
-                >
-                  {!isMyMessage && showAvatar && (
-                    <div className="freelance-chat-bubble-avatar">
-                      {message.user?.name?.charAt(0).toUpperCase() ?? 'U'}
-                    </div>
-                  )}
-                  <div className="freelance-chat-bubble-content">
-                    {!isMyMessage && showAvatar && (
-                      <span className="freelance-chat-bubble-name">
-                        {message.user?.name || 'Utente'}
-                      </span>
-                    )}
-                    <div className="freelance-chat-bubble">
-                      {message.message && (
-                        <p className="freelance-chat-bubble-text">{message.message}</p>
-                      )}
-                      {message.media_path && (
-                        <div className="freelance-chat-bubble-media">
-                          <a
-                            href={message.media_url || message.media_path}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            {message.media_name || 'Allegato'}
-                          </a>
-                        </div>
-                      )}
-                      <span className="freelance-chat-bubble-time">
-                        {formatMessageTime(message.created_at)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          ) : (
-            <div className="freelance-chat-mobile-empty-messages">
-              <MessageSquare size={40} />
-              <p>{t('freelance.no_message')}</p>
-              <p className="freelance-chat-mobile-empty-messages-hint">
-                Invia un messaggio per iniziare
-              </p>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-        <div className="freelance-chat-mobile-input-bar">
-          <button
-            type="button"
-            className="freelance-chat-mobile-input-attach"
-            title="Allega file"
-            aria-label="Allega"
-          >
-            <Paperclip size={22} />
-          </button>
-          <textarea
-            className="freelance-chat-mobile-input"
-            placeholder="Messaggio"
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            rows={1}
-            disabled={sending}
-          />
-          <button
-            type="button"
-            className="freelance-chat-mobile-input-send"
-            onClick={handleSendMessage}
-            disabled={!messageText.trim() || sending}
-            aria-label="Invia"
-          >
-            <Send size={20} />
-          </button>
-        </div>
+        {renderMessages()}
+        {renderInputBar()}
       </div>
     );
   };
 
-  // ---------- Render: mobile = list o conversation, desktop = layout sidebar + main ----------
+  // ── Desktop: channel sidebar ────────────────────────────────────────────────
+
+  const renderSidebar = () => (
+    <div className="fcp-sidebar">
+      <div className="fcp-sidebar-top">
+        <h2 className="fcp-sidebar-title">Messaggi</h2>
+        <div className="fcp-search-wrap fcp-search-wrap--sidebar">
+          <Search size={13} className="fcp-search-icon" />
+          <input
+            type="search"
+            className="fcp-search-input"
+            placeholder="Cerca..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="fcp-sidebar-section-label">CANALI</div>
+
+      <div className="fcp-channel-list fcp-channel-list--sidebar">
+        {filteredChannels.length === 0 ? (
+          <div className="fcp-sidebar-empty">
+            <MessageSquare size={28} strokeWidth={1.2} />
+            <p>{t('freelance.no_projects_available')}</p>
+          </div>
+        ) : (
+          filteredChannels.map((channel) => (
+            <button
+              key={channel.projectId}
+              type="button"
+              className={`fcp-channel-item fcp-channel-item--sidebar${selectedChannel === channel.projectId ? ' fcp-channel-item--active' : ''}`}
+              onClick={() => setSelectedChannel(channel.projectId)}
+            >
+              <div className="fcp-channel-item-icon">
+                <MessageSquare size={15} />
+              </div>
+              <div className="fcp-channel-item-body">
+                <div className="fcp-channel-item-row">
+                  <span className="fcp-channel-item-name">{channel.projectName}</span>
+                  {channel.lastMessage && (
+                    <span className="fcp-channel-item-time">
+                      {formatListTime(channel.lastMessage.created_at)}
+                    </span>
+                  )}
+                </div>
+                {channel.lastMessage && (
+                  <p className="fcp-channel-item-preview">
+                    {(channel.lastMessage.message ?? 'Messaggio').substring(0, 40)}
+                    {(channel.lastMessage.message?.length ?? 0) > 40 ? '…' : ''}
+                  </p>
+                )}
+              </div>
+              {channel.unreadCount > 0 && (
+                <span className="fcp-badge">{channel.unreadCount}</span>
+              )}
+            </button>
+          ))
+        )}
+      </div>
+    </div>
+  );
+
+  // ── Desktop: main conversation area ────────────────────────────────────────
+
+  const renderDesktopMain = () => (
+    <div className="fcp-main">
+      <AnimatePresence mode="wait">
+        {selectedChannel && currentChannel ? (
+          <motion.div
+            key={selectedChannel}
+            className="fcp-main-inner"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <header className="fcp-conv-header">
+              <div className="fcp-conv-info">
+                <h2 className="fcp-conv-title">{currentChannel.projectName}</h2>
+                {currentChannel.manager && (
+                  <p className="fcp-conv-subtitle">
+                    Manager: {currentChannel.manager.name}
+                  </p>
+                )}
+              </div>
+              <div className="fcp-conv-actions">
+                <button type="button" className="fcp-conv-action" aria-label="Cerca">
+                  <Search size={18} />
+                </button>
+                <button type="button" className="fcp-conv-action" aria-label="Info">
+                  <Info size={18} />
+                </button>
+              </div>
+            </header>
+
+            {renderMessages()}
+            {renderInputBar()}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="empty"
+            className="fcp-empty"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div className="fcp-empty-icon">
+              <MessageSquare size={56} strokeWidth={1} />
+            </div>
+            <h2>Seleziona una conversazione</h2>
+            <p>Scegli un progetto per iniziare a chattare</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
+  // ── Root render ─────────────────────────────────────────────────────────────
+
   return (
-    <div className={`freelance-chat ${isMobile ? 'freelance-chat-mobile' : ''}`}>
+    <div className={`fcp-root${isMobile ? ' fcp-root--mobile' : ''}`}>
       <GuideTour steps={freelanceChatTourSteps} tourId="freelance-chat-tour" />
       <GuideTour steps={freelanceCompleteTourSteps} tourId="freelance-complete-tour" />
 
@@ -427,204 +617,39 @@ const FreelanceChatPage: React.FC = () => {
         </>
       ) : (
         <>
-          <div className="freelance-chat-sidebar">
-            <div className="freelance-chat-sidebar-header">
-              <h2 className="freelance-chat-sidebar-title">Chat</h2>
-              <div className="freelance-chat-desktop-search-wrap">
-                <Search size={16} />
-                <input
-                  type="search"
-                  className="freelance-chat-desktop-search"
-                  placeholder={t('freelance.search_projects')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="freelance-chat-sidebar-channels">
-              {filteredChannels.length > 0 ? (
-                filteredChannels.map((channel) => (
-                  <div
-                    key={channel.projectId}
-                    role="button"
-                    tabIndex={0}
-                    className={`freelance-chat-channel ${selectedChannel === channel.projectId ? 'active' : ''}`}
-                    onClick={() => setSelectedChannel(channel.projectId)}
-                    onKeyDown={(e) =>
-                      e.key === 'Enter' && setSelectedChannel(channel.projectId)
-                    }
-                  >
-                    <div className="freelance-chat-channel-icon">
-                      <MessageSquare size={20} />
-                      {channel.unreadCount > 0 && (
-                        <span className="freelance-chat-channel-badge">
-                          {channel.unreadCount}
-                        </span>
-                      )}
-                    </div>
-                    <div className="freelance-chat-channel-content">
-                      <div className="freelance-chat-channel-name">{channel.projectName}</div>
-                      {channel.lastMessage && (
-                        <div className="freelance-chat-channel-preview">
-                          {channel.lastMessage.message?.substring(0, 50) || 'Messaggio'}
-                          {(channel.lastMessage.message?.length ?? 0) > 50 && '...'}
-                        </div>
-                      )}
-                    </div>
-                    {channel.lastMessage && (
-                      <div className="freelance-chat-channel-time">
-                        {formatListTime(channel.lastMessage.created_at)}
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="freelance-empty-state">
-                  <MessageSquare size={32} />
-                  <p>{t('freelance.no_projects_available')}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="freelance-chat-main">
-            {selectedChannel && currentChannel ? (
-              <>
-                <div className="freelance-chat-header">
-                  <div>
-                    <h2 className="freelance-chat-header-title">
-                      {currentChannel.projectName}
-                    </h2>
-                    {currentChannel.manager && (
-                      <p className="freelance-chat-header-subtitle">
-                        Manager: {currentChannel.manager.name}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="freelance-chat-messages"
-                  ref={messagesContainerRef}
-                >
-                  {messages.length > 0 ? (
-                    messages.map((message, index) => {
-                      const isMyMessage = message.user_id === user?.id;
-                      const showAvatar =
-                        index === 0 || messages[index - 1].user_id !== message.user_id;
-                      return (
-                        <div
-                          key={message.id}
-                          className={`freelance-chat-message ${isMyMessage ? 'my-message' : 'other-message'}`}
-                        >
-                          {!isMyMessage && showAvatar && (
-                            <div className="freelance-chat-message-avatar">
-                              {message.user?.name?.charAt(0).toUpperCase() ?? 'U'}
-                            </div>
-                          )}
-                          <div className="freelance-chat-message-content">
-                            {!isMyMessage && showAvatar && (
-                              <div className="freelance-chat-message-name">
-                                {message.user?.name || 'Utente'}
-                              </div>
-                            )}
-                            <div className="freelance-chat-message-bubble">
-                              {message.message && (
-                                <p className="freelance-chat-message-text">{message.message}</p>
-                              )}
-                              {message.media_path && (
-                                <div className="freelance-chat-message-media">
-                                  <a
-                                    href={message.media_url || message.media_path}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="freelance-chat-message-media-link"
-                                  >
-                                    {message.media_name || 'Allegato'}
-                                  </a>
-                                </div>
-                              )}
-                              <div className="freelance-chat-message-time">
-                                {formatMessageTime(message.created_at)}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <div className="freelance-empty-state">
-                      <MessageSquare size={48} />
-                      <p>{t('freelance.no_message')} ancora</p>
-                      <p className="freelance-empty-state-subtitle">
-                        Inizia la conversazione inviando un messaggio
-                      </p>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-                <div className="freelance-chat-input-area">
-                  <button className="freelance-chat-input-attach" title="Allega file">
-                    <Paperclip size={20} />
-                  </button>
-                  <textarea
-                    className="freelance-chat-input"
-                    placeholder="Scrivi un messaggio..."
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    rows={1}
-                    disabled={sending}
-                  />
-                  <button
-                    className="freelance-chat-input-send"
-                    onClick={handleSendMessage}
-                    disabled={!messageText.trim() || sending}
-                    title="Invia"
-                  >
-                    <Send size={20} />
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="freelance-chat-empty">
-                <MessageSquare size={64} />
-                <h2>Seleziona un progetto</h2>
-                <p>Scegli un progetto dalla lista per iniziare a chattare</p>
-              </div>
-            )}
-          </div>
+          {renderSidebar()}
+          {renderDesktopMain()}
         </>
       )}
 
-      {/* Bottom sheet: Nuova chat - Scegli progetto */}
       <BottomSheet
         isOpen={showNewChatSheet}
         onClose={() => setShowNewChatSheet(false)}
         title="Nuova chat"
         snapPoints={[70, 90]}
       >
-        <div className="freelance-chat-new-sheet">
+        <div className="fcp-new-sheet">
           {loadingProjects ? (
-            <div className="freelance-chat-new-sheet-loading">
-              <div className="freelance-spinner" />
+            <div className="fcp-new-sheet-loading">
+              <div className="fcp-spinner" />
               <p>{t('freelance.loading_projects')}</p>
             </div>
           ) : projectsForNewChat.length === 0 ? (
-            <p className="freelance-chat-new-sheet-empty">{t('freelance.no_projects_available')}</p>
+            <p className="fcp-new-sheet-empty">{t('freelance.no_projects_available')}</p>
           ) : (
-            <ul className="freelance-chat-new-sheet-list">
+            <ul className="fcp-new-sheet-list">
               {projectsForNewChat.map((project) => (
                 <li key={project.id}>
                   <button
                     type="button"
-                    className="freelance-chat-new-sheet-item"
+                    className="fcp-new-sheet-item"
                     onClick={() => openNewChatProject(project)}
                   >
-                    <div className="freelance-chat-new-sheet-avatar">
+                    <div className="fcp-new-sheet-avatar">
                       <Briefcase size={20} />
                     </div>
-                    <span className="freelance-chat-new-sheet-name">{project.name}</span>
-                    <ChevronLeft size={20} className="freelance-chat-new-sheet-chevron" />
+                    <span className="fcp-new-sheet-name">{project.name}</span>
+                    <ChevronLeft size={18} className="fcp-new-sheet-chevron" />
                   </button>
                 </li>
               ))}

@@ -263,7 +263,7 @@
   font-weight: 600;
   text-transform: uppercase;
   background-color: rgba(255, 69, 58, 0.15);
-  color: #FF453A;
+  color: var(--seller-danger);
 }
 
 /* Filter Options */

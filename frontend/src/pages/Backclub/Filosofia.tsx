@@ -8,7 +8,7 @@ const Filosofia: React.FC = () => {
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] as const }}
         className="backclub-container-center"
       >
         <h1 className="backclub-h1 backclub-serif" style={{ textAlign: 'center', marginBottom: '3rem' }}>
@@ -47,7 +47,7 @@ const Filosofia: React.FC = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 1.2, ease: [0.4, 0, 0.2, 1] as const }}
           style={{
             margin: '4rem auto',
             maxWidth: '900px',
@@ -91,7 +91,7 @@ const Filosofia: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] as const }}
           style={{ marginTop: '6rem' }}
         >
           <h2 className="backclub-h2 backclub-serif" style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -113,7 +113,7 @@ const Filosofia: React.FC = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
           style={{ marginTop: '4rem' }}
         >
           <h2 className="backclub-h2 backclub-serif" style={{ textAlign: 'center', marginBottom: '2rem' }}>

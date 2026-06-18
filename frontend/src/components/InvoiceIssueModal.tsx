@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { invoicesApi } from '../api/invoices';
 import { serbatoiApi, type Serbatoio } from '../api/serbatoi';
 import type { InvoiceToIssue } from '../api/invoices';
@@ -151,8 +152,22 @@ const InvoiceIssueModal: React.FC<InvoiceIssueModalProps> = ({ toIssue, onClose 
   };
 
   return (
-    <div className="invoice-issue-modal-overlay" onClick={onClose}>
-      <div className="invoice-issue-modal" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="invoice-issue-modal-overlay"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15 }}
+    >
+      <motion.div
+        className="invoice-issue-modal"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.96, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 8 }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] as const }}
+      >
         <header className="invoice-issue-modal-header">
           <h2>Emetti Fattura</h2>
           <button type="button" className="invoice-issue-modal-close" onClick={onClose} aria-label="Chiudi">
@@ -317,8 +332,8 @@ const InvoiceIssueModal: React.FC<InvoiceIssueModalProps> = ({ toIssue, onClose 
             </button>
           </footer>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

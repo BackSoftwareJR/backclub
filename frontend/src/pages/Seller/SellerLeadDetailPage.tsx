@@ -279,6 +279,16 @@ const SellerLeadDetailPage: React.FC = () => {
       .slice(0, 2);
   };
 
+  // HSL avatar style — deterministic hue from name hash
+  const getAvatarStyle = (name: string): React.CSSProperties => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = Math.abs(hash) % 360;
+    return { background: `hsl(${hue}, 70%, 45%)`, color: '#ffffff' };
+  };
+
   if (loading) {
     return (
       <div className="lead-detail-page lead-detail-skeleton">
@@ -326,7 +336,7 @@ const SellerLeadDetailPage: React.FC = () => {
         <div className="contact-profile-card">
           {/* Header Section */}
           <div className="profile-header">
-            <div className="profile-avatar">
+            <div className="profile-avatar" style={getAvatarStyle(lead.company_name)}>
               {getInitials(lead.company_name)}
             </div>
             <h1 className="profile-name">{lead.company_name}</h1>

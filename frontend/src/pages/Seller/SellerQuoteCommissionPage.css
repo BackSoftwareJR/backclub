@@ -1,44 +1,49 @@
-/* Seller Quote Commission Page - Dettaglio commissione stimata */
+/* ==================== Seller Quote Commission Page — Seller Design System ====================
+   Zero hardcoded colours. All values from --seller-* tokens.
+   ============================================================================================== */
 
 .seller-quote-commission-page {
   min-height: 100vh;
-  background: #000000;
-  color: #f5f5f7;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
-  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+  background: var(--seller-bg);
+  color: var(--seller-text-primary);
+  padding-bottom: calc(var(--seller-spacing-8) + env(safe-area-inset-bottom, 0px));
 }
+
+/* ── Header ───────────────────────────────────────────────── */
 
 .seller-quote-commission-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
-  padding-top: max(16px, env(safe-area-inset-top, 0px));
-  background: #1C1C1E;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-4);
+  padding-top: max(var(--seller-spacing-4), env(safe-area-inset-top, 0px));
+  background: var(--seller-bg-elevated);
+  border-bottom: 1px solid var(--seller-border);
   position: sticky;
   top: 0;
   z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .seller-quote-commission-back {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--seller-border);
   background: transparent;
-  color: #f5f5f7;
+  color: var(--seller-text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background var(--seller-transition-base), border-color var(--seller-transition-base);
   flex-shrink: 0;
 }
 
 .seller-quote-commission-back:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  background: var(--seller-bg-overlay);
+  border-color: var(--seller-border-strong);
 }
 
 .seller-quote-commission-back:active {
@@ -46,67 +51,84 @@
 }
 
 .seller-quote-commission-title {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: var(--seller-font-lg);
+  font-weight: var(--seller-weight-bold);
   margin: 0;
-  color: #f5f5f7;
+  color: var(--seller-text-primary);
+  letter-spacing: -0.02em;
 }
 
+/* ── Content area ─────────────────────────────────────────── */
+
 .seller-quote-commission-content {
-  padding: 16px;
+  padding: var(--seller-spacing-4);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--seller-spacing-4);
   max-width: 480px;
   margin: 0 auto;
 }
 
 .seller-quote-commission-empty {
-  padding: 32px 16px;
+  padding: var(--seller-spacing-8) var(--seller-spacing-4);
   text-align: center;
 }
 
 .seller-quote-commission-empty p {
-  margin: 0 0 16px;
-  color: #a0a0a0;
-  font-size: 0.9375rem;
+  margin: 0 0 var(--seller-spacing-4);
+  color: var(--seller-text-secondary);
+  font-size: var(--seller-font-base);
 }
+
+/* ── Primary button ───────────────────────────────────────── */
 
 .seller-quote-commission-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 24px;
-  background: #0A84FF;
-  color: #ffffff;
+  padding: var(--seller-spacing-3) var(--seller-spacing-6);
+  background: var(--seller-accent);
+  color: var(--seller-text-inverse);
   border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: var(--seller-radius-md);
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-semibold);
   cursor: pointer;
-  transition: opacity 0.2s, background 0.2s;
+  transition: background var(--seller-transition-base),
+              transform var(--seller-transition-fast);
+  width: 100%;
 }
 
 .seller-quote-commission-btn-primary:hover {
-  background: #0066CC;
+  background: var(--seller-accent-hover);
+  transform: translateY(-1px);
 }
 
 .seller-quote-commission-btn-primary:active {
   opacity: 0.9;
+  transform: translateY(0);
 }
 
-/* Skeleton loading */
+/* ── Skeleton ─────────────────────────────────────────────── */
+
 .seller-quote-commission-page .skeleton-line {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background: var(--seller-bg-overlay);
+  border-radius: var(--seller-radius-sm);
 }
 
-/* Cards */
+/* ── Cards ────────────────────────────────────────────────── */
+
 .seller-quote-commission-card {
-  background: #1C1C1E;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 1rem;
-  padding: 1.25rem;
+  background: var(--seller-bg-elevated);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-lg);
+  padding: var(--seller-spacing-5);
+  transition: border-color var(--seller-transition-base), box-shadow var(--seller-transition-base);
+}
+
+.seller-quote-commission-card:hover {
+  border-color: var(--seller-border-strong);
+  box-shadow: var(--seller-shadow-sm);
 }
 
 .seller-quote-commission-card-hero {
@@ -114,73 +136,81 @@
 }
 
 .seller-quote-commission-hero-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #a0a0a0;
+  font-size: var(--seller-font-xs);
+  font-weight: var(--seller-weight-semibold);
+  color: var(--seller-text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--seller-spacing-1);
 }
 
 .seller-quote-commission-hero-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #f5f5f7;
+  font-size: var(--seller-font-2xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-text-primary);
+  letter-spacing: -0.02em;
 }
 
 .seller-quote-commission-hero-sub {
-  font-size: 0.875rem;
-  color: #a0a0a0;
-  margin-top: 4px;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  margin-top: var(--seller-spacing-1);
 }
+
+/* ── Row layout within card ───────────────────────────────── */
 
 .seller-quote-commission-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: var(--seller-spacing-2) 0;
 }
 
 .seller-quote-commission-row-final {
-  padding-top: 12px;
+  padding-top: var(--seller-spacing-3);
 }
 
 .seller-quote-commission-label {
-  font-size: 0.9375rem;
-  color: #a0a0a0;
+  font-size: var(--seller-font-base);
+  color: var(--seller-text-secondary);
 }
 
 .seller-quote-commission-value {
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: #f5f5f7;
+  font-size: var(--seller-font-base);
+  font-weight: var(--seller-weight-medium);
+  color: var(--seller-text-primary);
+  font-variant-numeric: tabular-nums;
 }
 
 .seller-quote-commission-value-final {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #30D158;
+  font-size: var(--seller-font-xl);
+  font-weight: var(--seller-weight-bold);
+  color: var(--seller-success);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
 .seller-quote-commission-divider {
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 8px 0;
+  background: var(--seller-border);
+  margin: var(--seller-spacing-2) 0;
 }
+
+/* ── Info note ────────────────────────────────────────────── */
 
 .seller-quote-commission-note {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(10, 132, 255, 0.08);
-  border: 1px solid rgba(10, 132, 255, 0.2);
-  border-radius: 12px;
+  gap: var(--seller-spacing-3);
+  padding: var(--seller-spacing-3) var(--seller-spacing-4);
+  background: var(--seller-accent-soft);
+  border: 1px solid var(--seller-border);
+  border-radius: var(--seller-radius-md);
 }
 
 .seller-quote-commission-note-icon {
   flex-shrink: 0;
-  color: #0A84FF;
+  color: var(--seller-accent);
   margin-top: 2px;
 }
 
@@ -191,64 +221,11 @@
 
 .seller-quote-commission-note-text p {
   margin: 0;
-  font-size: 0.8125rem;
-  color: #a0a0a0;
-  line-height: 1.45;
+  font-size: var(--seller-font-sm);
+  color: var(--seller-text-secondary);
+  line-height: 1.5;
 }
 
 .seller-quote-commission-note-text p + p {
-  margin-top: 10px;
-}
-
-/* Light theme */
-[data-theme="light"] .seller-quote-commission-page {
-  background: #F5F5F7;
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-commission-header {
-  background: #ffffff;
-  border-bottom-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-commission-back {
-  border-color: rgba(0, 0, 0, 0.1);
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-commission-back:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-[data-theme="light"] .seller-quote-commission-title {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-commission-card {
-  background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-commission-hero-value,
-[data-theme="light"] .seller-quote-commission-value {
-  color: #1d1d1f;
-}
-
-[data-theme="light"] .seller-quote-commission-label,
-[data-theme="light"] .seller-quote-commission-hero-sub,
-[data-theme="light"] .seller-quote-commission-note-text p {
-  color: #6b7280;
-}
-
-[data-theme="light"] .seller-quote-commission-divider {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-[data-theme="light"] .seller-quote-commission-note {
-  background: rgba(10, 132, 255, 0.06);
-  border-color: rgba(10, 132, 255, 0.15);
-}
-
-[data-theme="light"] .seller-quote-commission-page .skeleton-line {
-  background: rgba(0, 0, 0, 0.06);
+  margin-top: var(--seller-spacing-2);
 }
