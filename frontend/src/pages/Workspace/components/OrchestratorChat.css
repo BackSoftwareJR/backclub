@@ -1,0 +1,662 @@
+/* OrchestratorChat.css — Apple glassmorphism chat UI */
+
+.orch-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ws-bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.orch-chat__header {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing-md);
+  padding: var(--ws-spacing-md) var(--ws-spacing-lg);
+  background: var(--ws-surface-glass);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border-bottom: 1px solid var(--ws-border);
+  flex-shrink: 0;
+}
+
+.orch-chat__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.2), rgba(175, 82, 222, 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.orch-chat__header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orch-chat__header-name {
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text);
+  letter-spacing: -0.01em;
+}
+
+.orch-chat__header-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-secondary);
+}
+
+.orch-chat__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ws-green);
+  animation: ws-status-pulse 2s infinite;
+}
+
+/* ── Messages ── */
+.orch-chat__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ws-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing-md);
+  scroll-behavior: smooth;
+}
+
+.orch-chat__messages::-webkit-scrollbar {
+  width: 4px;
+}
+.orch-chat__messages::-webkit-scrollbar-track { background: transparent; }
+.orch-chat__messages::-webkit-scrollbar-thumb {
+  background: var(--ws-border);
+  border-radius: var(--ws-radius-pill);
+}
+
+/* ── Loading / Welcome ── */
+.orch-chat__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ws-spacing);
+  color: var(--ws-text-secondary);
+  font-size: var(--ws-font-sm);
+  padding: var(--ws-spacing-xl) 0;
+}
+
+.orch-chat__welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--ws-spacing-xl) var(--ws-spacing-md);
+  gap: var(--ws-spacing-md);
+}
+
+.orch-chat__welcome-icon {
+  font-size: 40px;
+  margin-bottom: var(--ws-spacing);
+}
+
+.orch-chat__welcome-title {
+  font-size: var(--ws-font-title);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.orch-chat__welcome-desc {
+  font-size: var(--ws-font-base);
+  color: var(--ws-text-secondary);
+  line-height: 1.5;
+  max-width: 300px;
+  margin: 0;
+}
+
+.orch-chat__suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing);
+  width: 100%;
+  margin-top: var(--ws-spacing);
+}
+
+.orch-chat__suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface-elevated);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  transition: all var(--ws-transition);
+  text-align: left;
+}
+
+.orch-chat__suggestion:hover {
+  background: var(--ws-surface-hover);
+  color: var(--ws-text);
+  border-color: var(--ws-border-strong);
+  transform: translateY(-1px);
+}
+
+/* ── Message bubbles ── */
+.orch-chat__message {
+  display: flex;
+  gap: var(--ws-spacing);
+  max-width: 100%;
+  animation: orch-msg-in 0.2s ease-out;
+}
+
+@keyframes orch-msg-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.orch-chat__message--user {
+  flex-direction: row-reverse;
+}
+
+.orch-chat__message-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ws-surface-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  border: 1px solid var(--ws-border);
+}
+
+.orch-chat__message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: calc(100% - 40px);
+}
+
+.orch-chat__message--user .orch-chat__message-body {
+  align-items: flex-end;
+}
+
+.orch-chat__message-text {
+  margin: 0;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.orch-chat__message--user .orch-chat__message-text {
+  background: var(--ws-accent);
+  color: #fff;
+  border-bottom-right-radius: var(--ws-radius-sm);
+}
+
+.orch-chat__message--orchestrator .orch-chat__message-text,
+.orch-chat__message--subagent .orch-chat__message-text {
+  background: var(--ws-surface-elevated);
+  color: var(--ws-text);
+  border-bottom-left-radius: var(--ws-radius-sm);
+  border: 1px solid var(--ws-border);
+}
+
+.orch-chat__message-time {
+  font-size: 10px;
+  color: var(--ws-text-tertiary);
+  padding: 0 4px;
+}
+
+/* ── Sub-agent badge ── */
+.orch-chat__subagent-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--ws-radius-pill);
+  font-size: 10px;
+  font-weight: var(--ws-weight-semibold);
+  color: #fff;
+  letter-spacing: 0.02em;
+  width: fit-content;
+}
+
+/* ── Minor flow log ── */
+.orch-chat__log-minor {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing);
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-secondary);
+  padding: 2px 0;
+}
+
+/* ── Artifact card ── */
+.orch-chat__artifact {
+  background: var(--ws-surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  overflow: hidden;
+  width: 100%;
+}
+
+.orch-chat__artifact-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  border-bottom: 1px solid var(--ws-border);
+  background: var(--ws-surface-elevated);
+}
+
+.orch-chat__artifact-title {
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.orch-chat__artifact-content {
+  padding: var(--ws-spacing-md);
+  font-size: var(--ws-font-xs);
+  font-family: var(--ws-font-mono);
+  color: var(--ws-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+/* ── Copy button ── */
+.orch-chat__copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-sm);
+  font-size: 10px;
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  transition: all var(--ws-transition);
+}
+
+.orch-chat__copy-btn:hover {
+  background: var(--ws-surface-hover);
+  color: var(--ws-text);
+}
+
+.orch-chat__copy-btn--large {
+  font-size: var(--ws-font-xs);
+  padding: var(--ws-spacing-xs) var(--ws-spacing-md);
+}
+
+/* ── Perfect Prompt ── */
+.orch-chat__perfect-prompt {
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.08), rgba(175, 82, 222, 0.08));
+  border: 1px solid rgba(0, 122, 255, 0.25);
+  border-radius: var(--ws-radius-xl);
+  overflow: hidden;
+  margin: var(--ws-spacing) 0;
+}
+
+.orch-chat__perfect-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--ws-spacing-md) var(--ws-spacing-lg);
+  border-bottom: 1px solid rgba(0, 122, 255, 0.15);
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-accent);
+}
+
+.orch-chat__perfect-prompt-content {
+  padding: var(--ws-spacing-md) var(--ws-spacing-lg);
+  font-size: var(--ws-font-xs);
+  font-family: var(--ws-font-mono);
+  color: var(--ws-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  max-height: 280px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+.orch-chat__dismiss-btn {
+  width: 100%;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--ws-border);
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  transition: color var(--ws-transition);
+}
+.orch-chat__dismiss-btn:hover { color: var(--ws-text); }
+
+/* ── Interview UI ── */
+.orch-chat__interview {
+  background: var(--ws-surface-glass);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-xl);
+  padding: var(--ws-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing-md);
+  animation: modalSlideIn 0.25s ease-out;
+}
+
+.orch-chat__interview-progress {
+  display: flex;
+  gap: var(--ws-spacing);
+}
+
+.orch-chat__interview-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ws-border-strong);
+  transition: background var(--ws-transition);
+}
+.orch-chat__interview-dot.active {
+  background: var(--ws-accent);
+}
+
+.orch-chat__interview-question {
+  font-size: var(--ws-font-base);
+  font-weight: var(--ws-weight-medium);
+  color: var(--ws-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.orch-chat__interview-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing);
+}
+
+.orch-chat__interview-option {
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface-elevated);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--ws-transition);
+}
+.orch-chat__interview-option:hover {
+  background: var(--ws-surface-active);
+  border-color: var(--ws-accent);
+  color: var(--ws-accent);
+}
+
+.orch-chat__interview-text-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing);
+}
+
+.orch-chat__interview-textarea {
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  color: var(--ws-text);
+  font-family: var(--ws-font-family);
+  resize: none;
+  transition: border-color var(--ws-transition);
+}
+.orch-chat__interview-textarea:focus {
+  outline: none;
+  border-color: var(--ws-border-focus);
+}
+
+.orch-chat__interview-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ws-spacing-xs);
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-accent);
+  border: none;
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-medium);
+  color: #fff;
+  cursor: pointer;
+  transition: background var(--ws-transition);
+}
+.orch-chat__interview-confirm:hover { background: var(--ws-accent-hover); }
+
+/* ── Onboarding wizard ── */
+.orch-chat__onboarding {
+  background: var(--ws-surface-glass);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+  border-radius: var(--ws-radius-xl);
+  padding: var(--ws-spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing-md);
+  animation: modalSlideIn 0.25s ease-out;
+}
+
+.orch-chat__onboarding-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.orch-chat__onboarding-title {
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-green);
+}
+
+.orch-chat__onboarding-steps {
+  display: flex;
+  gap: var(--ws-spacing-xs);
+}
+
+.orch-chat__onboarding-step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ws-border-strong);
+  transition: all var(--ws-transition);
+}
+.orch-chat__onboarding-step-dot.done { background: var(--ws-green); }
+.orch-chat__onboarding-step-dot.active {
+  background: var(--ws-green);
+  box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2);
+}
+
+.orch-chat__onboarding-question {
+  font-size: var(--ws-font-base);
+  font-weight: var(--ws-weight-medium);
+  color: var(--ws-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.orch-chat__onboarding-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing);
+}
+
+.orch-chat__onboarding-option {
+  display: flex;
+  align-items: center;
+  gap: var(--ws-spacing);
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface-elevated);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  color: var(--ws-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--ws-transition);
+}
+.orch-chat__onboarding-option:hover {
+  background: rgba(52, 199, 89, 0.08);
+  border-color: var(--ws-green);
+  color: var(--ws-green);
+}
+.orch-chat__onboarding-option.selected {
+  background: rgba(52, 199, 89, 0.1);
+  border-color: var(--ws-green);
+  color: var(--ws-green);
+}
+
+.orch-chat__onboarding-multiselect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-spacing-md);
+}
+
+.orch-chat__onboarding-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ws-spacing-xs);
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-green);
+  border: none;
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-medium);
+  color: #fff;
+  cursor: pointer;
+  transition: opacity var(--ws-transition);
+}
+.orch-chat__onboarding-confirm:hover { opacity: 0.85; }
+
+/* ── Typing indicator ── */
+.orch-chat__typing {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ws-spacing);
+}
+
+.orch-chat__typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface-elevated);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  border-bottom-left-radius: var(--ws-radius-sm);
+}
+
+.orch-chat__typing-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ws-text-tertiary);
+  animation: orch-typing 1.2s infinite;
+}
+.orch-chat__typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.orch-chat__typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes orch-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── Input area ── */
+.orch-chat__input-area {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--ws-spacing);
+  padding: var(--ws-spacing-md) var(--ws-spacing-lg);
+  background: var(--ws-surface-glass);
+  backdrop-filter: blur(20px) saturate(1.8);
+  -webkit-backdrop-filter: blur(20px) saturate(1.8);
+  border-top: 1px solid var(--ws-border);
+  flex-shrink: 0;
+}
+
+.orch-chat__input {
+  flex: 1;
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  background: var(--ws-surface-elevated);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-lg);
+  font-size: var(--ws-font-sm);
+  color: var(--ws-text);
+  font-family: var(--ws-font-family);
+  resize: none;
+  max-height: 120px;
+  min-height: 38px;
+  transition: border-color var(--ws-transition);
+  line-height: 1.5;
+}
+
+.orch-chat__input:focus {
+  outline: none;
+  border-color: var(--ws-border-focus);
+}
+
+.orch-chat__input::placeholder {
+  color: var(--ws-text-tertiary);
+}
+
+.orch-chat__send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--ws-accent);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  transition: all var(--ws-transition);
+  flex-shrink: 0;
+}
+
+.orch-chat__send-btn:hover:not(:disabled) {
+  background: var(--ws-accent-hover);
+  transform: scale(1.05);
+}
+
+.orch-chat__send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

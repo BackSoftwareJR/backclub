@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class CrmProjectTask extends Model
 {
@@ -16,6 +17,7 @@ class CrmProjectTask extends Model
         'crm_label_id',
         'title',
         'description',
+        'work_notes',
         'status',
         'execution_mode',
         'exact_prompt',
@@ -135,6 +137,22 @@ class CrmProjectTask extends Model
     }
 
     /**
+     * Relazione con allegati
+     */
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(CrmProjectTaskAttachment::class, 'crm_project_task_id');
+    }
+
+    /**
+     * Relazione con brief AI
+     */
+    public function aiBriefs(): HasMany
+    {
+        return $this->hasMany(TaskAiBrief::class, 'crm_project_task_id');
+    }
+
+    /**
      * Relazione con eventi
      */
     public function events(): HasMany
@@ -148,6 +166,14 @@ class CrmProjectTask extends Model
     public function n8nSteps(): HasMany
     {
         return $this->hasMany(CrmProjectTaskN8nStep::class, 'crm_project_task_id');
+    }
+
+    /**
+     * Lavorazione workspace generata automaticamente per questo task agente
+     */
+    public function workspaceAgent(): HasOne
+    {
+        return $this->hasOne(WorkspaceAgent::class, 'crm_task_id');
     }
 
     /**

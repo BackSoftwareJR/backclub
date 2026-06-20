@@ -2,36 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useWorkspace } from '../../../context/WorkspaceContext';
 import { useNavigate } from 'react-router-dom';
+import {
+  WORKSPACE_TYPES,
+  getWorkspaceHomePath,
+  getWorkspaceTypeConfig,
+} from '../config/workspaceTypes';
+import type { WorkspaceTypeCode } from '../../../types/workspace';
 import './WorkspaceSwitcher.css';
-
-type WorkspaceTypeOption = {
-  code: string;
-  label: string;
-  color: string;
-  available: boolean;
-};
-
-const WORKSPACE_TYPES: WorkspaceTypeOption[] = [
-  {
-    code: 'developer',
-    label: 'Developer',
-    color: '#0066ff',
-    available: true,
-  },
-  // Future workspace types
-  {
-    code: 'designer',
-    label: 'Designer',
-    color: '#ff6600',
-    available: false,
-  },
-  {
-    code: 'manager',
-    label: 'Manager', 
-    color: '#00cc66',
-    available: false,
-  },
-];
 
 const WorkspaceSwitcher: React.FC = () => {
   const { workspaceType, setWorkspaceType } = useWorkspace();
@@ -40,9 +17,8 @@ const WorkspaceSwitcher: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentType = WORKSPACE_TYPES.find(t => t.code === workspaceType) || WORKSPACE_TYPES[0];
+  const currentType = getWorkspaceTypeConfig(workspaceType) ?? WORKSPACE_TYPES[0];
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -59,8 +35,8 @@ const WorkspaceSwitcher: React.FC = () => {
     };
   }, [isOpen]);
 
-  const handleTypeSelect = async (newType: WorkspaceTypeOption) => {
-    if (!newType.available || newType.code === workspaceType || isLoading) {
+  const handleTypeSelect = async (code: WorkspaceTypeCode) => {
+    if (code === workspaceType || isLoading) {
       setIsOpen(false);
       return;
     }
@@ -69,16 +45,18 @@ const WorkspaceSwitcher: React.FC = () => {
       setIsLoading(true);
       setIsOpen(false);
 
-      await setWorkspaceType(newType.code as any);
-      
-      // Navigate to the new workspace home
-      navigate(`/workspace/${newType.code}`);
+      await setWorkspaceType(code);
+      navigate(getWorkspaceHomePath(code));
     } catch (error) {
       console.error('Failed to switch workspace type:', error);
-      // TODO: show toast error message
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleChangeDepartment = () => {
+    setIsOpen(false);
+    navigate('/workspace/type-selector');
   };
 
   return (
@@ -87,18 +65,18 @@ const WorkspaceSwitcher: React.FC = () => {
         className="workspace-switcher-trigger"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isLoading}
-        title="Cambia tipo di workspace"
+        title="Cambia reparto WorkSpace"
       >
         <div className="workspace-switcher-current">
-          <div 
+          <div
             className="workspace-switcher-badge"
             style={{ backgroundColor: currentType.color }}
           >
-            {currentType.label}
+            {currentType.name}
           </div>
-          <ChevronDown 
-            size={16} 
-            className={`workspace-switcher-chevron ${isOpen ? 'open' : ''}`} 
+          <ChevronDown
+            size={16}
+            className={`workspace-switcher-chevron ${isOpen ? 'open' : ''}`}
           />
         </div>
       </button>
@@ -106,7 +84,7 @@ const WorkspaceSwitcher: React.FC = () => {
       {isOpen && (
         <div className="workspace-switcher-dropdown">
           <div className="workspace-switcher-header">
-            <span>Scegli workspace</span>
+            <span>Reparto WorkSpace</span>
           </div>
           <div className="workspace-switcher-options">
             {WORKSPACE_TYPES.map((type) => (
@@ -114,18 +92,17 @@ const WorkspaceSwitcher: React.FC = () => {
                 key={type.code}
                 className={`workspace-switcher-option ${
                   type.code === workspaceType ? 'active' : ''
-                } ${!type.available ? 'disabled' : ''}`}
-                onClick={() => handleTypeSelect(type)}
-                disabled={!type.available}
+                }`}
+                onClick={() => handleTypeSelect(type.code)}
               >
                 <div className="workspace-switcher-option-content">
-                  <div 
+                  <div
                     className="workspace-switcher-option-badge"
                     style={{ backgroundColor: type.color }}
                   >
-                    {type.label}
+                    {type.name}
                   </div>
-                  {!type.available && (
+                  {!type.isAvailable && (
                     <span className="workspace-switcher-coming-soon">
                       Prossimamente
                     </span>
@@ -137,6 +114,13 @@ const WorkspaceSwitcher: React.FC = () => {
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            className="workspace-switcher-change-dept"
+            onClick={handleChangeDepartment}
+          >
+            Cambia reparto
+          </button>
         </div>
       )}
     </div>

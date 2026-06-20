@@ -35,32 +35,33 @@ const TaskAgentControlPanel: React.FC<TaskAgentControlPanelProps> = ({
     setError(null);
     
     try {
-      const response = await crmProjectTasksApi.n8nAction(projectId, taskId, {
+      await crmProjectTasksApi.n8nAction(projectId, taskId, {
         action,
         review_message: message,
       });
       
-      // Mostra messaggio di successo
-      alert(response.message || `Azione "${action}" eseguita con successo`);
-      
-      // Reset review form se necessario
       if (action === 'request_review') {
         setShowReviewMessage(false);
         setReviewMessage('');
       }
       
-      // Notifica aggiornamento task
       onTaskUpdate?.();
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || `Errore durante l'azione "${action}"`;
-      setError(errorMessage);
+      const msg = err.response?.data?.message || err.message || `Errore durante l'azione "${action}"`;
+      setError(msg);
       console.error(`Error performing action ${action}:`, err);
     } finally {
       setActionLoading(null);
     }
   };
 
-  const canRestart = task.n8n_status === 'failed' || task.n8n_status === 'completed' || task.status === 'cancelled';
+  // Riavvio disponibile quando: fallito, completato, cancellato, in coda (pending/null) o saltato
+  const canRestart = !task.n8n_status
+    || task.n8n_status === 'failed'
+    || task.n8n_status === 'completed'
+    || task.n8n_status === 'pending'
+    || task.n8n_status === 'skipped'
+    || task.status === 'cancelled';
   const canStop = task.n8n_status === 'pending' || task.n8n_status === 'processing';
   const canRequestReview = task.n8n_status === 'completed' || task.n8n_status === 'failed';
 

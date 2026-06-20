@@ -74,11 +74,68 @@ class ProjectOrchestratorQueueService
         $this->tryDispatchNext($projectId);
     }
 
-    public function tryDispatchNext(int $projectId): void
+    /**
+     * Reset tasks/agents stuck in active state longer than $staleMinutes.
+     * Returns true if any items were reset (queue slot was freed).
+     */
+    public function resetStuckActiveWork(int $projectId, int $staleMinutes = 120): bool
+    {
+        $threshold = now()->subMinutes($staleMinutes);
+        $freed = false;
+
+        $stuckAgents = WorkspaceAgent::where('project_id', $projectId)
+            ->whereNull('deleted_at')
+            ->whereIn('status', self::WORKSPACE_ACTIVE_STATUSES)
+            ->where('updated_at', '<', $threshold)
+            ->get();
+
+        foreach ($stuckAgents as $agent) {
+            Log::warning('Resetting stuck workspace agent', [
+                'agent_id' => $agent->id,
+                'status' => $agent->status,
+                'updated_at' => $agent->updated_at,
+            ]);
+            $agent->update([
+                'status' => 'failed',
+                'completed_at' => now(),
+                'queue_position' => null,
+                'result' => 'Agente bloccato: reset automatico dopo ' . $staleMinutes . ' minuti senza aggiornamenti.',
+            ]);
+            $freed = true;
+        }
+
+        $stuckTasks = CrmProjectTask::where('crm_project_id', $projectId)
+            ->whereIn('execution_mode', self::CRM_AGENT_MODES)
+            ->where('n8n_status', 'processing')
+            ->where('updated_at', '<', $threshold)
+            ->get();
+
+        foreach ($stuckTasks as $task) {
+            Log::warning('Resetting stuck CRM task', [
+                'task_id' => $task->id,
+                'n8n_status' => $task->n8n_status,
+                'updated_at' => $task->updated_at,
+            ]);
+            $task->update([
+                'n8n_status' => 'failed',
+                'n8n_queue_position' => null,
+                'n8n_error' => 'Task bloccato: reset automatico dopo ' . $staleMinutes . ' minuti senza aggiornamenti dall\'orchestratore.',
+            ]);
+            $freed = true;
+        }
+
+        return $freed;
+    }
+
+    public function tryDispatchNext(int $projectId, bool $forceResetStuck = false): void
     {
         $taskN8nService = app(TaskN8nService::class);
         if (!$taskN8nService->isEnabled()) {
             return;
+        }
+
+        if ($forceResetStuck) {
+            $this->resetStuckActiveWork($projectId);
         }
 
         if ($this->hasActiveWork($projectId)) {

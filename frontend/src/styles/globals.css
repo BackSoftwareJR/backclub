@@ -1,61 +1,65 @@
-/* CSS Reset and Base Styles */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+/* CSS Reset and Base Styles — must live in @layer base so Tailwind utilities win */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-html {
-  font-size: 16px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", 
-               "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
-  background: var(--color-bg-primary);
-  color: var(--color-text-primary);
-  line-height: 1.5;
-  overflow-x: hidden;
-}
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI",
+      "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
 
-/* Smooth scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+  /* Smooth scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
 
-::-webkit-scrollbar-track {
-  background: var(--color-bg-secondary);
-}
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+  }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-bg-tertiary);
-  border-radius: 4px;
-}
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bg-tertiary);
+    border-radius: 4px;
+  }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-border-hover);
-}
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-border-hover);
+  }
 
-/* Focus styles */
-:focus-visible {
-  outline: 2px solid var(--color-accent-blue);
-  outline-offset: 2px;
-}
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid var(--color-accent-blue);
+    outline-offset: 2px;
+  }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid var(--color-accent-blue);
-  outline-offset: 2px;
-}
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid var(--color-accent-blue);
+    outline-offset: 2px;
+  }
 
-/* Selection */
-::selection {
-  background: var(--color-accent-blue);
-  color: var(--color-bg-primary);
+  /* Selection */
+  ::selection {
+    background: var(--color-accent-blue);
+    color: var(--color-bg-primary);
+  }
 }

@@ -55,6 +55,9 @@ Route::prefix('public/projects')
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // AI Task Improvement
+    Route::post('/ai/improve-task', [App\Http\Controllers\AiTaskImproveController::class, 'improve']);
     Route::post('/change-role', [AuthController::class, 'changeRole']);
     Route::post('/change-crm-department', [AuthController::class, 'changeCrmDepartment']);
     Route::post('/onboarding-preferences', [AuthController::class, 'updateOnboardingPreferences']);
@@ -208,11 +211,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('crm-projects/{id}/tasks')->group(function () {
         Route::get('/', [App\Http\Controllers\CrmProjectTaskController::class, 'index']);
         Route::post('/', [App\Http\Controllers\CrmProjectTaskController::class, 'store']);
+        Route::post('/series/analyze', [App\Http\Controllers\TaskSeriesController::class, 'analyze']);
+        Route::post('/series', [App\Http\Controllers\TaskSeriesController::class, 'create']);
         Route::get('/reschedule-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getRescheduleRequests']);
         Route::get('/deletion-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getDeletionRequests']);
         Route::get('/{taskId}/events', [App\Http\Controllers\CrmProjectTaskController::class, 'getEvents']);
         Route::get('/{taskId}/notes', [App\Http\Controllers\CrmProjectTaskController::class, 'getNotes']);
         Route::post('/{taskId}/notes', [App\Http\Controllers\CrmProjectTaskController::class, 'createNote']);
+        Route::patch('/{taskId}/work-notes', [App\Http\Controllers\CrmProjectTaskController::class, 'updateWorkNotes']);
+        Route::get('/{taskId}/attachments', [App\Http\Controllers\CrmProjectTaskController::class, 'getAttachments']);
+        Route::post('/{taskId}/attachments', [App\Http\Controllers\CrmProjectTaskController::class, 'storeAttachment']);
+        Route::delete('/{taskId}/attachments/{attachmentId}', [App\Http\Controllers\CrmProjectTaskController::class, 'destroyAttachment']);
+        Route::post('/{taskId}/take-charge', [App\Http\Controllers\CrmProjectTaskController::class, 'takeCharge']);
+        Route::post('/{taskId}/deliver', [App\Http\Controllers\CrmProjectTaskController::class, 'deliver']);
+        Route::get('/{taskId}/ai/brief', [App\Http\Controllers\TaskDetailAiController::class, 'brief']);
+        Route::post('/{taskId}/ai/ask', [App\Http\Controllers\TaskDetailAiController::class, 'ask']);
         Route::get('/{taskId}/deletion-requests', [App\Http\Controllers\CrmProjectTaskController::class, 'getTaskDeletionRequests']);
         Route::get('/{taskId}', [App\Http\Controllers\CrmProjectTaskController::class, 'show']);
         Route::put('/{taskId}', [App\Http\Controllers\CrmProjectTaskController::class, 'update']);
@@ -223,6 +236,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/{taskId}/reassign', [App\Http\Controllers\CrmProjectTaskController::class, 'reassign']);
         Route::get('/{taskId}/n8n-steps', [App\Http\Controllers\CrmProjectTaskController::class, 'getN8nSteps']);
         Route::post('/{taskId}/n8n-actions', [App\Http\Controllers\CrmProjectTaskController::class, 'n8nAction']);
+    });
+    Route::get('crm-projects/{id}/n8n-queue-status', [App\Http\Controllers\CrmProjectTaskController::class, 'n8nQueueStatus']);
+
+    // Coda agenti centralizzata (cross-project)
+    Route::prefix('agent-queue')->group(function () {
+        Route::get('/', [App\Http\Controllers\AgentQueueController::class, 'index']);
+        Route::post('/reset-stuck', [App\Http\Controllers\AgentQueueController::class, 'resetStuck']);
+        Route::post('/force-dispatch/{projectId}', [App\Http\Controllers\AgentQueueController::class, 'forceDispatch']);
+        Route::post('/cancel-item', [App\Http\Controllers\AgentQueueController::class, 'cancelItem']);
     });
     Route::put('crm-projects/{id}/tasks/reschedule-requests/{requestId}/review', [App\Http\Controllers\CrmProjectTaskController::class, 'reviewRescheduleRequest']);
     Route::put('crm-projects/{id}/tasks/deletion-requests/{requestId}/review', [App\Http\Controllers\CrmProjectTaskController::class, 'reviewDeletionRequest']);
@@ -611,6 +633,38 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/items/{itemId}/complete', [App\Http\Controllers\FreelanceCalendarController::class, 'completeItem']);
     });
 
+    // Focus Orchestrator
+    Route::prefix('freelance/focus')->group(function () {
+        Route::get('/session/today',           [App\Http\Controllers\FocusController::class, 'getTodaySession']);
+        Route::post('/session/regenerate',     [App\Http\Controllers\FocusController::class, 'regenerateSession']);
+        Route::get('/agenda',                  [App\Http\Controllers\FocusController::class, 'getAgenda']);
+        Route::get('/tasks',                   [App\Http\Controllers\FocusController::class, 'getTasks']);
+        Route::post('/tasks',                  [App\Http\Controllers\FocusController::class, 'createTask']);
+        // wrapper must be declared BEFORE /{id} routes to avoid routing conflict
+        Route::post('/tasks/wrapper',          [App\Http\Controllers\FocusController::class, 'ensureWrapper']);
+        Route::put('/tasks/{id}',              [App\Http\Controllers\FocusController::class, 'updateTask']);
+        Route::put('/tasks/{id}/priority',     [App\Http\Controllers\FocusController::class, 'updatePriority']);
+        Route::delete('/tasks/{id}',           [App\Http\Controllers\FocusController::class, 'deleteTask']);
+        Route::post('/tasks/{id}/complete',    [App\Http\Controllers\FocusController::class, 'completeTask']);
+        Route::get('/patterns',                [App\Http\Controllers\FocusController::class, 'getWorkPatterns']);
+        Route::post('/chat',                   [App\Http\Controllers\FocusController::class, 'chat']);
+        Route::get('/preferences',             [App\Http\Controllers\FocusController::class, 'getPreferences']);
+        Route::post('/preferences',            [App\Http\Controllers\FocusController::class, 'savePreferences']);
+        Route::post('/analyze-text',           [App\Http\Controllers\FocusController::class, 'analyzeText']);
+        Route::get('/analysis/reports',        [App\Http\Controllers\FocusController::class, 'getAnalysisReports']);
+        Route::post('/analysis/run-next',      [App\Http\Controllers\FocusController::class, 'runNextAnalysisStep']);
+        Route::post('/analysis/invalidate',    [App\Http\Controllers\FocusController::class, 'invalidateAnalysis']);
+        // Daily check-in
+        Route::post('/checkin',                [App\Http\Controllers\FocusController::class, 'storeCheckin']);
+        Route::get('/checkin/today',           [App\Http\Controllers\FocusController::class, 'getCheckin']);
+        Route::get('/checkin/briefing',        [App\Http\Controllers\FocusController::class, 'getCheckinBriefing']);
+        // Week plan
+        Route::get('/week-plan',               [App\Http\Controllers\FocusController::class, 'getWeekPlan']);
+        Route::patch('/tasks/{taskId}/week-plan', [App\Http\Controllers\FocusController::class, 'updateTaskWeekPlan']);
+        // Projects with tasks
+        Route::get('/projects-with-tasks',     [App\Http\Controllers\FocusController::class, 'getProjectsWithTasks']);
+    });
+
     Route::prefix('seller/calendar')->group(function () {
         Route::get('/items', [App\Http\Controllers\SellerCalendarController::class, 'getItems']);
         Route::post('/items', [App\Http\Controllers\SellerCalendarController::class, 'createItem']);
@@ -797,6 +851,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/projects/{id}', [App\Http\Controllers\WorkspaceController::class, 'getDeveloperProject']);
         Route::get('/projects/{id}/branches', [App\Http\Controllers\WorkspaceController::class, 'getProjectBranches']);
         Route::post('/projects/{id}/publish', [App\Http\Controllers\WorkspaceController::class, 'publishProject']);
+        Route::post('/projects/{id}/complete', [App\Http\Controllers\WorkspaceController::class, 'completeProject']);
 
         // Agents
         Route::get('/projects/{projectId}/agents', [App\Http\Controllers\WorkspaceAgentController::class, 'index']);
@@ -813,6 +868,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/projects/{projectId}/tasks', [App\Http\Controllers\WorkspaceUserTaskController::class, 'index']);
         Route::post('/projects/{projectId}/tasks', [App\Http\Controllers\WorkspaceUserTaskController::class, 'store']);
         Route::put('/projects/{projectId}/tasks/{taskId}', [App\Http\Controllers\WorkspaceUserTaskController::class, 'update']);
+
+        // Orchestrator AI (Senior Care)
+        Route::get('/projects/{projectId}/orchestrator', [App\Http\Controllers\WorkspaceAgentController::class, 'getOrchestratorMessages']);
+        Route::post('/projects/{projectId}/orchestrator', [App\Http\Controllers\WorkspaceAgentController::class, 'createOrchestratorMessage']);
+        Route::get('/projects/{projectId}/artifacts', [App\Http\Controllers\WorkspaceAgentController::class, 'getArtifacts']);
     });
 
     // PM workspace configuration

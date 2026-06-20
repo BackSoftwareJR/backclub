@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CrmProject;
 use App\Models\CrmProjectTask;
 use App\Models\WorkspaceAgent;
+use App\Notifications\AgentTaskCompleted;
 use App\Services\TaskN8nService;
 use App\Services\ProjectOrchestratorQueueService;
 use Illuminate\Http\Request;
@@ -164,6 +166,18 @@ class N8nTaskWebhookController extends Controller
                 $this->releaseProjectOrchestratorSlot($task->crm_project_id);
             }
 
+            // Notifica su failed o review via /status
+            $mappedStatus = $updateData['n8n_status'] ?? null;
+            if ($mappedStatus === 'failed') {
+                $this->notifyCrmTaskAgentStatus(
+                    $task,
+                    AgentTaskCompleted::STATUS_FAILED,
+                    $payload['error'] ?? $payload['message'] ?? null
+                );
+            } elseif ($mappedStatus === 'review') {
+                $this->notifyCrmTaskAgentStatus($task, AgentTaskCompleted::STATUS_REVIEW);
+            }
+
             $statusLabel = $updateData['n8n_status'] ?? ($payload['status'] ?? $payload['n8n_status'] ?? 'updated');
 
             try {
@@ -254,6 +268,11 @@ class N8nTaskWebhookController extends Controller
                 ]);
 
                 $this->releaseProjectOrchestratorSlot($agent->project_id);
+                $this->notifyWorkspaceAgentStatus(
+                    $agent->fresh(),
+                    in_array($finalStatus, ['completed', 'failed']) ? $finalStatus : 'completed',
+                    $payload['error'] ?? $payload['message'] ?? null
+                );
 
                 return response()->json([
                     'success' => true,
@@ -290,6 +309,7 @@ class N8nTaskWebhookController extends Controller
             ]);
 
             $this->releaseProjectOrchestratorSlot($task->crm_project_id);
+            $this->notifyCrmTaskAgentStatus($task->fresh(), AgentTaskCompleted::STATUS_COMPLETED);
 
             return response()->json([
                 'success' => true,
@@ -408,6 +428,7 @@ class N8nTaskWebhookController extends Controller
                 ]);
 
                 $this->releaseProjectOrchestratorSlot($agent->project_id);
+                $this->notifyWorkspaceAgentStatus($agent->fresh(), AgentTaskCompleted::STATUS_COMPLETED);
 
                 return response()->json([
                     'success' => true,
@@ -440,6 +461,7 @@ class N8nTaskWebhookController extends Controller
             ]);
 
             $this->releaseProjectOrchestratorSlot($task->crm_project_id);
+            $this->notifyCrmTaskAgentStatus($task->fresh(), AgentTaskCompleted::STATUS_COMPLETED);
 
             return response()->json([
                 'success' => true,
@@ -456,6 +478,96 @@ class N8nTaskWebhookController extends Controller
                 'success' => false,
                 'message' => 'Failed to close task'
             ], 500);
+        }
+    }
+
+    /**
+     * Invia notifica in-app al creatore del task e agli assegnati.
+     * Chiamato su completed, failed e close-task.
+     */
+    private function notifyCrmTaskAgentStatus(
+        CrmProjectTask $task,
+        string $agentStatus,
+        ?string $errorMessage = null,
+        ?int $workspaceAgentId = null
+    ): void {
+        try {
+            $task->loadMissing(['creator', 'assignments.user', 'project']);
+            $project = $task->project;
+            $projectName = $project->name ?? 'Progetto';
+            $projectId = $task->crm_project_id;
+
+            $notification = new AgentTaskCompleted(
+                taskId: $task->id,
+                taskTitle: $task->title,
+                projectId: $projectId,
+                projectName: $projectName,
+                agentStatus: $agentStatus,
+                errorMessage: $errorMessage,
+                workspaceAgentId: $workspaceAgentId,
+            );
+
+            $notified = collect();
+
+            // Notifica il creatore del task
+            if ($task->creator) {
+                $task->creator->notify($notification);
+                $notified->push($task->creator->id);
+            }
+
+            // Notifica gli assegnati attivi (se diversi dal creatore)
+            foreach ($task->assignments as $assignment) {
+                if ($assignment->is_active && $assignment->user && !$notified->contains($assignment->user->id)) {
+                    $assignment->user->notify($notification);
+                    $notified->push($assignment->user->id);
+                }
+            }
+
+            Log::info('AgentTask notification sent', [
+                'task_id'    => $task->id,
+                'status'     => $agentStatus,
+                'notified'   => $notified->toArray(),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('AgentTask notification failed', [
+                'task_id' => $task->id,
+                'error'   => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Invia notifica in-app per un workspace agent.
+     */
+    private function notifyWorkspaceAgentStatus(
+        WorkspaceAgent $agent,
+        string $agentStatus,
+        ?string $errorMessage = null
+    ): void {
+        try {
+            $agent->loadMissing(['user', 'project', 'crmTask']);
+            $project = $agent->project;
+            $projectName = $project->name ?? 'Progetto';
+            $projectId = $agent->project_id;
+
+            $notification = new AgentTaskCompleted(
+                taskId: $agent->crm_task_id ?? 0,
+                taskTitle: $agent->title,
+                projectId: $projectId,
+                projectName: $projectName,
+                agentStatus: $agentStatus,
+                errorMessage: $errorMessage,
+                workspaceAgentId: $agent->id,
+            );
+
+            if ($agent->user) {
+                $agent->user->notify($notification);
+            }
+        } catch (\Throwable $e) {
+            Log::error('WorkspaceAgent notification failed', [
+                'agent_id' => $agent->id,
+                'error'    => $e->getMessage(),
+            ]);
         }
     }
 

@@ -31,28 +31,7 @@ class WorkspaceUserTaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $tasks->map(function ($task) {
-                return [
-                    'id' => $task->id,
-                    'project_id' => $task->project_id,
-                    'branch_id' => $task->branch_id,
-                    'user_id' => $task->user_id,
-                    'title' => $task->title,
-                    'description' => $task->description,
-                    'status' => $task->status,
-                    'priority' => $task->priority,
-                    'sort_order' => $task->sort_order,
-                    'due_date' => $task->due_date?->format('c'),
-                    'completed_at' => $task->completed_at?->format('c'),
-                    'created_at' => $task->created_at?->format('c'),
-                    'updated_at' => $task->updated_at?->format('c'),
-                    'branch' => $task->branch ? [
-                        'id' => $task->branch->id,
-                        'name' => $task->branch->name,
-                        'color' => $task->branch->color
-                    ] : null
-                ];
-            })
+            'data' => $tasks->map(fn ($task) => $this->formatTask($task))->values(),
         ]);
     }
 
@@ -108,26 +87,7 @@ class WorkspaceUserTaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $task->id,
-                'project_id' => $task->project_id,
-                'branch_id' => $task->branch_id,
-                'user_id' => $task->user_id,
-                'title' => $task->title,
-                'description' => $task->description,
-                'status' => $task->status,
-                'priority' => $task->priority,
-                'sort_order' => $task->sort_order,
-                'due_date' => $task->due_date?->format('c'),
-                'completed_at' => $task->completed_at?->format('c'),
-                'created_at' => $task->created_at?->format('c'),
-                'updated_at' => $task->updated_at?->format('c'),
-                'branch' => $task->branch ? [
-                    'id' => $task->branch->id,
-                    'name' => $task->branch->name,
-                    'color' => $task->branch->color
-                ] : null
-            ]
+            'data' => $this->formatTask($task),
         ], 201);
     }
 
@@ -189,26 +149,32 @@ class WorkspaceUserTaskController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'id' => $task->id,
-                'project_id' => $task->project_id,
-                'branch_id' => $task->branch_id,
-                'user_id' => $task->user_id,
-                'title' => $task->title,
-                'description' => $task->description,
-                'status' => $task->status,
-                'priority' => $task->priority,
-                'sort_order' => $task->sort_order,
-                'due_date' => $task->due_date?->format('c'),
-                'completed_at' => $task->completed_at?->format('c'),
-                'created_at' => $task->created_at?->format('c'),
-                'updated_at' => $task->updated_at?->format('c'),
-                'branch' => $task->branch ? [
-                    'id' => $task->branch->id,
-                    'name' => $task->branch->name,
-                    'color' => $task->branch->color
-                ] : null
-            ]
+            'data' => $this->formatTask($task),
         ]);
+    }
+
+    private function formatTask(WorkspaceUserTask $task): array
+    {
+        return [
+            'id' => $task->id,
+            'project_id' => $task->project_id,
+            'branch_id' => $task->branch_id,
+            'user_id' => $task->user_id,
+            'title' => $task->title,
+            'description' => $task->description,
+            'status' => $task->status,
+            'priority' => $task->priority,
+            'sort_order' => $task->sort_order,
+            'completion_group_id' => $task->completion_group_id,
+            'due_date' => $task->due_date?->format('c'),
+            'completed_at' => $task->completed_at?->format('c'),
+            'created_at' => $task->created_at?->format('c'),
+            'updated_at' => $task->updated_at?->format('c'),
+            'branch' => $task->branch ? [
+                'id' => $task->branch->id,
+                'name' => $task->branch->name,
+                'color' => $task->branch->color,
+            ] : null,
+        ];
     }
 }

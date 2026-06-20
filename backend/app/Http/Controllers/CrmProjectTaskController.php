@@ -8,6 +8,8 @@ use App\Models\CrmProjectTaskAssignment;
 use App\Models\CrmProjectTaskRescheduleRequest;
 use App\Models\CrmProjectTaskDeletionRequest;
 use App\Models\CrmProjectTaskComment;
+use App\Models\CrmProjectTaskCommentAttachment;
+use App\Models\CrmProjectTaskAttachment;
 use App\Models\CrmProjectTaskEvent;
 use App\Models\CrmDepartment;
 use App\Models\User;
@@ -16,6 +18,7 @@ use App\Notifications\TaskAssigned;
 use App\Notifications\TaskReassigned;
 use App\Mail\TaskRescheduleRequestReviewed;
 use App\Mail\TaskDeletionRequestReviewed;
+use App\Services\CrmProjectTaskCreationService;
 use App\Services\MailService;
 use App\Services\TaskN8nService;
 use Illuminate\Http\Request;
@@ -25,6 +28,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CrmProjectTaskController extends Controller
 {
@@ -119,6 +123,13 @@ class CrmProjectTaskController extends Controller
         $project = CrmProject::findOrFail($id);
         $user = Auth::user();
 
+        if (!$this->canCreateTask($user, $project)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai il permesso di creare task in questo progetto.',
+            ], 403);
+        }
+
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -131,6 +142,7 @@ class CrmProjectTaskController extends Controller
             'estimated_hours' => 'nullable|numeric|min:0',
             'budget_cocchi' => 'nullable|numeric|min:0',
             'crm_label_id' => 'nullable|exists:crm_departments,id',
+            'parent_task_id' => 'nullable|exists:crm_project_tasks,id',
             'assignments' => 'nullable|array',
             'assignments.*.user_id' => 'required|exists:users,id',
             'assignments.*.payment_method' => 'required|in:hourly,per_task,per_project,fixed,no_payment',
@@ -147,89 +159,12 @@ class CrmProjectTaskController extends Controller
             ], 422);
         }
 
-        DB::beginTransaction();
         try {
-            $taskData = $validator->validated();
-            $taskData['crm_project_id'] = $project->id;
-            $taskData['created_by'] = $user->id;
-            $taskData['status'] = $taskData['status'] ?? 'pending';
-            $taskData['execution_mode'] = $taskData['execution_mode'] ?? 'human';
-            $taskData['exact_prompt'] = filter_var($taskData['exact_prompt'] ?? false, FILTER_VALIDATE_BOOLEAN);
-            $taskData['priority'] = $taskData['priority'] ?? 'medium';
-
-            // Rimuovi assignments dai dati del task
-            $assignments = $taskData['assignments'] ?? [];
-            unset($taskData['assignments']);
-
-            $task = CrmProjectTask::create($taskData);
-
-            // Crea le assegnazioni
-            $totalBudget = 0;
-            foreach ($assignments as $assignmentData) {
-                $assignment = new CrmProjectTaskAssignment($assignmentData);
-                $assignment->crm_project_task_id = $task->id;
-                $assignment->assigned_by = $user->id;
-                
-                // Calcola il costo totale
-                $assignment->total_cost_cocchi = $this->calculateAssignmentCost($assignment);
-                $totalBudget += $assignment->total_cost_cocchi;
-                
-                $assignment->save();
-                
-                // Notifica in-app (solo database) + email via PHPMailer (stessa config venditori)
-                $assignedUser = User::find($assignment->user_id);
-                if ($assignedUser) {
-                    $assignedUser->notify(new TaskAssigned($task, $project));
-                    try {
-                        $mailService = new MailService();
-                        $mailService->sendCrmTaskAssignedEmail(
-                            $assignedUser->email,
-                            $assignedUser->name ?? $assignedUser->email,
-                            $task,
-                            $project
-                        );
-                    } catch (\Exception $e) {
-                        Log::error('Email task CRM non inviata', [
-                            'assignee_id' => $assignedUser->id,
-                            'error' => $e->getMessage(),
-                        ]);
-                        // Non bloccare la creazione del task
-                    }
-                }
-            }
-
-            // Aggiorna il budget totale del task se non specificato
-            if (!$task->budget_cocchi && $totalBudget > 0) {
-                $task->budget_cocchi = $totalBudget;
-                $task->save();
-            }
-
-            // Dispatch to N8N if execution_mode is agent or agent_human
-            if (in_array($task->execution_mode, ['agent', 'agent_human'])) {
-                try {
-                    $taskN8nService = app(TaskN8nService::class);
-                    if ($taskN8nService->isEnabled()) {
-                        $taskN8nService->dispatchTaskAgent($task, $project);
-                        Log::info('Task dispatched to N8N orchestrator', [
-                            'task_id' => $task->id,
-                            'execution_mode' => $task->execution_mode
-                        ]);
-                    } else {
-                        Log::warning('N8N not enabled, task created in agent mode but not dispatched', [
-                            'task_id' => $task->id,
-                            'execution_mode' => $task->execution_mode
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::error('Failed to dispatch task to N8N', [
-                        'task_id' => $task->id,
-                        'error' => $e->getMessage()
-                    ]);
-                    // Don't fail task creation if N8N dispatch fails
-                }
-            }
-
-            DB::commit();
+            $task = app(CrmProjectTaskCreationService::class)->createTask(
+                $project,
+                $user,
+                $validator->validated()
+            );
 
             $task->load([
                 'creator',
@@ -246,7 +181,6 @@ class CrmProjectTaskController extends Controller
                 'data' => $task,
             ], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Errore nella creazione del task: ' . $e->getMessage(),
@@ -271,6 +205,7 @@ class CrmProjectTaskController extends Controller
                 'rescheduleRequests.reviewer',
                 'comments.user',
                 'events.user',
+                'attachments.user:id,name,email,avatar',
                 'subtasks',
                 'parentTask',
                 'crmLabel:id,code,name,color,icon',
@@ -362,6 +297,7 @@ class CrmProjectTaskController extends Controller
             'actual_hours' => 'nullable|numeric|min:0',
             'budget_cocchi' => 'nullable|numeric|min:0',
             'crm_label_id' => 'nullable|exists:crm_departments,id',
+            'work_notes' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -376,7 +312,14 @@ class CrmProjectTaskController extends Controller
             $validator->validated()['completed_date'] = now();
         }
 
-        $task->update($validator->validated());
+        $oldStatus = $task->status;
+        $validated = $validator->validated();
+        $task->update($validated);
+
+        if ($request->has('status') && $request->status !== $oldStatus) {
+            $this->recordStatusChangeEvent($task, $user, $oldStatus, $request->status);
+        }
+
         $task->load([
             'creator',
             'assignments.user',
@@ -905,24 +848,18 @@ class CrmProjectTaskController extends Controller
     /**
      * Calcola il costo di un'assegnazione in base al metodo di pagamento
      */
+    private function canCreateTask($user, CrmProject $project): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        return $user->role === 'admin' || (int) $project->manager_id === (int) $user->id;
+    }
+
     private function calculateAssignmentCost(CrmProjectTaskAssignment $assignment): float
     {
-        switch ($assignment->payment_method) {
-            case 'hourly':
-                if ($assignment->hourly_rate_cocchi && $assignment->hours_requested) {
-                    return $assignment->hourly_rate_cocchi * $assignment->hours_requested;
-                }
-                break;
-            case 'per_task':
-                return $assignment->task_rate_cocchi ?? 0;
-            case 'per_project':
-                return $assignment->project_rate_cocchi ?? 0;
-            case 'fixed':
-                return 0; // Nessun cocco per pagamento fisso
-            case 'no_payment':
-                return 0; // Nessun pagamento
-        }
-        return 0;
+        return app(CrmProjectTaskCreationService::class)->calculateAssignmentCost($assignment);
     }
 
     /**
@@ -965,7 +902,9 @@ class CrmProjectTaskController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'comment' => 'required|string|max:5000',
+            'comment' => 'required_without:files|nullable|string',
+            'files' => 'nullable|array|max:10',
+            'files.*' => 'file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,txt',
         ]);
 
         if ($validator->fails()) {
@@ -975,12 +914,42 @@ class CrmProjectTaskController extends Controller
             ], 422);
         }
 
+        $commentText = trim((string) $request->input('comment', ''));
+        $hasFiles = $request->hasFile('files') || $request->hasFile('file');
+
+        if ($commentText === '' && !$hasFiles) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Inserisci un commento o allega almeno un file',
+            ], 422);
+        }
+
         $comment = CrmProjectTaskComment::create([
             'crm_project_task_id' => $task->id,
             'user_id' => $user->id,
-            'comment' => $request->comment,
+            'comment' => $commentText !== '' ? $commentText : '[Allegato]',
             'is_note' => true,
         ]);
+
+        $uploadedFiles = [];
+        if ($request->hasFile('files')) {
+            $uploadedFiles = $request->file('files');
+        } elseif ($request->hasFile('file')) {
+            $uploadedFiles = [$request->file('file')];
+        }
+
+        foreach ($uploadedFiles as $file) {
+            $stored = $this->storeTaskFile($file, 'crm-projects/task-comments');
+            if ($stored) {
+                CrmProjectTaskCommentAttachment::create([
+                    'crm_project_task_comment_id' => $comment->id,
+                    'file_path' => $stored['path'],
+                    'file_name' => $stored['name'],
+                    'file_size' => $stored['size'],
+                    'mime_type' => $stored['mime'],
+                ]);
+            }
+        }
 
         // Crea evento per la nota aggiunta
         CrmProjectTaskEvent::create([
@@ -991,7 +960,9 @@ class CrmProjectTaskController extends Controller
             'created_at' => now(),
         ]);
 
-        $comment->load('user:id,name,email,avatar');
+        $comment->load('user:id,name,email,avatar', 'attachments');
+
+        $comment = $this->formatCommentWithUrls($comment);
 
         return response()->json([
             'success' => true,
@@ -1020,9 +991,10 @@ class CrmProjectTaskController extends Controller
 
         $notes = CrmProjectTaskComment::where('crm_project_task_id', $task->id)
             ->where('is_note', true)
-            ->with('user:id,name,email,avatar')
+            ->with(['user:id,name,email,avatar', 'attachments'])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(fn ($note) => $this->formatCommentWithUrls($note));
 
         return response()->json([
             'success' => true,
@@ -1338,13 +1310,15 @@ class CrmProjectTaskController extends Controller
                         'progress' => 0,
                     ]);
 
+                    $queue = app(\App\Services\ProjectOrchestratorQueueService::class);
+
                     if ($request->review_message) {
                         $this->dispatchTaskWithRevision($task, $project, $request->review_message, $taskN8nService);
                     } else {
-                        $queue = app(\App\Services\ProjectOrchestratorQueueService::class);
                         $queue->enqueueCrmTask($task);
                         $queue->bumpCrmTaskToFront($task);
-                        $queue->tryDispatchNext($project->id);
+                        // forceResetStuck=true: sblocca job stuck bloccati da più di 2 ore
+                        $queue->tryDispatchNext($project->id, forceResetStuck: true);
                     }
 
                     $taskN8nService->appendStep($task, [
@@ -1439,6 +1413,61 @@ class CrmProjectTaskController extends Controller
     }
 
     /**
+     * GET /api/crm-projects/{id}/n8n-queue-status
+     * Diagnostica: stato della coda N8N per il progetto (admin/PM only)
+     */
+    public function n8nQueueStatus(Request $request, $id)
+    {
+        $project = CrmProject::findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->role !== 'admin' && $project->manager_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Accesso negato'], 403);
+        }
+
+        $queueService = app(\App\Services\ProjectOrchestratorQueueService::class);
+        $taskN8nService = app(TaskN8nService::class);
+
+        $activeAgents = \App\Models\WorkspaceAgent::where('project_id', $project->id)
+            ->whereNull('deleted_at')
+            ->whereIn('status', \App\Services\ProjectOrchestratorQueueService::WORKSPACE_ACTIVE_STATUSES)
+            ->get(['id', 'title', 'status', 'started_at', 'updated_at', 'n8n_execution_id']);
+
+        $processingTasks = CrmProjectTask::where('crm_project_id', $project->id)
+            ->whereIn('execution_mode', \App\Services\ProjectOrchestratorQueueService::CRM_AGENT_MODES)
+            ->where('n8n_status', 'processing')
+            ->get(['id', 'title', 'n8n_status', 'n8n_execution_id', 'updated_at', 'created_at']);
+
+        $pendingTasks = CrmProjectTask::where('crm_project_id', $project->id)
+            ->whereIn('execution_mode', \App\Services\ProjectOrchestratorQueueService::CRM_AGENT_MODES)
+            ->where('n8n_status', 'pending')
+            ->orderBy('n8n_queue_position')
+            ->get(['id', 'title', 'n8n_status', 'n8n_queue_position', 'created_at']);
+
+        $staleThreshold = now()->subMinutes(120);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'n8n_enabled' => $taskN8nService->isEnabled(),
+                'has_active_work' => $queueService->hasActiveWork($project->id),
+                'active_workspace_agents' => $activeAgents->map(fn ($a) => array_merge(
+                    $a->toArray(),
+                    ['is_stale' => $a->updated_at < $staleThreshold]
+                )),
+                'processing_tasks' => $processingTasks->map(fn ($t) => array_merge(
+                    $t->toArray(),
+                    ['is_stale' => $t->updated_at < $staleThreshold]
+                )),
+                'pending_tasks' => $pendingTasks,
+                'queue_blocked_by' => $activeAgents->count() + $processingTasks->count() > 0
+                    ? 'active_work'
+                    : null,
+            ],
+        ]);
+    }
+
+    /**
      * Dispatch task with revision feedback
      */
     private function dispatchTaskWithRevision(CrmProjectTask $task, CrmProject $project, string $revisionFeedback, TaskN8nService $taskN8nService): void
@@ -1465,5 +1494,425 @@ class CrmProjectTaskController extends Controller
 
         unset($task->revision_feedback);
         unset($task->is_revision);
+    }
+
+    /**
+     * PATCH /api/crm-projects/{id}/tasks/{taskId}/work-notes
+     */
+    public function updateWorkNotes(Request $request, $id, $taskId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'work_notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $task->update(['work_notes' => $request->input('work_notes')]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Note salvate',
+            'data' => [
+                'work_notes' => $task->work_notes,
+                'updated_at' => $task->updated_at,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /api/crm-projects/{id}/tasks/{taskId}/attachments
+     */
+    public function getAttachments($id, $taskId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        $attachments = CrmProjectTaskAttachment::where('crm_project_task_id', $task->id)
+            ->with('user:id,name,email,avatar')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($attachment) => $this->formatAttachmentWithUrl($attachment));
+
+        return response()->json([
+            'success' => true,
+            'data' => $attachments,
+        ]);
+    }
+
+    /**
+     * POST /api/crm-projects/{id}/tasks/{taskId}/attachments
+     */
+    public function storeAttachment(Request $request, $id, $taskId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'file' => 'required|file|max:10240|mimes:jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,txt',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $stored = $this->storeTaskFile($request->file('file'), 'crm-projects/task-attachments');
+        if (!$stored) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Errore nel salvataggio del file',
+            ], 500);
+        }
+
+        $attachment = CrmProjectTaskAttachment::create([
+            'crm_project_task_id' => $task->id,
+            'user_id' => $user->id,
+            'file_path' => $stored['path'],
+            'file_name' => $stored['name'],
+            'file_size' => $stored['size'],
+            'mime_type' => $stored['mime'],
+        ]);
+
+        CrmProjectTaskEvent::create([
+            'crm_project_task_id' => $task->id,
+            'user_id' => $user->id,
+            'event_type' => 'aggiunta_allegato',
+            'description' => "Allegato caricato: {$stored['name']}",
+            'created_at' => now(),
+        ]);
+
+        $attachment->load('user:id,name,email,avatar');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'File caricato con successo',
+            'data' => $this->formatAttachmentWithUrl($attachment),
+        ], 201);
+    }
+
+    /**
+     * DELETE /api/crm-projects/{id}/tasks/{taskId}/attachments/{attachmentId}
+     */
+    public function destroyAttachment($id, $taskId, $attachmentId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        $attachment = CrmProjectTaskAttachment::where('crm_project_task_id', $task->id)
+            ->findOrFail($attachmentId);
+
+        $canDelete = $user->role === 'admin'
+            || (int) $project->manager_id === (int) $user->id
+            || (int) $attachment->user_id === (int) $user->id;
+
+        if (!$canDelete) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non puoi eliminare questo allegato',
+            ], 403);
+        }
+
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            Storage::disk('public')->delete($attachment->file_path);
+        }
+
+        $fileName = $attachment->file_name;
+        $attachment->delete();
+
+        CrmProjectTaskEvent::create([
+            'crm_project_task_id' => $task->id,
+            'user_id' => $user->id,
+            'event_type' => 'rimozione_allegato',
+            'description' => "Allegato rimosso: {$fileName}",
+            'created_at' => now(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Allegato eliminato',
+        ]);
+    }
+
+    /**
+     * POST /api/crm-projects/{id}/tasks/{taskId}/take-charge
+     */
+    public function takeCharge($id, $taskId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)
+            ->with('assignments')
+            ->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        if (in_array($task->status, ['completed', 'cancelled', 'review'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Questa task non può essere presa in carico nel suo stato attuale',
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $isAssigned = $task->assignments()
+                ->where('user_id', $user->id)
+                ->where('is_active', true)
+                ->exists();
+
+            if (!$isAssigned) {
+                $existing = CrmProjectTaskAssignment::where('crm_project_task_id', $task->id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+                if ($existing) {
+                    $existing->update([
+                        'is_active' => true,
+                        'start_date' => now(),
+                        'end_date' => null,
+                        'assigned_by' => $user->id,
+                    ]);
+                } else {
+                    CrmProjectTaskAssignment::create([
+                        'crm_project_task_id' => $task->id,
+                        'user_id' => $user->id,
+                        'assigned_by' => $user->id,
+                        'payment_method' => 'hourly',
+                        'is_active' => true,
+                        'start_date' => now(),
+                    ]);
+                }
+            }
+
+            $oldStatus = $task->status;
+            if ($task->status === 'pending') {
+                $task->update(['status' => 'in_progress']);
+            }
+
+            CrmProjectTaskEvent::create([
+                'crm_project_task_id' => $task->id,
+                'user_id' => $user->id,
+                'event_type' => 'presa_in_carico',
+                'event_data' => [
+                    'old_status' => $oldStatus,
+                    'new_status' => $task->status,
+                ],
+                'description' => "{$user->name} ha preso in carico la task",
+                'created_at' => now(),
+            ]);
+
+            DB::commit();
+
+            $task->load(['assignments.user:id,name,email,avatar', 'creator:id,name,email']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Task presa in carico',
+                'data' => $task,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Errore durante la presa in carico: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * POST /api/crm-projects/{id}/tasks/{taskId}/deliver
+     */
+    public function deliver(Request $request, $id, $taskId)
+    {
+        $user = Auth::user();
+        $project = CrmProject::findOrFail($id);
+        $task = CrmProjectTask::where('crm_project_id', $project->id)->findOrFail($taskId);
+
+        if (!$this->userCanAccessTask($user, $project, $task)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non hai accesso a questo task',
+            ], 403);
+        }
+
+        if (!in_array($task->status, ['in_progress', 'pending'], true)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La task non è in uno stato consegnabile',
+            ], 422);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'satisfaction' => 'nullable|integer|min:1|max:5',
+            'feedback' => 'nullable|string|max:5000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $oldStatus = $task->status;
+        $task->update(['status' => 'review']);
+
+        if ($request->filled('feedback') || $request->filled('satisfaction')) {
+            $feedbackParts = [];
+            if ($request->filled('satisfaction')) {
+                $feedbackParts[] = 'Valutazione: ' . $request->satisfaction . '/5';
+            }
+            if ($request->filled('feedback')) {
+                $feedbackParts[] = $request->feedback;
+            }
+
+            CrmProjectTaskComment::create([
+                'crm_project_task_id' => $task->id,
+                'user_id' => $user->id,
+                'comment' => '[Consegna] ' . implode("\n", $feedbackParts),
+                'is_note' => true,
+            ]);
+        }
+
+        CrmProjectTaskEvent::create([
+            'crm_project_task_id' => $task->id,
+            'user_id' => $user->id,
+            'event_type' => 'termine_incarico',
+            'event_data' => [
+                'old_status' => $oldStatus,
+                'new_status' => 'review',
+            ],
+            'description' => "{$user->name} ha consegnato la task per revisione",
+            'created_at' => now(),
+        ]);
+
+        $task->load(['assignments.user:id,name,email,avatar', 'creator:id,name,email']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Task consegnata per revisione',
+            'data' => $task,
+        ]);
+    }
+
+    private function recordStatusChangeEvent(CrmProjectTask $task, $user, string $oldStatus, string $newStatus): void
+    {
+        $eventType = match ($newStatus) {
+            'in_progress' => $oldStatus === 'pending' ? 'presa_in_carico' : 'aggiornamento_stato',
+            'review' => 'termine_incarico',
+            'completed' => 'completamento',
+            'cancelled' => 'annullamento',
+            default => 'aggiornamento_stato',
+        };
+
+        CrmProjectTaskEvent::create([
+            'crm_project_task_id' => $task->id,
+            'user_id' => $user->id,
+            'event_type' => $eventType,
+            'event_data' => [
+                'old_status' => $oldStatus,
+                'new_status' => $newStatus,
+            ],
+            'description' => "Stato aggiornato da {$oldStatus} a {$newStatus}",
+            'created_at' => now(),
+        ]);
+    }
+
+    /**
+     * @return array{path: string, name: string, size: int, mime: string}|null
+     */
+    private function storeTaskFile($file, string $directory): ?array
+    {
+        if (!Storage::disk('public')->exists($directory)) {
+            Storage::disk('public')->makeDirectory($directory, 0755, true);
+        }
+
+        $path = $file->store($directory, 'public');
+
+        if (!Storage::disk('public')->exists($path)) {
+            Log::error('Task file not saved', ['path' => $path]);
+            return null;
+        }
+
+        return [
+            'path' => $path,
+            'name' => $file->getClientOriginalName(),
+            'size' => $file->getSize(),
+            'mime' => $file->getMimeType(),
+        ];
+    }
+
+    private function buildPublicStorageUrl(string $path): string
+    {
+        $baseUrl = rtrim(config('app.url'), '/');
+        return $baseUrl . '/backend/storage/' . $path;
+    }
+
+    private function formatAttachmentWithUrl(CrmProjectTaskAttachment $attachment): CrmProjectTaskAttachment
+    {
+        if (Storage::disk('public')->exists($attachment->file_path)) {
+            $attachment->file_url = $this->buildPublicStorageUrl($attachment->file_path);
+        }
+        return $attachment;
+    }
+
+    private function formatCommentWithUrls(CrmProjectTaskComment $comment): CrmProjectTaskComment
+    {
+        if ($comment->relationLoaded('attachments')) {
+            $comment->attachments = $comment->attachments->map(function ($attachment) {
+                if (Storage::disk('public')->exists($attachment->file_path)) {
+                    $attachment->file_url = $this->buildPublicStorageUrl($attachment->file_path);
+                }
+                return $attachment;
+            });
+        }
+        return $comment;
     }
 }

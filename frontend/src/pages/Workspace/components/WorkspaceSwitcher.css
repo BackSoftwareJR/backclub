@@ -131,3 +131,21 @@
   font-weight: var(--ws-weight-semibold);
   font-size: var(--ws-font-sm);
 }
+
+.workspace-switcher-change-dept {
+  width: 100%;
+  border: none;
+  border-top: 1px solid var(--ws-border);
+  background: var(--ws-surface-subtle);
+  padding: var(--ws-spacing) var(--ws-spacing-md);
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-accent);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--ws-transition);
+}
+
+.workspace-switcher-change-dept:hover {
+  background: var(--ws-surface-hover);
+}

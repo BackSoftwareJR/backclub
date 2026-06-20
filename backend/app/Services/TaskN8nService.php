@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use App\Jobs\CheckCrmTaskN8nTimeout;
 
 class TaskN8nService
 {
@@ -24,20 +25,14 @@ class TaskN8nService
     }
 
     /**
-     * Accoda un task CRM e avvia il prossimo slot libero del progetto.
+     * Dispatch immediato di un task CRM all'orchestratore.
+     * Crea automaticamente una WorkspaceAgent per renderlo visibile nelle lavorazioni.
+     * Non aspetta la coda: invia subito e lascia all'orchestratore la gestione concorrenza.
      */
     public function dispatchTaskAgent(CrmProjectTask $task, CrmProject $project): void
     {
-        $this->enqueueTaskAgent($task, $project);
-    }
-
-    /**
-     * Accoda un task CRM nel gestionale (non invia subito all'orchestratore).
-     */
-    public function enqueueTaskAgent(CrmProjectTask $task, CrmProject $project): void
-    {
         if (!$this->isEnabled()) {
-            Log::warning('N8N not enabled, skipping task enqueue', ['task_id' => $task->id]);
+            Log::warning('N8N not enabled, skipping task dispatch', ['task_id' => $task->id]);
             return;
         }
 
@@ -45,15 +40,66 @@ class TaskN8nService
             throw new Exception('github_url del progetto richiesto per avviare l\'agent orchestrator');
         }
 
-        $queue = app(ProjectOrchestratorQueueService::class);
-        $queue->enqueueCrmTask($task);
-        $queue->tryDispatchNext($project->id);
+        // Crea o aggiorna il WorkspaceAgent collegato per rendere il task visibile nelle lavorazioni
+        $agent = $this->ensureWorkspaceAgentForTask($task, $project);
+
+        // Invia direttamente all'orchestratore senza aspettare la coda backend
+        $this->sendTaskToOrchestrator($task, $project, $agent);
+
+        // Schedula il controllo timeout dopo 10 minuti
+        CheckCrmTaskN8nTimeout::dispatch($task->id)->delay(now()->addMinutes(10));
     }
 
     /**
-     * Invio effettivo di un task CRM all'orchestratore (chiamato dalla coda).
+     * Crea (o recupera esistente) il WorkspaceAgent collegato a un CRM task agente.
      */
-    public function sendTaskToOrchestrator(CrmProjectTask $task, CrmProject $project): void
+    public function ensureWorkspaceAgentForTask(CrmProjectTask $task, CrmProject $project): WorkspaceAgent
+    {
+        $existing = WorkspaceAgent::where('crm_task_id', $task->id)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if ($existing) {
+            $existing->update([
+                'status' => 'pending',
+                'started_at' => null,
+                'completed_at' => null,
+                'queue_position' => null,
+                'n8n_execution_id' => null,
+                'logs' => null,
+                'result' => null,
+            ]);
+            return $existing->fresh();
+        }
+
+        $prompt = $this->buildDedicatedPrompt($task->title, $task->description, (bool) $task->exact_prompt);
+
+        return WorkspaceAgent::create([
+            'project_id' => $project->id,
+            'user_id' => $task->created_by,
+            'crm_task_id' => $task->id,
+            'title' => $task->title,
+            'prompt' => $prompt,
+            'exact_prompt' => (bool) $task->exact_prompt,
+            'status' => 'pending',
+            'flow_type' => 'major',
+        ]);
+    }
+
+    /**
+     * @deprecated Usare dispatchTaskAgent() direttamente.
+     * Accoda un task CRM nel gestionale (non invia subito all'orchestratore).
+     */
+    public function enqueueTaskAgent(CrmProjectTask $task, CrmProject $project): void
+    {
+        $this->dispatchTaskAgent($task, $project);
+    }
+
+    /**
+     * Invio effettivo di un task CRM all'orchestratore.
+     * Se viene passato un $agent, aggiorna il suo stato di conseguenza.
+     */
+    public function sendTaskToOrchestrator(CrmProjectTask $task, CrmProject $project, ?WorkspaceAgent $agent = null): void
     {
         if (!$this->isEnabled()) {
             return;
@@ -73,11 +119,20 @@ class TaskN8nService
                 'n8n_response' => null,
             ]);
 
+            if ($agent) {
+                $agent->update([
+                    'status' => 'running',
+                    'started_at' => now(),
+                    'queue_position' => null,
+                ]);
+            }
+
             $payload = $this->buildOrchestratorPayload($task, $project);
 
             Log::info('Sending CRM task to orchestrator', [
                 'task_id' => $task->id,
                 'project_id' => $project->id,
+                'workspace_agent_id' => $agent?->id,
             ]);
 
             $response = Http::withHeaders([
@@ -89,12 +144,17 @@ class TaskN8nService
 
             if ($response->successful()) {
                 $responseData = $response->json();
+                $executionId = $responseData['run_id'] ?? $responseData['orchestrator_job_id'] ?? null;
 
                 $task->update([
-                    'n8n_execution_id' => $responseData['run_id'] ?? $responseData['orchestrator_job_id'] ?? null,
+                    'n8n_execution_id' => $executionId,
                     'n8n_response' => $responseData,
                     'n8n_response_format' => 'orchestrator_api',
                 ]);
+
+                if ($agent && $executionId) {
+                    $agent->update(['n8n_execution_id' => $executionId]);
+                }
 
                 $this->appendStep($task, [
                     'step_key' => 'orchestrator_queued',
@@ -104,12 +164,25 @@ class TaskN8nService
                     'payload' => $responseData,
                     'sort_order' => 1,
                 ]);
+
+                if ($agent) {
+                    $this->appendWorkspaceAgentLog($agent, [
+                        'step_key' => 'orchestrator_queued',
+                        'title' => 'Task CRM inviato all\'orchestratore',
+                        'message' => 'Avviato dall\'orchestratore (run: ' . ($executionId ?? '?') . ')',
+                        'status' => 'running',
+                        'payload' => $responseData,
+                    ]);
+                }
             } else {
                 $errorMessage = "HTTP {$response->status()}: " . $response->body();
                 $task->update([
                     'n8n_status' => 'failed',
                     'n8n_error' => $errorMessage,
                 ]);
+                if ($agent) {
+                    $agent->update(['status' => 'failed', 'completed_at' => now()]);
+                }
                 throw new Exception($errorMessage);
             }
         } catch (Exception $e) {
@@ -117,6 +190,10 @@ class TaskN8nService
                 'n8n_status' => 'failed',
                 'n8n_error' => $e->getMessage(),
             ]);
+
+            if ($agent) {
+                $agent->update(['status' => 'failed', 'completed_at' => now()]);
+            }
 
             Log::error('Exception sending CRM task to orchestrator', [
                 'task_id' => $task->id,
@@ -302,16 +379,28 @@ class TaskN8nService
 
     /**
      * Shared callback URL fields for CRM tasks and workspace agents.
+     *
+     * Usa N8N_CALLBACK_BASE_URL se impostato nel .env, altrimenti usa APP_URL.
+     * Necessario quando APP_URL non corrisponde al path pubblico dell'API
+     * (es: APP_URL=https://backclub.it ma l'API è su https://backclub.it/backend/public).
      */
     public function buildOrchestratorCallbackFields(): array
     {
+        $base = config('services.n8n.callback_base_url');
+        if (!empty($base)) {
+            $base = rtrim((string) $base, '/');
+            $buildUrl = fn (string $path) => $base . $path;
+        } else {
+            $buildUrl = fn (string $path) => url($path);
+        }
+
         $fields = [
-            'callback_url' => url('/api/webhooks/n8n/task-events'),
-            'callback_status_url' => url('/api/webhooks/n8n/status'),
-            'callback_completed_url' => url('/api/webhooks/n8n/completed'),
-            'callback_task_log_url' => url('/api/webhooks/n8n/task-log'),
-            'callback_close_task_url' => url('/api/webhooks/n8n/close-task'),
-            'callback_auth_header' => config('services.n8n.callback_auth_header'),
+            'callback_url'           => $buildUrl('/api/webhooks/n8n/task-events'),
+            'callback_status_url'    => $buildUrl('/api/webhooks/n8n/status'),
+            'callback_completed_url' => $buildUrl('/api/webhooks/n8n/completed'),
+            'callback_task_log_url'  => $buildUrl('/api/webhooks/n8n/task-log'),
+            'callback_close_task_url' => $buildUrl('/api/webhooks/n8n/close-task'),
+            'callback_auth_header'   => config('services.n8n.callback_auth_header'),
         ];
 
         $callbackAuthValue = config('services.n8n.callback_auth_value');

@@ -21,11 +21,13 @@ class WorkspaceUserTask extends Model
         'due_date',
         'completed_at',
         'sort_order',
+        'completion_group_id',
     ];
 
     protected $casts = [
         'due_date' => 'date',
         'completed_at' => 'datetime',
+        'completion_group_id' => 'integer',
     ];
 
     public function project(): BelongsTo

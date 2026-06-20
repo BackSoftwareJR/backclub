@@ -106,6 +106,7 @@ const FreelanceSupportPage = lazy(() => import('./pages/Freelance/FreelanceSuppo
 const FreelanceNotificationsPage = lazy(() => import('./pages/Freelance/FreelanceNotificationsPage.tsx'));
 const FreelanceSettingsPage = lazy(() => import('./pages/Freelance/FreelanceSettingsPage.tsx'));
 const FreelanceCrmHub = lazy(() => import('./pages/Freelance/FreelanceCrmHub.tsx'));
+const FocusPage = lazy(() => import('./pages/Freelance/Focus/FocusPage.tsx'));
 const WorkspaceTypeSelectorPage = lazy(() => import('./pages/Workspace/WorkspaceTypeSelectorPage.tsx'));
 const WorkspaceDeveloperLayout = lazy(() => import('./pages/Workspace/WorkspaceDeveloperLayout.tsx'));
 const WorkspaceProjectsPage = lazy(() => import('./pages/Workspace/WorkspaceProjectsPage.tsx'));
@@ -113,6 +114,10 @@ const WorkspaceProjectPage = lazy(() => import('./pages/Workspace/WorkspaceProje
 const WorkspaceAgentsPage = lazy(() => import('./pages/Workspace/WorkspaceAgentsPage.tsx'));
 const WorkspaceAgentDetailPage = lazy(() => import('./pages/Workspace/WorkspaceAgentDetailPage.tsx'));
 const WorkspaceTasksPage = lazy(() => import('./pages/Workspace/WorkspaceTasksPage.tsx'));
+const WorkspaceAreaRoute = lazy(() => import('./pages/Workspace/WorkspaceAreaRoute.tsx'));
+const WorkspaceAreaIndex = lazy(() =>
+  import('./pages/Workspace/WorkspaceAreaRoute.tsx').then((m) => ({ default: m.WorkspaceAreaIndex }))
+);
 const Progetti = lazy(() => import('./pages/Progetti/Progetti.tsx'));
 const ProgettiInAttesaPage = lazy(() => import('./pages/ProgettiInAttesa/ProgettiInAttesaPage.tsx'));
 const GestioneProgettiPage = lazy(() => import('./pages/GestioneProgetti/GestioneProgettiPage.tsx'));
@@ -159,7 +164,7 @@ import './styles/seller-design-system.css';
 import './styles/mobile-safe-area.css';
 import './styles/ios-design-system.css';
 import { getHomeRouteForUser, isFreelanceUser, isSellerUser, canAccessAdminArea, canAccessStaffArea } from './utils/userRoles.ts';
-import { WorkspaceProvider, useWorkspace } from './context/WorkspaceContext.tsx';
+import { WorkspaceProvider } from './context/WorkspaceContext.tsx';
 import WorkspaceDeveloperRoute from './components/Routes/WorkspaceDeveloperRoute.tsx';
 
 // Protected Route wrapper
@@ -342,39 +347,8 @@ const AdminOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-// Workspace Gateway component (inline)
+// Workspace Gateway: ingresso sempre sulla pagina di selezione reparto
 const WorkspaceGateway: React.FC = () => {
-  const { isFirstVisit, isLoading, workspaceType } = useWorkspace();
-
-  if (isLoading) {
-    return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '100vh',
-        background: 'var(--color-bg-primary)'
-      }}>
-        <div className="animate-spin" style={{
-          width: '48px',
-          height: '48px',
-          border: '3px solid var(--color-bg-tertiary)',
-          borderTopColor: 'var(--color-accent-blue)',
-          borderRadius: '50%'
-        }} />
-      </div>
-    );
-  }
-
-  if (isFirstVisit || !workspaceType) {
-    return <Navigate to="/workspace/type-selector" replace />;
-  }
-
-  if (workspaceType === 'developer') {
-    return <Navigate to="/workspace/developer" replace />;
-  }
-
-  // Default fallback
   return <Navigate to="/workspace/type-selector" replace />;
 };
 
@@ -457,12 +431,21 @@ function App() {
               path="/login"
               element={
                 <PublicRoute>
-                  <Login />
+                  <BackclubLayout>
+                    <Login />
+                  </BackclubLayout>
                 </PublicRoute>
               }
             />
             <Route path="/portfolio-azienda" element={<PortfolioPage />} />
-            <Route path="/richiedi-accesso" element={<RichiediAccessoBackclub />} />
+            <Route
+              path="/richiedi-accesso"
+              element={
+                <BackclubLayout>
+                  <RichiediAccessoBackclub />
+                </BackclubLayout>
+              }
+            />
             <Route
               path="/role-change"
               element={
@@ -729,6 +712,18 @@ function App() {
               <Route path="agenti" element={<WorkspaceAgentsPage />} />
               <Route path="task" element={<WorkspaceTasksPage />} />
             </Route>
+            <Route
+              path="/workspace/:areaCode/*"
+              element={
+                <WorkspaceDeveloperRoute>
+                  <WorkspaceProvider>
+                    <WorkspaceAreaRoute />
+                  </WorkspaceProvider>
+                </WorkspaceDeveloperRoute>
+              }
+            >
+              <Route index element={<WorkspaceAreaIndex />} />
+            </Route>
             {/* Freelance Portal */}
             <Route
               path="/freelance"
@@ -751,6 +746,7 @@ function App() {
               <Route path="supporto" element={<FreelanceSupportPage />} />
               <Route path="notifiche" element={<FreelanceNotificationsPage />} />
               <Route path="impostazioni" element={<FreelanceSettingsPage />} />
+              <Route path="focus" element={<FocusPage />} />
               {/* CRM dedicati: vista dedicata per ogni CRM assegnato all'utente */}
               <Route path="crm/:code" element={<FreelanceCrmHub />}>
                 <Route index element={<Navigate to="dashboard" replace />} />

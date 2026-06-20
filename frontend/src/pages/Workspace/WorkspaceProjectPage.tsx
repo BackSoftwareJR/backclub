@@ -15,7 +15,12 @@ import {
   Code2,
   Upload,
   ChevronDown,
+  ChevronRight,
   GitBranch,
+  Brain,
+  Flag,
+  Folder,
+  FolderOpen,
 } from 'lucide-react';
 import { workspaceApi } from '../../api/workspace';
 import { workspaceTasksApi } from '../../api/workspaceTasks';
@@ -25,9 +30,11 @@ import FloatingTaskPanel from './components/FloatingTaskPanel';
 import TaskDetailModal from './components/TaskDetailModal';
 import AddTaskForm from './components/AddTaskForm';
 import WorkspaceAgentPanel from './components/WorkspaceAgentPanel';
+import OrchestratorChat from './components/OrchestratorChat';
+import ArtifactViewer from './components/ArtifactViewer';
 import './WorkspaceProjectPage.css';
 
-type TabType = 'tasks' | 'lavorazioni' | 'aggiornamenti' | 'code';
+type TabType = 'tasks' | 'lavorazioni' | 'aggiornamenti' | 'code' | 'orchestrator';
 
 const TAB_MAP: Record<string, TabType> = {
   tasks: 'tasks',
@@ -38,6 +45,8 @@ const TAB_MAP: Record<string, TabType> = {
   aggiornamenti: 'aggiornamenti',
   updates: 'aggiornamenti',
   code: 'code',
+  orchestrator: 'orchestrator',
+  ai: 'orchestrator',
 };
 
 const WorkspaceProjectPage: React.FC = () => {
@@ -56,6 +65,10 @@ const WorkspaceProjectPage: React.FC = () => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [showBranches, setShowBranches] = useState(false);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [completeFeedback, setCompleteFeedback] = useState('');
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState<Set<number>>(new Set());
 
   const projectId = id ? parseInt(id, 10) : null;
 
@@ -163,6 +176,51 @@ const WorkspaceProjectPage: React.FC = () => {
     } finally {
       setIsPublishing(false);
     }
+  };
+
+  const handleCompleteProject = async () => {
+    if (!projectId) return;
+
+    // Check locally before calling API — show friendly UI message
+    const activeTasks = tasks.filter(t => t.completion_group_id == null);
+    const pendingTasks = activeTasks.filter(t => t.status !== 'completed');
+    if (pendingTasks.length > 0) {
+      showToast('error', `Ci sono ancora ${pendingTasks.length} task non completate. Completale tutte prima di chiudere il progetto.`);
+      setShowCompleteModal(false);
+      return;
+    }
+
+    try {
+      setIsCompleting(true);
+      await workspaceApi.completeProject(projectId, completeFeedback || undefined);
+      showToast('success', 'Progetto segnato come completato!');
+      setShowCompleteModal(false);
+      setCompleteFeedback('');
+      // Reload project data + tasks to get updated statuses
+      const [updatedProject, updatedTasks] = await Promise.all([
+        workspaceApi.getWorkspaceProject(projectId),
+        workspaceTasksApi.getWorkspaceTasks(projectId),
+      ]);
+      setProject(updatedProject);
+      setTasks(updatedTasks);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Errore nel completare il progetto';
+      showToast('error', message);
+    } finally {
+      setIsCompleting(false);
+    }
+  };
+
+  const toggleGroup = (groupId: number) => {
+    setExpandedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(groupId)) {
+        next.delete(groupId);
+      } else {
+        next.add(groupId);
+      }
+      return next;
+    });
   };
 
   const getStatusDotClass = (status: string): string => {
@@ -359,20 +417,51 @@ const WorkspaceProjectPage: React.FC = () => {
           <Code2 size={13} />
           <span>Code</span>
         </button>
+        <button
+          className={`wpp-tab wpp-tab--ai ${activeTab === 'orchestrator' ? 'active' : ''}`}
+          onClick={() => setActiveTab('orchestrator')}
+        >
+          <Brain size={13} />
+          <span>AI Studio</span>
+        </button>
       </div>
 
       {/* ── Content area ── */}
-      <div className={`wpp-content ${activeTab === 'lavorazioni' ? 'wpp-content--full' : ''}`}>
+      <div className={`wpp-content ${activeTab === 'lavorazioni' ? 'wpp-content--full' : ''} ${activeTab === 'orchestrator' ? 'wpp-content--split' : ''}`}>
 
         {/* Tasks tab */}
         {activeTab === 'tasks' && (
           <div className="wpp-tab-pane">
             <div className="wpp-tasks-toolbar">
               <h2 className="wpp-section-title">Task</h2>
-              <button className="wpp-add-btn" onClick={() => setShowAddTaskForm(true)}>
-                <Plus size={12} />
-                Aggiungi
-              </button>
+              <div className="wpp-tasks-toolbar-actions">
+                {project.is_project_manager && (
+                  <button
+                    className="wpp-complete-project-btn"
+                    onClick={() => {
+                      const activeTasks = tasks.filter(t => t.completion_group_id == null);
+                      const pendingCount = activeTasks.filter(t => t.status !== 'completed').length;
+                      if (pendingCount > 0) {
+                        showToast('error', `Ci sono ancora ${pendingCount} task non completate.`);
+                        return;
+                      }
+                      if (activeTasks.length === 0) {
+                        showToast('error', 'Nessuna task attiva da completare.');
+                        return;
+                      }
+                      setShowCompleteModal(true);
+                    }}
+                    title="Segna progetto come completato"
+                  >
+                    <Flag size={12} />
+                    Segna completato
+                  </button>
+                )}
+                <button className="wpp-add-btn" onClick={() => setShowAddTaskForm(true)}>
+                  <Plus size={12} />
+                  Aggiungi
+                </button>
+              </div>
             </div>
 
             {loadingTasks ? (
@@ -381,80 +470,182 @@ const WorkspaceProjectPage: React.FC = () => {
                 <span>Caricamento task...</span>
               </div>
             ) : tasks.length > 0 ? (
-              <div className="wpp-tasks-list">
-                {/* List header */}
-                <div className="wpp-tasks-list-header">
-                  <div className="wpp-tc-status" />
-                  <div className="wpp-tc-title">TITOLO</div>
-                  <div className="wpp-tc-priority">PRIORITÀ</div>
-                  <div className="wpp-tc-status-label">STATO</div>
-                  <div className="wpp-tc-due">SCADENZA</div>
-                  <div className="wpp-tc-action" />
-                </div>
-                {tasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="wpp-task-row"
-                    onClick={() => setSelectedTask(task)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setSelectedTask(task)}
-                  >
-                    <div className="wpp-tc-status">
-                      <span
-                        className="wpp-task-status-dot"
-                        style={{ backgroundColor: getTaskStatusColor(task.status) }}
-                      />
+              (() => {
+                const activeTasks = tasks.filter(t => t.completion_group_id == null);
+                const archivedGroups = tasks
+                  .filter(t => t.completion_group_id != null)
+                  .reduce<Record<number, typeof tasks>>((acc, t) => {
+                    const gid = t.completion_group_id!;
+                    if (!acc[gid]) acc[gid] = [];
+                    acc[gid].push(t);
+                    return acc;
+                  }, {});
+
+                const sortedGroupIds = Object.keys(archivedGroups)
+                  .map(Number)
+                  .sort((a, b) => b - a);
+
+                return (
+                  <div className="wpp-tasks-list">
+                    <div className="wpp-tasks-list-header">
+                      <div className="wpp-tc-status" />
+                      <div className="wpp-tc-title">TITOLO</div>
+                      <div className="wpp-tc-priority">PRIORITÀ</div>
+                      <div className="wpp-tc-status-label">STATO</div>
+                      <div className="wpp-tc-due">SCADENZA</div>
+                      <div className="wpp-tc-action" />
                     </div>
-                    <div className="wpp-tc-title">
-                      <span className="wpp-task-title">{task.title}</span>
-                      {task.description && (
-                        <span className="wpp-task-desc">
-                          {task.description.length > 60
-                            ? `${task.description.substring(0, 60)}…`
-                            : task.description}
-                        </span>
-                      )}
-                    </div>
-                    <div className="wpp-tc-priority">
-                      <span
-                        className="wpp-priority-badge"
-                        style={{ color: getPriorityColor(task.priority) }}
+
+                    {/* Active (non-archived) tasks */}
+                    {activeTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className="wpp-task-row"
+                        onClick={() => setSelectedTask(task)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setSelectedTask(task)}
                       >
-                        {task.priority}
-                      </span>
-                    </div>
-                    <div className="wpp-tc-status-label">
-                      <span
-                        className="wpp-status-chip"
-                        style={{ color: getTaskStatusColor(task.status) }}
-                      >
-                        {getTaskStatusLabel(task.status)}
-                      </span>
-                    </div>
-                    <div className="wpp-tc-due">
-                      {task.due_date && (
-                        <span className="wpp-due-date">
-                          {new Date(task.due_date).toLocaleDateString('it-IT', {
-                            month: 'short', day: 'numeric',
-                          })}
-                        </span>
-                      )}
-                    </div>
-                    <div className="wpp-tc-action" onClick={e => e.stopPropagation()}>
-                      {task.status !== 'completed' && (
-                        <button
-                          className="wpp-task-complete-btn"
-                          onClick={() => handleTaskComplete(task.id)}
-                          title="Segna completata"
-                        >
-                          <CheckSquare size={13} />
-                        </button>
-                      )}
-                    </div>
+                        <div className="wpp-tc-status">
+                          <span
+                            className="wpp-task-status-dot"
+                            style={{ backgroundColor: getTaskStatusColor(task.status) }}
+                          />
+                        </div>
+                        <div className="wpp-tc-title">
+                          <span className="wpp-task-title">{task.title}</span>
+                          {task.description && (
+                            <span className="wpp-task-desc">
+                              {task.description.length > 60
+                                ? `${task.description.substring(0, 60)}…`
+                                : task.description}
+                            </span>
+                          )}
+                        </div>
+                        <div className="wpp-tc-priority">
+                          <span
+                            className="wpp-priority-badge"
+                            style={{ color: getPriorityColor(task.priority) }}
+                          >
+                            {task.priority}
+                          </span>
+                        </div>
+                        <div className="wpp-tc-status-label">
+                          <span
+                            className="wpp-status-chip"
+                            style={{ color: getTaskStatusColor(task.status) }}
+                          >
+                            {getTaskStatusLabel(task.status)}
+                          </span>
+                        </div>
+                        <div className="wpp-tc-due">
+                          {task.due_date && (
+                            <span className="wpp-due-date">
+                              {new Date(task.due_date).toLocaleDateString('it-IT', {
+                                month: 'short', day: 'numeric',
+                              })}
+                            </span>
+                          )}
+                        </div>
+                        <div className="wpp-tc-action" onClick={e => e.stopPropagation()}>
+                          {task.status !== 'completed' && (
+                            <button
+                              className="wpp-task-complete-btn"
+                              onClick={() => handleTaskComplete(task.id)}
+                              title="Segna completata"
+                            >
+                              <CheckSquare size={13} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Archived completion groups (folders) */}
+                    {sortedGroupIds.map((groupId, idx) => {
+                      const groupTasks = archivedGroups[groupId];
+                      const isExpanded = expandedGroups.has(groupId);
+                      const groupDate = new Date(groupId * 1000).toLocaleDateString('it-IT', {
+                        day: 'numeric', month: 'short', year: 'numeric',
+                      });
+                      const cycleNumber = sortedGroupIds.length - idx;
+
+                      return (
+                        <div key={groupId} className="wpp-task-group">
+                          <button
+                            className="wpp-task-group-header"
+                            onClick={() => toggleGroup(groupId)}
+                          >
+                            {isExpanded
+                              ? <FolderOpen size={13} className="wpp-task-group-icon" />
+                              : <Folder size={13} className="wpp-task-group-icon" />
+                            }
+                            <span className="wpp-task-group-label">
+                              Completamento #{cycleNumber} — {groupDate}
+                            </span>
+                            <span className="wpp-task-group-count">{groupTasks.length} task</span>
+                            {isExpanded
+                              ? <ChevronDown size={11} className="wpp-task-group-chevron" />
+                              : <ChevronRight size={11} className="wpp-task-group-chevron" />
+                            }
+                          </button>
+
+                          {isExpanded && (
+                            <div className="wpp-task-group-body">
+                              {groupTasks.map((task) => (
+                                <div
+                                  key={task.id}
+                                  className="wpp-task-row wpp-task-row--archived"
+                                  onClick={() => setSelectedTask(task)}
+                                  role="button"
+                                  tabIndex={0}
+                                  onKeyDown={e => (e.key === 'Enter' || e.key === ' ') && setSelectedTask(task)}
+                                >
+                                  <div className="wpp-tc-status">
+                                    <span
+                                      className="wpp-task-status-dot"
+                                      style={{ backgroundColor: getTaskStatusColor(task.status) }}
+                                    />
+                                  </div>
+                                  <div className="wpp-tc-title">
+                                    <span className="wpp-task-title">{task.title}</span>
+                                  </div>
+                                  <div className="wpp-tc-priority">
+                                    <span
+                                      className="wpp-priority-badge"
+                                      style={{ color: getPriorityColor(task.priority) }}
+                                    >
+                                      {task.priority}
+                                    </span>
+                                  </div>
+                                  <div className="wpp-tc-status-label">
+                                    <span
+                                      className="wpp-status-chip"
+                                      style={{ color: getTaskStatusColor(task.status) }}
+                                    >
+                                      {getTaskStatusLabel(task.status)}
+                                    </span>
+                                  </div>
+                                  <div className="wpp-tc-due">
+                                    {task.due_date && (
+                                      <span className="wpp-due-date">
+                                        {new Date(task.due_date).toLocaleDateString('it-IT', {
+                                          month: 'short', day: 'numeric',
+                                        })}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="wpp-tc-action" />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+                );
+              })()
             ) : (
               <div className="wpp-empty">
                 <CheckSquare size={28} className="wpp-empty-icon" />
@@ -598,6 +789,18 @@ const WorkspaceProjectPage: React.FC = () => {
             )}
           </div>
         )}
+        {/* AI Studio tab — Split View 40/60 */}
+        {activeTab === 'orchestrator' && projectId && (
+          <div className="wpp-orchestrator-split">
+            <div className="wpp-orchestrator-left">
+              <OrchestratorChat projectId={projectId} />
+            </div>
+            <div className="wpp-orchestrator-divider" />
+            <div className="wpp-orchestrator-right">
+              <ArtifactViewer projectId={projectId} />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── Status bar (bottom) ── */}
@@ -636,6 +839,50 @@ const WorkspaceProjectPage: React.FC = () => {
           onClose={() => setShowAddTaskForm(false)}
           onTaskCreated={handleTaskCreated}
         />
+      )}
+
+      {/* ── Complete Project Modal ── */}
+      {showCompleteModal && (
+        <div className="wpp-modal-overlay" onClick={() => !isCompleting && setShowCompleteModal(false)}>
+          <div className="wpp-modal wpp-complete-modal" onClick={e => e.stopPropagation()}>
+            <div className="wpp-modal-header">
+              <Flag size={16} className="wpp-modal-icon wpp-modal-icon--success" />
+              <h3 className="wpp-modal-title">Segna progetto come completato</h3>
+            </div>
+            <p className="wpp-modal-body">
+              Tutte le task attive verranno archiviate in una cartella. Se in futuro aggiungerai
+              nuove task, il progetto tornerà "In corso" e il progresso ripartirà da zero.
+            </p>
+            <label className="wpp-modal-label">
+              Feedback (opzionale)
+              <textarea
+                className="wpp-modal-textarea"
+                placeholder="Come è andato il progetto? Aggiungi note o commenti per il cliente..."
+                value={completeFeedback}
+                onChange={e => setCompleteFeedback(e.target.value)}
+                rows={4}
+                disabled={isCompleting}
+              />
+            </label>
+            <div className="wpp-modal-footer">
+              <button
+                className="wpp-modal-btn wpp-modal-btn--cancel"
+                onClick={() => setShowCompleteModal(false)}
+                disabled={isCompleting}
+              >
+                Annulla
+              </button>
+              <button
+                className="wpp-modal-btn wpp-modal-btn--confirm"
+                onClick={handleCompleteProject}
+                disabled={isCompleting}
+              >
+                {isCompleting ? <Loader2 size={13} className="wpp-spin" /> : <Flag size={13} />}
+                {isCompleting ? 'Completamento...' : 'Conferma completamento'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

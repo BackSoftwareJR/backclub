@@ -57,6 +57,10 @@ return [
         'publish_head_branch' => env('GITHUB_PUBLISH_HEAD_BRANCH', 'staging'),
     ],
 
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+    ],
+
     'n8n' => [
         'enabled' => env('N8N_ENABLED', false),
         'webhook_base_url' => env('N8N_WEBHOOK_BASE_URL'),
@@ -65,6 +69,10 @@ return [
         'webhook_auth_value' => env('N8N_WEBHOOK_AUTH_VALUE'),
         'callback_auth_header' => env('N8N_CALLBACK_AUTH_HEADER'),
         'callback_auth_value' => env('N8N_CALLBACK_AUTH_VALUE'),
+        // URL base usato per costruire i callback URL inviati all'orchestratore N8N.
+        // Se APP_URL non punta all'API pubblica, impostare questo nel .env del server.
+        // Esempio: N8N_CALLBACK_BASE_URL=https://backclub.it/backend/public
+        'callback_base_url' => env('N8N_CALLBACK_BASE_URL'),
         'start_timeout_seconds' => env('N8N_START_TIMEOUT_SECONDS', 30),
         'webhook_publish_production' => env('N8N_WEBHOOK_PUBLISH_PRODUCTION'),
         'calendar_call_webhook' => env('N8N_CALENDAR_CALL_WEBHOOK', 'webhook/backclub-calendar-call'),

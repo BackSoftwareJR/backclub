@@ -1,31 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Code, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { useTheme } from '../../context/ThemeContext';
+import {
+  WORKSPACE_TYPES,
+  getWorkspaceHomePath,
+} from './config/workspaceTypes';
 import type { WorkspaceTypeCode } from '../../types/workspace';
 import './workspace-tokens.css';
 import './WorkspaceTypeSelectorPage.css';
-
-interface WorkspaceTypeOption {
-  code: WorkspaceTypeCode;
-  name: string;
-  description: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  color: string;
-  badge: string;
-}
-
-const workspaceTypes: WorkspaceTypeOption[] = [
-  {
-    code: 'developer',
-    name: 'Developer',
-    description: 'Lavora su progetti, branch, agenti AI e task su staging.',
-    icon: Code,
-    color: 'var(--color-accent-blue)',
-    badge: 'Disponibile',
-  },
-];
 
 const WorkspaceTypeSelectorPage: React.FC = () => {
   const navigate = useNavigate();
@@ -41,15 +25,10 @@ const WorkspaceTypeSelectorPage: React.FC = () => {
       setIsLoading(true);
       setSelectedType(type);
 
-      // Add visual feedback with animation
-      await new Promise(resolve => setTimeout(resolve, 200));
-      
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
       await setWorkspaceType(type);
-      
-      // Redirect to the appropriate workspace area
-      if (type === 'developer') {
-        navigate('/workspace/developer/progetti');
-      }
+      navigate(getWorkspaceHomePath(type));
     } catch (error) {
       console.error('Failed to set workspace type:', error);
       setSelectedType(null);
@@ -62,14 +41,14 @@ const WorkspaceTypeSelectorPage: React.FC = () => {
     <div className="workspace-type-selector workspace-theme-scope" data-theme={resolvedTheme}>
       <div className="workspace-type-selector-container">
         <div className="workspace-type-selector-header">
-          <h1 className="workspace-type-selector-title">Scegli il tuo WorkSpace</h1>
+          <h1 className="workspace-type-selector-title">Scegli il tuo reparto</h1>
           <p className="workspace-type-selector-subtitle">
-            Seleziona il tipo di workspace che meglio si adatta al tuo ruolo e alle tue esigenze.
+            Seleziona la macroarea di WorkSpace in cui vuoi lavorare. Potrai cambiarla in qualsiasi momento dal menu laterale.
           </p>
         </div>
 
         <div className="workspace-type-grid">
-          {workspaceTypes.map((workspaceType) => {
+          {WORKSPACE_TYPES.map((workspaceType) => {
             const Icon = workspaceType.icon;
             const isSelected = selectedType === workspaceType.code;
             const isCurrentlyLoading = isLoading && isSelected;
@@ -87,11 +66,13 @@ const WorkspaceTypeSelectorPage: React.FC = () => {
                     <div className="workspace-type-card-icon">
                       <Icon size={32} />
                     </div>
-                    <div className="workspace-type-card-badge">
+                    <div
+                      className={`workspace-type-card-badge ${workspaceType.isAvailable ? '' : 'workspace-type-card-badge-soon'}`}
+                    >
                       {workspaceType.badge}
                     </div>
                   </div>
-                  
+
                   <div className="workspace-type-card-info">
                     <h3 className="workspace-type-card-name">{workspaceType.name}</h3>
                     <p className="workspace-type-card-description">{workspaceType.description}</p>

@@ -1,129 +1,68 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import '../../styles/backclub.css';
+import { SparklesCore } from '@/components/ui/sparkles';
+import { LiquidButton } from '@/components/ui/liquid-glass-button';
 
-const Home: React.FC = () => {
-  const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start']
-  });
-
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-  const yDecorative1 = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
-  const yDecorative2 = useTransform(scrollYProgress, [0, 1], ['0%', '-20%']);
-
+const Home = () => {
   return (
-    <>
-      {/* Hero Section */}
-      <section ref={heroRef} className="backclub-hero">
-        <div className="backclub-container-center" style={{ position: 'relative', zIndex: 1 }}>
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3, ease: [0.4, 0, 0.2, 1] as const }}
-            style={{ opacity }}
-          >
-            <h1 className="backclub-h1 backclub-serif" style={{ textAlign: 'center' }}>
-              Coltiviamo la sintonia digitale.
-            </h1>
-            <p
-              className="backclub-text backclub-text-large"
-              style={{
-                textAlign: 'center',
-                marginBottom: '3rem',
-                maxWidth: '700px',
-                margin: '0 auto 3rem'
-              }}
-            >
-              Dove i migliori talenti incontrano imprenditori visionari. 
-              Un ecosistema esclusivo per progetti unici, curati con dedizione sartoriale.
-            </p>
-            <div style={{ textAlign: 'center' }}>
-              <Link to="/login">
-                <motion.button
-                  className="backclub-button"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                >
-                  Accedi
-                </motion.button>
-              </Link>
-            </div>
-          </motion.div>
+    <section
+      className="min-h-screen w-full bg-black flex flex-col items-center justify-center overflow-hidden px-4"
+      aria-label="Hero"
+    >
+      <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20 tracking-tight">
+        BackClub
+      </h1>
+
+      <div className="relative z-20 w-full max-w-[40rem] flex flex-col items-center mt-10 sm:mt-14 md:mt-16">
+        {/* Linea blu centrata sotto il titolo */}
+        <div
+          className="relative w-[75%] max-w-md h-4 shrink-0"
+          aria-hidden="true"
+        >
+          <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+            <div className="h-[2px] w-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent blur-sm" />
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
+          </div>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1/4">
+            <div className="h-[5px] w-full bg-gradient-to-r from-transparent via-sky-500 to-transparent blur-sm" />
+            <div className="h-px w-full bg-gradient-to-r from-transparent via-sky-500 to-transparent" />
+          </div>
         </div>
 
-        {/* Elementi decorativi di sfondo con parallasse */}
-        <motion.div
-          style={{
-            position: 'absolute',
-            top: '10%',
-            left: '5%',
-            width: '200px',
-            height: '200px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(44, 95, 93, 0.08) 0%, transparent 70%)',
-            y: yDecorative1,
-            zIndex: 0
-          }}
-        />
-        <motion.div
-          style={{
-            position: 'absolute',
-            bottom: '15%',
-            right: '8%',
-            width: '150px',
-            height: '150px',
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(201, 169, 97, 0.06) 0%, transparent 70%)',
-            y: yDecorative2,
-            zIndex: 0
-          }}
-        />
-      </section>
+        {/* Particelle + accedi appena sopra i puntini */}
+        <div className="relative w-full h-36 sm:h-44 md:h-48 mt-10 sm:mt-12 md:mt-14">
+          <SparklesCore
+            background="transparent"
+            minSize={0.4}
+            maxSize={1}
+            particleDensity={1200}
+            className="absolute inset-0 w-full h-full"
+            particleColor="#FFFFFF"
+          />
+          <div className="absolute inset-0 w-full h-full bg-black [mask-image:radial-gradient(350px_200px_at_top,transparent_20%,white)]" />
 
-      {/* Sezione "La Velocità del Cambiamento" */}
-      <section className="backclub-section">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 1, ease: [0.4, 0, 0.2, 1] as const }}
-          className="backclub-container-center"
-        >
-          <h2 className="backclub-h2 backclub-serif" style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            La Velocità del Cambiamento
-          </h2>
-          <p
-            className="backclub-text backclub-text-large"
-            style={{
-              textAlign: 'center',
-              marginBottom: '2rem'
+          <motion.div
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{
+              duration: 0.9,
+              delay: 0.45,
+              ease: [0.25, 0.1, 0.25, 1],
             }}
+            className="absolute left-1/2 -translate-x-1/2 z-20 bottom-[42%] sm:bottom-[40%] md:bottom-[38%]"
           >
-            La tecnologia corre veloce. Le tendenze si susseguono. I framework nascono e muoiono 
-            nel giro di mesi. In questo vortice di innovazione continua, è facile perdere di vista 
-            ciò che davvero conta: la qualità delle connessioni umane.
-          </p>
-          <p
-            className="backclub-text"
-            style={{
-              textAlign: 'center'
-            }}
-          >
-            In Backclub, ci prendiamo il tempo necessario. Non per essere lenti, ma per essere 
-            precisi. Perché un progetto digitale di valore non nasce dalla fretta, ma dalla 
-            sintonia tra chi lo concepisce e chi lo realizza. Dalla cura artigianale che trasforma 
-            un'idea in un'opera.
-          </p>
-
-        </motion.div>
-      </section>
-    </>
+            <LiquidButton
+              asChild
+              size="lg"
+              className="text-white text-sm sm:text-base font-normal tracking-[-0.01em] lowercase min-w-[8.5rem] sm:min-w-[9rem]"
+            >
+              <Link to="/login">accedi</Link>
+            </LiquidButton>
+          </motion.div>
+        </div>
+      </div>
+    </section>
   );
 };
 
 export default Home;
-

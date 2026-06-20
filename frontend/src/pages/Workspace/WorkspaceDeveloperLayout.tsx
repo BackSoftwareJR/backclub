@@ -154,7 +154,7 @@ const WorkspaceDeveloperLayout: React.FC = () => {
               <span className="workspace-mini-profile-name">
                 {user?.name ? user.name.split(' ')[0] : 'Developer'}
               </span>
-              <span className="workspace-mini-profile-role">Developer</span>
+              <span className="workspace-mini-profile-role">Frontend Dev</span>
             </div>
             <Settings size={13} className="workspace-mini-profile-icon" />
           </div>

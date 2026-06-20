@@ -3979,6 +3979,37 @@
     background: rgba(0,122,255,0.22);
 }
 
+.pd-tasks-series-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    height: 32px;
+}
+
+.pd-tasks-series-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.pd-tasks-empty-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
 .pd-tasks-view-toggle {
     display: flex;
     align-items: center;

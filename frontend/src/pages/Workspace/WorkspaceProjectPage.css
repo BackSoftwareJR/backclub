@@ -848,3 +848,276 @@
     padding: var(--ws-spacing-md);
   }
 }
+
+/* ── AI Studio — Orchestrator Split View ── */
+.wpp-content--split {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.wpp-orchestrator-split {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.wpp-orchestrator-left {
+  flex: 0 0 40%;
+  min-width: 280px;
+  max-width: 480px;
+  overflow: hidden;
+  border-right: 1px solid var(--ws-border);
+}
+
+.wpp-orchestrator-divider {
+  display: none;
+}
+
+.wpp-orchestrator-right {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* AI Studio tab indicator */
+.wpp-tab--ai {
+  position: relative;
+}
+
+.wpp-tab--ai.active {
+  color: var(--ws-purple) !important;
+  border-bottom-color: var(--ws-purple) !important;
+}
+
+.wpp-tab--ai svg {
+  color: inherit;
+}
+
+@media (max-width: 768px) {
+  .wpp-orchestrator-split {
+    flex-direction: column;
+  }
+
+  .wpp-orchestrator-left {
+    flex: 0 0 50%;
+    max-width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--ws-border);
+  }
+
+  .wpp-orchestrator-right {
+    flex: 0 0 50%;
+  }
+}
+
+/* ── Tasks toolbar actions group ── */
+.wpp-tasks-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Complete Project button ── */
+.wpp-complete-project-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px var(--ws-spacing-md);
+  background: transparent;
+  color: var(--ws-green);
+  border: 1px solid var(--ws-green);
+  border-radius: var(--ws-radius-sm);
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-medium);
+  cursor: pointer;
+  transition: background var(--ws-transition), color var(--ws-transition);
+}
+.wpp-complete-project-btn:hover {
+  background: var(--ws-green);
+  color: #fff;
+}
+
+/* ── Task completion group (folder) ── */
+.wpp-task-group {
+  margin-top: 4px;
+}
+
+.wpp-task-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--ws-bg-secondary);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-sm);
+  cursor: pointer;
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-secondary);
+  text-align: left;
+  transition: background var(--ws-transition);
+  margin-bottom: 2px;
+}
+.wpp-task-group-header:hover {
+  background: var(--ws-bg-hover, color-mix(in srgb, var(--ws-bg-secondary) 80%, var(--ws-accent)));
+}
+
+.wpp-task-group-icon {
+  color: var(--ws-accent);
+  flex-shrink: 0;
+}
+
+.wpp-task-group-label {
+  flex: 1;
+  font-weight: var(--ws-weight-medium);
+  color: var(--ws-text-primary);
+}
+
+.wpp-task-group-count {
+  font-size: 10px;
+  color: var(--ws-text-tertiary);
+  background: var(--ws-bg-tertiary, rgba(255,255,255,0.06));
+  padding: 1px 6px;
+  border-radius: 8px;
+}
+
+.wpp-task-group-chevron {
+  color: var(--ws-text-tertiary);
+  flex-shrink: 0;
+}
+
+.wpp-task-group-body {
+  border: 1px solid var(--ws-border);
+  border-top: none;
+  border-radius: 0 0 var(--ws-radius-sm) var(--ws-radius-sm);
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+/* Archived task row — slightly muted */
+.wpp-task-row--archived {
+  opacity: 0.65;
+}
+.wpp-task-row--archived:hover {
+  opacity: 0.85;
+}
+
+/* ── Complete Project Modal ── */
+.wpp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9000;
+  padding: 16px;
+}
+
+.wpp-modal {
+  background: var(--ws-bg-primary, #1a1a2e);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius);
+  padding: 24px;
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.wpp-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wpp-modal-icon {
+  flex-shrink: 0;
+}
+.wpp-modal-icon--success {
+  color: var(--ws-green);
+}
+
+.wpp-modal-title {
+  font-size: var(--ws-font-sm);
+  font-weight: var(--ws-weight-semibold);
+  color: var(--ws-text-primary);
+  margin: 0;
+}
+
+.wpp-modal-body {
+  font-size: var(--ws-font-xs);
+  color: var(--ws-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.wpp-modal-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-medium);
+  color: var(--ws-text-secondary);
+}
+
+.wpp-modal-textarea {
+  background: var(--ws-bg-secondary);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius-sm);
+  color: var(--ws-text-primary);
+  font-size: var(--ws-font-xs);
+  padding: 10px 12px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color var(--ws-transition);
+}
+.wpp-modal-textarea:focus {
+  border-color: var(--ws-accent);
+}
+.wpp-modal-textarea:disabled {
+  opacity: 0.5;
+}
+
+.wpp-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.wpp-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border-radius: var(--ws-radius-sm);
+  font-size: var(--ws-font-xs);
+  font-weight: var(--ws-weight-medium);
+  cursor: pointer;
+  border: none;
+  transition: opacity var(--ws-transition), background var(--ws-transition);
+}
+.wpp-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.wpp-modal-btn--cancel {
+  background: transparent;
+  color: var(--ws-text-secondary);
+  border: 1px solid var(--ws-border);
+}
+.wpp-modal-btn--cancel:hover:not(:disabled) {
+  background: var(--ws-bg-secondary);
+}
+.wpp-modal-btn--confirm {
+  background: var(--ws-green);
+  color: #fff;
+}
+.wpp-modal-btn--confirm:hover:not(:disabled) {
+  opacity: 0.88;
+}

@@ -12,10 +12,46 @@ import {
   LayoutList,
   GitBranch,
   CheckSquare,
+  Plus,
+  Brain,
 } from 'lucide-react';
 import { workspaceApi } from '../../api/workspace';
 import type { WorkspaceProject } from '../../types/workspace';
 import './WorkspaceProjectsPage.css';
+
+/* ── Circular progress ring ── */
+const ProgressRing: React.FC<{ progress: number; size?: number }> = ({ progress, size = 44 }) => {
+  const radius = (size - 6) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+  return (
+    <svg width={size} height={size} className="wsp-progress-ring" viewBox={`0 0 ${size} ${size}`}>
+      <circle
+        className="wsp-progress-ring__track"
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" strokeWidth="3"
+      />
+      <circle
+        className="wsp-progress-ring__fill"
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" strokeWidth="3"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+      <text
+        x={size / 2} y={size / 2 + 4}
+        textAnchor="middle"
+        className="wsp-progress-ring__label"
+        fontSize="10"
+        fontWeight="600"
+      >
+        {progress}%
+      </text>
+    </svg>
+  );
+};
 
 const WorkspaceProjectsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -121,7 +157,7 @@ const WorkspaceProjectsPage: React.FC = () => {
       {/* ── Toolbar ── */}
       <div className="wsp-toolbar">
         <div className="wsp-toolbar-left">
-          <h1 className="wsp-page-title">Progetti</h1>
+          <h1 className="wsp-page-title">Watchlist</h1>
           <span className="wsp-count-badge">{filtered.length}</span>
         </div>
         <div className="wsp-toolbar-right">
@@ -130,7 +166,7 @@ const WorkspaceProjectsPage: React.FC = () => {
             <input
               type="text"
               className="wsp-search-input"
-              placeholder="Cerca progetto..."
+              placeholder="Cerca struttura..."
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
@@ -151,20 +187,30 @@ const WorkspaceProjectsPage: React.FC = () => {
               <LayoutGrid size={14} />
             </button>
           </div>
+          <button className="wsp-new-structure-btn" title="Aggiungi nuova struttura Senior Care">
+            <Plus size={13} />
+            <span>Nuova Struttura</span>
+          </button>
         </div>
       </div>
 
       {filtered.length === 0 ? (
         <div className="wsp-empty">
-          <span className="wsp-empty-icon">⌁</span>
+          <span className="wsp-empty-icon">🏡</span>
           <h3 className="wsp-empty-title">
-            {search ? 'Nessun progetto trovato' : 'Nessun progetto nel workspace Developer'}
+            {search ? 'Nessuna struttura trovata' : 'Nessuna struttura nel workspace'}
           </h3>
           <p className="wsp-empty-desc">
             {search
-              ? `Nessun progetto corrisponde a "${search}"`
-              : 'Chiedi al tuo project manager di abilitare questo workspace per i tuoi progetti.'}
+              ? `Nessuna struttura corrisponde a "${search}"`
+              : 'Aggiungi la prima struttura Senior Care per iniziare a usare l\'AI Studio.'}
           </p>
+          {!search && (
+            <button className="wsp-empty-cta">
+              <Plus size={14} />
+              Aggiungi Struttura
+            </button>
+          )}
         </div>
       ) : viewMode === 'list' ? (
         /* ── LIST VIEW ── */
@@ -272,12 +318,12 @@ const WorkspaceProjectsPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        /* ── GRID VIEW ── */
+        /* ── GRID VIEW — Watchlist Kanban ── */
         <div className="wsp-grid">
           {filtered.map((project) => (
             <div
               key={project.id}
-              className={`wsp-card ${selectedId === project.id ? 'selected' : ''}`}
+              className={`wsp-card wsp-card--watchlist ${selectedId === project.id ? 'selected' : ''}`}
               onClick={() => handleProjectClick(project)}
               role="button"
               tabIndex={0}
@@ -290,25 +336,34 @@ const WorkspaceProjectsPage: React.FC = () => {
                 />
               )}
               <div className="wsp-card-body">
-                <div className="wsp-card-header">
-                  <span className={`wsp-status-dot ${getStatusDotClass(project.status)}`} />
-                  <span className="wsp-project-name">{project.name}</span>
-                  {project.is_project_manager && (
-                    <span className="wsp-pm-badge">
-                      <Crown size={9} /> PM
-                    </span>
-                  )}
+                <div className="wsp-card-top">
+                  <div className="wsp-card-info">
+                    <div className="wsp-card-header">
+                      <span className={`wsp-status-dot ${getStatusDotClass(project.status)}`} />
+                      <span className="wsp-project-name">{project.name}</span>
+                      {project.is_project_manager && (
+                        <span className="wsp-pm-badge">
+                          <Crown size={9} /> PM
+                        </span>
+                      )}
+                    </div>
+                    <div className="wsp-card-stats">
+                      <span className="wsp-stat"><GitBranch size={10} /> {project.branches_count}</span>
+                      <span className="wsp-stat"><Bot size={10} /> {project.active_agents_count}</span>
+                      <span className="wsp-stat"><CheckSquare size={10} /> {project.open_tasks_count}</span>
+                    </div>
+                  </div>
+                  <ProgressRing progress={project.progress} />
                 </div>
-                <div className="wsp-card-stats">
-                  <span className="wsp-stat"><GitBranch size={10} /> {project.branches_count} branch</span>
-                  <span className="wsp-stat"><Bot size={10} /> {project.active_agents_count} agenti</span>
-                  <span className="wsp-stat"><CheckSquare size={10} /> {project.open_tasks_count} task</span>
-                </div>
-                {project.progress > 0 && (
-                  <div className="wsp-progress">
-                    <div className="wsp-progress-fill" style={{ width: `${project.progress}%` }} />
+
+                {/* Active agent badge */}
+                {project.active_agents_count > 0 && (
+                  <div className="wsp-card-agent-badge">
+                    <Brain size={10} />
+                    <span>{project.active_agents_count} agente{project.active_agents_count > 1 ? 'i' : ''} attivo</span>
                   </div>
                 )}
+
                 <div className="wsp-card-footer">
                   <span className="wsp-date">{formatDate(project.updated_at)}</span>
                   <div className="wsp-card-links" onClick={e => e.stopPropagation()}>

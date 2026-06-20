@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Traits\ChecksWorkspaceProjectAccess;
 use App\Models\UserWorkspacePreference;
+use App\Models\WorkspaceType;
 use App\Models\CrmProject;
 use App\Models\CrmProjectTeamMember;
 use App\Models\CrmProjectWorkspaceSetting;
 use App\Models\WorkspaceBranch;
 use App\Models\WorkspaceAgent;
 use App\Models\WorkspaceUserTask;
-use App\Models\CrmProjectTask;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
@@ -53,8 +53,10 @@ class WorkspaceController extends Controller
      */
     public function updatePreferences(Request $request): JsonResponse
     {
+        $allowedCodes = WorkspaceType::where('is_active', true)->pluck('code')->implode(',');
+
         $validator = Validator::make($request->all(), [
-            'workspace_type_code' => 'required|string|in:developer',
+            'workspace_type_code' => 'required|string|in:' . $allowedCodes,
             'settings' => 'nullable|array'
         ]);
 
@@ -153,13 +155,16 @@ class WorkspaceController extends Controller
                 ->where('status', '!=', 'completed')
                 ->count();
             
-            // Progresso generale del progetto (CrmProjectTask)
-            $totalTasks = CrmProjectTask::where('crm_project_id', $project->id)->count();
-            $completedTasks = CrmProjectTask::where('crm_project_id', $project->id)
+            // Progress: based only on WorkspaceUserTasks not yet archived (completion_group_id IS NULL)
+            $activeTasks = WorkspaceUserTask::where('project_id', $project->id)
+                ->whereNull('completion_group_id')
+                ->count();
+            $activeCompletedTasks = WorkspaceUserTask::where('project_id', $project->id)
+                ->whereNull('completion_group_id')
                 ->where('status', 'completed')
                 ->count();
-            
-            $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+
+            $progress = $activeTasks > 0 ? round(($activeCompletedTasks / $activeTasks) * 100) : 0;
 
             $enrichedProjects[] = [
                 'id' => $project->id,
@@ -238,12 +243,16 @@ class WorkspaceController extends Controller
             ->where('status', '!=', 'completed')
             ->count();
         
-        $totalTasks = CrmProjectTask::where('crm_project_id', $id)->count();
-        $completedTasks = CrmProjectTask::where('crm_project_id', $id)
+        // Progress: based only on active workspace tasks (completion_group_id IS NULL)
+        $activeTasks = WorkspaceUserTask::where('project_id', $id)
+            ->whereNull('completion_group_id')
+            ->count();
+        $activeCompletedTasks = WorkspaceUserTask::where('project_id', $id)
+            ->whereNull('completion_group_id')
             ->where('status', 'completed')
             ->count();
-        
-        $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+
+        $progress = $activeTasks > 0 ? round(($activeCompletedTasks / $activeTasks) * 100) : 0;
 
         return response()->json([
             'success' => true,
@@ -336,6 +345,85 @@ class WorkspaceController extends Controller
                 'message' => 'Errore imprevisto durante la pubblicazione',
             ], 500);
         }
+    }
+
+    /**
+     * POST /api/workspace/developer/projects/{id}/complete
+     * Segna il progetto come completato:
+     *   1. Verifica che tutte le task attive siano nello stato 'completed'.
+     *   2. Archivia le task nello snapshot corrente (completion_group_id = now timestamp).
+     *   3. Aggiorna lo status del progetto a 'completed'.
+     *   4. Salva il feedback opzionale nelle settings del progetto.
+     */
+    public function completeProject(Request $request, int $id): JsonResponse
+    {
+        $project = $this->getUserAccessibleProject($id);
+        $userId = auth()->id();
+        $isPmOrAdmin = $project->manager_id === $userId
+            || auth()->user()->role === 'admin'
+            || (method_exists(auth()->user(), 'hasRole') && auth()->user()->hasRole('admin'));
+
+        if (!$isPmOrAdmin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Solo il Project Manager può segnare il progetto come completato',
+            ], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'feedback' => 'nullable|string|max:2000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        // Verifica che non esistano task attive non completate
+        $pendingCount = WorkspaceUserTask::where('project_id', $id)
+            ->whereNull('completion_group_id')
+            ->where('status', '!=', 'completed')
+            ->count();
+
+        if ($pendingCount > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => "Ci sono ancora {$pendingCount} task non completate. Completa tutte le task prima di chiudere il progetto.",
+            ], 422);
+        }
+
+        // Usa il timestamp come identificatore univoco del gruppo di completamento
+        $completionGroupId = now()->timestamp;
+
+        // Archivia tutte le task attive nel gruppo corrente
+        WorkspaceUserTask::where('project_id', $id)
+            ->whereNull('completion_group_id')
+            ->update(['completion_group_id' => $completionGroupId]);
+
+        // Salva feedback nelle settings del progetto e aggiorna lo status
+        $settings = $project->settings ?? [];
+        $settings['completion_history'] = array_merge(
+            $settings['completion_history'] ?? [],
+            [[
+                'completed_at' => now()->toIso8601String(),
+                'feedback' => $request->input('feedback'),
+                'completed_by' => $userId,
+                'completion_group_id' => $completionGroupId,
+            ]]
+        );
+
+        $project->update([
+            'status' => 'completed',
+            'settings' => $settings,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Progetto segnato come completato',
+            'data' => [
+                'status' => $project->status,
+                'completion_group_id' => $completionGroupId,
+            ],
+        ]);
     }
 
     /**

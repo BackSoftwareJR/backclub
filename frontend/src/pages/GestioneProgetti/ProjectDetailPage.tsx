@@ -43,7 +43,8 @@ import {
     Github,
     Globe,
     Monitor,
-    MoreHorizontal
+    MoreHorizontal,
+    Layers
 } from 'lucide-react';
 import { 
     crmProjectsApi, 
@@ -72,6 +73,8 @@ import ProjectCalendar from '../../components/ProjectCalendar/ProjectCalendar';
 import FinancialCalendar from '../../components/FinancialCalendar/FinancialCalendar';
 import TaskExecutionModeSelector from '../../components/Tasks/TaskExecutionModeSelector';
 import ExactPromptCheckbox from '../../components/Tasks/ExactPromptCheckbox';
+import CreateTaskModal from './CreateTaskModal';
+import TaskSeriesModal from './TaskSeriesModal';
 import TaskAgentControlPanel from '../../components/Tasks/TaskAgentControlPanel';
 import WorkspaceTab from './tabs/WorkspaceTab';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -145,7 +148,7 @@ const ProjectDetailPage: React.FC = () => {
     const isPmInFreelanceContext = isFreelanceContext && project != null && user?.id === project.manager_id;
 
     const handleOpenTaskDetail = (task: CrmProjectTask) => {
-        if (isPmInFreelanceContext && id) {
+        if (id) {
             const returnTo = `${location.pathname}?tab=tasks`;
             navigate(`/freelance/task/${task.id}?projectId=${id}`, { state: { returnTo } });
             return;
@@ -213,6 +216,7 @@ const ProjectDetailPage: React.FC = () => {
     const [filteredTasks, setFilteredTasks] = useState<CrmProjectTask[]>([]);
     const [tasksView, setTasksView] = useState<'users' | 'table' | 'cards'>('table');
     const [showTaskModal, setShowTaskModal] = useState(false);
+    const [showSeriesModal, setShowSeriesModal] = useState(false);
     const [showTaskDetail, setShowTaskDetail] = useState(false);
     const [showEditTaskModal, setShowEditTaskModal] = useState(false);
     const [showReassignModal, setShowReassignModal] = useState(false);
@@ -921,6 +925,22 @@ const ProjectDetailPage: React.FC = () => {
         } finally {
             setLoadingCrmInvolved(false);
         }
+    };
+
+    const handleOpenSeriesModal = () => {
+        setShowSeriesModal(true);
+        if (project && teamMembers.length === 0) {
+            loadTeamMembers();
+        }
+    };
+
+    const handleCloseSeriesModal = () => {
+        setShowSeriesModal(false);
+    };
+
+    const handleSeriesSuccess = async () => {
+        await loadTasks();
+        await loadProject();
     };
 
     const handleOpenTaskModal = () => {
@@ -3001,10 +3021,16 @@ const ProjectDetailPage: React.FC = () => {
                                 </div>
                                 <div className="pd-tasks-toolbar-right">
                                     {canCreateTask && (
-                                        <button className="pd-tasks-new-btn" onClick={handleOpenTaskModal}>
-                                            <Plus size={14} />
-                                            Nuovo Task
-                                        </button>
+                                        <>
+                                            <button className="pd-tasks-series-btn" onClick={handleOpenSeriesModal}>
+                                                <Layers size={14} />
+                                                Nuova Serie
+                                            </button>
+                                            <button className="pd-tasks-new-btn" onClick={handleOpenTaskModal}>
+                                                <Plus size={14} />
+                                                Nuovo Task
+                                            </button>
+                                        </>
                                     )}
                                     <div className="pd-tasks-view-toggle">
                                         <button className={`pd-tasks-view-btn${tasksView === 'table' ? ' active' : ''}`} onClick={() => setTasksView('table')} title="Vista Lista"><List size={14} /></button>
@@ -3094,10 +3120,16 @@ const ProjectDetailPage: React.FC = () => {
                                     <CheckSquare size={40} className="pd-tasks-empty-icon" />
                                     <p className="pd-tasks-empty-title">Nessun task trovato</p>
                                     {canCreateTask && (
-                                        <button className="pd-tasks-empty-btn" onClick={handleOpenTaskModal}>
-                                            <Plus size={14} />
-                                            Crea il primo task
-                                        </button>
+                                        <div className="pd-tasks-empty-actions">
+                                            <button className="pd-tasks-series-btn" onClick={handleOpenSeriesModal}>
+                                                <Layers size={14} />
+                                                Nuova Serie
+                                            </button>
+                                            <button className="pd-tasks-empty-btn" onClick={handleOpenTaskModal}>
+                                                <Plus size={14} />
+                                                Crea il primo task
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             ) : (
@@ -4392,20 +4424,60 @@ const ProjectDetailPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Modal Crea Task */}
             {showTaskModal && (
-                <div className="modal-overlay" onClick={handleCloseTaskModal}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <div className="modal-header">
-                            <h2 className="modal-title">Crea Nuovo Task</h2>
-                            <button 
-                                className="modal-close-btn"
-                                onClick={handleCloseTaskModal}
-                            >
-                                <X size={20} />
-                            </button>
+                <CreateTaskModal
+                    taskTitle={taskTitle}
+                    setTaskTitle={setTaskTitle}
+                    taskDescription={taskDescription}
+                    setTaskDescription={setTaskDescription}
+                    taskStatus={taskStatus}
+                    setTaskStatus={setTaskStatus}
+                    taskPriority={taskPriority}
+                    setTaskPriority={setTaskPriority}
+                    taskStartDate={taskStartDate}
+                    setTaskStartDate={setTaskStartDate}
+                    taskDueDate={taskDueDate}
+                    setTaskDueDate={setTaskDueDate}
+                    taskCrmLabelId={taskCrmLabelId}
+                    setTaskCrmLabelId={setTaskCrmLabelId}
+                    taskExecutionMode={taskExecutionMode}
+                    setTaskExecutionMode={setTaskExecutionMode}
+                    taskExactPrompt={taskExactPrompt}
+                    setTaskExactPrompt={setTaskExactPrompt}
+                    taskAssignments={taskAssignments}
+                    handleAddAssignment={handleAddAssignment}
+                    handleRemoveAssignment={handleRemoveAssignment}
+                    handleUpdateAssignment={handleUpdateAssignment}
+                    creatingTask={creatingTask}
+                    project={project}
+                    assignedCrms={getAssignedCrms()}
+                    remainingBudget={getRemainingBudget()}
+                    totalAssignmentsBudget={calculateTotalAssignmentsBudget()}
+                    teamUsers={getTeamUsers()}
+                    getPreferredPaymentMethodsForUser={getPreferredPaymentMethodsForUser}
+                    getDefaultProjectRateForUser={getDefaultProjectRateForUser}
+                    onClose={handleCloseTaskModal}
+                    onSubmit={handleCreateTask}
+                />
+            )}
+
+            {showSeriesModal && id && (
+                <TaskSeriesModal
+                    projectId={Number(id)}
+                    teamUsers={getTeamUsers()}
+                    onClose={handleCloseSeriesModal}
+                    onSuccess={handleSeriesSuccess}
+                />
+            )}
+            {/* LEGACY CREATE TASK MODAL — replaced by CreateTaskModal component above */}
+            {false && (
+                <div>
+                    <div>
+                        <div>
+                            <div>
+                            </div>
                         </div>
-                        <div className="modal-body">
+                        <div>
                             <div className="form-group">
                                 <label>Titolo Task *</label>
                                 <input

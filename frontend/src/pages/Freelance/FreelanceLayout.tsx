@@ -18,7 +18,8 @@ import {
   PlayCircle,
   LayoutGrid,
   Zap,
-  InboxIcon
+  InboxIcon,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { isFreelanceUser } from '../../utils/userRoles';
@@ -122,6 +123,7 @@ const FreelanceLayout: React.FC = () => {
     { id: 'richieste', label: 'Richieste', icon: InboxIcon, path: '/freelance/richieste' },
     { id: 'chat', label: 'Chat', icon: MessageSquare, path: '/freelance/chat' },
     { id: 'calendario', label: 'Calendario', icon: Calendar, path: '/freelance/calendario' },
+    { id: 'focus', label: 'Focus', icon: Sparkles, path: '/freelance/focus' },
   ];
 
   const isActive = (path: string) => {

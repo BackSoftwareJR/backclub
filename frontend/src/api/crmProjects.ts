@@ -566,6 +566,7 @@ export interface CrmProjectTask {
     crm_label_id: number | null;
     title: string;
     description: string | null;
+    work_notes?: string | null;
     status: 'pending' | 'in_progress' | 'review' | 'completed' | 'cancelled';
     priority: 'low' | 'medium' | 'high' | 'urgent';
     start_date: string | null;
@@ -735,6 +736,37 @@ export interface CreateCalendarItemData {
     completed_by?: number | null;
 }
 
+export interface CrmProjectTaskCommentAttachment {
+    id: number;
+    crm_project_task_comment_id: number;
+    file_path: string;
+    file_name: string;
+    file_size: number;
+    mime_type: string | null;
+    file_url?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CrmProjectTaskAttachment {
+    id: number;
+    crm_project_task_id: number;
+    user_id: number;
+    file_path: string;
+    file_name: string;
+    file_size: number;
+    mime_type: string | null;
+    file_url?: string;
+    created_at: string;
+    updated_at: string;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        avatar?: string | null;
+    };
+}
+
 export interface CrmProjectTaskComment {
     id: number;
     crm_project_task_id: number;
@@ -743,6 +775,7 @@ export interface CrmProjectTaskComment {
     is_note?: boolean;
     created_at: string;
     updated_at: string;
+    attachments?: CrmProjectTaskCommentAttachment[];
     user?: {
         id: number;
         name: string;
@@ -755,7 +788,7 @@ export interface CrmProjectTaskEvent {
     id: number;
     crm_project_task_id: number;
     user_id: number;
-    event_type: 'presa_in_carico' | 'rifiuto_incarico' | 'termine_incarico' | 'richiesta_spostamento' | 'modifica_scadenza' | 'aggiunta_note' | 'approvazione_spostamento' | 'rifiuto_spostamento';
+    event_type: 'presa_in_carico' | 'rifiuto_incarico' | 'termine_incarico' | 'richiesta_spostamento' | 'modifica_scadenza' | 'aggiunta_note' | 'approvazione_spostamento' | 'rifiuto_spostamento' | 'aggiunta_allegato' | 'rimozione_allegato' | 'aggiornamento_stato' | 'completamento' | 'annullamento' | 'reassign' | 'assign' | string;
     event_data?: {
         old_due_date?: string;
         new_due_date?: string;
@@ -937,12 +970,94 @@ export const crmProjectTasksApi = {
     },
 
     /**
-     * Create a note on a task
+     * Create a note on a task (text and/or files)
      */
-    createNote: async (projectId: number, taskId: number, comment: string): Promise<{ success: boolean; message: string; data: CrmProjectTaskComment }> => {
-        const response = await apiClient.post<{ success: boolean; message: string; data: CrmProjectTaskComment }>(`/crm-projects/${projectId}/tasks/${taskId}/notes`, {
-            comment,
-        });
+    createNote: async (
+        projectId: number,
+        taskId: number,
+        data: { comment?: string; files?: File[] }
+    ): Promise<{ success: boolean; message: string; data: CrmProjectTaskComment }> => {
+        const formData = new FormData();
+        if (data.comment) formData.append('comment', data.comment);
+        if (data.files?.length) {
+            data.files.forEach((file) => formData.append('files[]', file));
+        }
+        const response = await apiClient.post<{ success: boolean; message: string; data: CrmProjectTaskComment }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/notes`,
+            formData
+        );
+        return response.data;
+    },
+
+    /**
+     * Auto-save work notes
+     */
+    updateWorkNotes: async (
+        projectId: number,
+        taskId: number,
+        workNotes: string
+    ): Promise<{ success: boolean; message: string; data: { work_notes: string | null; updated_at: string } }> => {
+        const response = await apiClient.patch<{ success: boolean; message: string; data: { work_notes: string | null; updated_at: string } }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/work-notes`,
+            { work_notes: workNotes }
+        );
+        return response.data;
+    },
+
+    /**
+     * Task attachments
+     */
+    getAttachments: async (projectId: number, taskId: number): Promise<{ success: boolean; data: CrmProjectTaskAttachment[] }> => {
+        const response = await apiClient.get<{ success: boolean; data: CrmProjectTaskAttachment[] }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/attachments`
+        );
+        return response.data;
+    },
+
+    uploadAttachment: async (
+        projectId: number,
+        taskId: number,
+        file: File
+    ): Promise<{ success: boolean; message: string; data: CrmProjectTaskAttachment }> => {
+        const formData = new FormData();
+        formData.append('file', file);
+        const response = await apiClient.post<{ success: boolean; message: string; data: CrmProjectTaskAttachment }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/attachments`,
+            formData
+        );
+        return response.data;
+    },
+
+    deleteAttachment: async (
+        projectId: number,
+        taskId: number,
+        attachmentId: number
+    ): Promise<{ success: boolean; message: string }> => {
+        const response = await apiClient.delete<{ success: boolean; message: string }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/attachments/${attachmentId}`
+        );
+        return response.data;
+    },
+
+    /**
+     * Lifecycle actions
+     */
+    takeCharge: async (projectId: number, taskId: number): Promise<{ success: boolean; message: string; data: CrmProjectTask }> => {
+        const response = await apiClient.post<{ success: boolean; message: string; data: CrmProjectTask }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/take-charge`
+        );
+        return response.data;
+    },
+
+    deliver: async (
+        projectId: number,
+        taskId: number,
+        data?: { satisfaction?: number; feedback?: string }
+    ): Promise<{ success: boolean; message: string; data: CrmProjectTask }> => {
+        const response = await apiClient.post<{ success: boolean; message: string; data: CrmProjectTask }>(
+            `/crm-projects/${projectId}/tasks/${taskId}/deliver`,
+            data ?? {}
+        );
         return response.data;
     },
 

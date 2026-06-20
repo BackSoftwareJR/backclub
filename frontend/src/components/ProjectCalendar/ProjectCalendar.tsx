@@ -952,7 +952,7 @@ const ProjectCalendar: React.FC<ProjectCalendarProps> = ({
 
         try {
             setSavingNote(true);
-            const response = await crmProjectTasksApi.createNote(projectId, selectedItem.taskId, newNoteText.trim());
+            const response = await crmProjectTasksApi.createNote(projectId, selectedItem.taskId, { comment: newNoteText.trim() });
             if (response.success) {
                 setNewNoteText('');
                 await loadTaskNotes(selectedItem.taskId);

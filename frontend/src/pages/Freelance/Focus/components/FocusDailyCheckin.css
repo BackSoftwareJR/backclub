@@ -1,0 +1,1031 @@
+/* ── Focus Daily Check-in ── */
+
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+
+.fdci-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 5, 12, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* ── Modal card ──────────────────────────────────────────────────────────── */
+
+.fdci-modal {
+  background: rgba(18, 16, 30, 0.96);
+  border: 1px solid rgba(124, 58, 237, 0.28);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 480px;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 60px rgba(124, 58, 237, 0.12);
+  position: relative;
+  font-family: -apple-system, "SF Pro Display", BlinkMacSystemFont, system-ui, sans-serif;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* ── Close button ────────────────────────────────────────────────────────── */
+
+.fdci-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  z-index: 10;
+}
+.fdci-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ── Stepper dots ────────────────────────────────────────────────────────── */
+
+.fdci-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px 56px 0;
+  flex-shrink: 0;
+  min-height: 48px;
+}
+
+.fdci-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.18s ease;
+}
+
+.fdci-dot--active {
+  border-color: #7C3AED;
+  background: rgba(124, 58, 237, 0.22);
+  color: #c4b5fd;
+  box-shadow: 0 0 12px rgba(124, 58, 237, 0.35);
+  transform: scale(1.1);
+}
+
+.fdci-dot--done {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.18);
+  color: #86efac;
+}
+
+.fdci-summary-header-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #c4b5fd;
+  letter-spacing: 0.01em;
+}
+
+/* ── Step content area ───────────────────────────────────────────────────── */
+
+.fdci-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  padding: 4px 0;
+}
+
+.fdci-step {
+  padding: 16px 28px 8px;
+  height: 100%;
+}
+
+.fdci-step-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fdci-step-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  letter-spacing: -0.02em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.fdci-step-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.5;
+  margin: 0;
+  margin-top: -8px;
+}
+
+/* ── Step 1 — Energy buttons ─────────────────────────────────────────────── */
+
+.fdci-energy-row {
+  display: flex;
+  gap: 8px;
+}
+
+.fdci-energy-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 14px 8px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  font-family: inherit;
+}
+.fdci-energy-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.fdci-energy-btn--active {
+  border-color: rgba(124, 58, 237, 0.6);
+  background: rgba(124, 58, 237, 0.18);
+  box-shadow: 0 0 16px rgba(124, 58, 237, 0.3);
+}
+
+.fdci-energy-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.fdci-energy-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+  line-height: 1;
+}
+
+.fdci-energy-label {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Step 2 — Hours slider ───────────────────────────────────────────────── */
+
+.fdci-hours-display {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #c4b5fd;
+  text-align: center;
+  line-height: 1;
+  padding: 4px 0;
+}
+
+.fdci-range {
+  width: 100%;
+  accent-color: #7c3aed;
+  cursor: pointer;
+  height: 20px;
+}
+
+.fdci-range-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-top: -8px;
+}
+
+.fdci-presets {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.fdci-preset-btn {
+  padding: 6px 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  font-family: inherit;
+}
+.fdci-preset-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.9);
+}
+.fdci-preset-btn--active {
+  background: rgba(124, 58, 237, 0.25);
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #c4b5fd;
+}
+
+/* ── Step 3 — Projects ───────────────────────────────────────────────────── */
+
+.fdci-select-all {
+  align-self: flex-start;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  font-family: inherit;
+}
+.fdci-select-all:hover { background: rgba(255, 255, 255, 0.08); }
+.fdci-select-all--active {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #86efac;
+}
+
+.fdci-project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.fdci-project-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: background 0.14s, border-color 0.14s;
+}
+.fdci-project-item:hover { background: rgba(255, 255, 255, 0.06); }
+.fdci-project-item--checked {
+  background: rgba(124, 58, 237, 0.1);
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.fdci-project-item input[type="checkbox"] {
+  accent-color: #7c3aed;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.fdci-project-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fdci-project-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.fdci-project-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+
+/* ── Step 4 — Fixed events ───────────────────────────────────────────────── */
+
+.fdci-mini-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fdci-timeline-bar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  gap: 1px;
+}
+
+.fdci-timeline-seg {
+  border-radius: 3px;
+  min-width: 2px;
+  transition: flex 0.3s ease;
+}
+.fdci-timeline-seg--free { background: rgba(124, 58, 237, 0.35); }
+.fdci-timeline-seg--busy { background: rgba(239, 68, 68, 0.55); }
+
+.fdci-timeline-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.fdci-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 120px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+.fdci-event-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.fdci-event-time {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.fdci-event-title {
+  flex: 1;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdci-event-remove {
+  background: none;
+  border: none;
+  color: rgba(239, 68, 68, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 4px;
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+}
+.fdci-event-remove:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.fdci-add-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  background: rgba(124, 58, 237, 0.07);
+}
+
+.fdci-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  padding: 8px 12px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.fdci-input:focus { border-color: rgba(124, 58, 237, 0.5); }
+.fdci-input::placeholder { color: rgba(255, 255, 255, 0.25); }
+.fdci-input--time {
+  width: auto;
+  padding: 6px 10px;
+  color-scheme: dark;
+}
+
+.fdci-time-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fdci-time-sep {
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 13px;
+}
+
+.fdci-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.fdci-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  font-family: inherit;
+  align-self: flex-start;
+}
+.fdci-add-btn:hover {
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.1);
+}
+
+/* ── Step 5 — Free note ──────────────────────────────────────────────────── */
+
+.fdci-textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 13px;
+  padding: 12px 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+.fdci-textarea:focus { border-color: rgba(124, 58, 237, 0.5); }
+.fdci-textarea::placeholder { color: rgba(255, 255, 255, 0.25); }
+
+.fdci-char-count {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+  align-self: flex-end;
+  margin-top: -8px;
+}
+
+/* ── Summary step ────────────────────────────────────────────────────────── */
+
+.fdci-summary {
+  gap: 20px;
+}
+
+.fdci-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.fdci-summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 16px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  text-align: center;
+}
+
+.fdci-summary-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.fdci-summary-val {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.02em;
+}
+
+.fdci-summary-key {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.fdci-summary-note {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.fdci-summary-note-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+.fdci-summary-note-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
+}
+
+/* ── Start button ────────────────────────────────────────────────────────── */
+
+.fdci-start-btn {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #7C3AED 0%, #6d28d9 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.16s ease;
+  font-family: inherit;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 24px rgba(124, 58, 237, 0.5);
+}
+.fdci-start-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.6);
+}
+.fdci-start-btn:active { transform: translateY(0); }
+.fdci-start-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Shared buttons ──────────────────────────────────────────────────────── */
+
+.fdci-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: 9px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.fdci-btn--primary {
+  background: rgba(124, 58, 237, 0.25);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  color: #c4b5fd;
+}
+.fdci-btn--primary:hover:not(:disabled) {
+  background: rgba(124, 58, 237, 0.35);
+}
+.fdci-btn--primary:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.fdci-btn--ghost {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+}
+.fdci-btn--ghost:hover { color: rgba(255, 255, 255, 0.75); }
+
+/* ── Navigation footer ───────────────────────────────────────────────────── */
+
+.fdci-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+
+.fdci-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2.5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #a78bfa;
+  border-radius: 50%;
+  animation: fdci-spin 0.75s linear infinite;
+  align-self: center;
+  margin: 24px auto;
+}
+
+.fdci-spinner-sm {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: fdci-spin 0.7s linear infinite;
+}
+
+@keyframes fdci-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.fdci-empty-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.35);
+  text-align: center;
+  padding: 12px;
+  margin: 0;
+}
+
+/* ── Briefing step ───────────────────────────────────────────────────────── */
+
+.fdci-modal--wide {
+  max-width: 560px;
+  max-height: min(90vh, 720px);
+}
+
+.fdci-briefing-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: min(52vh, 420px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  margin-right: -4px;
+}
+
+.fdci-briefing-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.fdci-briefing-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.fdci-briefing-intro {
+  font-size: 13px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.2);
+  border-radius: 10px;
+}
+
+.fdci-briefing-loading,
+.fdci-briefing-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 24px 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+}
+
+.fdci-briefing-error {
+  color: rgba(239, 68, 68, 0.8);
+}
+
+.fdci-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.fdci-stat {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.fdci-stat--danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.fdci-stat--warn {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+.fdci-priority-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fdci-priority-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.fdci-priority-group-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.45);
+  padding: 2px 2px 0;
+}
+
+.fdci-priority-group-label--danger { color: #fca5a5; }
+.fdci-priority-group-label--warn   { color: #fcd34d; }
+
+.fdci-priority-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.fdci-priority-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 6px;
+  border-radius: 5px;
+  border: 1px solid;
+  white-space: nowrap;
+  max-width: 88px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdci-priority-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fdci-priority-title {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.fdci-priority-project {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Project list (rows, not chips) ─────────────────────────────────────── */
+
+.fdci-section {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.fdci-section-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.fdci-section-title {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.fdci-section-chevron {
+  color: rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s ease;
+}
+.fdci-section-chevron--open {
+  transform: rotate(180deg);
+}
+
+.fdci-project-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.fdci-project-list::-webkit-scrollbar {
+  width: 3px;
+}
+.fdci-project-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
+}
+
+.fdci-project-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fdci-project-row-icon {
+  flex-shrink: 0;
+  color: rgba(124, 58, 237, 0.85);
+  display: flex;
+}
+
+.fdci-project-row-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.fdci-project-row-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.88);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdci-project-row-task {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.38);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fdci-project-row-meta {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.fdci-project-row-overdue {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 2px 5px;
+  border-radius: 8px;
+}
+
+.fdci-project-row-count {
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba(124, 58, 237, 0.2);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.fdci-expand-btn {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(124, 58, 237, 0.08);
+  color: rgba(167, 139, 250, 0.95);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+.fdci-expand-btn:hover {
+  background: rgba(124, 58, 237, 0.16);
+}
+.fdci-expand-btn--muted {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.fdci-question-block {
+  margin-bottom: 14px;
+}
+
+.fdci-question-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0 0 8px;
+}
+
+.fdci-start-options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fdci-start-option {
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fdci-start-option:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.fdci-start-option--active {
+  border-color: rgba(124, 58, 237, 0.6);
+  background: rgba(124, 58, 237, 0.18);
+  color: #fff;
+}
+
+.fdci-textarea--compact {
+  min-height: 0;
+  font-size: 13px;
+}
+
+.fdci-summary-val--small {
+  font-size: 11px !important;
+  line-height: 1.3;
+}
+
+/* ── Mobile ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 520px) {
+  .fdci-modal { border-radius: 16px; min-height: 0; }
+  .fdci-step  { padding: 12px 18px 6px; }
+  .fdci-energy-btn { padding: 10px 4px; }
+  .fdci-summary-grid { grid-template-columns: 1fr 1fr; }
+}

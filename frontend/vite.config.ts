@@ -1,3 +1,4 @@
+import path from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,6 +9,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+    dedupe: ['react', 'react-dom'],
+  },
   base: '/',
   build: {
     target: 'es2020',
@@ -23,14 +30,12 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]',
         manualChunks(id) {
           if (!id.includes('node_modules')) return
-          if (id.includes('i18next') || id.includes('react-i18next')) return 'i18n'
-          if (id.includes('react-dom') || id.includes('scheduler') || id.includes('/react/')) return 'react-vendor'
-          if (id.includes('react-router')) return 'react-router'
-          if (id.includes('recharts') || id.includes('react-big-calendar') || id.includes('framer-motion')) return 'vendor-ui'
+          // Only split libraries with no React dependency.
+          // Forcing React into a separate chunk breaks packages that import hooks at init time.
           if (id.includes('date-fns')) return 'date-fns'
           if (id.includes('axios')) return 'axios'
           if (id.includes('lucide-react')) return 'lucide'
-          return 'vendor'
+          if (id.includes('i18next') && !id.includes('react-i18next')) return 'i18n-core'
         },
       },
     },

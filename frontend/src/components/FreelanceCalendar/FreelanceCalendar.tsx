@@ -1822,7 +1822,7 @@ const FreelanceCalendar: React.FC<FreelanceCalendarProps> = ({ isVisible = true,
                 await crmProjectTasksApi.createNote(
                     selectedItem.projectId,
                     selectedItem.taskId,
-                    `[Consegna] Valutazione: ${deliveryData.satisfaction}/5\n${deliveryData.feedback}`
+                    { comment: `[Consegna] Valutazione: ${deliveryData.satisfaction}/5\n${deliveryData.feedback}` }
                 );
             }
 

@@ -225,4 +225,30 @@ class User extends Authenticatable
     {
         return $this->hasOne(UserGoogleIntegration::class);
     }
+
+    // Focus module relationships
+    public function focusTasks()
+    {
+        return $this->hasMany(\App\Models\FocusTask::class);
+    }
+
+    public function workPattern()
+    {
+        return $this->hasOne(\App\Models\UserWorkPattern::class);
+    }
+
+    public function focusSessions()
+    {
+        return $this->hasMany(\App\Models\FocusSession::class);
+    }
+
+    public function taskMetrics()
+    {
+        return $this->hasMany(\App\Models\TaskMetric::class);
+    }
+
+    public function focusPreference()
+    {
+        return $this->hasOne(\App\Models\UserFocusPreference::class);
+    }
 }

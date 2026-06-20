@@ -14,7 +14,10 @@
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.27",
         "laravel/tinker": "^2.10.1",
-        "phpmailer/phpmailer": "^7.0"
+        "phpmailer/phpmailer": "^7.0",
+        "phpoffice/phpspreadsheet": "^5.8",
+        "phpoffice/phpword": "^1.4",
+        "smalot/pdfparser": "^2.12"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

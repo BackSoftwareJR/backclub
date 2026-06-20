@@ -62,6 +62,27 @@ export const workspaceApi = {
   },
 
   /**
+   * POST /api/workspace/developer/projects/:id/complete
+   * Segna il progetto come completato e archivia le task correnti.
+   */
+  completeProject: async (projectId: number, feedback?: string): Promise<{
+    status: string;
+    completion_group_id: number;
+  }> => {
+    const response = await apiClient.post<{
+      success: boolean;
+      message?: string;
+      data?: { status: string; completion_group_id: number };
+    }>(`/workspace/developer/projects/${projectId}/complete`, { feedback: feedback ?? null });
+
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Impossibile completare il progetto');
+    }
+
+    return response.data.data!;
+  },
+
+  /**
    * POST /api/workspace/developer/projects/:id/publish
    * Merge staging → main su GitHub.
    */

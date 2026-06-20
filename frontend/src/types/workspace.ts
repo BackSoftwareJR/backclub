@@ -1,4 +1,9 @@
-export type WorkspaceTypeCode = 'developer'; // estendibile
+export type WorkspaceTypeCode =
+  | 'developer'
+  | 'organic_web'
+  | 'social_media'
+  | 'video_grafica'
+  | 'intelligence_marketing';
 
 export interface WorkspaceType {
   code: WorkspaceTypeCode;
@@ -54,10 +59,22 @@ export interface WorkspaceAgent {
   project_id: number;
   branch_id: number | null;
   user_id: number;
+  crm_task_id?: number | null;
+  crm_task?: {
+    id: number;
+    title: string;
+    status: string;
+    n8n_status: string | null;
+    priority: string;
+    progress: number;
+    url: string;
+  } | null;
   title: string;
   prompt: string;
   exact_prompt?: boolean;
   status: WorkspaceAgentStatus;
+  flow_type?: string | null;
+  sub_agent_role?: string | null;
   n8n_execution_id: string | null;
   queue_position?: number | null;
   logs: string | null;
@@ -86,5 +103,54 @@ export interface WorkspaceUserTask {
   due_date: string | null;
   completed_at: string | null;
   sort_order: number;
+  /** null = active task; positive integer = archived in a completion snapshot */
+  completion_group_id: number | null;
   branch?: WorkspaceBranch;
+}
+
+/* ── Senior Care AI Architecture ── */
+
+export type AgentFlowType = 'minor' | 'major' | 'onboarding';
+
+export type SubAgentRole =
+  | 'consulente_aziendale'
+  | 'scrittore_creativo'
+  | 'consulente_seo'
+  | 'pianificatore_marketing'
+  | 'consulente_legale'
+  | 'comunicazione_clienti'
+  | 'vendite_prospezione';
+
+export interface Artifact {
+  id: string;
+  type: 'markdown' | 'task' | 'prompt' | 'brand_book';
+  title: string;
+  content: string;
+  created_at: string;
+}
+
+export interface OrchestratorMessage {
+  id: string;
+  role: 'user' | 'orchestrator' | 'subagent';
+  content: string;
+  flow_type?: AgentFlowType;
+  sub_agent?: SubAgentRole;
+  artifacts?: Artifact[];
+  created_at: string;
+}
+
+export interface BrandBook {
+  primary_color: string;
+  secondary_color: string;
+  tone_of_voice: string;
+  keywords: string[];
+  avoid_words: string[];
+}
+
+export interface SeniorCareProject extends WorkspaceProject {
+  brand_book?: BrandBook | null;
+  onboarding_completed?: boolean;
+  tech_stack?: 'html_static' | 'react' | 'laravel' | null;
+  care_values?: string[];
+  target_audience?: string[];
 }

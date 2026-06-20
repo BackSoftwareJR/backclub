@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Traits\ChecksWorkspaceProjectAccess;
 use App\Models\WorkspaceAgent;
 use App\Models\WorkspaceBranch;
+use App\Notifications\AgentTaskCompleted;
 use App\Services\TaskN8nService;
 use App\Services\ProjectOrchestratorQueueService;
 use Illuminate\Http\Request;
@@ -102,6 +103,8 @@ class WorkspaceAgentController extends Controller
             'prompt' => $request->prompt,
             'exact_prompt' => filter_var($request->input('exact_prompt', false), FILTER_VALIDATE_BOOLEAN),
             'status' => 'pending',
+            'flow_type' => $this->classifyFlowType($request->prompt, $projectId),
+            'sub_agent_role' => $request->input('sub_agent_role'),
         ]);
 
         $agent->load('branch');
@@ -501,15 +504,36 @@ class WorkspaceAgentController extends Controller
      */
     private function formatAgent(WorkspaceAgent $agent): array
     {
+        $crmTask = null;
+        if ($agent->crm_task_id) {
+            $agent->loadMissing('crmTask');
+            $task = $agent->crmTask;
+            if ($task) {
+                $crmTask = [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'status' => $task->status,
+                    'n8n_status' => $task->n8n_status,
+                    'priority' => $task->priority,
+                    'progress' => $task->progress,
+                    'url' => '/freelance/task/' . $task->id . '?projectId=' . $task->crm_project_id,
+                ];
+            }
+        }
+
         return [
             'id' => $agent->id,
             'project_id' => $agent->project_id,
             'branch_id' => $agent->branch_id,
             'user_id' => $agent->user_id,
+            'crm_task_id' => $agent->crm_task_id,
+            'crm_task' => $crmTask,
             'title' => $agent->title,
             'prompt' => $agent->prompt,
             'exact_prompt' => (bool) $agent->exact_prompt,
             'status' => $agent->status,
+            'flow_type' => $agent->flow_type ?? null,
+            'sub_agent_role' => $agent->sub_agent_role ?? null,
             'n8n_workflow_id' => $agent->n8n_workflow_id,
             'n8n_execution_id' => $agent->n8n_execution_id,
             'queue_position' => $agent->queue_position,
@@ -667,8 +691,10 @@ class WorkspaceAgentController extends Controller
                 app(ProjectOrchestratorQueueService::class)->releaseProjectSlot($agent->project_id);
             }
 
-            // TODO: Broadcasting evento se il progetto usa Laravel Echo/Pusher/Reverb
-            // broadcast(new AgentStatusUpdated($agent))->toOthers();
+            // Se il WorkspaceAgent è collegato a un CRM task, sincronizza lo stato
+            if ($agent->crm_task_id) {
+                $this->syncStatusToCrmTask($agent, $updateData);
+            }
 
         } catch (\Exception $e) {
             Log::error("N8N callback processing failed for agent {$agentId}", [
@@ -682,52 +708,211 @@ class WorkspaceAgentController extends Controller
     }
 
     /**
-     * Send in-app notification for agent status changes
+     * Sincronizza lo stato del WorkspaceAgent al CRM task collegato.
+     * Chiamato quando il task è stato creato come agente e ha un crm_task_id.
+     */
+    private function syncStatusToCrmTask(WorkspaceAgent $agent, array $updateData): void
+    {
+        $task = \App\Models\CrmProjectTask::find($agent->crm_task_id);
+        if (!$task) {
+            return;
+        }
+
+        $agentStatus = $updateData['status'] ?? $agent->status;
+        $taskUpdate = [];
+
+        $statusMap = [
+            'running' => 'processing',
+            'completed' => 'completed',
+            'failed' => 'failed',
+            'stopped' => 'skipped',
+            'pending' => 'pending',
+        ];
+
+        $n8nStatus = $statusMap[$agentStatus] ?? null;
+        if ($n8nStatus && $n8nStatus !== $task->n8n_status) {
+            $taskUpdate['n8n_status'] = $n8nStatus;
+        }
+
+        if ($agentStatus === 'completed') {
+            $taskUpdate['n8n_completed_at'] = now();
+            $taskUpdate['progress'] = 100;
+            if ($task->execution_mode === 'agent') {
+                $taskUpdate['status'] = 'completed';
+                $taskUpdate['completed_date'] = now();
+            }
+        } elseif ($agentStatus === 'failed') {
+            $taskUpdate['n8n_error'] = $agent->result ?? 'Lavorazione fallita';
+        }
+
+        if (!empty($agent->n8n_execution_id) && empty($task->n8n_execution_id)) {
+            $taskUpdate['n8n_execution_id'] = $agent->n8n_execution_id;
+        }
+
+        if (!empty($taskUpdate)) {
+            $task->update($taskUpdate);
+        }
+    }
+
+    /**
+     * Send in-app notification for agent status changes.
+     * Sends to the agent owner; also notifies CRM task assignees if linked.
      */
     private function sendAgentStatusNotification(WorkspaceAgent $agent, string $status): void
     {
         try {
-            // Find the agent owner
             $user = User::find($agent->user_id);
             if (!$user) {
                 return;
             }
 
-            // Create notification based on status
-            switch ($status) {
-                case 'review':
-                    Log::info("Agent {$agent->id} requires review - notification created", [
-                        'agent_id' => $agent->id,
-                        'user_id' => $user->id,
-                        'title' => $agent->title
-                    ]);
-                    // TODO: send in-app notification when notification system is available
-                    break;
-                    
-                case 'completed':
-                    Log::info("Agent {$agent->id} completed - notification created", [
-                        'agent_id' => $agent->id,
-                        'user_id' => $user->id,
-                        'title' => $agent->title
-                    ]);
-                    // TODO: send in-app notification when notification system is available
-                    break;
-                    
-                case 'failed':
-                    Log::info("Agent {$agent->id} failed - notification created", [
-                        'agent_id' => $agent->id,
-                        'user_id' => $user->id,
-                        'title' => $agent->title
-                    ]);
-                    // TODO: send in-app notification when notification system is available
-                    break;
+            $notifyStatus = match ($status) {
+                'review'    => AgentTaskCompleted::STATUS_REVIEW,
+                'completed' => AgentTaskCompleted::STATUS_COMPLETED,
+                'failed'    => AgentTaskCompleted::STATUS_FAILED,
+                default     => null,
+            };
+
+            if ($notifyStatus === null) {
+                return;
             }
+
+            $agent->loadMissing('project');
+            $project = $agent->project;
+
+            $notification = new AgentTaskCompleted(
+                taskId: $agent->crm_task_id ?? 0,
+                taskTitle: $agent->title,
+                projectId: $agent->project_id,
+                projectName: $project->name ?? 'Progetto',
+                agentStatus: $notifyStatus,
+                workspaceAgentId: $agent->id,
+            );
+
+            $user->notify($notification);
+
+            Log::info("Agent status notification sent", [
+                'agent_id' => $agent->id,
+                'status'   => $status,
+                'user_id'  => $user->id,
+            ]);
         } catch (\Exception $e) {
             Log::error("Failed to send agent status notification", [
                 'agent_id' => $agent->id,
-                'status' => $status,
-                'error' => $e->getMessage()
+                'status'   => $status,
+                'error'    => $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * GET /api/workspace/developer/projects/{projectId}/orchestrator
+     * Restituisce messaggi orchestratore (stub — in futuro da DB).
+     */
+    public function getOrchestratorMessages(Request $request, int $projectId): JsonResponse
+    {
+        $this->getUserAccessibleProject($projectId);
+        // Stub: ritorna array vuoto finché non viene implementato il modello OrchestratorMessage
+        return response()->json([
+            'success' => true,
+            'data' => [],
+        ]);
+    }
+
+    /**
+     * POST /api/workspace/developer/projects/{projectId}/orchestrator
+     * Crea un messaggio per l'orchestratore e ritorna la risposta.
+     */
+    public function createOrchestratorMessage(Request $request, int $projectId): JsonResponse
+    {
+        $this->getUserAccessibleProject($projectId);
+
+        $validator = Validator::make($request->all(), [
+            'message' => 'required|string|max:4000',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+        }
+
+        $flowType = $this->classifyFlowType($request->input('message'), $projectId);
+
+        // Risposta stub dell'orchestratore
+        $responseContent = match ($flowType) {
+            'minor' => 'Ho ricevuto la richiesta di modifica. Il task è in esecuzione in background.',
+            'major' => 'Ho capito che vuoi fare una modifica importante. Avvia il flusso di intervista nell\'interfaccia per generare il Prompt Perfetto.',
+            'onboarding' => 'Benvenuto! Prima di iniziare, configuriamo la struttura. Avvia il wizard di onboarding.',
+            default => 'Messaggio ricevuto. Come posso aiutarti?',
+        };
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => 'orch-' . uniqid(),
+                'role' => 'orchestrator',
+                'content' => $responseContent,
+                'flow_type' => $flowType,
+                'sub_agent' => null,
+                'artifacts' => [],
+                'created_at' => now()->format('c'),
+            ],
+        ], 201);
+    }
+
+    /**
+     * GET /api/workspace/developer/projects/{projectId}/artifacts
+     * Restituisce gli artefatti generati per il progetto (stub).
+     */
+    public function getArtifacts(Request $request, int $projectId): JsonResponse
+    {
+        $this->getUserAccessibleProject($projectId);
+        // Stub: ritorna array vuoto finché non viene implementato il modello Artifact
+        return response()->json([
+            'success' => true,
+            'data' => [],
+        ]);
+    }
+
+    /**
+     * Classifica il tipo di flusso in base alle keyword del prompt.
+     * - 'minor': modifiche piccole e autonome (aggiorna, modifica, cambia, correggi...)
+     * - 'major': riprogettazioni o nuove sezioni (rifare, riprogettare, nuova sezione...)
+     * - 'onboarding': primo agente del progetto senza onboarding completato
+     */
+    private function classifyFlowType(string $prompt, int $projectId): string
+    {
+        $lower = mb_strtolower($prompt);
+
+        $minorKeywords = [
+            'aggiorna', 'modifica', 'cambia', 'correggi', 'aggiungi', 'rimuovi',
+            'sostituisci', 'sistemare', 'fixare', 'fix', 'piccola modifica',
+            'testo', 'colore', 'font', 'immagine', 'link',
+        ];
+
+        $majorKeywords = [
+            'rifare', 'riprogettare', 'nuova sezione', 'nuovo sito', 'redesign',
+            'rifacimento', 'ristrutturare', 'ricominciare', 'riscrivere',
+            'architettura', 'layout completo', 'da zero',
+        ];
+
+        foreach ($majorKeywords as $kw) {
+            if (str_contains($lower, $kw)) {
+                return 'major';
+            }
+        }
+
+        foreach ($minorKeywords as $kw) {
+            if (str_contains($lower, $kw)) {
+                return 'minor';
+            }
+        }
+
+        // Controlla se è il primo agente del progetto (possibile onboarding)
+        $existingAgentsCount = WorkspaceAgent::where('project_id', $projectId)->count();
+        if ($existingAgentsCount === 0) {
+            return 'onboarding';
+        }
+
+        return 'major';
     }
 }

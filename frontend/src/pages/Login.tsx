@@ -2,161 +2,92 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getHomeRouteForUser } from '../utils/userRoles';
-import { LogIn, Loader2 } from 'lucide-react';
-import '../styles/pages/Login.css';
+import { SignInPage } from '@/components/ui/sign-in';
 
 const Login: React.FC = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-    const { login } = useAuth();
-    const navigate = useNavigate();
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError('');
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
 
-        if (!email || !password) {
-            setError('Inserisci email e password');
-            return;
+    const formData = new FormData(event.currentTarget);
+    const email = String(formData.get('email') ?? '').trim();
+    const password = String(formData.get('password') ?? '');
+
+    if (!email || !password) {
+      setError('Inserisci email e password');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await login(email, password);
+
+      if (result && result.requiresRoleSelection === true) {
+        if (result.roles && result.roles.length > 0) {
+          sessionStorage.setItem('pending_role_selection', JSON.stringify(result.roles));
+          sessionStorage.setItem('role_selection_in_progress', 'true');
         }
+        navigate('/role-selection', {
+          state: { roles: result.roles || [] },
+          replace: true,
+        });
+        return;
+      }
 
-        setLoading(true);
+      const loginUser = result?.user;
+      const needsOnboarding =
+        loginUser &&
+        (loginUser.onboarding_completed === false ||
+          loginUser.onboarding_completed === null ||
+          loginUser.onboarding_completed === undefined);
 
-        try {
-            const result = await login(email, password);
-            
-            console.log('Login result:', {
-                hasResult: !!result,
-                requiresRoleSelection: result?.requiresRoleSelection,
-                roles: result?.roles,
-                rolesCount: result?.roles?.length || 0,
-                user: result?.user
-            });
-            
-            // ALWAYS check if role selection is required FIRST
-            // If backend says requires_role_selection is true, MUST go to role selection page
-            // This happens when user has multiple roles (regardless of current_role)
-            if (result && result.requiresRoleSelection === true) {
-                console.log('Redirecting to role-selection page with roles:', result.roles);
-                // IMPORTANT: Save roles to sessionStorage as backup in case state is lost
-                if (result.roles && result.roles.length > 0) {
-                    sessionStorage.setItem('pending_role_selection', JSON.stringify(result.roles));
-                    // Set a flag to prevent automatic redirects during role selection
-                    sessionStorage.setItem('role_selection_in_progress', 'true');
-                }
-                // Redirect to role selection page with roles - Use replace: true to prevent back navigation issues
-                navigate('/role-selection', { 
-                    state: { roles: result.roles || [] },
-                    replace: true
-                });
-                setLoading(false);
-                return;
-            }
-            
-            console.log('No role selection needed');
-            // Check if user needs onboarding - if so, let ProtectedRoute handle it
-            const loginUser = result?.user;
-            
-            // If user hasn't completed onboarding, navigate to a protected route
-            // The ProtectedRoute will automatically show the onboarding wizard
-            // Check for false, null, or undefined (DB might return null/undefined for new users)
-            const needsOnboarding = loginUser && (
-                loginUser.onboarding_completed === false || 
-                loginUser.onboarding_completed === null || 
-                loginUser.onboarding_completed === undefined
-            );
-            
-            if (needsOnboarding) {
-                console.log('Login: User needs onboarding, navigating to home route (onboarding will be shown)', {
-                    onboarding_completed: loginUser.onboarding_completed,
-                    user_id: loginUser.id
-                });
-                navigate(getHomeRouteForUser(loginUser));
-                return;
-            }
-            
-            navigate(getHomeRouteForUser(loginUser));
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Credenziali non valide');
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (needsOnboarding) {
+        navigate(getHomeRouteForUser(loginUser));
+        return;
+      }
 
-    return (
-        <div className="login-container">
-            <div className="login-background gradient-animated" />
+      navigate(getHomeRouteForUser(loginUser));
+    } catch (err: unknown) {
+      const message =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data &&
+        typeof err.response.data.message === 'string'
+          ? err.response.data.message
+          : 'Credenziali non valide';
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className="login-card glass-card animate-scale-in">
-                <div className="login-header">
-                    <h1 className="login-title text-gradient">Back Club</h1>
-                </div>
-
-                <form onSubmit={handleSubmit} className="login-form">
-                    {error && (
-                        <div className="login-error animate-slide-in-top">
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="form-group">
-                        <label htmlFor="email" className="form-label">
-                            Email
-                        </label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="form-input"
-                            placeholder="nome@esempio.it"
-                            disabled={loading}
-                            autoComplete="email"
-                            autoFocus
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="password" className="form-label">
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            className="form-input"
-                            placeholder="••••••••"
-                            disabled={loading}
-                            autoComplete="current-password"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        className="login-button"
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 className="animate-spin" size={20} />
-                                <span>Accesso in corso...</span>
-                            </>
-                        ) : (
-                            <>
-                                <LogIn size={20} />
-                                <span>Accedi</span>
-                            </>
-                        )}
-                    </button>
-                </form>
-
-            </div>
-        </div>
-    );
+  return (
+    <div className="bg-background text-foreground">
+      <SignInPage
+        heroImageSrc="https://images.unsplash.com/photo-1642615835477-d303d7dc9ee9?w=2160&q=80"
+        error={error}
+        loading={loading}
+        onSignIn={handleSignIn}
+        onResetPassword={() => {
+          window.location.href = 'mailto:supporto@backclub.it?subject=Recupero%20password%20Backclub';
+        }}
+        onCreateAccount={() => navigate('/richiedi-accesso')}
+      />
+    </div>
+  );
 };
 
 export default Login;

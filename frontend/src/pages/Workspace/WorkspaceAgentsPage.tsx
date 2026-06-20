@@ -1,8 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bot, ArrowRight, Loader2, AlertCircle, ChevronRight, ListOrdered } from 'lucide-react';
+import {
+  Bot, ArrowRight, Loader2, AlertCircle, ChevronRight, ListOrdered,
+  RefreshCw, TriangleAlert, CheckCircle2, Zap, X, WifiOff,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { workspaceApi } from '../../api/workspace';
-import { workspaceAgentsApi } from '../../api/workspaceAgents';
+import { workspaceAgentsApi, agentQueueApi } from '../../api/workspaceAgents';
+import type { AgentQueueData, AgentQueueItem } from '../../api/workspaceAgents';
 import type { WorkspaceProject, WorkspaceAgent } from '../../types/workspace';
 import {
   getAgentStatusConfig,
@@ -15,12 +19,233 @@ import {
 import './WorkspaceAgentsPage.css';
 
 const POLL_INTERVAL_MS = 4500;
+const QUEUE_POLL_INTERVAL_MS = 8000;
+
+// ─── Queue Panel ─────────────────────────────────────────────────────────────
+
+interface QueuePanelProps {
+  queue: AgentQueueData | null;
+  isLoadingQueue: boolean;
+  onResetStuck: () => Promise<void>;
+  onForceDispatch: (projectId: number) => Promise<void>;
+  onCancelItem: (type: 'crm_task' | 'workspace_agent', id: number) => Promise<void>;
+  onRefresh: () => void;
+}
+
+const QueuePanel: React.FC<QueuePanelProps> = ({
+  queue, isLoadingQueue, onResetStuck, onForceDispatch, onCancelItem, onRefresh,
+}) => {
+  const [resetting, setResetting] = useState(false);
+  const [dispatchingProject, setDispatchingProject] = useState<number | null>(null);
+  const [cancellingId, setCancellingId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  const handleReset = async () => {
+    setResetting(true);
+    setFeedback(null);
+    try {
+      const result = await onResetStuck();
+      setFeedback((result as any)?.message ?? 'Fatto!');
+      setTimeout(() => setFeedback(null), 4000);
+    } catch (e: any) {
+      setFeedback('Errore: ' + e.message);
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const handleDispatch = async (projectId: number) => {
+    setDispatchingProject(projectId);
+    try {
+      await onForceDispatch(projectId);
+      setFeedback('Dispatch avviato!');
+      setTimeout(() => setFeedback(null), 3000);
+    } catch (e: any) {
+      setFeedback('Errore: ' + e.message);
+    } finally {
+      setDispatchingProject(null);
+    }
+  };
+
+  const handleCancel = async (type: 'crm_task' | 'workspace_agent', id: number) => {
+    const key = `${type}-${id}`;
+    setCancellingId(key);
+    try {
+      await onCancelItem(type, id);
+    } catch (e: any) {
+      setFeedback('Errore: ' + e.message);
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
+  const getDotClass = (item: AgentQueueItem) => {
+    if (item.is_stale) return 'ws-queue-dot ws-queue-dot--stale';
+    if (item.status === 'processing' || item.status === 'running') return 'ws-queue-dot ws-queue-dot--running';
+    if (item.status === 'review') return 'ws-queue-dot ws-queue-dot--review';
+    return 'ws-queue-dot ws-queue-dot--pending';
+  };
+
+  const hasAlert = queue && (queue.stale_count > 0 || queue.blocked_count > 0);
+
+  return (
+    <div className="ws-queue-panel">
+      <div className={`ws-queue-panel-header${hasAlert ? ' ws-queue-panel-header--alert' : ''}`}>
+        <div className="ws-queue-panel-title">
+          <ListOrdered size={15} />
+          <h3>Coda Agenti</h3>
+          {queue && (
+            <>
+              {queue.stale_count > 0 && (
+                <span className="ws-queue-panel-badge ws-queue-panel-badge--warn">
+                  {queue.stale_count} bloccati
+                </span>
+              )}
+              {queue.total > 0 && queue.stale_count === 0 && (
+                <span className="ws-queue-panel-badge ws-queue-panel-badge--info">
+                  {queue.total} in coda
+                </span>
+              )}
+              {!queue.n8n_enabled && (
+                <span className="ws-queue-panel-badge ws-queue-panel-badge--warn">
+                  N8N disabilitato
+                </span>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="ws-queue-panel-actions">
+          {feedback && (
+            <span style={{ fontSize: 12, color: 'var(--ws-text-secondary)' }}>{feedback}</span>
+          )}
+          <button
+            className="ws-queue-btn ws-queue-btn--dispatch"
+            onClick={onRefresh}
+            disabled={isLoadingQueue}
+            title="Aggiorna coda"
+          >
+            <RefreshCw size={12} className={isLoadingQueue ? 'ws-queue-spin' : ''} />
+            Aggiorna
+          </button>
+          {queue && queue.stale_count > 0 && (
+            <button
+              className="ws-queue-btn ws-queue-btn--reset"
+              onClick={handleReset}
+              disabled={resetting}
+            >
+              {resetting ? <Loader2 size={12} /> : <Zap size={12} />}
+              Sblocca tutto
+            </button>
+          )}
+        </div>
+      </div>
+
+      {isLoadingQueue && !queue ? (
+        <div className="ws-queue-empty">
+          <Loader2 size={14} style={{ animation: 'ws-spin 0.8s linear infinite' }} />
+          Caricamento coda…
+        </div>
+      ) : !queue?.n8n_enabled ? (
+        <div className="ws-queue-n8n-disabled">
+          <WifiOff size={14} />
+          N8N non abilitato — gli agenti non possono partire.
+        </div>
+      ) : queue.total === 0 ? (
+        <div className="ws-queue-empty">
+          <CheckCircle2 size={14} />
+          Coda libera — nessun job in attesa o bloccato.
+        </div>
+      ) : (
+        <div className="ws-queue-items">
+          {queue.items.map((item) => {
+            const cancelKey = `${item.type}-${item.id}`;
+            const isCancelling = cancellingId === cancelKey;
+            const isDispatching = dispatchingProject === item.project_id;
+
+            return (
+              <div
+                key={cancelKey}
+                className={`ws-queue-item${item.is_stale ? ' ws-queue-item--stale' : ''}`}
+              >
+                <span className={getDotClass(item)} />
+
+                <div className="ws-queue-item-body">
+                  <div className="ws-queue-item-top">
+                    <span className="ws-queue-item-title">{item.title}</span>
+                    <span className={`ws-queue-item-type-badge${item.type === 'crm_task' ? ' ws-queue-item-type-badge--crm' : ''}`}>
+                      {item.type === 'crm_task' ? 'CRM Task' : 'Workspace'}
+                    </span>
+                  </div>
+                  <div className="ws-queue-item-meta">
+                    <span className="ws-queue-item-project">{item.project_name}</span>
+                    {item.queue_position != null && (
+                      <span>Pos. {item.queue_position}</span>
+                    )}
+                    {item.is_stale ? (
+                      <span className="ws-queue-item-stale-warn">
+                        <TriangleAlert size={10} style={{ display: 'inline', marginRight: 3 }} />
+                        Bloccato da {item.stale_minutes}min
+                      </span>
+                    ) : (
+                      <span>{formatRelativeTime(item.updated_at)}</span>
+                    )}
+                    {item.n8n_error && (
+                      <span title={item.n8n_error} style={{ color: '#ef4444', cursor: 'help' }}>
+                        Errore ⓘ
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="ws-queue-item-actions">
+                  {item.is_stale && (
+                    <button
+                      className="ws-queue-btn ws-queue-btn--dispatch"
+                      onClick={() => handleDispatch(item.project_id)}
+                      disabled={isDispatching}
+                      title="Forza dispatch per questo progetto"
+                    >
+                      {isDispatching ? <Loader2 size={11} /> : <Zap size={11} />}
+                      Dispatch
+                    </button>
+                  )}
+                  <button
+                    className="ws-queue-btn ws-queue-btn--cancel"
+                    onClick={() => handleCancel(item.type, item.id)}
+                    disabled={isCancelling}
+                    title="Rimuovi dalla coda"
+                  >
+                    {isCancelling ? <Loader2 size={11} /> : <X size={11} />}
+                  </button>
+                  <Link
+                    to={item.url}
+                    className="ws-queue-btn ws-queue-btn--dispatch"
+                    style={{ textDecoration: 'none' }}
+                    title="Apri dettaglio"
+                  >
+                    <ArrowRight size={11} />
+                  </Link>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ─── Main Page ───────────────────────────────────────────────────────────────
 
 const WorkspaceAgentsPage: React.FC = () => {
   const [projects, setProjects] = useState<WorkspaceProject[]>([]);
   const [agentsByProject, setAgentsByProject] = useState<Record<number, WorkspaceAgent[]>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [queue, setQueue] = useState<AgentQueueData | null>(null);
+  const [isLoadingQueue, setIsLoadingQueue] = useState(false);
 
   const loadData = useCallback(async (silent = false) => {
     try {
@@ -54,34 +279,68 @@ const WorkspaceAgentsPage: React.FC = () => {
     }
   }, []);
 
+  const loadQueue = useCallback(async (silent = false) => {
+    if (!silent) setIsLoadingQueue(true);
+    try {
+      const data = await agentQueueApi.getQueue();
+      setQueue(data);
+    } catch (e) {
+      console.error('Failed to load agent queue:', e);
+    } finally {
+      if (!silent) setIsLoadingQueue(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadData();
-  }, [loadData]);
+    loadQueue();
+  }, [loadData, loadQueue]);
 
   const allAgentsFlat = Object.values(agentsByProject).flat();
   const shouldPoll = needsLivePolling(allAgentsFlat);
+  const queueHasActive = queue ? queue.total > 0 : false;
 
   useEffect(() => {
     if (!shouldPoll) return;
     const interval = setInterval(() => {
-      loadData(true).catch((err) => console.error('Failed to refresh agents:', err));
+      loadData(true).catch(console.error);
     }, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [shouldPoll, loadData]);
 
+  useEffect(() => {
+    if (!queueHasActive) return;
+    const interval = setInterval(() => {
+      loadQueue(true).catch(console.error);
+    }, QUEUE_POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [queueHasActive, loadQueue]);
+
+  // Queue actions
+  const handleResetStuck = async () => {
+    const result = await agentQueueApi.resetStuck();
+    await Promise.all([loadQueue(), loadData(true)]);
+    return result as any;
+  };
+
+  const handleForceDispatch = async (projectId: number) => {
+    await agentQueueApi.forceDispatch(projectId);
+    await Promise.all([loadQueue(true), loadData(true)]);
+  };
+
+  const handleCancelItem = async (type: 'crm_task' | 'workspace_agent', id: number) => {
+    await agentQueueApi.cancelItem(type, id);
+    await Promise.all([loadQueue(), loadData(true)]);
+  };
+
   const getAllAgents = (): Array<WorkspaceAgent & { projectName: string }> => {
     const allAgents: Array<WorkspaceAgent & { projectName: string }> = [];
-
     projects.forEach((project) => {
       const projectAgents = agentsByProject[project.id] || [];
       projectAgents.forEach((agent) => {
-        allAgents.push({
-          ...agent,
-          projectName: project.name,
-        });
+        allAgents.push({ ...agent, projectName: project.name });
       });
     });
-
     return allAgents.sort(
       (a, b) => new Date(b.updated_at || b.created_at).getTime() - new Date(a.updated_at || a.created_at).getTime()
     );
@@ -152,6 +411,16 @@ const WorkspaceAgentsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Coda centralizzata sempre visibile */}
+      <QueuePanel
+        queue={queue}
+        isLoadingQueue={isLoadingQueue}
+        onResetStuck={handleResetStuck}
+        onForceDispatch={handleForceDispatch}
+        onCancelItem={handleCancelItem}
+        onRefresh={() => loadQueue()}
+      />
+
       {queuedCount > 1 && (
         <div className="workspace-agents-queue-banner">
           <ListOrdered size={14} />
@@ -183,6 +452,15 @@ const WorkspaceAgentsPage: React.FC = () => {
                     <div className="workspace-agent-recent-body">
                       <div className="workspace-agent-recent-top">
                         <span className="workspace-agent-recent-title">{agent.title}</span>
+                        {agent.crm_task_id && (
+                          <span style={{
+                            fontSize: 10, padding: '1px 5px', borderRadius: 4,
+                            background: 'color-mix(in srgb, #a855f7 12%, transparent)',
+                            color: '#a855f7', fontWeight: 600, flexShrink: 0,
+                          }}>
+                            CRM
+                          </span>
+                        )}
                         <span className="workspace-agent-recent-status" style={{ color: statusConfig.color }}>
                           {statusConfig.label}
                         </span>

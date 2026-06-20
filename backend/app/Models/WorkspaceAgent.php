@@ -15,10 +15,13 @@ class WorkspaceAgent extends Model
         'project_id',
         'branch_id',
         'user_id',
+        'crm_task_id',
         'title',
         'prompt',
         'exact_prompt',
         'status',
+        'flow_type',
+        'sub_agent_role',
         'n8n_workflow_id',
         'n8n_execution_id',
         'queue_position',
@@ -51,5 +54,10 @@ class WorkspaceAgent extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function crmTask(): BelongsTo
+    {
+        return $this->belongsTo(CrmProjectTask::class, 'crm_task_id');
     }
 }
