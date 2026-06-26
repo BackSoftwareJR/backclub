@@ -11,6 +11,8 @@ class OrganicBlogPost extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'organic_project_id',
         'skill_run_id',

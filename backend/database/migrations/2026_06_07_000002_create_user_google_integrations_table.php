@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected $connection = 'mysql_marketing';
+
     public function up(): void
     {
-        Schema::create('user_google_integrations', function (Blueprint $table) {
+        Schema::connection('mysql_marketing')->create('user_google_integrations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
             $table->string('google_email');
@@ -25,6 +27,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('user_google_integrations');
+        Schema::connection('mysql_marketing')->dropIfExists('user_google_integrations');
     }
 };

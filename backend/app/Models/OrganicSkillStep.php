@@ -11,6 +11,8 @@ class OrganicSkillStep extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'skill_run_id',
         'step_index',

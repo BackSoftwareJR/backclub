@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected $connection = 'mysql_marketing';
+
     public function up(): void
     {
-        Schema::create('organic_web_projects', function (Blueprint $table) {
+        Schema::connection('mysql_marketing')->create('organic_web_projects', function (Blueprint $table) {
             $table->id();
             $table->foreignId('crm_project_id')->constrained('crm_projects')->onDelete('cascade');
             $table->string('website_url');
@@ -32,6 +34,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('organic_web_projects');
+        Schema::connection('mysql_marketing')->dropIfExists('organic_web_projects');
     }
 };

@@ -10,6 +10,8 @@ class OrganicHumanTask extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'skill_step_id',
         'organic_project_id',

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Crypt;
 
 class UserGoogleIntegration extends Model
 {
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'user_id',
         'google_email',
@@ -28,6 +29,8 @@ class UserGoogleIntegration extends Model
     protected function casts(): array
     {
         return [
+            'access_token' => 'encrypted',
+            'refresh_token' => 'encrypted',
             'token_expires_at' => 'datetime',
             'connected_at' => 'datetime',
             'scopes' => 'array',
@@ -38,41 +41,5 @@ class UserGoogleIntegration extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function setAccessTokenAttribute(?string $value): void
-    {
-        $this->attributes['access_token'] = $value ? Crypt::encryptString($value) : null;
-    }
-
-    public function getAccessTokenAttribute(?string $value): ?string
-    {
-        if (!$value) {
-            return null;
-        }
-
-        try {
-            return Crypt::decryptString($value);
-        } catch (\Throwable) {
-            return null;
-        }
-    }
-
-    public function setRefreshTokenAttribute(?string $value): void
-    {
-        $this->attributes['refresh_token'] = $value ? Crypt::encryptString($value) : null;
-    }
-
-    public function getRefreshTokenAttribute(?string $value): ?string
-    {
-        if (!$value) {
-            return null;
-        }
-
-        try {
-            return Crypt::decryptString($value);
-        } catch (\Throwable) {
-            return null;
-        }
     }
 }

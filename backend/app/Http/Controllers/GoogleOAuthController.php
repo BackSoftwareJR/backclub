@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\UserGoogleIntegration;
 use App\Services\GoogleCalendarService;
+use App\Services\GoogleTokenService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -13,12 +15,20 @@ use Illuminate\Support\Str;
 
 class GoogleOAuthController extends Controller
 {
-    public function connect(Request $request)
+    public function __construct(
+        private readonly GoogleTokenService $tokenService,
+    ) {}
+
+    // =========================================================
+    // CALENDAR OAUTH (flusso server-side esistente)
+    // =========================================================
+
+    public function connect(Request $request): JsonResponse
     {
-        if (!config('services.google.client_id') || !config('services.google.client_secret')) {
+        if (! config('services.google.client_id') || ! config('services.google.client_secret')) {
             return response()->json([
                 'success' => false,
-                'message' => 'Integrazione Google non configurata. Contatta l\'amministratore.',
+                'message' => "Integrazione Google non configurata. Contatta l'amministratore.",
             ], 503);
         }
 
@@ -39,28 +49,32 @@ class GoogleOAuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'url' => 'https://accounts.google.com/o/oauth2/v2/auth?' . $params,
+            'url' => 'https://accounts.google.com/o/oauth2/v2/auth?'.$params,
         ]);
     }
 
+    /**
+     * Callback reale di Google (browser redirect) — usato dal flusso Calendar.
+     * Questo endpoint è pubblico: Google vi reindirizza dopo il consenso utente.
+     */
     public function callback(Request $request)
     {
-        $frontendRedirect = config('services.google.frontend_redirect', config('app.url') . '/freelance/impostazioni');
+        $frontendRedirect = config('services.google.frontend_redirect', config('app.url').'/freelance/impostazioni');
 
         if ($request->has('error')) {
-            return redirect($frontendRedirect . '?google=error&message=' . urlencode((string) $request->get('error')));
+            return redirect($frontendRedirect.'?google=error&message='.urlencode((string) $request->get('error')));
         }
 
         $state = (string) $request->get('state');
         $userId = Cache::pull("google_oauth_state:{$state}");
 
-        if (!$userId) {
-            return redirect($frontendRedirect . '?google=error&message=' . urlencode('Sessione OAuth scaduta'));
+        if (! $userId) {
+            return redirect($frontendRedirect.'?google=error&message='.urlencode('Sessione OAuth scaduta'));
         }
 
         $code = (string) $request->get('code');
         if ($code === '') {
-            return redirect($frontendRedirect . '?google=error&message=' . urlencode('Codice OAuth mancante'));
+            return redirect($frontendRedirect.'?google=error&message='.urlencode('Codice OAuth mancante'));
         }
 
         try {
@@ -72,7 +86,7 @@ class GoogleOAuthController extends Controller
                 'redirect_uri' => config('services.google.redirect'),
             ]);
 
-            if (!$tokenResponse->successful()) {
+            if (! $tokenResponse->successful()) {
                 Log::error('Google token exchange failed', [
                     'user_id' => $userId,
                     'status' => $tokenResponse->status(),
@@ -86,24 +100,24 @@ class GoogleOAuthController extends Controller
             $refreshToken = $tokenData['refresh_token'] ?? null;
             $expiresIn = (int) ($tokenData['expires_in'] ?? 3600);
 
-            if (!$accessToken) {
+            if (! $accessToken) {
                 throw new \RuntimeException('Access token mancante');
             }
 
             $userInfoResponse = Http::withToken($accessToken)
                 ->get('https://www.googleapis.com/oauth2/v2/userinfo');
 
-            if (!$userInfoResponse->successful()) {
+            if (! $userInfoResponse->successful()) {
                 throw new \RuntimeException('Impossibile recuperare profilo Google');
             }
 
             $googleEmail = $userInfoResponse->json('email');
-            if (!$googleEmail) {
+            if (! $googleEmail) {
                 throw new \RuntimeException('Email Google non disponibile');
             }
 
             $existing = UserGoogleIntegration::where('user_id', $userId)->first();
-            if (!$refreshToken && $existing?->refresh_token) {
+            if (! $refreshToken && $existing?->refresh_token) {
                 $refreshToken = $existing->refresh_token;
             }
 
@@ -119,27 +133,25 @@ class GoogleOAuthController extends Controller
                 ]
             );
 
-            return redirect($frontendRedirect . '?google=connected');
+            return redirect($frontendRedirect.'?google=connected');
         } catch (\Throwable $e) {
             Log::error('Google OAuth callback failed', [
                 'user_id' => $userId,
                 'error' => $e->getMessage(),
             ]);
 
-            return redirect($frontendRedirect . '?google=error&message=' . urlencode('Collegamento Google fallito'));
+            return redirect($frontendRedirect.'?google=error&message='.urlencode('Collegamento Google fallito'));
         }
     }
 
-    public function status(GoogleCalendarService $googleCalendar)
+    public function status(GoogleCalendarService $googleCalendar): JsonResponse
     {
         $integration = UserGoogleIntegration::where('user_id', Auth::id())->first();
 
-        if (!$integration) {
+        if (! $integration) {
             return response()->json([
                 'success' => true,
-                'data' => [
-                    'connected' => false,
-                ],
+                'data' => ['connected' => false],
             ]);
         }
 
@@ -166,11 +178,11 @@ class GoogleOAuthController extends Controller
         ]);
     }
 
-    public function updatePreferences(Request $request)
+    public function updatePreferences(Request $request): JsonResponse
     {
         $integration = UserGoogleIntegration::where('user_id', Auth::id())->first();
 
-        if (!$integration) {
+        if (! $integration) {
             return response()->json([
                 'success' => false,
                 'message' => 'Account Google non collegato',
@@ -194,13 +206,101 @@ class GoogleOAuthController extends Controller
         ]);
     }
 
-    public function disconnect()
+    public function disconnect(): JsonResponse
     {
         UserGoogleIntegration::where('user_id', Auth::id())->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Account Google scollegato',
+        ]);
+    }
+
+    // =========================================================
+    // SEARCH CONSOLE OAUTH (flusso SPA — credenziali GOOGLE_SEO_*)
+    // =========================================================
+
+    /**
+     * Genera l'URL di autorizzazione Google Search Console.
+     * Il frontend reindirizza l'utente a questo URL e cattura il `code` di ritorno.
+     */
+    public function redirect(Request $request): JsonResponse
+    {
+        if (! config('services.google_seo.client_id') || ! config('services.google_seo.client_secret')) {
+            return response()->json([
+                'success' => false,
+                'message' => "Integrazione Google SEO non configurata. Contatta l'amministratore.",
+            ], 503);
+        }
+
+        $state = Str::random(40);
+        Cache::put("google_seo_oauth_state:{$state}", Auth::id(), now()->addMinutes(10));
+
+        $url = $this->tokenService->getAuthUrl($state);
+
+        return response()->json([
+            'success' => true,
+            'url' => $url,
+        ]);
+    }
+
+    /**
+     * Scambia il `code` ricevuto dal frontend con i token Google Search Console.
+     * Endpoint SPA protetto da auth:sanctum — il frontend invia il codice via GET param.
+     */
+    public function searchConsoleCallback(Request $request): JsonResponse
+    {
+        $request->validate(['code' => 'required|string']);
+
+        $state = (string) $request->get('state', '');
+        if ($state !== '') {
+            $userId = Cache::pull("google_seo_oauth_state:{$state}");
+            if (! $userId || $userId !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sessione OAuth non valida o scaduta.',
+                ], 422);
+            }
+        }
+
+        try {
+            $tokenPayload = $this->tokenService->exchangeCode($request->string('code')->toString());
+        } catch (\RuntimeException $e) {
+            Log::error('Google SEO OAuth exchange failed', [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Scambio codice Google fallito: '.$e->getMessage(),
+            ], 422);
+        }
+
+        if (isset($tokenPayload['error'])) {
+            return response()->json([
+                'success' => false,
+                'message' => $tokenPayload['error_description'] ?? $tokenPayload['error'],
+            ], 422);
+        }
+
+        $existing = UserGoogleIntegration::where('user_id', Auth::id())->first();
+
+        UserGoogleIntegration::updateOrCreate(
+            ['user_id' => Auth::id()],
+            [
+                'access_token' => $tokenPayload['access_token'],
+                'refresh_token' => $tokenPayload['refresh_token'] ?? $existing?->refresh_token,
+                'token_expires_at' => isset($tokenPayload['expires_in'])
+                    ? now()->addSeconds((int) $tokenPayload['expires_in'])
+                    : null,
+                'connected_at' => now(),
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Account Google Search Console collegato con successo.',
         ]);
     }
 }

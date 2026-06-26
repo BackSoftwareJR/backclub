@@ -51,6 +51,12 @@ return [
         'sync_enabled' => env('GOOGLE_CALENDAR_SYNC_ENABLED', true),
     ],
 
+    'google_seo' => [
+        'client_id'    => env('GOOGLE_SEO_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_SEO_CLIENT_SECRET'),
+        'redirect_uri' => env('GOOGLE_SEO_REDIRECT_URI'),
+    ],
+
     'github' => [
         'token' => env('GITHUB_TOKEN'),
         'publish_base_branch' => env('GITHUB_PUBLISH_BASE_BRANCH', 'main'),

@@ -12,6 +12,8 @@ class OrganicWebProject extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'crm_project_id',
         'website_url',

@@ -10,6 +10,8 @@ class OrganicKeywordSnapshot extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql_marketing';
+
     protected $fillable = [
         'organic_project_id',
         'snapshot_date',

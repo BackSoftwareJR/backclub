@@ -69,6 +69,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/disconnect', [App\Http\Controllers\GoogleOAuthController::class, 'disconnect']);
     });
 
+    // Google Search Console OAuth (flusso SPA — credenziali GOOGLE_SEO_*)
+    Route::prefix('oauth/google')->group(function () {
+        Route::get('/redirect', [App\Http\Controllers\GoogleOAuthController::class, 'redirect']);
+        Route::get('/callback', [App\Http\Controllers\GoogleOAuthController::class, 'searchConsoleCallback']);
+    });
+
     Route::post('/translate', [App\Http\Controllers\TranslateController::class]);
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     

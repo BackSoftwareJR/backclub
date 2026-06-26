@@ -82,7 +82,8 @@
             "dont-discover": []
         },
         "google/apiclient-services": [
-            "Calendar"
+            "Calendar",
+            "SearchConsole"
         ]
     },
     "config": {

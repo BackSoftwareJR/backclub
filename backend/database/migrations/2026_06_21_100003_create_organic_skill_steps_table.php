@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected $connection = 'mysql_marketing';
+
     public function up(): void
     {
-        Schema::create('organic_skill_steps', function (Blueprint $table) {
+        Schema::connection('mysql_marketing')->create('organic_skill_steps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('skill_run_id')->constrained('organic_skill_runs')->onDelete('cascade');
             $table->integer('step_index');
@@ -28,6 +30,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('organic_skill_steps');
+        Schema::connection('mysql_marketing')->dropIfExists('organic_skill_steps');
     }
 };
