@@ -988,6 +988,18 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
     Route::post('/projects/{id}/gsc-refresh', [App\Http\Controllers\OrganicWebGscController::class, 'refreshGscData']);
     Route::get('/projects/{id}/gsc-properties', [App\Http\Controllers\OrganicWebGscController::class, 'getGscProperties']);
     Route::post('/projects/{id}/gsc-property', [App\Http\Controllers\OrganicWebGscController::class, 'selectGscProperty']);
+
+    // Sitemap tab endpoints
+    Route::get('/projects/{id}/sitemap/overview', [App\Http\Controllers\OrganicSitemapController::class, 'overview']);
+    Route::get('/projects/{id}/sitemap/list', [App\Http\Controllers\OrganicSitemapController::class, 'list']);
+    Route::post('/projects/{id}/sitemap/submit', [App\Http\Controllers\OrganicSitemapController::class, 'submit']);
+    Route::delete('/projects/{id}/sitemap/{sitemapId}', [App\Http\Controllers\OrganicSitemapController::class, 'destroy']);
+    Route::get('/projects/{id}/sitemap/urls', [App\Http\Controllers\OrganicSitemapController::class, 'urls']);
+    Route::post('/projects/{id}/sitemap/inspect-url', [App\Http\Controllers\OrganicSitemapController::class, 'inspectUrl']);
+    Route::post('/projects/{id}/sitemap/request-indexing', [App\Http\Controllers\OrganicSitemapController::class, 'requestIndexing']);
+    Route::get('/projects/{id}/sitemap/coverage', [App\Http\Controllers\OrganicSitemapController::class, 'coverage']);
+    Route::get('/projects/{id}/sitemap/alerts', [App\Http\Controllers\OrganicSitemapController::class, 'alerts']);
+    Route::get('/projects/{id}/robots-txt', [App\Http\Controllers\OrganicSitemapController::class, 'robotsTxt']);
 });
 
 Route::get('/user', function (Request $request) {

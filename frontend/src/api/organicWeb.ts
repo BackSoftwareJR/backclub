@@ -263,6 +263,53 @@ export interface CrmProjectOption {
     client_name: string;
 }
 
+// ── Sitemap Tab Types ──
+
+export interface SitemapAlert {
+    id: number;
+    type: string;
+    severity: 'critical' | 'warning' | 'info';
+    message: string;
+}
+
+export interface CoverageSummary {
+    total_urls_sitemap: number;
+    indexed: number;
+    errors: number;
+    missing_from_sitemap: number;
+}
+
+export interface HealthTrendPoint {
+    score: number;
+    recorded_at: string;
+}
+
+export interface SitemapOverview {
+    health_score: number;
+    health_breakdown: Record<string, number>;
+    health_trend: HealthTrendPoint[];
+    alerts: SitemapAlert[];
+    coverage: CoverageSummary;
+}
+
+export interface GscUrlDetail {
+    url: string;
+    indexing_status: string | null;
+    last_crawled: string | null;
+    canonical_url: string | null;
+    mobile_usability: string | null;
+    coverage_state: string | null;
+    blocked_by_robots: boolean;
+    errors: string[];
+}
+
+export interface RobotsTxtData {
+    content: string | null;
+    url: string | null;
+    fetched_at: string;
+    error?: string;
+}
+
 // ==================== Create/Update Data Types ====================
 
 export interface CreateProjectData {
@@ -521,6 +568,85 @@ export const organicWebApi = {
         const response = await apiClient.post<{ success: boolean; message: string; property_url: string }>(
             `/organic-web/projects/${projectId}/gsc-property`,
             { property_url: propertyUrl }
+        );
+        return response.data;
+    },
+
+    // ── Sitemap Tab ──
+
+    getSitemapOverview: async (projectId: number): Promise<SitemapOverview> => {
+        const response = await apiClient.get<SitemapOverview>(
+            `/organic-web/projects/${projectId}/sitemap/overview`
+        );
+        return response.data;
+    },
+
+    getSitemapList: async (projectId: number): Promise<{ sitemaps: GscSitemap[] }> => {
+        const response = await apiClient.get<{ sitemaps: GscSitemap[] }>(
+            `/organic-web/projects/${projectId}/sitemap/list`
+        );
+        return response.data;
+    },
+
+    submitSitemap: async (projectId: number, sitemapUrl: string): Promise<{ success: boolean; message: string }> => {
+        const response = await apiClient.post<{ success: boolean; message: string }>(
+            `/organic-web/projects/${projectId}/sitemap/submit`,
+            { sitemap_url: sitemapUrl }
+        );
+        return response.data;
+    },
+
+    deleteSitemap: async (projectId: number, sitemapId: number): Promise<{ success: boolean; message: string }> => {
+        const response = await apiClient.delete<{ success: boolean; message: string }>(
+            `/organic-web/projects/${projectId}/sitemap/${sitemapId}`
+        );
+        return response.data;
+    },
+
+    getSitemapUrls: async (
+        projectId: number,
+        params: { page?: number; status?: string; per_page?: number }
+    ): Promise<PaginatedResponse<GscUrlDetail>> => {
+        const response = await apiClient.get<PaginatedResponse<GscUrlDetail>>(
+            `/organic-web/projects/${projectId}/sitemap/urls`,
+            { params }
+        );
+        return response.data;
+    },
+
+    inspectUrl: async (projectId: number, url: string): Promise<GscUrlDetail> => {
+        const response = await apiClient.post<GscUrlDetail>(
+            `/organic-web/projects/${projectId}/sitemap/inspect-url`,
+            { url }
+        );
+        return response.data;
+    },
+
+    requestIndexing: async (projectId: number, urls: string[]): Promise<{ success: boolean; queued: number }> => {
+        const response = await apiClient.post<{ success: boolean; queued: number }>(
+            `/organic-web/projects/${projectId}/sitemap/request-indexing`,
+            { urls }
+        );
+        return response.data;
+    },
+
+    getCoverageReport: async (projectId: number): Promise<CoverageSummary> => {
+        const response = await apiClient.get<CoverageSummary>(
+            `/organic-web/projects/${projectId}/sitemap/coverage`
+        );
+        return response.data;
+    },
+
+    getSitemapAlerts: async (projectId: number): Promise<{ alerts: SitemapAlert[] }> => {
+        const response = await apiClient.get<{ alerts: SitemapAlert[] }>(
+            `/organic-web/projects/${projectId}/sitemap/alerts`
+        );
+        return response.data;
+    },
+
+    getRobotsTxt: async (projectId: number): Promise<RobotsTxtData> => {
+        const response = await apiClient.get<RobotsTxtData>(
+            `/organic-web/projects/${projectId}/robots-txt`
         );
         return response.data;
     },

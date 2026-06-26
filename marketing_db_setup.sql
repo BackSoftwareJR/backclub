@@ -235,4 +235,75 @@ CREATE TABLE IF NOT EXISTS `organic_project_google_integrations` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET foreign_key_checks = 1;
+
+-- ------------------------------------------------------------
+-- Tabella: organic_gsc_url_details
+-- Cache dettagli per singolo URL da GSC URL Inspection API
+-- Ref cross-DB: organic_web_project_id → mysql_marketing.organic_web_projects (FK ok)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `organic_gsc_url_details` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `organic_web_project_id` BIGINT UNSIGNED NOT NULL,
+  `url` VARCHAR(2048) NOT NULL,
+  `indexing_status` VARCHAR(64) NULL,
+  `last_crawled` TIMESTAMP NULL,
+  `canonical_url` VARCHAR(2048) NULL,
+  `mobile_usability` VARCHAR(64) NULL,
+  `coverage_state` VARCHAR(128) NULL,
+  `blocked_by_robots` TINYINT(1) NOT NULL DEFAULT 0,
+  `errors_json` JSON NULL,
+  `created_at` TIMESTAMP NULL,
+  `updated_at` TIMESTAMP NULL,
+  INDEX `idx_ogud_project_id` (`organic_web_project_id`),
+  INDEX `idx_ogud_project_status` (`organic_web_project_id`, `indexing_status`),
+  CONSTRAINT `fk_ogud_organic_web_project_id`
+    FOREIGN KEY (`organic_web_project_id`)
+    REFERENCES `organic_web_projects` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Tabella: organic_sitemap_alerts
+-- Storico alert automatici per il modulo Sitemap
+-- Ref intra-DB: organic_web_project_id → organic_web_projects (FK ok)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `organic_sitemap_alerts` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `organic_web_project_id` BIGINT UNSIGNED NOT NULL,
+  `type` VARCHAR(64) NOT NULL,
+  `severity` ENUM('critical','warning','info') NOT NULL DEFAULT 'info',
+  `message` TEXT NOT NULL,
+  `resolved_at` TIMESTAMP NULL,
+  `created_at` TIMESTAMP NULL,
+  `updated_at` TIMESTAMP NULL,
+  INDEX `idx_osa_project_id` (`organic_web_project_id`),
+  INDEX `idx_osa_project_resolved` (`organic_web_project_id`, `resolved_at`),
+  CONSTRAINT `fk_osa_organic_web_project_id`
+    FOREIGN KEY (`organic_web_project_id`)
+    REFERENCES `organic_web_projects` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ------------------------------------------------------------
+-- Tabella: organic_sitemap_health_history
+-- Trend dello health score nel tempo
+-- Ref intra-DB: organic_web_project_id → organic_web_projects (FK ok)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `organic_sitemap_health_history` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `organic_web_project_id` BIGINT UNSIGNED NOT NULL,
+  `score` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `breakdown_json` JSON NULL,
+  `recorded_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` TIMESTAMP NULL,
+  `updated_at` TIMESTAMP NULL,
+  INDEX `idx_oshh_project_id` (`organic_web_project_id`),
+  INDEX `idx_oshh_project_recorded` (`organic_web_project_id`, `recorded_at`),
+  CONSTRAINT `fk_oshh_organic_web_project_id`
+    FOREIGN KEY (`organic_web_project_id`)
+    REFERENCES `organic_web_projects` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+SET foreign_key_checks = 1;
 -- Fine script marketing_db_setup.sql

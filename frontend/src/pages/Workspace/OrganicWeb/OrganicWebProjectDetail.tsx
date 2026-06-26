@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Play, X, Loader, AlertCircle, RefreshCw,
     ChevronRight, Globe, Edit2, FileText, BarChart2, Settings,
-    Sparkles, Check, Pencil, Users, Mic2, Tag, Zap, Calendar, CheckCircle
+    Sparkles, Check, Pencil, Users, Mic2, Tag, Zap, Calendar, CheckCircle, Map
 } from 'lucide-react';
 import organicWebApi from '../../../api/organicWeb';
 import type {
@@ -15,9 +15,10 @@ import HumanTaskCard from './components/HumanTaskCard';
 import OrganicProjectSettingsForm from './components/OrganicProjectSettingsForm';
 import GscBentoDashboard from './components/GscBentoDashboard';
 import GscPropertySelector from './components/GscPropertySelector';
+import SitemapTab from './components/SitemapTab';
 import './OrganicWeb.css';
 
-type TabId = 'overview' | 'runs' | 'tasks' | 'posts' | 'seo' | 'settings';
+type TabId = 'overview' | 'runs' | 'tasks' | 'posts' | 'seo' | 'sitemap' | 'settings';
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Overview', icon: <Globe size={13} /> },
@@ -25,6 +26,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: 'tasks', label: 'Task Umani', icon: <Edit2 size={13} /> },
     { id: 'posts', label: 'Post Blog', icon: <FileText size={13} /> },
     { id: 'seo', label: 'SEO Audit', icon: <BarChart2 size={13} /> },
+    { id: 'sitemap', label: 'Sitemap', icon: <Map size={13} /> },
     { id: 'settings', label: 'Impostazioni', icon: <Settings size={13} /> },
 ];
 
@@ -321,6 +323,9 @@ const OrganicWebProjectDetail: React.FC = () => {
             )}
             {activeTab === 'seo' && (
                 <SeoTab audits={seoAudits} />
+            )}
+            {activeTab === 'sitemap' && (
+                <SitemapTab projectId={projectId} />
             )}
             {activeTab === 'settings' && (
                 <OrganicProjectSettingsForm
