@@ -97,7 +97,10 @@ const SitemapListCard: React.FC<SitemapListCardProps> = ({ projectId, sitemaps, 
                                     </span>
                                     {sitemap.downloaded_urls > 0 && (
                                         <span style={{ fontSize: 'var(--ws-font-xs)', color: 'var(--ws-text-secondary)' }}>
-                                            {sitemap.downloaded_urls.toLocaleString('it-IT')} URL
+                                            {sitemap.downloaded_urls.toLocaleString('it-IT')} in sitemap
+                                            {(sitemap.indexed_urls ?? 0) > 0 && (
+                                                <> · {sitemap.indexed_urls!.toLocaleString('it-IT')} indicizzati</>
+                                            )}
                                         </span>
                                     )}
                                     {sitemap.last_submitted && (

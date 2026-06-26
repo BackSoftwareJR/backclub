@@ -36,6 +36,7 @@ export interface GscSitemap {
     last_downloaded: string | null;
     status: string | null;
     downloaded_urls: number;
+    indexed_urls?: number;
     errors: string | null;
     created_at: string;
     updated_at: string;
@@ -277,6 +278,7 @@ export interface CoverageSummary {
     indexed: number;
     errors: number;
     missing_from_sitemap: number;
+    urls_tracked?: number;
 }
 
 export interface HealthTrendPoint {
@@ -633,6 +635,13 @@ export const organicWebApi = {
     getCoverageReport: async (projectId: number): Promise<CoverageSummary> => {
         const response = await apiClient.get<CoverageSummary>(
             `/organic-web/projects/${projectId}/sitemap/coverage`
+        );
+        return response.data;
+    },
+
+    syncSitemapUrls: async (projectId: number): Promise<{ success: boolean; message: string; synced: { synced_urls: number; sitemaps_processed: number }; coverage: CoverageSummary }> => {
+        const response = await apiClient.post<{ success: boolean; message: string; synced: { synced_urls: number; sitemaps_processed: number }; coverage: CoverageSummary }>(
+            `/organic-web/projects/${projectId}/sitemap/sync-urls`
         );
         return response.data;
     },

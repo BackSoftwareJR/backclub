@@ -27,61 +27,63 @@ final class OrganicSitemapController extends Controller
         try {
             $project = OrganicWebProject::with('googleIntegration')->findOrFail($projectId);
 
-            $this->generateAlerts($projectId, $project);
+            try {
+                $this->generateAlerts($projectId, $project);
+            } catch (\Throwable $e) {
+                Log::warning('Sitemap alerts skipped', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+            }
 
             $healthResult = $this->searchConsoleService->calculateHealthScore($projectId);
 
-            OrganicSitemapHealthHistory::create([
-                'organic_web_project_id' => $projectId,
-                'score' => $healthResult['score'],
-                'breakdown_json' => $healthResult['breakdown'],
-                'recorded_at' => now(),
-            ]);
-
-            $alerts = OrganicSitemapAlert::where('organic_web_project_id', $projectId)
-                ->whereNull('resolved_at')
-                ->orderBy('severity')
-                ->orderByDesc('created_at')
-                ->get()
-                ->map(fn ($a) => [
-                    'id' => $a->id,
-                    'type' => $a->type,
-                    'severity' => $a->severity,
-                    'message' => $a->message,
+            try {
+                OrganicSitemapHealthHistory::create([
+                    'organic_web_project_id' => $projectId,
+                    'score' => $healthResult['score'],
+                    'breakdown_json' => $healthResult['breakdown'],
+                    'recorded_at' => now(),
                 ]);
+            } catch (\Throwable $e) {
+                Log::warning('Health history skipped', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+            }
 
-            $sitemaps = OrganicGscSitemap::where('organic_web_project_id', $projectId)->get();
-            $totalUrls = $sitemaps->sum('downloaded_urls');
+            $alerts = collect();
+            try {
+                $alerts = OrganicSitemapAlert::where('organic_web_project_id', $projectId)
+                    ->whereNull('resolved_at')
+                    ->orderBy('severity')
+                    ->orderByDesc('created_at')
+                    ->get()
+                    ->map(fn ($a) => [
+                        'id' => $a->id,
+                        'type' => $a->type,
+                        'severity' => $a->severity,
+                        'message' => $a->message,
+                    ]);
+            } catch (\Throwable $e) {
+                Log::warning('Sitemap alerts fetch skipped', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+            }
 
-            $indexed = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->where('indexing_status', 'PASS')
-                ->count();
+            $coverage = $this->buildCoverageSummary($projectId);
 
-            $errors = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->whereNotNull('errors_json')
-                ->count();
-
-            $missing = max(0, $totalUrls - $indexed);
-
-            $trendHistory = OrganicSitemapHealthHistory::where('organic_web_project_id', $projectId)
-                ->orderByDesc('recorded_at')
-                ->limit(10)
-                ->get()
-                ->map(fn ($h) => ['score' => $h->score, 'recorded_at' => $h->recorded_at?->toIso8601String()])
-                ->reverse()
-                ->values();
+            $trendHistory = collect();
+            try {
+                $trendHistory = OrganicSitemapHealthHistory::where('organic_web_project_id', $projectId)
+                    ->orderByDesc('recorded_at')
+                    ->limit(10)
+                    ->get()
+                    ->map(fn ($h) => ['score' => $h->score, 'recorded_at' => $h->recorded_at?->toIso8601String()])
+                    ->reverse()
+                    ->values();
+            } catch (\Throwable $e) {
+                Log::warning('Health trend skipped', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+            }
 
             return response()->json([
                 'health_score' => $healthResult['score'],
                 'health_breakdown' => $healthResult['breakdown'],
                 'health_trend' => $trendHistory,
                 'alerts' => $alerts,
-                'coverage' => [
-                    'total_urls_sitemap' => $totalUrls,
-                    'indexed' => $indexed,
-                    'errors' => $errors,
-                    'missing_from_sitemap' => $missing,
-                ],
+                'coverage' => $coverage,
             ]);
         } catch (\Throwable $e) {
             Log::error('Sitemap overview error', ['project_id' => $projectId, 'error' => $e->getMessage()]);
@@ -258,26 +260,31 @@ final class OrganicSitemapController extends Controller
         try {
             OrganicWebProject::findOrFail($projectId);
 
-            $sitemaps = OrganicGscSitemap::where('organic_web_project_id', $projectId)->get();
-            $totalUrls = $sitemaps->sum('downloaded_urls');
+            return response()->json($this->buildCoverageSummary($projectId));
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
 
-            $indexed = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->where('indexing_status', 'PASS')
-                ->count();
+    /**
+     * Parses sitemap XML and stores URL list for the project.
+     */
+    public function syncUrls(int $projectId): JsonResponse
+    {
+        try {
+            OrganicWebProject::findOrFail($projectId);
 
-            $errorsCount = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->whereNotNull('errors_json')
-                ->count();
-
-            $missing = max(0, $totalUrls - $indexed);
+            $result = $this->searchConsoleService->syncUrlListFromSitemaps($projectId);
 
             return response()->json([
-                'total_urls_sitemap' => $totalUrls,
-                'indexed' => $indexed,
-                'errors' => $errorsCount,
-                'missing_from_sitemap' => $missing,
+                'success' => true,
+                'message' => 'URL sincronizzati dalla sitemap',
+                'synced' => $result,
+                'coverage' => $this->buildCoverageSummary($projectId),
             ]);
         } catch (\Throwable $e) {
+            Log::error('Sync sitemap URLs error', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+
             return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
         }
     }
@@ -382,15 +389,11 @@ final class OrganicSitemapController extends Controller
 
         $totalUrls = $sitemaps->sum('downloaded_urls');
         if ($totalUrls > 0) {
-            $indexed = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->where('indexing_status', 'PASS')
-                ->count();
+            $coverage = $this->buildCoverageSummary($projectId);
+            $indexed = $coverage['indexed'];
+            $errorUrls = $coverage['errors'];
 
-            $errorUrls = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->whereNotNull('errors_json')
-                ->count();
-
-            if ($errorUrls > 0 && ($errorUrls / $totalUrls) > 0.20) {
+            if ($errorUrls > 0 && ($errorUrls / max(1, $totalUrls)) > 0.20) {
                 OrganicSitemapAlert::create([
                     'organic_web_project_id' => $projectId,
                     'type' => 'high_error_rate',
@@ -409,5 +412,50 @@ final class OrganicSitemapController extends Controller
                 ]);
             }
         }
+    }
+
+    /**
+     * @return array{
+     *     total_urls_sitemap: int,
+     *     indexed: int,
+     *     errors: int,
+     *     missing_from_sitemap: int,
+     *     urls_tracked: int
+     * }
+     */
+    private function buildCoverageSummary(int $projectId): array
+    {
+        $sitemaps = OrganicGscSitemap::where('organic_web_project_id', $projectId)->get();
+        $totalUrls = (int) $sitemaps->sum('downloaded_urls');
+        $indexedFromGsc = (int) $sitemaps->sum('indexed_urls');
+
+        $indexedFromInspection = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
+            ->where(function ($q) {
+                $q->where('indexing_status', 'PASS')
+                    ->orWhere('coverage_state', 'like', '%Indexed%');
+            })
+            ->count();
+
+        $errorsCount = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
+            ->where(function ($q) {
+                $q->where('indexing_status', 'FAIL')
+                    ->orWhereNotNull('errors_json');
+            })
+            ->count();
+
+        $urlsTracked = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)->count();
+        if ($totalUrls === 0 && $urlsTracked > 0) {
+            $totalUrls = $urlsTracked;
+        }
+
+        $indexed = max($indexedFromGsc, $indexedFromInspection);
+
+        return [
+            'total_urls_sitemap' => $totalUrls,
+            'indexed' => $indexed,
+            'errors' => $errorsCount,
+            'missing_from_sitemap' => max(0, $totalUrls - $indexed),
+            'urls_tracked' => $urlsTracked,
+        ];
     }
 }

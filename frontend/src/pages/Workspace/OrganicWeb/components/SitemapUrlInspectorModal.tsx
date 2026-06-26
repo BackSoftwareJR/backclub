@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader, RefreshCw, ExternalLink, CheckCircle, AlertCircle, Bot } from 'lucide-react';
+import { X, Loader, ExternalLink, CheckCircle, AlertCircle, Bot } from 'lucide-react';
 import type { GscUrlDetail } from '../../../../api/organicWeb';
 import organicWebApi from '../../../../api/organicWeb';
 

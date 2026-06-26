@@ -998,6 +998,7 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
     Route::post('/projects/{id}/sitemap/inspect-url', [App\Http\Controllers\OrganicSitemapController::class, 'inspectUrl']);
     Route::post('/projects/{id}/sitemap/request-indexing', [App\Http\Controllers\OrganicSitemapController::class, 'requestIndexing']);
     Route::get('/projects/{id}/sitemap/coverage', [App\Http\Controllers\OrganicSitemapController::class, 'coverage']);
+    Route::post('/projects/{id}/sitemap/sync-urls', [App\Http\Controllers\OrganicSitemapController::class, 'syncUrls']);
     Route::get('/projects/{id}/sitemap/alerts', [App\Http\Controllers\OrganicSitemapController::class, 'alerts']);
     Route::get('/projects/{id}/robots-txt', [App\Http\Controllers\OrganicSitemapController::class, 'robotsTxt']);
 });

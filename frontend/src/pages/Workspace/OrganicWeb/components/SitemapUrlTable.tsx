@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Search, Download, RefreshCw, Loader, ExternalLink } from 'lucide-react';
 import type { GscUrlDetail, PaginatedResponse } from '../../../../api/organicWeb';
 import organicWebApi from '../../../../api/organicWeb';
@@ -9,6 +9,8 @@ interface SitemapUrlTableProps {
     initialData: PaginatedResponse<GscUrlDetail> | null;
     loading?: boolean;
     onRefresh: () => void;
+    onSyncUrls: () => void;
+    syncing?: boolean;
 }
 
 const STATUS_OPTIONS = [
@@ -25,7 +27,7 @@ function getStatusBadge(status: string | null) {
     return <span className="ow-badge ow-badge--sm ow-badge--gray">{status ?? '—'}</span>;
 }
 
-const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialData, loading, onRefresh }) => {
+const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialData, loading, onRefresh, onSyncUrls, syncing }) => {
     const [data, setData] = useState<PaginatedResponse<GscUrlDetail> | null>(initialData);
     const [statusFilter, setStatusFilter] = useState('');
     const [page, setPage] = useState(1);
@@ -33,6 +35,10 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
     const [inspectingUrl, setInspectingUrl] = useState<string | null>(null);
     const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
     const [bulkLoading, setBulkLoading] = useState(false);
+
+    useEffect(() => {
+        setData(initialData);
+    }, [initialData]);
 
     const fetchPage = useCallback(async (newPage: number, newStatus: string) => {
         setFetching(true);
@@ -111,7 +117,7 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
         <div className="ow-gsc-bento-card ow-sitemap-url-table-card" style={{ gridColumn: '1 / -1' }}>
             <div className="ow-gsc-bento-card-header">
                 <Search size={15} style={{ color: 'var(--ws-accent)' }} />
-                <span className="ow-gsc-bento-card-title">URL Indicizzati</span>
+                <span className="ow-gsc-bento-card-title">URL in Sitemap</span>
                 {data && (
                     <span style={{ fontSize: 'var(--ws-font-xs)', color: 'var(--ws-text-secondary)', marginLeft: 6 }}>
                         {data.total.toLocaleString('it-IT')} totali
@@ -142,6 +148,16 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
                     <button
                         className="ow-btn ow-btn--secondary"
                         style={{ padding: '4px 8px', fontSize: 'var(--ws-font-xs)' }}
+                        onClick={onSyncUrls}
+                        disabled={syncing}
+                        title="Importa URL dalla sitemap XML"
+                    >
+                        {syncing ? <Loader size={11} className="ws-spin" /> : <RefreshCw size={11} />}
+                        Sincronizza
+                    </button>
+                    <button
+                        className="ow-btn ow-btn--secondary"
+                        style={{ padding: '4px 8px', fontSize: 'var(--ws-font-xs)' }}
                         onClick={handleExportCsv}
                         title="Esporta CSV"
                     >
@@ -155,7 +171,7 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
             ) : rows.length === 0 ? (
                 <div className="ow-gsc-bento-empty">
                     <Search size={20} />
-                    <span>Nessun URL trovato. Usa "Ispeziona URL" per aggiungere dati.</span>
+                    <span>Nessun URL in elenco. Clicca "Sincronizza" per importare gli URL dalla sitemap, oppure "Aggiorna Dati" nella dashboard GSC.</span>
                 </div>
             ) : (
                 <>

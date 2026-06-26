@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import type { SitemapOverview, GscSitemap, PaginatedResponse, GscUrlDetail } from '../../../../api/organicWeb';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import type { SitemapOverview, GscSitemap, PaginatedResponse, GscUrlDetail, CoverageSummary } from '../../../../api/organicWeb';
 import organicWebApi from '../../../../api/organicWeb';
 import SitemapHealthCard from './SitemapHealthCard';
 import SitemapAlertsCard from './SitemapAlertsCard';
@@ -12,6 +12,18 @@ interface SitemapTabProps {
     projectId: number;
 }
 
+function coverageFromSitemaps(sitemaps: GscSitemap[]): CoverageSummary {
+    const total = sitemaps.reduce((sum, sitemap) => sum + sitemap.downloaded_urls, 0);
+    const indexed = sitemaps.reduce((sum, sitemap) => sum + (sitemap.indexed_urls ?? 0), 0);
+
+    return {
+        total_urls_sitemap: total,
+        indexed,
+        errors: 0,
+        missing_from_sitemap: Math.max(0, total - indexed),
+    };
+}
+
 const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
     const [overview, setOverview] = useState<SitemapOverview | null>(null);
     const [sitemaps, setSitemaps] = useState<GscSitemap[]>([]);
@@ -19,14 +31,18 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
     const [loadingOverview, setLoadingOverview] = useState(true);
     const [loadingSitemaps, setLoadingSitemaps] = useState(true);
     const [loadingUrls, setLoadingUrls] = useState(true);
+    const [syncingUrls, setSyncingUrls] = useState(false);
+    const [overviewLoaded, setOverviewLoaded] = useState(false);
 
     const fetchOverview = useCallback(async () => {
         setLoadingOverview(true);
         try {
             const res = await organicWebApi.getSitemapOverview(projectId);
             setOverview(res);
+            setOverviewLoaded(true);
         } catch {
-            // silent
+            setOverview(null);
+            setOverviewLoaded(false);
         } finally {
             setLoadingOverview(false);
         }
@@ -38,7 +54,7 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
             const res = await organicWebApi.getSitemapList(projectId);
             setSitemaps(res.sitemaps);
         } catch {
-            // silent
+            setSitemaps([]);
         } finally {
             setLoadingSitemaps(false);
         }
@@ -50,11 +66,26 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
             const res = await organicWebApi.getSitemapUrls(projectId, { per_page: 25 });
             setUrlData(res);
         } catch {
-            // silent
+            setUrlData(null);
         } finally {
             setLoadingUrls(false);
         }
     }, [projectId]);
+
+    const syncUrlsFromSitemap = useCallback(async () => {
+        setSyncingUrls(true);
+        try {
+            const res = await organicWebApi.syncSitemapUrls(projectId);
+            if (res.coverage && overviewLoaded) {
+                setOverview(prev => prev ? { ...prev, coverage: res.coverage } : prev);
+            }
+            await Promise.all([fetchUrls(), fetchOverview(), fetchSitemaps()]);
+        } catch {
+            // silent
+        } finally {
+            setSyncingUrls(false);
+        }
+    }, [projectId, fetchUrls, fetchOverview, fetchSitemaps, overviewLoaded]);
 
     useEffect(() => {
         fetchOverview();
@@ -62,13 +93,28 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
         fetchUrls();
     }, [fetchOverview, fetchSitemaps, fetchUrls]);
 
+    useEffect(() => {
+        if (loadingSitemaps || loadingUrls || syncingUrls) return;
+        if (sitemaps.length > 0 && (urlData?.total ?? 0) === 0) {
+            syncUrlsFromSitemap();
+        }
+    }, [loadingSitemaps, loadingUrls, syncingUrls, sitemaps.length, urlData?.total, syncUrlsFromSitemap]);
+
     const handleRefresh = () => {
         fetchOverview();
         fetchSitemaps();
         fetchUrls();
     };
 
-    const emptyCoverage = { total_urls_sitemap: 0, indexed: 0, errors: 0, missing_from_sitemap: 0 };
+    const coverage = useMemo(() => {
+        if (overview?.coverage && overview.coverage.total_urls_sitemap > 0) {
+            return overview.coverage;
+        }
+        if (sitemaps.length > 0) {
+            return coverageFromSitemaps(sitemaps);
+        }
+        return overview?.coverage ?? { total_urls_sitemap: 0, indexed: 0, errors: 0, missing_from_sitemap: 0 };
+    }, [overview, sitemaps]);
 
     return (
         <div className="ow-sitemap-tab">
@@ -78,6 +124,7 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
                     breakdown={overview?.health_breakdown ?? {}}
                     trend={overview?.health_trend ?? []}
                     loading={loadingOverview}
+                    loaded={overviewLoaded}
                 />
 
                 <SitemapAlertsCard
@@ -86,8 +133,8 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
                 />
 
                 <SitemapCoverageCard
-                    coverage={overview?.coverage ?? emptyCoverage}
-                    loading={loadingOverview}
+                    coverage={coverage}
+                    loading={loadingOverview && loadingSitemaps}
                 />
 
                 <SitemapListCard
@@ -100,8 +147,10 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
                 <SitemapUrlTable
                     projectId={projectId}
                     initialData={urlData}
-                    loading={loadingUrls}
+                    loading={loadingUrls || syncingUrls}
                     onRefresh={handleRefresh}
+                    onSyncUrls={syncUrlsFromSitemap}
+                    syncing={syncingUrls}
                 />
 
                 <RobotsTxtCard projectId={projectId} />

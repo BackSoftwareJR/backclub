@@ -18,6 +18,7 @@ class OrganicGscSitemap extends Model
         'last_downloaded',
         'status',
         'downloaded_urls',
+        'indexed_urls',
         'errors',
     ];
 
@@ -27,6 +28,7 @@ class OrganicGscSitemap extends Model
             'last_submitted' => 'datetime',
             'last_downloaded' => 'datetime',
             'downloaded_urls' => 'integer',
+            'indexed_urls' => 'integer',
         ];
     }
 

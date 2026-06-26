@@ -203,7 +203,7 @@ const GscBentoDashboard: React.FC<GscBentoDashboardProps> = ({ projectId }) => {
                                             {new URL(sitemap.path).pathname.split('/').pop() || sitemap.path}
                                         </span>
                                         <span className="ow-gsc-bento-sitemap-meta">
-                                            {sitemap.downloaded_urls.toLocaleString('it-IT')} URL indicizzati
+                                            {sitemap.downloaded_urls.toLocaleString('it-IT')} URL in sitemap
                                         </span>
                                     </div>
                                 </div>

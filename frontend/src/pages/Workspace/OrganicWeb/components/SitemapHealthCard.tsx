@@ -7,6 +7,7 @@ interface SitemapHealthCardProps {
     breakdown: Record<string, number>;
     trend: HealthTrendPoint[];
     loading?: boolean;
+    loaded?: boolean;
 }
 
 function getScoreColor(score: number): string {
@@ -30,7 +31,7 @@ const BREAKDOWN_LABELS: Record<string, string> = {
     critical_alerts: 'Alert critici',
 };
 
-const SitemapHealthCard: React.FC<SitemapHealthCardProps> = ({ score, breakdown, trend, loading }) => {
+const SitemapHealthCard: React.FC<SitemapHealthCardProps> = ({ score, breakdown, trend, loading, loaded = true }) => {
     const prevScore = trend.length >= 2 ? trend[trend.length - 2].score : null;
     const delta = prevScore !== null ? score - prevScore : null;
 
@@ -65,7 +66,11 @@ const SitemapHealthCard: React.FC<SitemapHealthCardProps> = ({ score, breakdown,
                     </div>
 
                     <div className="ow-sitemap-health-details">
-                        {Object.keys(breakdown).length === 0 ? (
+                        {!loaded ? (
+                            <p style={{ fontSize: 'var(--ws-font-sm)', color: 'var(--ws-text-secondary)' }}>
+                                Overview non disponibile. Verifica le tabelle sitemap nel database marketing.
+                            </p>
+                        ) : Object.keys(breakdown).length === 0 ? (
                             <p style={{ fontSize: 'var(--ws-font-sm)', color: 'var(--ws-green)' }}>
                                 Nessun problema rilevato ✓
                             </p>

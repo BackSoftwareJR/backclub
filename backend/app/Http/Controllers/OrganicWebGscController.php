@@ -59,6 +59,7 @@ final class OrganicWebGscController extends Controller
 
             $performanceResult = $this->searchConsoleService->syncPerformance($projectId);
             $sitemapsResult = $this->searchConsoleService->syncSitemaps($projectId, $siteUrl);
+            $urlsResult = $this->searchConsoleService->syncUrlListFromSitemaps($projectId);
 
             return response()->json([
                 'success' => true,
@@ -66,6 +67,7 @@ final class OrganicWebGscController extends Controller
                 'synced' => [
                     'performance' => $performanceResult,
                     'sitemaps' => $sitemapsResult,
+                    'urls' => $urlsResult,
                 ],
             ]);
         } catch (\Throwable $e) {

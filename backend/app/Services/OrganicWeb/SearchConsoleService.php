@@ -204,9 +204,11 @@ final class SearchConsoleService
                 }
 
                 $downloadedUrls = 0;
+                $indexedUrls = 0;
                 if ($contents && count($contents) > 0) {
                     foreach ($contents as $content) {
                         $downloadedUrls += (int) $content->getSubmitted();
+                        $indexedUrls += (int) $content->getIndexed();
                     }
                 }
 
@@ -220,6 +222,7 @@ final class SearchConsoleService
                         'last_downloaded' => $lastDownloaded ? \Carbon\Carbon::parse($lastDownloaded) : null,
                         'status' => $status,
                         'downloaded_urls' => $downloadedUrls,
+                        'indexed_urls' => $indexedUrls,
                         'errors' => $errors,
                     ]
                 );
@@ -473,11 +476,17 @@ final class SearchConsoleService
             }
 
             $totalUrls = $sitemaps->sum('downloaded_urls');
-            $indexedUrls = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
-                ->where('indexing_status', 'PASS')
+            $indexedUrls = $sitemaps->sum('indexed_urls');
+            $inspectedIndexed = OrganicGscUrlDetail::where('organic_web_project_id', $projectId)
+                ->where(function ($q) {
+                    $q->where('indexing_status', 'PASS')
+                        ->orWhere('coverage_state', 'like', '%Indexed%');
+                })
                 ->count();
 
-            if ($totalUrls > 0 && $indexedUrls < ($totalUrls * 0.5)) {
+            $indexedForScore = max($indexedUrls, $inspectedIndexed);
+
+            if ($totalUrls > 0 && $indexedForScore < ($totalUrls * 0.5)) {
                 $score -= 20;
                 $breakdown['low_coverage'] = -20;
             }
@@ -498,5 +507,79 @@ final class SearchConsoleService
             'score' => max(0, $score),
             'breakdown' => $breakdown,
         ];
+    }
+
+    /**
+     * Parses sitemap XML files and stores discovered URLs locally.
+     *
+     * @return array{synced_urls: int, sitemaps_processed: int}
+     */
+    public function syncUrlListFromSitemaps(int $projectId): array
+    {
+        $sitemaps = OrganicGscSitemap::where('organic_web_project_id', $projectId)->get();
+        $synced = 0;
+
+        foreach ($sitemaps as $sitemap) {
+            $urls = $this->fetchUrlsFromSitemapXml($sitemap->path);
+
+            foreach ($urls as $url) {
+                OrganicGscUrlDetail::updateOrCreate(
+                    ['organic_web_project_id' => $projectId, 'url' => $url],
+                    ['indexing_status' => null]
+                );
+                $synced++;
+            }
+        }
+
+        return [
+            'synced_urls' => $synced,
+            'sitemaps_processed' => $sitemaps->count(),
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fetchUrlsFromSitemapXml(string $sitemapUrl, int $depth = 0): array
+    {
+        if ($depth > 3) {
+            return [];
+        }
+
+        try {
+            $response = Http::timeout(20)->get($sitemapUrl);
+            if ($response->failed()) {
+                Log::warning('Sitemap fetch failed', ['url' => $sitemapUrl, 'status' => $response->status()]);
+
+                return [];
+            }
+
+            $xml = @simplexml_load_string($response->body());
+            if ($xml === false) {
+                return [];
+            }
+
+            $urls = [];
+
+            foreach ($xml->sitemap ?? [] as $entry) {
+                $loc = trim((string) ($entry->loc ?? ''));
+                if ($loc !== '') {
+                    $urls = array_merge($urls, $this->fetchUrlsFromSitemapXml($loc, $depth + 1));
+                }
+            }
+
+            foreach ($xml->url ?? [] as $entry) {
+                $loc = trim((string) ($entry->loc ?? ''));
+                if ($loc !== '') {
+                    $urls[] = $loc;
+                }
+            }
+
+            return array_values(array_unique($urls));
+        } catch (\Throwable $e) {
+            Log::warning('Sitemap parse error', ['url' => $sitemapUrl, 'error' => $e->getMessage()]);
+
+            return [];
+        }
     }
 }
