@@ -73,6 +73,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('oauth/google')->group(function () {
         Route::get('/redirect', [App\Http\Controllers\GoogleOAuthController::class, 'redirect']);
         Route::get('/callback', [App\Http\Controllers\GoogleOAuthController::class, 'searchConsoleCallback']);
+        Route::get('/status', [App\Http\Controllers\GoogleOAuthController::class, 'checkConnection']);
     });
 
     Route::post('/translate', [App\Http\Controllers\TranslateController::class]);
