@@ -264,6 +264,26 @@ export interface CrmProjectOption {
     client_name: string;
 }
 
+// ── Page Queries (Keyword per pagina) ──
+
+export interface PageQuery {
+    id: number;
+    organic_web_project_id: number;
+    date: string;
+    page_url: string;
+    query: string;
+    clicks: number;
+    impressions: number;
+    ctr: number | null;
+    position: number | null;
+}
+
+export interface SeoAdvisorResult {
+    health_score: number;
+    main_problem: string;
+    actionable_advice: string[];
+}
+
 // ── Sitemap Tab Types ──
 
 export interface SitemapAlert {
@@ -310,6 +330,18 @@ export interface RobotsTxtData {
     url: string | null;
     fetched_at: string;
     error?: string;
+}
+
+// ── Enterprise AI Audit (Step 10) ──
+
+export interface AiAudit {
+    id: number;
+    organic_web_project_id: number;
+    analysis_type: string;
+    model_used: string | null;
+    generated_markdown: string | null;
+    action_plan: string[] | null;
+    created_at: string;
 }
 
 // ==================== Create/Update Data Types ====================
@@ -545,6 +577,12 @@ export const organicWebApi = {
         return response.data;
     },
 
+    disconnectGoogle: async (projectId: number): Promise<void> => {
+        await apiClient.delete('/oauth/google/disconnect-project', {
+            params: { project_id: projectId },
+        });
+    },
+
     // ── Google Search Console Data ──
 
     getGscData: async (projectId: number): Promise<GscData> => {
@@ -656,6 +694,75 @@ export const organicWebApi = {
     getRobotsTxt: async (projectId: number): Promise<RobotsTxtData> => {
         const response = await apiClient.get<RobotsTxtData>(
             `/organic-web/projects/${projectId}/robots-txt`
+        );
+        return response.data;
+    },
+
+    // ── Page Queries (Keyword per pagina) ──
+
+    getPageQueries: async (
+        projectId: number,
+        params?: { page_url?: string; per_page?: number; page?: number }
+    ): Promise<PaginatedResponse<PageQuery>> => {
+        const response = await apiClient.get<PaginatedResponse<PageQuery>>(
+            `/organic-web/projects/${projectId}/page-queries`,
+            { params }
+        );
+        return response.data;
+    },
+
+    syncPageQueries: async (projectId: number): Promise<{ success: boolean; message: string; synced: number }> => {
+        const response = await apiClient.post<{ success: boolean; message: string; synced: number }>(
+            `/organic-web/projects/${projectId}/page-queries/sync`
+        );
+        return response.data;
+    },
+
+    // ── SEO Advisor (Groq AI) ──
+
+    analyzeUrl: async (projectId: number, url: string): Promise<SeoAdvisorResult> => {
+        const response = await apiClient.post<SeoAdvisorResult>(
+            `/organic-web/projects/${projectId}/advisor/analyze-url`,
+            { url }
+        );
+        return response.data;
+    },
+
+    // ── Ping Sitemap ──
+
+    pingSitemap: async (projectId: number, sitemapUrl: string): Promise<{ success: boolean; message: string }> => {
+        const response = await apiClient.post<{ success: boolean; message: string }>(
+            `/organic-web/projects/${projectId}/sitemap/ping`,
+            { sitemap_url: sitemapUrl }
+        );
+        return response.data;
+    },
+
+    // ── Enterprise AI (Step 10) ──
+
+    generateAudit: async (projectId: number): Promise<{ success: boolean; audit: AiAudit }> => {
+        const response = await apiClient.post<{ success: boolean; audit: AiAudit }>(
+            `/organic-web/projects/${projectId}/ai/generate-audit`
+        );
+        return response.data;
+    },
+
+    chatWithAudit: async (
+        projectId: number,
+        auditId: number,
+        message: string,
+        history: { role: string; content: string }[]
+    ): Promise<{ success: boolean; reply: string }> => {
+        const response = await apiClient.post<{ success: boolean; reply: string }>(
+            `/organic-web/projects/${projectId}/ai/chat`,
+            { audit_id: auditId, message, history }
+        );
+        return response.data;
+    },
+
+    getLatestAudit: async (projectId: number): Promise<{ audit: AiAudit | null }> => {
+        const response = await apiClient.get<{ audit: AiAudit | null }>(
+            `/organic-web/projects/${projectId}/ai/latest-audit`
         );
         return response.data;
     },

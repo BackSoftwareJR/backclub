@@ -26,6 +26,22 @@ const GscBentoDashboard: React.FC<GscBentoDashboardProps> = ({ projectId }) => {
         }
     }, [projectId]);
 
+    // Returns true if all cached data tables are empty — happens right after a property
+    // switch because the backend purges stale data before this component mounts.
+    const isDataEmpty = data !== null
+        && data.performance.length === 0
+        && data.sitemaps.length === 0
+        && data.indexing_errors.length === 0;
+
+    // Auto-trigger a sync the first time we load and find no data (property just changed).
+    useEffect(() => {
+        if (isDataEmpty && !refreshing) {
+            handleRefresh();
+        }
+    // Only fire once on initial empty-data detection, not on subsequent refreshing changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isDataEmpty]);
+
     const handleRefresh = async () => {
         setRefreshing(true);
         try {
@@ -59,6 +75,28 @@ const GscBentoDashboard: React.FC<GscBentoDashboardProps> = ({ projectId }) => {
             <div className="ow-gsc-bento-error">
                 <AlertCircle size={16} style={{ color: 'var(--ws-red)' }} />
                 <span>{error ?? 'Dati non disponibili'}</span>
+            </div>
+        );
+    }
+
+    if (isDataEmpty) {
+        return (
+            <div className="ow-gsc-bento-container">
+                <div className="ow-gsc-bento-header">
+                    <div className="ow-gsc-bento-header-left">
+                        <TrendingUp size={18} style={{ color: 'var(--ws-accent)' }} />
+                        <span className="ow-gsc-bento-title">Dati Search Console</span>
+                    </div>
+                </div>
+                <div className="ow-gsc-bento-empty" style={{ minHeight: 200, flexDirection: 'column', gap: 12 }}>
+                    <Loader size={28} className="ws-spin" style={{ color: 'var(--ws-accent)' }} />
+                    <span style={{ fontWeight: 600, color: 'var(--ws-text)' }}>
+                        {refreshing ? 'Sincronizzazione dati in corso…' : 'Caricamento dati…'}
+                    </span>
+                    <span style={{ fontSize: 'var(--ws-font-xs)', color: 'var(--ws-text-secondary)' }}>
+                        Recupero performance dalla nuova proprietà Search Console
+                    </span>
+                </div>
             </div>
         );
     }

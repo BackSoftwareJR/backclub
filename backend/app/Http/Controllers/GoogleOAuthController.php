@@ -318,10 +318,45 @@ class GoogleOAuthController extends Controller
                     ? now()->addSeconds((int) $tokenPayload['expires_in'])
                     : null,
                 'connected_at' => now(),
+                // Persist the scopes actually granted by Google so we can detect
+                // under-scoped tokens (e.g. webmasters.readonly) before write calls.
+                'granted_scopes' => $tokenPayload['scope'] ?? null,
             ]
         );
 
         return redirect($frontendBase.'/workspace/organic_web/project/'.$projectId.'?gsc_connected=true');
+    }
+
+    /**
+     * Disconnette l'integrazione Google Search Console da un progetto specifico.
+     *
+     * DELETE /api/oauth/google/disconnect-project?project_id=16
+     */
+    public function disconnectSearchConsole(Request $request): JsonResponse
+    {
+        $request->validate(['project_id' => 'required|integer|min:1']);
+        $projectId = (int) $request->input('project_id');
+
+        $deleted = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)
+            ->where('user_id', Auth::id())
+            ->delete();
+
+        if (! $deleted) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Nessuna integrazione trovata per questo progetto.',
+            ], 404);
+        }
+
+        Log::info('GSC integration disconnected', [
+            'user_id' => Auth::id(),
+            'project_id' => $projectId,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Google Search Console disconnessa con successo.',
+        ]);
     }
 
     /**

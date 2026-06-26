@@ -75,6 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('oauth/google')->group(function () {
         Route::get('/redirect', [App\Http\Controllers\GoogleOAuthController::class, 'redirect']);
         Route::get('/status', [App\Http\Controllers\GoogleOAuthController::class, 'checkConnection']);
+        Route::delete('/disconnect-project', [App\Http\Controllers\GoogleOAuthController::class, 'disconnectSearchConsole']);
     });
 
     Route::post('/translate', [App\Http\Controllers\TranslateController::class]);
@@ -1001,6 +1002,25 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
     Route::post('/projects/{id}/sitemap/sync-urls', [App\Http\Controllers\OrganicSitemapController::class, 'syncUrls']);
     Route::get('/projects/{id}/sitemap/alerts', [App\Http\Controllers\OrganicSitemapController::class, 'alerts']);
     Route::get('/projects/{id}/robots-txt', [App\Http\Controllers\OrganicSitemapController::class, 'robotsTxt']);
+
+    // --- Advanced SEO Engine (Step 9) ---
+
+    // Step 9.1 — Page + Query performance data
+    Route::get('/projects/{id}/page-queries', [App\Http\Controllers\OrganicWebGscController::class, 'getPageQueries']);
+    Route::post('/projects/{id}/page-queries/sync', [App\Http\Controllers\OrganicWebGscController::class, 'syncPageQueries']);
+
+    // Step 9.3 — SEO Advisor (Groq AI analysis)
+    Route::post('/projects/{id}/advisor/analyze-url', [App\Http\Controllers\OrganicWebGscController::class, 'analyzeUrl']);
+
+    // Step 9.4 — Sitemap ping (re-submit to GSC)
+    Route::post('/projects/{id}/sitemap/ping', [App\Http\Controllers\OrganicSitemapController::class, 'ping']);
+
+    // Step 10.4 — Enterprise AI Framework (CanopyWave + Groq chat)
+    Route::prefix('projects/{id}/ai')->group(function () {
+        Route::post('/generate-audit', [App\Http\Controllers\OrganicAiController::class, 'generateAudit']);
+        Route::post('/chat', [App\Http\Controllers\OrganicAiController::class, 'chat']);
+        Route::get('/latest-audit', [App\Http\Controllers\OrganicAiController::class, 'latestAudit']);
+    });
 });
 
 Route::get('/user', function (Request $request) {

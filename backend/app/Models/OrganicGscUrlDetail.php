@@ -21,6 +21,7 @@ class OrganicGscUrlDetail extends Model
         'coverage_state',
         'blocked_by_robots',
         'errors_json',
+        'inspection_result',
     ];
 
     protected function casts(): array
@@ -29,6 +30,7 @@ class OrganicGscUrlDetail extends Model
             'last_crawled' => 'datetime',
             'blocked_by_robots' => 'boolean',
             'errors_json' => 'array',
+            'inspection_result' => 'array',
         ];
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Services\OrganicWeb;
 
+use App\Models\OrganicGscPageQuery;
 use App\Models\OrganicGscPerformanceDaily;
 use App\Models\OrganicGscSitemap;
 use App\Models\OrganicGscUrlDetail;
@@ -311,6 +312,7 @@ final class SearchConsoleService
                     'coverage_state' => $indexStatus['coverageState'] ?? null,
                     'blocked_by_robots' => ($indexStatus['robotsTxtState'] ?? '') === 'BLOCKED_BY_ROBOTS_TXT',
                     'errors_json' => $errors ?: null,
+                    'inspection_result' => $result ?: null,
                 ]
             );
 
@@ -535,6 +537,141 @@ final class SearchConsoleService
             'synced_urls' => $synced,
             'sitemaps_processed' => $sitemaps->count(),
         ];
+    }
+
+    /**
+     * Syncs page+query performance data from Google Search Console for the last 30 days.
+     *
+     * @return array{synced_rows: int}
+     *
+     * @throws \RuntimeException
+     */
+    public function syncPageQueries(int $projectId): array
+    {
+        try {
+            $project = OrganicWebProject::with('googleIntegration')->findOrFail($projectId);
+            $siteUrl = $project->googleIntegration?->gsc_property_url;
+
+            if (! $siteUrl) {
+                throw new \RuntimeException('Proprietà GSC non selezionata per questo progetto. Seleziona una proprietà prima di sincronizzare i dati.');
+            }
+
+            $client = $this->tokenService->getAuthenticatedClient($projectId);
+            $service = new SearchConsole($client);
+
+            $startDate = now()->subDays(30)->toDateString();
+            $endDate = now()->toDateString();
+
+            $request = new SearchAnalyticsQueryRequest;
+            $request->setStartDate($startDate);
+            $request->setEndDate($endDate);
+            $request->setDimensions(['page', 'query']);
+            $request->setRowLimit(5000);
+
+            $response = $service->searchanalytics->query($siteUrl, $request);
+            $rows = $response->getRows() ?? [];
+
+            foreach ($rows as $row) {
+                $keys = $row->getKeys();
+                $pageUrl = $keys[0] ?? null;
+                $query = $keys[1] ?? null;
+
+                if (! $pageUrl || ! $query) {
+                    continue;
+                }
+
+                OrganicGscPageQuery::updateOrCreate(
+                    [
+                        'organic_web_project_id' => $projectId,
+                        'date' => $endDate,
+                        'page_url' => $pageUrl,
+                        'query' => $query,
+                    ],
+                    [
+                        'clicks' => (int) $row->getClicks(),
+                        'impressions' => (int) $row->getImpressions(),
+                        'ctr' => $row->getCtr() !== null ? round($row->getCtr() * 100, 4) : null,
+                        'position' => $row->getPosition() !== null ? round($row->getPosition(), 4) : null,
+                    ]
+                );
+            }
+
+            return ['synced_rows' => count($rows)];
+        } catch (\RuntimeException $e) {
+            Log::error('Errore sync page-queries GSC', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('Errore sync page-queries GSC', [
+                'project_id' => $projectId,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Errore sincronizzazione page-queries GSC: '.$e->getMessage(), 0, $e);
+        }
+    }
+
+    /**
+     * Pings (re-submits) a sitemap URL to Google Search Console via direct REST API.
+     *
+     * Uses Http::put() against the Webmasters v3 REST endpoint instead of the Google PHP
+     * client library, which can fail with scope/availability errors on certain token grants.
+     *
+     * @return array{submitted: bool, sitemap_url: string}
+     *
+     * @throws \RuntimeException
+     */
+    public function pingSitemap(int $projectId, string $sitemapUrl): array
+    {
+        try {
+            $project = OrganicWebProject::with('googleIntegration')->findOrFail($projectId);
+            $siteUrl = $project->googleIntegration?->gsc_property_url;
+
+            if (! $siteUrl) {
+                throw new \RuntimeException('Proprietà GSC non selezionata per questo progetto.');
+            }
+
+            $client = $this->tokenService->getAuthenticatedClient($projectId);
+            $accessToken = $client->getAccessToken();
+            $tokenStr = is_array($accessToken) ? ($accessToken['access_token'] ?? '') : (string) $accessToken;
+
+            if (empty($tokenStr)) {
+                throw new \RuntimeException('Token Google non disponibile. Scollega e ricollega Search Console.');
+            }
+
+            $endpoint = 'https://www.googleapis.com/webmasters/v3/sites/'
+                .urlencode($siteUrl)
+                .'/sitemaps/'
+                .urlencode($sitemapUrl);
+
+            $response = Http::withToken($tokenStr)->put($endpoint);
+
+            if ($response->failed()) {
+                throw new \RuntimeException(
+                    'Errore GSC Sitemaps API (HTTP '.$response->status().'): '.$response->body()
+                );
+            }
+
+            return [
+                'submitted' => true,
+                'sitemap_url' => $sitemapUrl,
+            ];
+        } catch (\RuntimeException $e) {
+            Log::error('Errore ping sitemap GSC', [
+                'project_id' => $projectId,
+                'sitemap_url' => $sitemapUrl,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        } catch (\Throwable $e) {
+            Log::error('Errore ping sitemap GSC', [
+                'project_id' => $projectId,
+                'sitemap_url' => $sitemapUrl,
+                'error' => $e->getMessage(),
+            ]);
+            throw new \RuntimeException('Errore ping sitemap GSC: '.$e->getMessage(), 0, $e);
+        }
     }
 
     /**

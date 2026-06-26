@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Search, Download, RefreshCw, Loader, ExternalLink } from 'lucide-react';
+import { Search, Download, RefreshCw, Loader, ExternalLink, Zap } from 'lucide-react';
 import type { GscUrlDetail, PaginatedResponse } from '../../../../api/organicWeb';
 import organicWebApi from '../../../../api/organicWeb';
 import SitemapUrlInspectorModal from './SitemapUrlInspectorModal';
@@ -35,6 +35,7 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
     const [inspectingUrl, setInspectingUrl] = useState<string | null>(null);
     const [selectedUrls, setSelectedUrls] = useState<Set<string>>(new Set());
     const [bulkLoading, setBulkLoading] = useState(false);
+    const [indexingUrls, setIndexingUrls] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         setData(initialData);
@@ -73,6 +74,22 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
             // silent
         } finally {
             setBulkLoading(false);
+        }
+    };
+
+    const handleRequestIndexing = async (url: string) => {
+        if (indexingUrls.has(url)) return;
+        setIndexingUrls(prev => new Set(prev).add(url));
+        try {
+            await organicWebApi.requestIndexing(projectId, [url]);
+        } catch {
+            // silent — user sees spinner stop as feedback
+        } finally {
+            setIndexingUrls(prev => {
+                const next = new Set(prev);
+                next.delete(url);
+                return next;
+            });
         }
     };
 
@@ -226,7 +243,18 @@ const SitemapUrlTable: React.FC<SitemapUrlTableProps> = ({ projectId, initialDat
                                                 ? <span className="ow-badge ow-badge--sm ow-badge--red">Sì</span>
                                                 : <span className="ow-badge ow-badge--sm ow-badge--gray">No</span>}
                                         </td>
-                                        <td>
+                                        <td style={{ whiteSpace: 'nowrap' }}>
+                                            <button
+                                                className="ow-btn ow-btn--ghost"
+                                                style={{ padding: '2px 6px', fontSize: 'var(--ws-font-xs)' }}
+                                                onClick={() => handleRequestIndexing(row.url)}
+                                                disabled={indexingUrls.has(row.url)}
+                                                title="Richiedi indicizzazione"
+                                            >
+                                                {indexingUrls.has(row.url)
+                                                    ? <Loader size={10} className="ws-spin" />
+                                                    : <Zap size={10} style={{ color: '#facc15' }} />}
+                                            </button>
                                             <button
                                                 className="ow-btn ow-btn--ghost"
                                                 style={{ padding: '2px 6px', fontSize: 'var(--ws-font-xs)' }}

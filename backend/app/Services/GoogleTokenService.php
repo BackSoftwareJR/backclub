@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Log;
 
 final class GoogleTokenService
 {
-    private const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
+    /** Lettura + scrittura GSC (submit/delete sitemap, ecc.) */
+    private const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters';
+
+    /** Richiesta indicizzazione URL (Indexing API) */
+    private const INDEXING_SCOPE = 'https://www.googleapis.com/auth/indexing';
 
     public function __construct(
         private readonly string $clientId,
@@ -27,6 +31,7 @@ final class GoogleTokenService
         $client->setAccessType('offline');
         $client->setPrompt('consent');
         $client->addScope(self::SEARCH_CONSOLE_SCOPE);
+        $client->addScope(self::INDEXING_SCOPE);
 
         return $client;
     }
@@ -140,12 +145,30 @@ final class GoogleTokenService
      * Returns an authenticated Google Client for the given Organic Web project,
      * auto-refreshing the access token via the Google SDK if expired.
      *
+     * Throws a descriptive RuntimeException when the stored token was obtained
+     * with insufficient scopes (e.g. webmasters.readonly instead of webmasters),
+     * so callers receive a clear re-authentication prompt instead of a 403.
+     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      * @throws \RuntimeException
      */
     public function getAuthenticatedClient(int $projectId): GoogleClient
     {
         $integration = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->firstOrFail();
+
+        // Detect tokens obtained before the write scope was requested.
+        // granted_scopes is null for legacy rows — we let those through and rely on
+        // the API returning a 403 if they truly lack the scope; the error is then caught
+        // by the controller which already maps it to a human-readable re-auth message.
+        if ($integration->granted_scopes !== null) {
+            $grantedList = array_map('trim', explode(' ', $integration->granted_scopes));
+            if (! in_array(self::SEARCH_CONSOLE_SCOPE, $grantedList, true)) {
+                throw new \RuntimeException(
+                    'Il token Google non include lo scope di scrittura Search Console ('.self::SEARCH_CONSOLE_SCOPE.'). '
+                    .'Scollega e ricollega l\'account Google per concedere i permessi corretti (re-autenticazione richiesta).'
+                );
+            }
+        }
 
         $client = $this->createClient();
 

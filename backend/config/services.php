@@ -67,6 +67,12 @@ return [
         'api_key' => env('GROQ_API_KEY'),
     ],
 
+    'canopy_wave' => [
+        'api_key'  => env('CANOPY_WAVE_API_KEY', ''),
+        'base_url' => env('CANOPY_WAVE_BASE_URL', 'https://inference.canopywave.io/v1'),
+        'model'    => env('CANOPY_WAVE_MODEL', 'moonshotai/kimi-k2.6'),
+    ],
+
     'n8n' => [
         'enabled' => env('N8N_ENABLED', false),
         'webhook_base_url' => env('N8N_WEBHOOK_BASE_URL'),

@@ -138,7 +138,12 @@ final class OrganicSitemapController extends Controller
         } catch (\Throwable $e) {
             Log::error('Submit sitemap error', ['project_id' => $projectId, 'error' => $e->getMessage()]);
 
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+            $message = $e->getMessage();
+            if (str_contains($message, 'insufficient') || str_contains($message, 'insufficientPermissions') || str_contains($message, 'ACCESS_TOKEN_SCOPE_INSUFFICIENT')) {
+                $message = 'Permessi Google insufficienti. Scollega e ricollega Search Console per concedere i permessi di scrittura (submit sitemap).';
+            }
+
+            return response()->json(['success' => false, 'message' => $message], 422);
         }
     }
 
@@ -411,6 +416,45 @@ final class OrganicSitemapController extends Controller
                     'message' => "Copertura di indicizzazione bassa: solo il {$pct}% degli URL risulta indicizzato.",
                 ]);
             }
+        }
+    }
+
+    /**
+     * Pings (re-submits) an existing sitemap URL to Google Search Console.
+     * Body: { "sitemap_url": "..." }
+     */
+    public function ping(int $projectId, Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'sitemap_url' => 'required|string|url|max:2048',
+            ]);
+
+            $result = $this->searchConsoleService->pingSitemap($projectId, $validated['sitemap_url']);
+
+            OrganicGscSitemap::where('organic_web_project_id', $projectId)
+                ->where('path', $validated['sitemap_url'])
+                ->update(['last_submitted' => now(), 'status' => 'pending']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sitemap inviata a Google Search Console.',
+                'submitted' => $result['submitted'],
+                'sitemap_url' => $result['sitemap_url'],
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Ping sitemap error', ['project_id' => $projectId, 'error' => $e->getMessage()]);
+
+            $message = $e->getMessage();
+            if (str_contains($message, 'insufficient') || str_contains($message, 'insufficientPermissions') || str_contains($message, 'ACCESS_TOKEN_SCOPE_INSUFFICIENT')) {
+                $message = 'Permessi Google insufficienti. Scollega e ricollega Search Console per concedere i permessi di scrittura.';
+            } elseif (str_contains($message, '404') || str_contains($message, 'Not Found')) {
+                $message = 'Sitemap non trovata su Google Search Console. Verifica che l\'URL sia corretto.';
+            } elseif (str_contains($message, '403') || str_contains($message, 'Forbidden')) {
+                $message = 'Accesso negato. Verifica di essere proprietario verificato della property GSC.';
+            }
+
+            return response()->json(['success' => false, 'message' => $message], 422);
         }
     }
 
