@@ -416,6 +416,22 @@ export const organicWebApi = {
         );
         return response.data;
     },
+
+    // ── Google OAuth (per-progetto) ──
+
+    getGoogleAuthUrl: async (projectId: number): Promise<string> => {
+        const response = await apiClient.get<{ success: boolean; url: string }>('/oauth/google/redirect', {
+            params: { project_id: projectId },
+        });
+        return response.data.url;
+    },
+
+    checkGoogleConnection: async (projectId: number): Promise<{ connected: boolean; connected_at: string | null }> => {
+        const response = await apiClient.get<{ connected: boolean; connected_at: string | null }>('/oauth/google/status', {
+            params: { project_id: projectId },
+        });
+        return response.data;
+    },
 };
 
 export default organicWebApi;

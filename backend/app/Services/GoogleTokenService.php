@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\OrganicProjectGoogleIntegration;
 use App\Models\UserGoogleIntegration;
 use Google\Client as GoogleClient;
 use Illuminate\Support\Facades\Http;
@@ -136,15 +137,15 @@ final class GoogleTokenService
     }
 
     /**
-     * Returns an authenticated Google Client for the given user, auto-refreshing
-     * the access token via the Google SDK if expired.
+     * Returns an authenticated Google Client for the given Organic Web project,
+     * auto-refreshing the access token via the Google SDK if expired.
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      * @throws \RuntimeException
      */
-    public function getAuthenticatedClient(int $userId): GoogleClient
+    public function getAuthenticatedClient(int $projectId): GoogleClient
     {
-        $integration = UserGoogleIntegration::where('user_id', $userId)->firstOrFail();
+        $integration = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->firstOrFail();
 
         $client = $this->createClient();
 

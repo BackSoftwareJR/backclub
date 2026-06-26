@@ -209,5 +209,29 @@ CREATE TABLE IF NOT EXISTS `organic_keyword_snapshots` (
   INDEX `idx_organic_keyword_snapshots_approved_by` (`approved_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ------------------------------------------------------------
+-- Tabella: organic_project_google_integrations
+-- Connessione Google Search Console per ogni progetto Organic Web.
+-- Ref cross-DB: user_id → main_db.users (gestita via Eloquent)
+-- Ref intra-DB: organic_web_project_id → organic_web_projects (FK ok, stesso DB)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS `organic_project_google_integrations` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `organic_web_project_id` BIGINT UNSIGNED NOT NULL,
+  `user_id` BIGINT UNSIGNED NOT NULL,
+  `access_token` TEXT NULL,
+  `refresh_token` TEXT NULL,
+  `token_expires_at` TIMESTAMP NULL,
+  `connected_at` TIMESTAMP NULL,
+  `created_at` TIMESTAMP NULL,
+  `updated_at` TIMESTAMP NULL,
+  UNIQUE KEY `uq_organic_project_google_integrations_project` (`organic_web_project_id`),
+  INDEX `idx_organic_project_google_integrations_user_id` (`user_id`),
+  CONSTRAINT `fk_opgi_organic_web_project_id`
+    FOREIGN KEY (`organic_web_project_id`)
+    REFERENCES `organic_web_projects` (`id`)
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET foreign_key_checks = 1;
 -- Fine script marketing_db_setup.sql

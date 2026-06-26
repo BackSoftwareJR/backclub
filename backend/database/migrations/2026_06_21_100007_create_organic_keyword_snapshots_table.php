@@ -21,7 +21,8 @@ return new class extends Migration
             $table->json('primary_cluster')->nullable();
             $table->json('search_intents')->nullable();
             $table->timestamp('approved_at')->nullable();
-            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            // Cross-DB reference: approved_by → main_db.users (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('approved_by')->nullable()->index();
             $table->timestamps();
         });
     }

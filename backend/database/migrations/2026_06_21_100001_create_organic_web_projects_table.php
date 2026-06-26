@@ -12,7 +12,8 @@ return new class extends Migration
     {
         Schema::connection('mysql_marketing')->create('organic_web_projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('crm_project_id')->constrained('crm_projects')->onDelete('cascade');
+            // Cross-DB reference: crm_project_id → main_db.crm_projects (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('crm_project_id')->index();
             $table->string('website_url');
             $table->enum('blog_platform', ['wordpress', 'webflow', 'custom', 'other'])->default('wordpress');
             $table->string('blog_api_url')->nullable();

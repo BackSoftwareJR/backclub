@@ -27,7 +27,8 @@ return new class extends Migration
             $table->integer('word_count')->nullable();
             $table->integer('seo_score')->nullable();
             $table->boolean('human_approved')->default(false);
-            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            // Cross-DB reference: approved_by → main_db.users (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('approved_by')->nullable()->index();
             $table->timestamp('approved_at')->nullable();
             $table->timestamps();
             $table->softDeletes();

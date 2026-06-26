@@ -13,16 +13,16 @@ final class SearchConsoleService
     ) {}
 
     /**
-     * Lists all sites verified in Google Search Console for the given user.
+     * Lists all sites verified in Google Search Console for the given Organic Web project.
      *
      * @return array{sites: \Google\Service\SearchConsole\WmxSite[]}
      *
      * @throws \RuntimeException
      */
-    public function listSites(int $userId): array
+    public function listSites(int $projectId): array
     {
         try {
-            $client = $this->tokenService->getAuthenticatedClient($userId);
+            $client = $this->tokenService->getAuthenticatedClient($projectId);
             $service = new SearchConsole($client);
             $siteList = $service->sites->listSites();
 
@@ -39,10 +39,10 @@ final class SearchConsoleService
      *
      * @throws \RuntimeException
      */
-    public function submitSitemap(int $userId, string $siteUrl, string $sitemapUrl): void
+    public function submitSitemap(int $projectId, string $siteUrl, string $sitemapUrl): void
     {
         try {
-            $client = $this->tokenService->getAuthenticatedClient($userId);
+            $client = $this->tokenService->getAuthenticatedClient($projectId);
             $service = new SearchConsole($client);
             $service->sitemaps->submit($siteUrl, $sitemapUrl);
         } catch (\RuntimeException $e) {
@@ -59,10 +59,10 @@ final class SearchConsoleService
      *
      * @throws \RuntimeException
      */
-    public function getAnalytics(int $userId, string $siteUrl, string $startDate, string $endDate): array
+    public function getAnalytics(int $projectId, string $siteUrl, string $startDate, string $endDate): array
     {
         try {
-            $client = $this->tokenService->getAuthenticatedClient($userId);
+            $client = $this->tokenService->getAuthenticatedClient($projectId);
             $service = new SearchConsole($client);
 
             $postBody = new SearchAnalyticsQueryRequest;

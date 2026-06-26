@@ -23,7 +23,8 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('failed_at')->nullable();
             $table->text('error_message')->nullable();
-            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            // Cross-DB reference: created_by → main_db.users (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('created_by')->nullable()->index();
             $table->timestamps();
         });
     }

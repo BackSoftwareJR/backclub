@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\OrganicProjectGoogleIntegration;
 use App\Models\UserGoogleIntegration;
 use App\Services\GoogleCalendarService;
 use App\Services\GoogleTokenService;
@@ -221,8 +222,9 @@ class GoogleOAuthController extends Controller
     // =========================================================
 
     /**
-     * Genera l'URL di autorizzazione Google Search Console.
-     * Il frontend reindirizza l'utente a questo URL e cattura il `code` di ritorno.
+     * Genera l'URL di autorizzazione Google Search Console per un progetto specifico.
+     *
+     * GET /api/oauth/google/redirect?project_id=16
      */
     public function redirect(Request $request): JsonResponse
     {
@@ -233,10 +235,17 @@ class GoogleOAuthController extends Controller
             ], 503);
         }
 
-        $state = Str::random(40);
-        Cache::put("google_seo_oauth_state:{$state}", Auth::id(), now()->addMinutes(10));
+        $request->validate(['project_id' => 'required|integer|min:1']);
+        $projectId = (int) $request->input('project_id');
 
-        $url = $this->tokenService->getAuthUrl($state);
+        // Encode project_id + nonce nel parametro state di OAuth per recuperarlo nel callback
+        $statePayload = base64_encode(json_encode([
+            'project_id' => $projectId,
+            'user_id' => Auth::id(),
+            'nonce' => Str::random(16),
+        ]));
+
+        $url = $this->tokenService->getAuthUrl($statePayload);
 
         return response()->json([
             'success' => true,
@@ -245,22 +254,25 @@ class GoogleOAuthController extends Controller
     }
 
     /**
-     * Scambia il `code` ricevuto dal frontend con i token Google Search Console.
-     * Endpoint SPA protetto da auth:sanctum — il frontend invia il codice via GET param.
+     * Callback SPA: scambia il code Google e salva i token per il progetto Organic Web.
+     *
+     * GET /api/oauth/google/callback?code=...&state=...
      */
     public function searchConsoleCallback(Request $request): JsonResponse
     {
-        $request->validate(['code' => 'required|string']);
+        $request->validate(['code' => 'required|string', 'state' => 'required|string']);
 
-        $state = (string) $request->get('state', '');
-        if ($state !== '') {
-            $userId = Cache::pull("google_seo_oauth_state:{$state}");
-            if (! $userId || $userId !== Auth::id()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sessione OAuth non valida o scaduta.',
-                ], 422);
-            }
+        $stateRaw = (string) $request->input('state');
+        $stateData = json_decode(base64_decode($stateRaw), true);
+
+        $projectId = isset($stateData['project_id']) ? (int) $stateData['project_id'] : null;
+        $stateUserId = isset($stateData['user_id']) ? (int) $stateData['user_id'] : null;
+
+        if (! $projectId || $stateUserId !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Sessione OAuth non valida o scaduta.',
+            ], 422);
         }
 
         try {
@@ -268,6 +280,7 @@ class GoogleOAuthController extends Controller
         } catch (\RuntimeException $e) {
             Log::error('Google SEO OAuth exchange failed', [
                 'user_id' => Auth::id(),
+                'project_id' => $projectId,
                 'error' => $e->getMessage(),
             ]);
 
@@ -284,11 +297,12 @@ class GoogleOAuthController extends Controller
             ], 422);
         }
 
-        $existing = UserGoogleIntegration::where('user_id', Auth::id())->first();
+        $existing = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->first();
 
-        UserGoogleIntegration::updateOrCreate(
-            ['user_id' => Auth::id()],
+        OrganicProjectGoogleIntegration::updateOrCreate(
+            ['organic_web_project_id' => $projectId],
             [
+                'user_id' => Auth::id(),
                 'access_token' => $tokenPayload['access_token'],
                 'refresh_token' => $tokenPayload['refresh_token'] ?? $existing?->refresh_token,
                 'token_expires_at' => isset($tokenPayload['expires_in'])
@@ -298,9 +312,24 @@ class GoogleOAuthController extends Controller
             ]
         );
 
+        return redirect(config('app.frontend_url').'/workspace/organic_web?gsc_connected=true&project_id='.$projectId);
+    }
+
+    /**
+     * Verifica se un progetto Organic Web ha GSC collegato.
+     *
+     * GET /api/oauth/google/status?project_id=16
+     */
+    public function checkConnection(Request $request): JsonResponse
+    {
+        $request->validate(['project_id' => 'required|integer|min:1']);
+        $projectId = (int) $request->input('project_id');
+
+        $integration = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->first();
+
         return response()->json([
-            'success' => true,
-            'message' => 'Account Google Search Console collegato con successo.',
+            'connected' => $integration !== null && $integration->access_token !== null,
+            'connected_at' => $integration?->connected_at,
         ]);
     }
 }

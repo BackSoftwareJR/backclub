@@ -22,7 +22,8 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('completed_at')->nullable();
-            $table->foreignId('completed_by')->nullable()->constrained('users')->nullOnDelete();
+            // Cross-DB reference: completed_by → main_db.users (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('completed_by')->nullable()->index();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

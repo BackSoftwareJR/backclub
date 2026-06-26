@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Plus, Globe, Loader, AlertCircle, X } from 'lucide-react';
+import { Plus, Globe, Loader, AlertCircle, X, CheckCircle } from 'lucide-react';
 import organicWebApi from '../../../api/organicWeb';
 import type { OrganicWebProject, OrganicStats, SkillStatus, CreateProjectData, CrmProjectOption } from '../../../api/organicWeb';
 import OrganicProjectCard from './components/OrganicProjectCard';
@@ -16,6 +16,13 @@ const OrganicWebDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
+
+    const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    const showToast = useCallback((type: 'success' | 'error', message: string) => {
+        setToast({ type, message });
+        setTimeout(() => setToast(null), 5000);
+    }, []);
 
     const loadData = useCallback(async () => {
         setLoading(true);
@@ -49,6 +56,21 @@ const OrganicWebDashboard: React.FC = () => {
     useEffect(() => {
         loadData();
     }, [loadData]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('gsc_connected') === 'true') {
+            showToast('success', 'Account Google Search Console collegato con successo!');
+            params.delete('gsc_connected');
+            params.delete('project_id');
+            const newSearch = params.toString();
+            window.history.replaceState(
+                null,
+                '',
+                window.location.pathname + (newSearch ? `?${newSearch}` : '')
+            );
+        }
+    }, [showToast]);
 
     if (loading) {
         return (
@@ -135,6 +157,13 @@ const OrganicWebDashboard: React.FC = () => {
                         loadData();
                     }}
                 />
+            )}
+
+            {toast && (
+                <div className={`ow-toast ow-toast--${toast.type}`}>
+                    {toast.type === 'success' ? <CheckCircle size={14} /> : <AlertCircle size={14} />}
+                    {toast.message}
+                </div>
             )}
         </div>
     );

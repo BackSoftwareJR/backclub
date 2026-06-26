@@ -14,7 +14,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('skill_step_id')->constrained('organic_skill_steps')->onDelete('cascade');
             $table->foreignId('organic_project_id')->constrained('organic_web_projects')->onDelete('cascade');
-            $table->foreignId('assignee_id')->nullable()->constrained('users')->nullOnDelete();
+            // Cross-DB reference: assignee_id → main_db.users (no FK constraint possible cross-DB)
+            $table->unsignedBigInteger('assignee_id')->nullable()->index();
             $table->string('title');
             $table->text('description');
             $table->text('instructions')->nullable();
