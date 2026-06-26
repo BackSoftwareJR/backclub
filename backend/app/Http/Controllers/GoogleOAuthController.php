@@ -7,6 +7,7 @@ use App\Models\UserGoogleIntegration;
 use App\Services\GoogleCalendarService;
 use App\Services\GoogleTokenService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -238,14 +239,14 @@ class GoogleOAuthController extends Controller
         $request->validate(['project_id' => 'required|integer|min:1']);
         $projectId = (int) $request->input('project_id');
 
-        // Encode project_id + nonce nel parametro state di OAuth per recuperarlo nel callback
-        $statePayload = base64_encode(json_encode([
+        // State randomico in cache (come il flusso Calendar) — evita problemi base64 negli URL
+        $state = Str::random(40);
+        Cache::put("google_seo_oauth_state:{$state}", [
             'project_id' => $projectId,
             'user_id' => Auth::id(),
-            'nonce' => Str::random(16),
-        ]));
+        ], now()->addMinutes(10));
 
-        $url = $this->tokenService->getAuthUrl($statePayload);
+        $url = $this->tokenService->getAuthUrl($state);
 
         return response()->json([
             'success' => true,
@@ -254,47 +255,55 @@ class GoogleOAuthController extends Controller
     }
 
     /**
-     * Callback SPA: scambia il code Google e salva i token per il progetto Organic Web.
+     * Callback pubblico di Google (browser redirect) — Search Console OAuth.
+     * Non richiede auth:sanctum: Google reindirizza qui senza bearer token.
      *
      * GET /api/oauth/google/callback?code=...&state=...
      */
-    public function searchConsoleCallback(Request $request): JsonResponse
+    public function searchConsoleCallback(Request $request): RedirectResponse
     {
-        $request->validate(['code' => 'required|string', 'state' => 'required|string']);
+        $frontendBase = rtrim((string) config('app.frontend_url', config('app.url')), '/');
 
-        $stateRaw = (string) $request->input('state');
-        $stateData = json_decode(base64_decode($stateRaw), true);
+        if ($request->has('error')) {
+            return redirect($frontendBase.'/workspace/organic_web?gsc_error='.urlencode((string) $request->get('error')));
+        }
 
-        $projectId = isset($stateData['project_id']) ? (int) $stateData['project_id'] : null;
-        $stateUserId = isset($stateData['user_id']) ? (int) $stateData['user_id'] : null;
+        $code = (string) $request->get('code', '');
+        $state = (string) $request->get('state', '');
 
-        if (! $projectId || $stateUserId !== Auth::id()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Sessione OAuth non valida o scaduta.',
-            ], 422);
+        if ($code === '' || $state === '') {
+            return redirect($frontendBase.'/workspace/organic_web?gsc_error='.urlencode('Parametri OAuth mancanti'));
+        }
+
+        $cachedState = Cache::pull("google_seo_oauth_state:{$state}");
+
+        if (! is_array($cachedState)) {
+            return redirect($frontendBase.'/workspace/organic_web?gsc_error='.urlencode('Sessione OAuth scaduta o non valida'));
+        }
+
+        $projectId = (int) ($cachedState['project_id'] ?? 0);
+        $userId = (int) ($cachedState['user_id'] ?? 0);
+
+        if ($projectId <= 0 || $userId <= 0) {
+            return redirect($frontendBase.'/workspace/organic_web?gsc_error='.urlencode('Sessione OAuth non valida'));
         }
 
         try {
-            $tokenPayload = $this->tokenService->exchangeCode($request->string('code')->toString());
+            $tokenPayload = $this->tokenService->exchangeCode($code);
         } catch (\RuntimeException $e) {
             Log::error('Google SEO OAuth exchange failed', [
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'project_id' => $projectId,
                 'error' => $e->getMessage(),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Scambio codice Google fallito: '.$e->getMessage(),
-            ], 422);
+            return redirect($frontendBase.'/workspace/organic_web/project/'.$projectId.'?gsc_error='.urlencode('Scambio codice Google fallito'));
         }
 
         if (isset($tokenPayload['error'])) {
-            return response()->json([
-                'success' => false,
-                'message' => $tokenPayload['error_description'] ?? $tokenPayload['error'],
-            ], 422);
+            $message = $tokenPayload['error_description'] ?? $tokenPayload['error'];
+
+            return redirect($frontendBase.'/workspace/organic_web/project/'.$projectId.'?gsc_error='.urlencode((string) $message));
         }
 
         $existing = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->first();
@@ -302,7 +311,7 @@ class GoogleOAuthController extends Controller
         OrganicProjectGoogleIntegration::updateOrCreate(
             ['organic_web_project_id' => $projectId],
             [
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'access_token' => $tokenPayload['access_token'],
                 'refresh_token' => $tokenPayload['refresh_token'] ?? $existing?->refresh_token,
                 'token_expires_at' => isset($tokenPayload['expires_in'])
@@ -312,7 +321,7 @@ class GoogleOAuthController extends Controller
             ]
         );
 
-        return redirect(config('app.frontend_url').'/workspace/organic_web?gsc_connected=true&project_id='.$projectId);
+        return redirect($frontendBase.'/workspace/organic_web/project/'.$projectId.'?gsc_connected=true');
     }
 
     /**
@@ -328,7 +337,7 @@ class GoogleOAuthController extends Controller
         $integration = OrganicProjectGoogleIntegration::where('organic_web_project_id', $projectId)->first();
 
         return response()->json([
-            'connected' => $integration !== null && $integration->access_token !== null,
+            'connected' => $integration !== null && $integration->connected_at !== null,
             'connected_at' => $integration?->connected_at,
         ]);
     }

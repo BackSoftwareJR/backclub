@@ -223,6 +223,7 @@ CREATE TABLE IF NOT EXISTS `organic_project_google_integrations` (
   `refresh_token` TEXT NULL,
   `token_expires_at` TIMESTAMP NULL,
   `connected_at` TIMESTAMP NULL,
+  `gsc_property_url` VARCHAR(512) NULL,
   `created_at` TIMESTAMP NULL,
   `updated_at` TIMESTAMP NULL,
   UNIQUE KEY `uq_organic_project_google_integrations_project` (`organic_web_project_id`),

@@ -13,6 +13,8 @@ import type {
 import SkillRunStatusBadge from './components/SkillRunStatusBadge';
 import HumanTaskCard from './components/HumanTaskCard';
 import OrganicProjectSettingsForm from './components/OrganicProjectSettingsForm';
+import GscBentoDashboard from './components/GscBentoDashboard';
+import GscPropertySelector from './components/GscPropertySelector';
 import './OrganicWeb.css';
 
 type TabId = 'overview' | 'runs' | 'tasks' | 'posts' | 'seo' | 'settings';
@@ -47,11 +49,19 @@ const OrganicWebProjectDetail: React.FC = () => {
     // GSC per-progetto
     const [gscConnected, setGscConnected] = useState<boolean | null>(null);
     const [gscConnectedAt, setGscConnectedAt] = useState<string | null>(null);
+    const [gscPropertyUrl, setGscPropertyUrl] = useState<string | null>(null);
     const [gscConnecting, setGscConnecting] = useState(false);
+    const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+    const showToast = useCallback((type: 'success' | 'error', message: string) => {
+        setToast({ type, message });
+        window.setTimeout(() => setToast(null), 5000);
+    }, []);
 
     const loadProject = useCallback(async () => {
         setLoading(true);
         setError(null);
+        setGscConnected(null);
         try {
             const [projectRes, skillDefsRes] = await Promise.all([
                 organicWebApi.getProject(projectId),
@@ -60,6 +70,9 @@ const OrganicWebProjectDetail: React.FC = () => {
             setProject(projectRes.project);
             setSkillStatus(projectRes.skill_status);
             setSkillDefs(skillDefsRes.skills);
+            setGscConnected(projectRes.gsc?.connected ?? false);
+            setGscConnectedAt(projectRes.gsc?.connected_at ?? null);
+            setGscPropertyUrl(projectRes.gsc?.property_url ?? null);
         } catch {
             setError('Errore nel caricamento del progetto.');
         } finally {
@@ -106,8 +119,31 @@ const OrganicWebProjectDetail: React.FC = () => {
 
     useEffect(() => {
         loadProject();
-        loadGscStatus();
-    }, [loadProject, loadGscStatus]);
+    }, [loadProject]);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('gsc_connected') === 'true') {
+            showToast('success', 'Google Search Console collegata con successo!');
+            loadProject();
+            params.delete('gsc_connected');
+            const newSearch = params.toString();
+            window.history.replaceState(
+                null,
+                '',
+                window.location.pathname + (newSearch ? `?${newSearch}` : '')
+            );
+        } else if (params.get('gsc_error')) {
+            showToast('error', decodeURIComponent(params.get('gsc_error') ?? 'Collegamento fallito'));
+            params.delete('gsc_error');
+            const newSearch = params.toString();
+            window.history.replaceState(
+                null,
+                '',
+                window.location.pathname + (newSearch ? `?${newSearch}` : '')
+            );
+        }
+    }, [showToast, loadProject]);
 
     useEffect(() => {
         if (project) loadTabData(activeTab);
@@ -165,7 +201,7 @@ const OrganicWebProjectDetail: React.FC = () => {
                     )}
                     <button
                         className="ow-btn ow-btn--secondary"
-                        onClick={loadProject}
+                        onClick={() => { loadProject(); loadGscStatus(); }}
                         title="Aggiorna"
                     >
                         <RefreshCw size={13} />
@@ -174,7 +210,7 @@ const OrganicWebProjectDetail: React.FC = () => {
             </div>
 
             {/* ── Google Search Console per questo progetto ── */}
-            <div className="ow-gsc-section" style={{ marginBottom: 16 }}>
+            <div className={`ow-gsc-section ${gscConnected ? 'ow-gsc-section--connected' : ''}`} style={{ marginBottom: 16 }}>
                 <div className="ow-gsc-left">
                     <div className="ow-gsc-icon">
                         <svg width={16} height={16} viewBox="0 0 24 24" aria-hidden="true">
@@ -186,22 +222,40 @@ const OrganicWebProjectDetail: React.FC = () => {
                     </div>
                     <div>
                         <span className="ow-gsc-title">Google Search Console</span>
-                        <span className="ow-gsc-desc">Performance di ricerca organica per questo progetto</span>
+                        <span className="ow-gsc-desc">
+                            {gscConnected
+                                ? 'Account collegato — monitoraggio ricerca organica attivo'
+                                : 'Performance di ricerca organica per questo progetto'}
+                        </span>
                     </div>
                 </div>
                 <div className="ow-gsc-right">
                     {gscConnected === null ? (
                         <div className="ow-skeleton ow-skeleton--btn" />
                     ) : gscConnected ? (
-                        <span className="ow-badge ow-badge--green">
-                            <CheckCircle size={11} />
-                            Search Console Connessa
+                        <div className="ow-gsc-status-connected">
+                            <GscPropertySelector
+                                projectId={projectId}
+                                currentPropertyUrl={gscPropertyUrl}
+                                onPropertySelected={(propertyUrl) => {
+                                    setGscPropertyUrl(propertyUrl);
+                                    showToast('success', 'Proprietà GSC cambiata con successo');
+                                }}
+                            />
+                            <span className="ow-badge ow-badge--green ow-gsc-badge">
+                                <CheckCircle size={12} />
+                                Connessa
+                            </span>
                             {gscConnectedAt && (
                                 <span className="ow-gsc-connected-date">
-                                    {' '}· {new Date(gscConnectedAt).toLocaleDateString('it-IT')}
+                                    Collegata il {new Date(gscConnectedAt).toLocaleDateString('it-IT', {
+                                        day: 'numeric',
+                                        month: 'long',
+                                        year: 'numeric',
+                                    })}
                                 </span>
                             )}
-                        </span>
+                        </div>
                     ) : (
                         <button
                             className="ow-btn ow-btn--secondary"
@@ -224,6 +278,8 @@ const OrganicWebProjectDetail: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {gscConnected && gscPropertyUrl && <GscBentoDashboard projectId={projectId} key={gscPropertyUrl} />}
 
             <div className="ow-tabs">
                 {TABS.map(tab => (
@@ -271,6 +327,12 @@ const OrganicWebProjectDetail: React.FC = () => {
                     project={project}
                     onSaved={updated => setProject(updated)}
                 />
+            )}
+
+            {toast && (
+                <div className={`ow-toast ow-toast--${toast.type}`}>
+                    {toast.message}
+                </div>
             )}
         </div>
     );

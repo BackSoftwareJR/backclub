@@ -16,6 +16,7 @@ class OrganicProjectGoogleIntegration extends Model
         'refresh_token',
         'token_expires_at',
         'connected_at',
+        'gsc_property_url',
     ];
 
     protected $hidden = [

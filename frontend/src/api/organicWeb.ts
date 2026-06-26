@@ -10,6 +10,69 @@ export type HumanTaskStatus = 'pending' | 'in_progress' | 'completed' | 'skipped
 export type HumanTaskPriority = 'low' | 'normal' | 'high' | 'urgent';
 export type BlogPostStatus = 'draft' | 'review' | 'scheduled' | 'published' | 'failed';
 
+export interface GscConnectionStatus {
+    connected: boolean;
+    connected_at: string | null;
+    property_url: string | null;
+}
+
+export interface GscPerformanceDaily {
+    id: number;
+    organic_web_project_id: number;
+    date: string;
+    clicks: number;
+    impressions: number;
+    ctr: number | null;
+    position: number | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GscSitemap {
+    id: number;
+    organic_web_project_id: number;
+    path: string;
+    last_submitted: string | null;
+    last_downloaded: string | null;
+    status: string | null;
+    downloaded_urls: number;
+    errors: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GscIndexingError {
+    id: number;
+    organic_web_project_id: number;
+    url: string;
+    verdict: string | null;
+    coverage_state: string | null;
+    last_scanned_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface GscData {
+    performance: GscPerformanceDaily[];
+    sitemaps: GscSitemap[];
+    indexing_errors: GscIndexingError[];
+}
+
+export interface GscRefreshResponse {
+    success: boolean;
+    message: string;
+    synced: {
+        performance?: number;
+        sitemaps?: number;
+        indexing_errors?: number;
+    };
+}
+
+export interface GscProperty {
+    url: string;
+    permission_level: string;
+}
+
 export interface OrganicWebProject {
     id: number;
     crm_project_id: number;
@@ -241,8 +304,8 @@ export const organicWebApi = {
         return response.data;
     },
 
-    getProject: async (id: number): Promise<{ project: OrganicWebProject; skill_status: SkillStatus[] }> => {
-        const response = await apiClient.get<{ project: OrganicWebProject; skill_status: SkillStatus[] }>(
+    getProject: async (id: number): Promise<{ project: OrganicWebProject; skill_status: SkillStatus[]; gsc: GscConnectionStatus }> => {
+        const response = await apiClient.get<{ project: OrganicWebProject; skill_status: SkillStatus[]; gsc: GscConnectionStatus }>(
             `/organic-web/projects/${id}`
         );
         return response.data;
@@ -430,6 +493,35 @@ export const organicWebApi = {
         const response = await apiClient.get<{ connected: boolean; connected_at: string | null }>('/oauth/google/status', {
             params: { project_id: projectId },
         });
+        return response.data;
+    },
+
+    // ── Google Search Console Data ──
+
+    getGscData: async (projectId: number): Promise<GscData> => {
+        const response = await apiClient.get<GscData>(`/organic-web/projects/${projectId}/gsc-data`);
+        return response.data;
+    },
+
+    refreshGscData: async (projectId: number): Promise<GscRefreshResponse> => {
+        const response = await apiClient.post<GscRefreshResponse>(
+            `/organic-web/projects/${projectId}/gsc-refresh`
+        );
+        return response.data;
+    },
+
+    getGscProperties: async (projectId: number): Promise<{ success: boolean; properties: GscProperty[] }> => {
+        const response = await apiClient.get<{ success: boolean; properties: GscProperty[] }>(
+            `/organic-web/projects/${projectId}/gsc-properties`
+        );
+        return response.data;
+    },
+
+    selectGscProperty: async (projectId: number, propertyUrl: string): Promise<{ success: boolean; message: string; property_url: string }> => {
+        const response = await apiClient.post<{ success: boolean; message: string; property_url: string }>(
+            `/organic-web/projects/${projectId}/gsc-property`,
+            { property_url: propertyUrl }
+        );
         return response.data;
     },
 };

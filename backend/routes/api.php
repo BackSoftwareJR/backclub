@@ -25,6 +25,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::get('/auth/google/callback', [App\Http\Controllers\GoogleOAuthController::class, 'callback']);
+Route::get('/oauth/google/callback', [App\Http\Controllers\GoogleOAuthController::class, 'searchConsoleCallback']);
 Route::post('/internal/n8n/calendar-call-result', [App\Http\Controllers\N8nCalendarController::class, 'calendarCallResult']);
 
 // Signed routes for email actions
@@ -70,9 +71,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     // Google Search Console OAuth (flusso SPA — credenziali GOOGLE_SEO_*)
+    // Nota: /oauth/google/callback è pubblico (Google reindirizza il browser senza token)
     Route::prefix('oauth/google')->group(function () {
         Route::get('/redirect', [App\Http\Controllers\GoogleOAuthController::class, 'redirect']);
-        Route::get('/callback', [App\Http\Controllers\GoogleOAuthController::class, 'searchConsoleCallback']);
         Route::get('/status', [App\Http\Controllers\GoogleOAuthController::class, 'checkConnection']);
     });
 
@@ -981,6 +982,12 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
     // Utility: CRM projects disponibili (non ancora collegati)
     Route::get('/available-crm-projects', [App\Http\Controllers\OrganicWebController::class, 'availableCrmProjects']);
     Route::post('/projects/{id}/ai-suggest', [App\Http\Controllers\OrganicWebController::class, 'aiSuggest']);
+
+    // Google Search Console data
+    Route::get('/projects/{id}/gsc-data', [App\Http\Controllers\OrganicWebGscController::class, 'getGscData']);
+    Route::post('/projects/{id}/gsc-refresh', [App\Http\Controllers\OrganicWebGscController::class, 'refreshGscData']);
+    Route::get('/projects/{id}/gsc-properties', [App\Http\Controllers\OrganicWebGscController::class, 'getGscProperties']);
+    Route::post('/projects/{id}/gsc-property', [App\Http\Controllers\OrganicWebGscController::class, 'selectGscProperty']);
 });
 
 Route::get('/user', function (Request $request) {

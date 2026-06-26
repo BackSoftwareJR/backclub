@@ -94,13 +94,20 @@ class OrganicWebController extends Controller
         $project = OrganicWebProject::with([
             'crmProject:id,name,client_id',
             'crmProject.client:id,company_name',
+            'googleIntegration:id,organic_web_project_id,connected_at,gsc_property_url',
         ])->findOrFail($id);
 
         $skillStatus = $this->skillEngine->getProjectSkillStatus($id);
+        $integration = $project->googleIntegration;
 
         return response()->json([
             'project' => $project,
             'skill_status' => $skillStatus,
+            'gsc' => [
+                'connected' => $integration !== null && $integration->connected_at !== null,
+                'connected_at' => $integration?->connected_at,
+                'property_url' => $integration?->gsc_property_url,
+            ],
         ]);
     }
 

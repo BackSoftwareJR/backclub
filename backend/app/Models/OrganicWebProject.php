@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrganicWebProject extends Model
@@ -67,5 +68,10 @@ class OrganicWebProject extends Model
     public function humanTasks(): HasMany
     {
         return $this->hasMany(OrganicHumanTask::class, 'organic_project_id');
+    }
+
+    public function googleIntegration(): HasOne
+    {
+        return $this->hasOne(OrganicProjectGoogleIntegration::class, 'organic_web_project_id');
     }
 }
