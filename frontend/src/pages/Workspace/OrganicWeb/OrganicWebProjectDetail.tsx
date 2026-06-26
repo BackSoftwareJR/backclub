@@ -190,10 +190,10 @@ const OrganicWebProjectDetail: React.FC = () => {
                 organicWebApi.getBlogPosts(projectId),
                 organicWebApi.getSeoAudits(projectId),
             ]);
-            if (results[0].status === 'fulfilled') setRuns(results[0].value.data);
-            if (results[1].status === 'fulfilled') setHumanTasks(results[1].value.tasks);
-            if (results[2].status === 'fulfilled') setBlogPosts(results[2].value.data);
-            if (results[3].status === 'fulfilled') setSeoAudits(results[3].value.data);
+            if (results[0].status === 'fulfilled') setRuns(results[0].value.data ?? []);
+            if (results[1].status === 'fulfilled') setHumanTasks(results[1].value.tasks ?? []);
+            if (results[2].status === 'fulfilled') setBlogPosts(results[2].value.data ?? []);
+            if (results[3].status === 'fulfilled') setSeoAudits(results[3].value.data ?? []);
         }
     }, [projectId]);
 

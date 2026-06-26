@@ -75,7 +75,7 @@ const PageSpeedCard: React.FC<PageSpeedCardProps> = ({ projectId, sitemapUrls = 
     const loadAudits = useCallback(async () => {
         try {
             const res = await organicWebApi.getPageSpeedAudits(projectId);
-            setAudits(res.audits);
+            setAudits(res.audits ?? []);
         } catch {
             // silent — data is optional
         } finally {
