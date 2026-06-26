@@ -3432,3 +3432,203 @@
         height: 480px;
     }
 }
+
+/* ── AI Strategy Phase 3 — Sidebar-first layout ─────────────────────────── */
+
+.ow-ai-layout {
+    display: flex;
+    height: 760px;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    overflow: hidden;
+    background: var(--ws-surface);
+}
+
+.ow-ai-sessions-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--ws-border);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ws-border) transparent;
+}
+
+.ow-ai-sessions-sidebar::-webkit-scrollbar { width: 4px; }
+.ow-ai-sessions-sidebar::-webkit-scrollbar-thumb {
+    background: var(--ws-border);
+    border-radius: 2px;
+}
+
+.ow-ai-new-session-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 12px;
+    padding: 8px 12px;
+    border-radius: var(--ws-radius);
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    color: var(--ws-text);
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    cursor: pointer;
+    transition: all var(--ws-transition);
+    flex-shrink: 0;
+    text-align: left;
+}
+
+.ow-ai-new-session-btn:hover {
+    background: var(--ws-accent);
+    color: #fff;
+    border-color: var(--ws-accent);
+}
+
+.ow-ai-session-group-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ws-text-tertiary);
+    padding: 10px 12px 3px;
+    flex-shrink: 0;
+}
+
+.ow-ai-session-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    margin: 1px 6px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background var(--ws-transition);
+    color: var(--ws-text-secondary);
+    min-width: 0;
+}
+
+.ow-ai-session-item:hover {
+    background: var(--ws-surface-hover);
+    color: var(--ws-text);
+}
+
+.ow-ai-session-item--active {
+    background: var(--ws-surface-elevated);
+    color: var(--ws-text);
+}
+
+.ow-ai-session-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ws-text-tertiary);
+    padding: 2px 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: all var(--ws-transition);
+    line-height: 1;
+}
+
+.ow-ai-session-delete-btn:hover {
+    color: var(--ws-red);
+    background: rgba(255, 59, 48, 0.1);
+}
+
+/* Content pane — right of sidebar */
+.ow-ai-content-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
+/* Report generation panel */
+.ow-ai-report-panel {
+    padding: 20px;
+    overflow-y: auto;
+    border-bottom: 1px solid var(--ws-border);
+    max-height: 45%;
+    flex-shrink: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ws-border) transparent;
+}
+
+.ow-ai-report-panel::-webkit-scrollbar { width: 4px; }
+.ow-ai-report-panel::-webkit-scrollbar-thumb {
+    background: var(--ws-border);
+    border-radius: 2px;
+}
+
+/* Markdown output wrapper inside report panel */
+.ow-ai-report-markdown-wrapper {
+    margin-top: 16px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ws-border) transparent;
+    border-top: 1px solid var(--ws-border);
+    padding-top: 12px;
+}
+
+/* Chat panel — lower portion of content pane */
+.ow-ai-chat-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.ow-ai-chat-panel .ow-ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ws-border) transparent;
+}
+
+/* File drop zone */
+.ow-file-drop {
+    border: 2px dashed var(--ws-border);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--ws-transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.ow-file-drop:hover,
+.ow-file-drop--active {
+    border-color: var(--ws-accent);
+    background: rgba(0, 122, 255, 0.04);
+}
+
+/* Responsive stacking for small screens */
+@media (max-width: 900px) {
+    .ow-ai-layout {
+        flex-direction: column;
+        height: auto;
+        min-height: 640px;
+    }
+
+    .ow-ai-sessions-sidebar {
+        width: 100%;
+        max-height: 180px;
+        border-right: none;
+        border-bottom: 1px solid var(--ws-border);
+    }
+
+    .ow-ai-report-panel {
+        max-height: none;
+    }
+}

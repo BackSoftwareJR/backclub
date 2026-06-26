@@ -332,6 +332,34 @@ export interface RobotsTxtData {
     error?: string;
 }
 
+// ── AI Reports & Chat Sessions (Fase 3) ──
+
+export interface AiReport {
+    id: number;
+    organic_web_project_id: number;
+    title: string | null;
+    deep_analysis_markdown: string | null;
+    model_used: string | null;
+    created_at: string;
+}
+
+export interface ChatSession {
+    id: number;
+    organic_web_project_id: number;
+    report_id: number | null;
+    title: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface ChatMessage {
+    id: number;
+    session_id: number;
+    role: 'user' | 'assistant';
+    content: string;
+    created_at: string;
+}
+
 // ── Enterprise AI Audit (Step 10) ──
 
 export interface AiAudit {
@@ -765,6 +793,74 @@ export const organicWebApi = {
             `/organic-web/projects/${projectId}/ai/latest-audit`
         );
         return response.data;
+    },
+
+    // ── Fase 3: Deep Reports ──
+
+    generateReport: async (
+        projectId: number,
+        params?: { title?: string; attached_texts?: string[] }
+    ): Promise<{ success: boolean; report: AiReport }> => {
+        const response = await apiClient.post<{ success: boolean; report: AiReport }>(
+            `/organic-web/projects/${projectId}/ai/reports`,
+            params ?? {}
+        );
+        return response.data;
+    },
+
+    listReports: async (projectId: number): Promise<{ reports: AiReport[] }> => {
+        const response = await apiClient.get<{ reports: AiReport[] }>(
+            `/organic-web/projects/${projectId}/ai/reports`
+        );
+        return response.data;
+    },
+
+    // ── Fase 3: Chat Sessions ──
+
+    listChatSessions: async (projectId: number): Promise<{ sessions: ChatSession[] }> => {
+        const response = await apiClient.get<{ sessions: ChatSession[] }>(
+            `/organic-web/projects/${projectId}/ai/sessions`
+        );
+        return response.data;
+    },
+
+    createChatSession: async (
+        projectId: number,
+        params?: { title?: string; report_id?: number }
+    ): Promise<{ session: ChatSession }> => {
+        const response = await apiClient.post<{ session: ChatSession }>(
+            `/organic-web/projects/${projectId}/ai/sessions`,
+            params ?? {}
+        );
+        return response.data;
+    },
+
+    getChatMessages: async (
+        projectId: number,
+        sessionId: number
+    ): Promise<{ messages: ChatMessage[] }> => {
+        const response = await apiClient.get<{ messages: ChatMessage[] }>(
+            `/organic-web/projects/${projectId}/ai/sessions/${sessionId}/messages`
+        );
+        return response.data;
+    },
+
+    sendChatMessage: async (
+        projectId: number,
+        sessionId: number,
+        message: string
+    ): Promise<{ reply: string; message_id: number }> => {
+        const response = await apiClient.post<{ reply: string; message_id: number }>(
+            `/organic-web/projects/${projectId}/ai/sessions/${sessionId}/chat`,
+            { message }
+        );
+        return response.data;
+    },
+
+    deleteChatSession: async (projectId: number, sessionId: number): Promise<void> => {
+        await apiClient.delete(
+            `/organic-web/projects/${projectId}/ai/sessions/${sessionId}`
+        );
     },
 };
 

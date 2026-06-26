@@ -1020,6 +1020,18 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
         Route::post('/generate-audit', [App\Http\Controllers\OrganicAiController::class, 'generateAudit']);
         Route::post('/chat', [App\Http\Controllers\OrganicAiController::class, 'chat']);
         Route::get('/latest-audit', [App\Http\Controllers\OrganicAiController::class, 'latestAudit']);
+
+        // Step 10.5 — AI Chat History (sessions + messages persistence)
+        Route::get('/sessions', [App\Http\Controllers\OrganicAiChatController::class, 'index']);
+        Route::post('/sessions', [App\Http\Controllers\OrganicAiChatController::class, 'store']);
+        Route::get('/sessions/{sessionId}/messages', [App\Http\Controllers\OrganicAiChatController::class, 'messages']);
+        Route::post('/sessions/{sessionId}/messages', [App\Http\Controllers\OrganicAiChatController::class, 'addMessage']);
+        Route::delete('/sessions/{sessionId}', [App\Http\Controllers\OrganicAiChatController::class, 'destroy']);
+
+        // Fase 2 — Deep Reports (CanopyWaveStrategyService) + Session Chat (GroqAssistantService)
+        Route::post('/reports', [App\Http\Controllers\OrganicAiController::class, 'generateReport']);
+        Route::get('/reports', [App\Http\Controllers\OrganicAiController::class, 'listReports']);
+        Route::post('/sessions/{sessionId}/chat', [App\Http\Controllers\OrganicAiController::class, 'sessionChat']);
     });
 });
 
