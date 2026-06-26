@@ -18,6 +18,8 @@ class CrmProject extends Model
 {
     use HasFactory;
 
+    protected $connection = 'mysql';
+
     protected $appends = ['cover_photo_url'];
 
     protected $fillable = [

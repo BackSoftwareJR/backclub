@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Client extends Model
 {
+    protected $connection = 'mysql';
+
     protected $fillable = [
         'seller_id',
         'company_name',
