@@ -19,6 +19,12 @@ interface TaskAiPanelProps {
   onApply: (title: string, description: string) => void;
   /** Called when AI suggests a provisional title (description-only mode) */
   onProvisionalTitle: (title: string | null) => void;
+  /** Override idle placeholder copy */
+  idleHint?: string;
+  /** Override panel header label */
+  panelTitle?: string;
+  /** Keep visible on narrow screens (embedded in workspace composer) */
+  embedded?: boolean;
 }
 
 const TaskAiPanel: React.FC<TaskAiPanelProps> = ({
@@ -26,6 +32,9 @@ const TaskAiPanel: React.FC<TaskAiPanelProps> = ({
   description,
   onApply,
   onProvisionalTitle,
+  idleHint,
+  panelTitle = 'Migliora con AI',
+  embedded = false,
 }) => {
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -146,12 +155,12 @@ const TaskAiPanel: React.FC<TaskAiPanelProps> = ({
   const retry = () => fetchSuggestions(title, description);
 
   return (
-    <div className="tap-panel">
+    <div className={`tap-panel${embedded ? ' tap-panel--embedded' : ''}`}>
       {/* Header */}
       <div className="tap-header">
         <div className="tap-header-left">
           <Sparkles size={14} className="tap-sparkle" />
-          <span className="tap-title">Migliora con AI</span>
+          <span className="tap-title">{panelTitle}</span>
         </div>
         <div className="tap-nav">
           <button
@@ -182,7 +191,7 @@ const TaskAiPanel: React.FC<TaskAiPanelProps> = ({
         {status === 'idle' && (
           <div className="tap-placeholder">
             <Sparkles size={28} className="tap-placeholder-icon" />
-            <p>Scrivi un titolo (≥3 car.) o una descrizione (≥10 car.) per ricevere suggerimenti AI automatici.</p>
+            <p>{idleHint ?? 'Scrivi un titolo (≥3 car.) o una descrizione (≥10 car.) per ricevere suggerimenti AI automatici.'}</p>
           </div>
         )}
 

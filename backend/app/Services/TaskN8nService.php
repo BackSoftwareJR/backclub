@@ -408,6 +408,11 @@ class TaskN8nService
             $fields['crm_auth_token'] = $callbackAuthValue;
         }
 
+        $callbackProxyUrl = config('services.n8n.crm_callback_proxy_url');
+        if (!empty($callbackProxyUrl)) {
+            $fields['callback_n8n_proxy_url'] = $callbackProxyUrl;
+        }
+
         return $fields;
     }
 

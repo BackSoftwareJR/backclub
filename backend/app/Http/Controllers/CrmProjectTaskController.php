@@ -1276,8 +1276,9 @@ class CrmProjectTaskController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'action' => 'required|in:restart,stop,request_review',
-            'review_message' => 'nullable|string|max:2000'
+            'action' => 'required|in:restart,stop,request_review,update_progress',
+            'review_message' => 'nullable|string|max:2000',
+            'progress' => 'nullable|integer|min:0|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -1379,6 +1380,12 @@ class CrmProjectTaskController extends Controller
                         ]
                     ]);
 
+                    break;
+
+                case 'update_progress':
+                    $progress = max(0, min(100, (int) $request->input('progress', 0)));
+                    $task->update(['progress' => $progress]);
+                    $message = "Progresso aggiornato a {$progress}%";
                     break;
             }
 

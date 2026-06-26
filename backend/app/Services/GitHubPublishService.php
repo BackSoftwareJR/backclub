@@ -20,7 +20,7 @@ class GitHubPublishService
 
         return [
             'owner' => $matches[1],
-            'repo' => rtrim($matches[2], '.git'),
+            'repo' => preg_replace('/\.git$/i', '', $matches[2]),
         ];
     }
 

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Sun, Moon, LogOut, User, Settings, UserCog, Briefcase, Search, CheckCircle2, XCircle, Trash2 } from 'lucide-react';
+import { Bell, Sun, Moon, LogOut, User, Settings, UserCog, Briefcase, Search, CheckCircle2, XCircle, Trash2, Bot, Eye } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { User as UserType } from '../../types/user';
 import { useAuth } from '../../context/AuthContext.tsx';
@@ -168,8 +168,16 @@ const Header: React.FC = () => {
     const getNotificationIcon = (notification: Notification) => {
         const type = notification.data?.type;
         const status = notification.data?.status;
-        
-        if (type === 'reschedule') {
+
+        if (type === 'agent_completed') {
+            return <CheckCircle2 size={16} style={{ color: '#34C759' }} />;
+        } else if (type === 'agent_failed') {
+            return <XCircle size={16} style={{ color: '#FF3B30' }} />;
+        } else if (type === 'agent_review') {
+            return <Eye size={16} style={{ color: '#FF9F0A' }} />;
+        } else if (type === 'agent_update') {
+            return <Bot size={16} style={{ color: '#007AFF' }} />;
+        } else if (type === 'reschedule') {
             return status === 'approved' ? <CheckCircle2 size={16} style={{ color: '#34C759' }} /> : <XCircle size={16} style={{ color: '#FF3B30' }} />;
         } else if (type === 'deletion') {
             return status === 'approved' ? <Trash2 size={16} style={{ color: '#34C759' }} /> : <XCircle size={16} style={{ color: '#FF3B30' }} />;

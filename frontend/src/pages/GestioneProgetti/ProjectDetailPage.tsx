@@ -75,10 +75,25 @@ import TaskExecutionModeSelector from '../../components/Tasks/TaskExecutionModeS
 import ExactPromptCheckbox from '../../components/Tasks/ExactPromptCheckbox';
 import CreateTaskModal from './CreateTaskModal';
 import TaskSeriesModal from './TaskSeriesModal';
+import ClientDetailModal from './ClientDetailModal';
 import TaskAgentControlPanel from '../../components/Tasks/TaskAgentControlPanel';
+import { Bot } from 'lucide-react';
+import TaskExecutionFilter from '../../components/Tasks/ProjectTaskList/TaskExecutionFilter';
+import TaskAgentDayGroup from '../../components/Tasks/ProjectTaskList/TaskAgentDayGroup';
+import {
+    type ExecutionFilter,
+    isAgentTask,
+    isHumanTask,
+    applyExecutionFilter,
+    groupAgentTasksByDay,
+    buildDefaultCollapsed,
+    loadCollapsedFromStorage,
+    saveCollapsedToStorage,
+} from '../../components/Tasks/ProjectTaskList/taskListUtils';
 import WorkspaceTab from './tabs/WorkspaceTab';
 import { motion, AnimatePresence } from 'framer-motion';
 import './ProjectDetailPage.css';
+import '../../components/Tasks/ProjectTaskList/ProjectTaskList.css';
 
 type TabType = 'overview' | 'client' | 'contracts' | 'quotes' | 'documents' | 'team' | 'project_manager' | 'tasks' | 'calendar' | 'financial' | 'crm_involved' | 'expenses' | 'analytics' | 'cover_photo' | 'workspace';
 
@@ -174,6 +189,7 @@ const ProjectDetailPage: React.FC = () => {
     
     // Document upload state
     const [showDocumentModal, setShowDocumentModal] = useState(false);
+    const [showClientDetailModal, setShowClientDetailModal] = useState(false);
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null);
     const [documentType, setDocumentType] = useState<'privacy_policy' | 'consent_personal_data' | 'other'>('other');
     const [documentName, setDocumentName] = useState('');
@@ -231,6 +247,11 @@ const ProjectDetailPage: React.FC = () => {
     const [taskFilterPriority, setTaskFilterPriority] = useState<string>('all');
     const [taskGroupBy, setTaskGroupBy] = useState<'none' | 'status' | 'assignee' | 'priority'>('none');
     const [activeTaskRowMenu, setActiveTaskRowMenu] = useState<number | null>(null);
+    // Execution filter (all / agents / humans)
+    const [executionFilter, setExecutionFilter] = useState<ExecutionFilter>('all');
+    // Agent day-group collapse state
+    const [agentCollapsed, setAgentCollapsed] = useState<Set<string>>(new Set());
+    const [agentCollapsedInit, setAgentCollapsedInit] = useState(false);
     
     // Financial transactions state
     const [financialTransactions, setFinancialTransactions] = useState<any[]>([]);
@@ -800,6 +821,29 @@ const ProjectDetailPage: React.FC = () => {
     useEffect(() => {
         applyTaskFilters();
     }, [taskFilterStatus, taskFilterUser, taskFilterPriority, tasks]);
+
+    // Initialise agent day-group collapse when tasks first load (or project changes)
+    useEffect(() => {
+        if (!tasks.length || agentCollapsedInit) return;
+        const projectId = id ? Number(id) : null;
+        const stored = projectId ? loadCollapsedFromStorage(projectId) : null;
+        if (stored) {
+            setAgentCollapsed(stored);
+        } else {
+            const groups = groupAgentTasksByDay(tasks.filter(isAgentTask));
+            setAgentCollapsed(buildDefaultCollapsed(groups));
+        }
+        setAgentCollapsedInit(true);
+    }, [tasks, agentCollapsedInit, id]);
+
+    const handleToggleAgentGroup = (key: string) => {
+        setAgentCollapsed((prev) => {
+            const next = new Set(prev);
+            if (next.has(key)) { next.delete(key); } else { next.add(key); }
+            if (id) saveCollapsedToStorage(Number(id), next);
+            return next;
+        });
+    };
 
     const loadRescheduleRequests = async () => {
         if (!id) return;
@@ -2265,7 +2309,7 @@ const ProjectDetailPage: React.FC = () => {
                                     <div className="client-actions">
                                         <button 
                                             className="btn-primary"
-                                            onClick={() => navigate(`/venditori/clienti/${project.client_id}`)}
+                                            onClick={() => setShowClientDetailModal(true)}
                                         >
                                             <Eye size={16} />
                                             Visualizza Dettagli Cliente
@@ -3004,7 +3048,49 @@ const ProjectDetailPage: React.FC = () => {
                     )}
 
                     {/* TASK */}
-                    {activeTab === 'tasks' && (
+                    {activeTab === 'tasks' && (() => {
+                        // ── derived task sets ──
+                        const agentTasks  = filteredTasks.filter(isAgentTask);
+                        const humanTasks  = filteredTasks.filter(isHumanTask);
+                        const execFiltered = applyExecutionFilter(filteredTasks, executionFilter);
+                        const agentDayGroups = groupAgentTasksByDay(
+                            executionFilter === 'humans' ? [] : agentTasks
+                        );
+                        const humanListTasks = executionFilter === 'agents' ? [] : humanTasks;
+
+                        // ── human grouping logic (reuse existing) ──
+                        const computeHumanGroups = () => {
+                            if (taskGroupBy === 'status') {
+                                const order = ['pending', 'in_progress', 'review', 'completed', 'cancelled'] as const;
+                                const labels: Record<string, string> = { pending: 'In Attesa', in_progress: 'In Corso', review: 'In Revisione', completed: 'Completati', cancelled: 'Annullati' };
+                                return order.map(s => ({ key: s as string, label: labels[s], tasks: humanListTasks.filter(t => t.status === s) })).filter(g => g.tasks.length > 0);
+                            }
+                            if (taskGroupBy === 'priority') {
+                                const order = ['urgent', 'high', 'medium', 'low'] as const;
+                                const labels: Record<string, string> = { urgent: 'Urgente', high: 'Alta', medium: 'Media', low: 'Bassa' };
+                                return order.map(p => ({ key: p as string, label: labels[p], tasks: humanListTasks.filter(t => t.priority === p) })).filter(g => g.tasks.length > 0);
+                            }
+                            if (taskGroupBy === 'assignee') {
+                                const m = new Map<string, { label: string; tasks: CrmProjectTask[] }>();
+                                humanListTasks.forEach(task => {
+                                    const active = task.assignments?.filter(a => a.is_active) ?? [];
+                                    if (active.length === 0) {
+                                        if (!m.has('__none')) m.set('__none', { label: 'Non assegnato', tasks: [] });
+                                        m.get('__none')!.tasks.push(task);
+                                    } else {
+                                        active.forEach(a => {
+                                            const key = `u${a.user_id}`;
+                                            if (!m.has(key)) m.set(key, { label: a.user?.name ?? `#${a.user_id}`, tasks: [] });
+                                            m.get(key)!.tasks.push(task);
+                                        });
+                                    }
+                                });
+                                return Array.from(m.entries()).map(([k, v]) => ({ key: k, label: v.label, tasks: v.tasks }));
+                            }
+                            return [{ key: 'all', label: null as string | null, tasks: humanListTasks }];
+                        };
+
+                        return (
                         <div className="tab-panel">
                             {/* ── TOOLBAR ── */}
                             <div className="pd-tasks-toolbar">
@@ -3012,13 +3098,27 @@ const ProjectDetailPage: React.FC = () => {
                                     <span className="pd-tasks-title">Task</span>
                                     <span className="pd-tasks-count">{tasks.length}</span>
                                 </div>
-                                <div className="pd-tasks-filter-pills">
-                                    <button className={`pd-tasks-pill${taskFilterStatus === 'all' && taskFilterPriority === 'all' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('all'); setTaskFilterPriority('all'); setTaskFilterUser(null); }}>Tutti</button>
-                                    <button className={`pd-tasks-pill${taskFilterStatus === 'in_progress' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('in_progress'); setTaskFilterPriority('all'); }}>In Corso</button>
-                                    <button className={`pd-tasks-pill${taskFilterStatus === 'review' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('review'); setTaskFilterPriority('all'); }}>In Revisione</button>
-                                    <button className={`pd-tasks-pill${taskFilterStatus === 'completed' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('completed'); setTaskFilterPriority('all'); }}>Completati</button>
-                                    <button className={`pd-tasks-pill${taskFilterPriority === 'urgent' ? ' active' : ''}`} onClick={() => { setTaskFilterPriority(taskFilterPriority === 'urgent' ? 'all' : 'urgent'); setTaskFilterStatus('all'); }}>Urgenti</button>
-                                </div>
+
+                                {/* ── Execution filter ── */}
+                                <TaskExecutionFilter
+                                    value={executionFilter}
+                                    onChange={setExecutionFilter}
+                                    agentCount={tasks.filter(isAgentTask).length}
+                                    humanCount={tasks.filter(isHumanTask).length}
+                                    totalCount={tasks.length}
+                                />
+
+                                {/* ── Status / priority pills (visibili solo se non filtro agenti) ── */}
+                                {executionFilter !== 'agents' && (
+                                    <div className="pd-tasks-filter-pills">
+                                        <button className={`pd-tasks-pill${taskFilterStatus === 'all' && taskFilterPriority === 'all' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('all'); setTaskFilterPriority('all'); setTaskFilterUser(null); }}>Tutti</button>
+                                        <button className={`pd-tasks-pill${taskFilterStatus === 'in_progress' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('in_progress'); setTaskFilterPriority('all'); }}>In Corso</button>
+                                        <button className={`pd-tasks-pill${taskFilterStatus === 'review' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('review'); setTaskFilterPriority('all'); }}>In Revisione</button>
+                                        <button className={`pd-tasks-pill${taskFilterStatus === 'completed' ? ' active' : ''}`} onClick={() => { setTaskFilterStatus('completed'); setTaskFilterPriority('all'); }}>Completati</button>
+                                        <button className={`pd-tasks-pill${taskFilterPriority === 'urgent' ? ' active' : ''}`} onClick={() => { setTaskFilterPriority(taskFilterPriority === 'urgent' ? 'all' : 'urgent'); setTaskFilterStatus('all'); }}>Urgenti</button>
+                                    </div>
+                                )}
+
                                 <div className="pd-tasks-toolbar-right">
                                     {canCreateTask && (
                                         <>
@@ -3032,15 +3132,18 @@ const ProjectDetailPage: React.FC = () => {
                                             </button>
                                         </>
                                     )}
-                                    <div className="pd-tasks-view-toggle">
-                                        <button className={`pd-tasks-view-btn${tasksView === 'table' ? ' active' : ''}`} onClick={() => setTasksView('table')} title="Vista Lista"><List size={14} /></button>
-                                        <button className={`pd-tasks-view-btn${tasksView === 'cards' ? ' active' : ''}`} onClick={() => setTasksView('cards')} title="Vista Card"><Grid size={14} /></button>
-                                    </div>
+                                    {/* View toggle — solo per vista umani */}
+                                    {executionFilter !== 'agents' && (
+                                        <div className="pd-tasks-view-toggle">
+                                            <button className={`pd-tasks-view-btn${tasksView === 'table' ? ' active' : ''}`} onClick={() => setTasksView('table')} title="Vista Lista"><List size={14} /></button>
+                                            <button className={`pd-tasks-view-btn${tasksView === 'cards' ? ' active' : ''}`} onClick={() => setTasksView('cards')} title="Vista Card"><Grid size={14} /></button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                             {/* ── ACTIVE FILTER CHIPS ── */}
-                            {(taskFilterStatus !== 'all' || taskFilterUser !== null || taskFilterPriority !== 'all') && (
+                            {(taskFilterStatus !== 'all' || taskFilterUser !== null || taskFilterPriority !== 'all') && executionFilter !== 'agents' && (
                                 <div className="pd-tasks-active-filters">
                                     {taskFilterStatus !== 'all' && (
                                         <span className="pd-tasks-filter-chip">
@@ -3115,7 +3218,7 @@ const ProjectDetailPage: React.FC = () => {
 
                             {loadingTasks ? (
                                 <div className="pd-tasks-loading"><p>Caricamento task...</p></div>
-                            ) : filteredTasks.length === 0 ? (
+                            ) : execFiltered.length === 0 ? (
                                 <div className="pd-tasks-empty">
                                     <CheckSquare size={40} className="pd-tasks-empty-icon" />
                                     <p className="pd-tasks-empty-title">Nessun task trovato</p>
@@ -3134,388 +3237,208 @@ const ProjectDetailPage: React.FC = () => {
                                 </div>
                             ) : (
                                 <>
-                                    {/* ── GROUPING TOGGLE ── */}
-                                    <div className="pd-tasks-groupby-row">
-                                        <span className="pd-tasks-groupby-label">Raggruppa per:</span>
-                                        {(['none', 'status', 'assignee', 'priority'] as const).map(g => (
-                                            <button
-                                                key={g}
-                                                className={`pd-tasks-groupby-pill${taskGroupBy === g ? ' active' : ''}`}
-                                                onClick={() => setTaskGroupBy(g)}
-                                            >
-                                                {g === 'none' ? 'Nessuno' : g === 'status' ? 'Status' : g === 'assignee' ? 'Assegnato' : 'Priorità'}
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {tasksView === 'users' && (
-                                        <div className="tasks-users-view">
-                                            {/* Vista per Utenti - raggruppa per utente assegnato */}
-                                            {Array.from(new Set(tasks.flatMap(t => t.assignments?.filter(a => a.is_active).map(a => a.user_id) || []))).map(userId => {
-                                                const userTasks = filteredTasks.filter(t => 
-                                                    t.assignments?.some(a => a.is_active && a.user_id === userId)
-                                                );
-                                                const user = userTasks[0]?.assignments?.find(a => a.user_id === userId)?.user;
-                                                if (!user) return null;
-                                                
-                                                return (
-                                                    <div key={userId} className="user-task-group">
-                                                        <div className="user-task-header">
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                                                {user.avatar ? (
-                                                                    <img src={user.avatar} alt={user.name} style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
-                                                                ) : (
-                                                                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255, 255, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                        <User size={20} />
-                                                                    </div>
-                                                                )}
-                                                                <div>
-                                                                    <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>{user.name}</h3>
-                                                                    <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>
-                                                                        {userTasks.length} task
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div className="user-tasks-list">
-                                                            {userTasks.map(task => (
-                                                                <div key={task.id} className="task-item" onClick={() => handleOpenTaskDetail(task)}>
-                                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-                                                                        <div style={{ flex: 1 }}>
-                                                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 600 }}>
-                                                                                {task.title}
-                                                                            </h4>
-                                                                            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', fontSize: '12px', color: 'rgba(255, 255, 255, 0.6)' }}>
-                                                                                <span style={{ 
-                                                                                    padding: '2px 8px', 
-                                                                                    borderRadius: '4px', 
-                                                                                    background: getStatusColor(task.status) + '20',
-                                                                                    color: getStatusColor(task.status)
-                                                                                }}>
-                                                                                    {task.status === 'in_progress' ? 'In Corso' : 
-                                                                                     task.status === 'completed' ? 'Completato' :
-                                                                                     task.status === 'review' ? 'In Revisione' :
-                                                                                     task.status === 'cancelled' ? 'Cancellato' : 'In Attesa'}
-                                                                                </span>
-                                                                                <span style={{ 
-                                                                                    padding: '2px 8px', 
-                                                                                    borderRadius: '4px', 
-                                                                                    background: getPriorityColor(task.priority) + '20',
-                                                                                    color: getPriorityColor(task.priority)
-                                                                                }}>
-                                                                                    {task.priority === 'urgent' ? 'Urgente' :
-                                                                                     task.priority === 'high' ? 'Alta' :
-                                                                                     task.priority === 'medium' ? 'Media' : 'Bassa'}
-                                                                                </span>
-                                                                                {task.due_date && (
-                                                                                    <span>
-                                                                                        <CalendarIcon size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                                                                                        {formatDate(task.due_date)}
-                                                                                    </span>
-                                                                                )}
-                                                                                {task.budget_cocchi && (
-                                                                                    <span>
-                                                                                        <CocchiIcon size={12} style={{ display: 'inline', marginRight: '4px' }} />
-                                                                                        {(Number(task.budget_cocchi) || 0).toFixed(2)} ¢
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                                            {isPmInFreelanceContext && task.status !== 'completed' && task.status !== 'cancelled' && (
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        handleMarkTaskCompleted(task);
-                                                                                    }}
-                                                                                    disabled={completingTaskId === task.id}
-                                                                                    style={{
-                                                                                        padding: '6px 10px',
-                                                                                        background: 'rgba(52, 199, 89, 0.2)',
-                                                                                        border: '1px solid rgba(52, 199, 89, 0.3)',
-                                                                                        borderRadius: '6px',
-                                                                                        color: '#34C759',
-                                                                                        cursor: completingTaskId === task.id ? 'wait' : 'pointer',
-                                                                                        fontSize: '11px',
-                                                                                        display: 'flex',
-                                                                                        alignItems: 'center',
-                                                                                        gap: '4px',
-                                                                                        whiteSpace: 'nowrap'
-                                                                                    }}
-                                                                                    title="Segna completata"
-                                                                                >
-                                                                                    {completingTaskId === task.id ? '...' : <CheckCircle2 size={14} />}
-                                                                                    Completata
-                                                                                </button>
-                                                                            )}
-                                                                            <div style={{ 
-                                                                                width: '60px', 
-                                                                                height: '60px', 
-                                                                                borderRadius: '8px', 
-                                                                                background: 'rgba(255, 255, 255, 0.05)',
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'center',
-                                                                                fontSize: '12px',
-                                                                                fontWeight: 600
-                                                                            }}>
-                                                                                {task.progress}%
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
+                                    {/* ── AGENT DAY GROUPS ── */}
+                                    {(executionFilter === 'agents' || executionFilter === 'all') && agentDayGroups.length > 0 && (
+                                        <div className="ptl-section">
+                                            {executionFilter === 'all' && (
+                                                <div className="ptl-section-header">
+                                                    <span className="ptl-section-icon ptl-section-icon--agent">
+                                                        <Bot size={13} />
+                                                    </span>
+                                                    <span className="ptl-section-title">Agenti IA</span>
+                                                    <span className="ptl-section-count">{agentTasks.length}</span>
+                                                </div>
+                                            )}
+                                            <div className="ptl-agent-list">
+                                                {agentDayGroups.map((group) => (
+                                                    <TaskAgentDayGroup
+                                                        key={group.key}
+                                                        group={group}
+                                                        collapsed={agentCollapsed.has(group.key)}
+                                                        onToggle={handleToggleAgentGroup}
+                                                        projectId={Number(id)}
+                                                        onOpenTask={handleOpenTaskDetail}
+                                                        onMarkCompleted={handleMarkTaskCompleted}
+                                                        completingTaskId={completingTaskId}
+                                                        canManage={!isFreelanceContext || isPmInFreelanceContext}
+                                                        onOpenEdit={(!isFreelanceContext || isPmInFreelanceContext) ? handleOpenEditTaskModal : undefined}
+                                                        onDelete={(!isFreelanceContext || isPmInFreelanceContext) ? handleDeleteTask : undefined}
+                                                    />
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
 
-                                    {tasksView === 'table' && (
-                                        <div className="pd-tasks-grid-container" onClick={() => setActiveTaskRowMenu(null)}>
-                                            {/* ── GRID HEADER ── */}
-                                            <div className="pd-tasks-grid-header">
-                                                <div className="pd-tasks-col pd-tasks-col-checkbox" />
-                                                <div className="pd-tasks-col pd-tasks-col-priority">Priorità</div>
-                                                <div className="pd-tasks-col pd-tasks-col-title">Titolo</div>
-                                                <div className="pd-tasks-col pd-tasks-col-assignee">Assegnato</div>
-                                                <div className="pd-tasks-col pd-tasks-col-status">Status</div>
-                                                <div className="pd-tasks-col pd-tasks-col-due">Scadenza</div>
-                                                <div className="pd-tasks-col pd-tasks-col-actions" />
+                                    {/* ── HUMAN TASKS ── */}
+                                    {(executionFilter === 'humans' || executionFilter === 'all') && humanListTasks.length > 0 && (
+                                        <div className="ptl-section">
+                                            {executionFilter === 'all' && (
+                                                <div className="ptl-section-header">
+                                                    <span className="ptl-section-icon ptl-section-icon--human">
+                                                        <User size={13} />
+                                                    </span>
+                                                    <span className="ptl-section-title">Umani</span>
+                                                    <span className="ptl-section-count">{humanTasks.length}</span>
+                                                </div>
+                                            )}
+
+                                            {/* ── Grouping toggle per umani ── */}
+                                            <div className="pd-tasks-groupby-row">
+                                                <span className="pd-tasks-groupby-label">Raggruppa per:</span>
+                                                {(['none', 'status', 'assignee', 'priority'] as const).map(g => (
+                                                    <button
+                                                        key={g}
+                                                        className={`pd-tasks-groupby-pill${taskGroupBy === g ? ' active' : ''}`}
+                                                        onClick={() => setTaskGroupBy(g)}
+                                                    >
+                                                        {g === 'none' ? 'Nessuno' : g === 'status' ? 'Status' : g === 'assignee' ? 'Assegnato' : 'Priorità'}
+                                                    </button>
+                                                ))}
                                             </div>
-                                            {/* ── GRID BODY (with optional grouping) ── */}
-                                            {(() => {
-                                                const computeGroups = () => {
-                                                    if (taskGroupBy === 'status') {
-                                                        const order = ['pending', 'in_progress', 'review', 'completed', 'cancelled'] as const;
-                                                        const labels: Record<string, string> = { pending: 'In Attesa', in_progress: 'In Corso', review: 'In Revisione', completed: 'Completati', cancelled: 'Annullati' };
-                                                        return order.map(s => ({ key: s as string, label: labels[s] as string | null, tasks: filteredTasks.filter(t => t.status === s) })).filter(g => g.tasks.length > 0);
-                                                    }
-                                                    if (taskGroupBy === 'priority') {
-                                                        const order = ['urgent', 'high', 'medium', 'low'] as const;
-                                                        const labels: Record<string, string> = { urgent: 'Urgente', high: 'Alta', medium: 'Media', low: 'Bassa' };
-                                                        return order.map(p => ({ key: p as string, label: labels[p] as string | null, tasks: filteredTasks.filter(t => t.priority === p) })).filter(g => g.tasks.length > 0);
-                                                    }
-                                                    if (taskGroupBy === 'assignee') {
-                                                        const m = new Map<string, { label: string; tasks: CrmProjectTask[] }>();
-                                                        filteredTasks.forEach(task => {
-                                                            const active = task.assignments?.filter(a => a.is_active) ?? [];
-                                                            if (active.length === 0) {
-                                                                if (!m.has('__none')) m.set('__none', { label: 'Non assegnato', tasks: [] });
-                                                                m.get('__none')!.tasks.push(task);
-                                                            } else {
-                                                                active.forEach(a => {
-                                                                    const key = `u${a.user_id}`;
-                                                                    if (!m.has(key)) m.set(key, { label: a.user?.name ?? `#${a.user_id}`, tasks: [] });
-                                                                    m.get(key)!.tasks.push(task);
-                                                                });
-                                                            }
-                                                        });
-                                                        return Array.from(m.entries()).map(([k, v]) => ({ key: k, label: v.label as string | null, tasks: v.tasks }));
-                                                    }
-                                                    return [{ key: 'all', label: null as string | null, tasks: filteredTasks }];
-                                                };
-                                                return computeGroups().map((group) => (
-                                                    <React.Fragment key={group.key}>
-                                                        {group.label !== null && (
-                                                            <div className="pd-tasks-group-header-row">
-                                                                <span className="pd-tasks-group-name">{group.label}</span>
-                                                                <span className="pd-tasks-group-badge">{group.tasks.length}</span>
-                                                            </div>
-                                                        )}
-                                                        {group.tasks.map((task, idx) => (
-                                                            <div
-                                                                key={task.id}
-                                                                className={`pd-tasks-grid-row${task.status === 'completed' ? ' completed' : ''}${idx === group.tasks.length - 1 ? ' last' : ''}`}
-                                                                onClick={() => handleOpenTaskDetail(task)}
-                                                            >
-                                                                {/* Checkbox */}
-                                                                <div className="pd-tasks-col pd-tasks-col-checkbox" onClick={(e) => e.stopPropagation()}>
-                                                                    <button
-                                                                        className={`pd-tasks-checkbox${task.status === 'completed' ? ' checked' : ''}`}
-                                                                        onClick={() => { if (task.status !== 'completed') handleMarkTaskCompleted(task); }}
-                                                                        disabled={completingTaskId === task.id}
-                                                                        title={task.status === 'completed' ? 'Completato' : 'Segna completato'}
-                                                                    >
-                                                                        {task.status === 'completed' && <CheckCircle2 size={10} />}
-                                                                    </button>
+
+                                            {tasksView === 'table' && (
+                                                <div className="pd-tasks-grid-container" onClick={() => setActiveTaskRowMenu(null)}>
+                                                    <div className="pd-tasks-grid-header">
+                                                        <div className="pd-tasks-col pd-tasks-col-checkbox" />
+                                                        <div className="pd-tasks-col pd-tasks-col-priority">Priorità</div>
+                                                        <div className="pd-tasks-col pd-tasks-col-title">Titolo</div>
+                                                        <div className="pd-tasks-col pd-tasks-col-assignee">Assegnato</div>
+                                                        <div className="pd-tasks-col pd-tasks-col-status">Status</div>
+                                                        <div className="pd-tasks-col pd-tasks-col-due">Scadenza</div>
+                                                        <div className="pd-tasks-col pd-tasks-col-actions" />
+                                                    </div>
+                                                    {computeHumanGroups().map((group) => (
+                                                        <React.Fragment key={group.key}>
+                                                            {group.label !== null && (
+                                                                <div className="pd-tasks-group-header-row">
+                                                                    <span className="pd-tasks-group-name">{group.label}</span>
+                                                                    <span className="pd-tasks-group-badge">{group.tasks.length}</span>
                                                                 </div>
-                                                                {/* Priority dot */}
-                                                                <div className="pd-tasks-col pd-tasks-col-priority">
-                                                                    <span
-                                                                        className="pd-tasks-priority-dot"
-                                                                        style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }}
-                                                                        title={task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Bassa'}
-                                                                    />
-                                                                </div>
-                                                                {/* Title */}
-                                                                <div className="pd-tasks-col pd-tasks-col-title">
-                                                                    <span className={`pd-tasks-task-title${task.status === 'completed' ? ' completed' : ''}`}>
-                                                                        {task.title}
-                                                                    </span>
-                                                                </div>
-                                                                {/* Assignee */}
-                                                                <div className="pd-tasks-col pd-tasks-col-assignee">
-                                                                    {task.assignments && task.assignments.filter(a => a.is_active).length > 0 ? (
-                                                                        <div className="pd-tasks-avatar-stack">
-                                                                            {task.assignments.filter(a => a.is_active).slice(0, 3).map((assignment, aIdx) => (
-                                                                                <div
-                                                                                    key={assignment.id}
-                                                                                    className="pd-tasks-avatar"
-                                                                                    style={{ zIndex: 10 - aIdx, marginLeft: aIdx > 0 ? '-4px' : '0' }}
-                                                                                    title={assignment.user?.name}
-                                                                                >
-                                                                                    {assignment.user?.avatar ? (
-                                                                                        <img src={assignment.user.avatar} alt={assignment.user.name} />
-                                                                                    ) : (
-                                                                                        <span>{assignment.user?.name?.charAt(0) ?? '?'}</span>
-                                                                                    )}
-                                                                                </div>
-                                                                            ))}
-                                                                            {task.assignments.filter(a => a.is_active).length === 1 && (
-                                                                                <span className="pd-tasks-assignee-name">
-                                                                                    {task.assignments.find(a => a.is_active)?.user?.name}
-                                                                                </span>
-                                                                            )}
-                                                                            {task.assignments.filter(a => a.is_active).length > 3 && (
-                                                                                <span className="pd-tasks-avatar-more">+{task.assignments.filter(a => a.is_active).length - 3}</span>
-                                                                            )}
-                                                                        </div>
-                                                                    ) : (
-                                                                        <span className="pd-tasks-unassigned">—</span>
-                                                                    )}
-                                                                </div>
-                                                                {/* Status badge */}
-                                                                <div className="pd-tasks-col pd-tasks-col-status">
-                                                                    <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
-                                                                        {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
-                                                                    </span>
-                                                                </div>
-                                                                {/* Due date */}
-                                                                <div className="pd-tasks-col pd-tasks-col-due">
-                                                                    {task.due_date ? (
-                                                                        <span style={{ fontSize: '12px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
-                                                                            {formatDate(task.due_date)}
-                                                                        </span>
-                                                                    ) : (
-                                                                        <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>—</span>
-                                                                    )}
-                                                                </div>
-                                                                {/* Row actions (three-dot menu) */}
-                                                                <div className="pd-tasks-col pd-tasks-col-actions" onClick={(e) => e.stopPropagation()}>
-                                                                    <div className="pd-tasks-actions-wrap">
+                                                            )}
+                                                            {group.tasks.map((task, idx) => (
+                                                                <div
+                                                                    key={task.id}
+                                                                    className={`pd-tasks-grid-row${task.status === 'completed' ? ' completed' : ''}${idx === group.tasks.length - 1 ? ' last' : ''}`}
+                                                                    onClick={() => handleOpenTaskDetail(task)}
+                                                                >
+                                                                    <div className="pd-tasks-col pd-tasks-col-checkbox" onClick={(e) => e.stopPropagation()}>
                                                                         <button
-                                                                            className="pd-tasks-more-btn"
-                                                                            onClick={() => setActiveTaskRowMenu(activeTaskRowMenu === task.id ? null : task.id)}
-                                                                            title="Azioni"
+                                                                            className={`pd-tasks-checkbox${task.status === 'completed' ? ' checked' : ''}`}
+                                                                            onClick={() => { if (task.status !== 'completed') handleMarkTaskCompleted(task); }}
+                                                                            disabled={completingTaskId === task.id}
                                                                         >
-                                                                            <MoreHorizontal size={14} />
+                                                                            {task.status === 'completed' && <CheckCircle2 size={10} />}
                                                                         </button>
-                                                                        {activeTaskRowMenu === task.id && (
-                                                                            <div className="pd-tasks-row-menu">
-                                                                                <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenTaskDetail(task); setActiveTaskRowMenu(null); }}>
-                                                                                    <Eye size={13} /> Visualizza
-                                                                                </button>
-                                                                                {(!isFreelanceContext || isPmInFreelanceContext) && (
-                                                                                    <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenEditTaskModal(task); setActiveTaskRowMenu(null); }}>
-                                                                                        <Edit size={13} /> Riassegna
-                                                                                    </button>
-                                                                                )}
-                                                                                {(!isFreelanceContext || isPmInFreelanceContext) && (
-                                                                                    <button className="pd-tasks-row-menu-item danger" onClick={() => { handleDeleteTask(task); setActiveTaskRowMenu(null); }}>
-                                                                                        <Trash2 size={13} /> Elimina
-                                                                                    </button>
+                                                                    </div>
+                                                                    <div className="pd-tasks-col pd-tasks-col-priority">
+                                                                        <span className="pd-tasks-priority-dot" style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }} />
+                                                                    </div>
+                                                                    <div className="pd-tasks-col pd-tasks-col-title">
+                                                                        <span className={`pd-tasks-task-title${task.status === 'completed' ? ' completed' : ''}`}>{task.title}</span>
+                                                                    </div>
+                                                                    <div className="pd-tasks-col pd-tasks-col-assignee">
+                                                                        {task.assignments && task.assignments.filter(a => a.is_active).length > 0 ? (
+                                                                            <div className="pd-tasks-avatar-stack">
+                                                                                {task.assignments.filter(a => a.is_active).slice(0, 3).map((assignment, aIdx) => (
+                                                                                    <div key={assignment.id} className="pd-tasks-avatar" style={{ zIndex: 10 - aIdx, marginLeft: aIdx > 0 ? '-4px' : '0' }} title={assignment.user?.name}>
+                                                                                        {assignment.user?.avatar ? <img src={assignment.user.avatar} alt={assignment.user.name} /> : <span>{assignment.user?.name?.charAt(0) ?? '?'}</span>}
+                                                                                    </div>
+                                                                                ))}
+                                                                                {task.assignments.filter(a => a.is_active).length === 1 && (
+                                                                                    <span className="pd-tasks-assignee-name">{task.assignments.find(a => a.is_active)?.user?.name}</span>
                                                                                 )}
                                                                             </div>
+                                                                        ) : (
+                                                                            <span className="pd-tasks-unassigned">—</span>
                                                                         )}
                                                                     </div>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </React.Fragment>
-                                                ));
-                                            })()}
-                                        </div>
-                                    )}
-
-                                    {tasksView === 'cards' && (
-                                        <div className="pd-tasks-cards-view">
-                                            {filteredTasks.map(task => (
-                                                <div key={task.id} className="pd-tasks-card" onClick={() => handleOpenTaskDetail(task)}>
-                                                    <div className="pd-tasks-card-header">
-                                                        <h3 className={`pd-tasks-card-title${task.status === 'completed' ? ' completed' : ''}`}>{task.title}</h3>
-                                                        <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
-                                                            {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
-                                                        </span>
-                                                    </div>
-                                                    {task.description && (
-                                                        <p className="pd-tasks-card-desc">{task.description}</p>
-                                                    )}
-                                                    <div className="pd-tasks-card-meta">
-                                                        <span className="pd-tasks-card-priority">
-                                                            <span className="pd-tasks-priority-dot" style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }} />
-                                                            {task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Bassa'}
-                                                        </span>
-                                                        {task.due_date && (
-                                                            <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
-                                                                <CalendarIcon size={12} />{formatDate(task.due_date)}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    {task.assignments && task.assignments.filter(a => a.is_active).length > 0 && (
-                                                        <div className="pd-tasks-avatar-stack" style={{ marginTop: '10px' }}>
-                                                            {task.assignments.filter(a => a.is_active).slice(0, 3).map((assignment, aIdx) => (
-                                                                <div key={assignment.id} className="pd-tasks-avatar" style={{ zIndex: 10 - aIdx, marginLeft: aIdx > 0 ? '-4px' : '0' }} title={assignment.user?.name}>
-                                                                    {assignment.user?.avatar ? (
-                                                                        <img src={assignment.user.avatar} alt={assignment.user.name} />
-                                                                    ) : (
-                                                                        <span>{assignment.user?.name?.charAt(0) ?? '?'}</span>
-                                                                    )}
+                                                                    <div className="pd-tasks-col pd-tasks-col-status">
+                                                                        <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
+                                                                            {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="pd-tasks-col pd-tasks-col-due">
+                                                                        {task.due_date ? (
+                                                                            <span style={{ fontSize: '12px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
+                                                                                {formatDate(task.due_date)}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)' }}>—</span>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className="pd-tasks-col pd-tasks-col-actions" onClick={(e) => e.stopPropagation()}>
+                                                                        <div className="pd-tasks-actions-wrap">
+                                                                            <button className="pd-tasks-more-btn" onClick={() => setActiveTaskRowMenu(activeTaskRowMenu === task.id ? null : task.id)}>
+                                                                                <MoreHorizontal size={14} />
+                                                                            </button>
+                                                                            {activeTaskRowMenu === task.id && (
+                                                                                <div className="pd-tasks-row-menu">
+                                                                                    <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenTaskDetail(task); setActiveTaskRowMenu(null); }}><Eye size={13} /> Visualizza</button>
+                                                                                    {(!isFreelanceContext || isPmInFreelanceContext) && (
+                                                                                        <button className="pd-tasks-row-menu-item" onClick={() => { handleOpenEditTaskModal(task); setActiveTaskRowMenu(null); }}><Edit size={13} /> Riassegna</button>
+                                                                                    )}
+                                                                                    {(!isFreelanceContext || isPmInFreelanceContext) && (
+                                                                                        <button className="pd-tasks-row-menu-item danger" onClick={() => { handleDeleteTask(task); setActiveTaskRowMenu(null); }}><Trash2 size={13} /> Elimina</button>
+                                                                                    )}
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
                                                             ))}
-                                                            {task.assignments.filter(a => a.is_active).length === 1 && (
-                                                                <span className="pd-tasks-assignee-name">{task.assignments.find(a => a.is_active)?.user?.name}</span>
-                                                            )}
-                                                            {task.assignments.filter(a => a.is_active).length > 3 && (
-                                                                <span className="pd-tasks-avatar-more">+{task.assignments.filter(a => a.is_active).length - 3}</span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <div className="pd-tasks-card-progress">
-                                                        <div className="pd-tasks-card-progress-bar">
-                                                            <div className="pd-tasks-card-progress-fill" style={{ width: `${task.progress}%`, background: getStatusColor(task.status) }} />
-                                                        </div>
-                                                        <span className="pd-tasks-card-progress-label">{task.progress}%</span>
-                                                    </div>
-                                                    <div className="pd-tasks-card-actions" onClick={(e) => e.stopPropagation()}>
-                                                        <button className="pd-tasks-card-btn" onClick={() => handleOpenTaskDetail(task)}>
-                                                            <Eye size={13} /> Dettagli
-                                                        </button>
-                                                        {isPmInFreelanceContext && task.status !== 'completed' && task.status !== 'cancelled' && (
-                                                            <button className="pd-tasks-card-btn success" onClick={() => handleMarkTaskCompleted(task)} disabled={completingTaskId === task.id}>
-                                                                <CheckCircle2 size={13} /> {completingTaskId === task.id ? '...' : 'Completata'}
-                                                            </button>
-                                                        )}
-                                                        {(!isFreelanceContext || isPmInFreelanceContext) && (
-                                                            <>
-                                                                <button className="pd-tasks-card-btn" onClick={() => handleOpenEditTaskModal(task)}>
-                                                                    <Edit size={13} /> Modifica
-                                                                </button>
-                                                                <button className="pd-tasks-card-btn danger" onClick={() => handleDeleteTask(task)}>
-                                                                    <Trash2 size={13} /> Elimina
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
+                                                        </React.Fragment>
+                                                    ))}
                                                 </div>
-                                            ))}
+                                            )}
+
+                                            {tasksView === 'cards' && (
+                                                <div className="pd-tasks-cards-view">
+                                                    {humanListTasks.map(task => (
+                                                        <div key={task.id} className="pd-tasks-card" onClick={() => handleOpenTaskDetail(task)}>
+                                                            <div className="pd-tasks-card-header">
+                                                                <h3 className={`pd-tasks-card-title${task.status === 'completed' ? ' completed' : ''}`}>{task.title}</h3>
+                                                                <span className={`pd-tasks-status-badge pd-tasks-status-${task.status}`}>
+                                                                    {task.status === 'in_progress' ? 'In Corso' : task.status === 'completed' ? 'Completato' : task.status === 'review' ? 'In Revisione' : task.status === 'cancelled' ? 'Annullato' : 'In Attesa'}
+                                                                </span>
+                                                            </div>
+                                                            {task.description && <p className="pd-tasks-card-desc">{task.description}</p>}
+                                                            <div className="pd-tasks-card-meta">
+                                                                <span className="pd-tasks-card-priority">
+                                                                    <span className="pd-tasks-priority-dot" style={{ background: task.priority === 'urgent' ? '#FF3B30' : task.priority === 'high' ? '#FF9500' : task.priority === 'medium' ? '#007AFF' : 'rgba(255,255,255,0.2)' }} />
+                                                                    {task.priority === 'urgent' ? 'Urgente' : task.priority === 'high' ? 'Alta' : task.priority === 'medium' ? 'Media' : 'Bassa'}
+                                                                </span>
+                                                                {task.due_date && (
+                                                                    <span style={{ fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px', color: (() => { const d = new Date(task.due_date); d.setHours(0,0,0,0); const n = new Date(); n.setHours(0,0,0,0); return d < n ? '#FF3B30' : d.getTime() === n.getTime() ? '#FF9500' : 'rgba(255,255,255,0.4)'; })() }}>
+                                                                        <CalendarIcon size={12} />{formatDate(task.due_date)}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="pd-tasks-card-progress">
+                                                                <div className="pd-tasks-card-progress-bar">
+                                                                    <div className="pd-tasks-card-progress-fill" style={{ width: `${task.progress}%`, background: getStatusColor(task.status) }} />
+                                                                </div>
+                                                                <span className="pd-tasks-card-progress-label">{task.progress}%</span>
+                                                            </div>
+                                                            <div className="pd-tasks-card-actions" onClick={(e) => e.stopPropagation()}>
+                                                                <button className="pd-tasks-card-btn" onClick={() => handleOpenTaskDetail(task)}><Eye size={13} /> Dettagli</button>
+                                                                {(!isFreelanceContext || isPmInFreelanceContext) && (
+                                                                    <>
+                                                                        <button className="pd-tasks-card-btn" onClick={() => handleOpenEditTaskModal(task)}><Edit size={13} /> Modifica</button>
+                                                                        <button className="pd-tasks-card-btn danger" onClick={() => handleDeleteTask(task)}><Trash2 size={13} /> Elimina</button>
+                                                                    </>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </>
                             )}
                         </div>
-                    )}
+                        );
+                    })()}
 
                     {/* CALENDARIO */}
                     {activeTab === 'calendar' && project && (
@@ -3526,6 +3449,7 @@ const ProjectDetailPage: React.FC = () => {
                             />
                         </div>
                     )}
+
 
                     {/* FINANZIARIO */}
                     {activeTab === 'financial' && (() => {
@@ -5896,6 +5820,14 @@ const ProjectDetailPage: React.FC = () => {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {project?.client_id && (
+                <ClientDetailModal
+                    clientId={project.client_id}
+                    isOpen={showClientDetailModal}
+                    onClose={() => setShowClientDetailModal(false)}
+                />
             )}
         </div>
     );

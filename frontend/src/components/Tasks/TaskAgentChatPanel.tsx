@@ -29,7 +29,8 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
   const [progress, setProgress] = useState<number | null>(null);
   const [n8nError, setN8nError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const prevStepCountRef = useRef(0);
 
   const isActive =
     n8nStatus === 'pending' || n8nStatus === 'processing' || n8nStatus === undefined;
@@ -62,7 +63,22 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
   }, [executionMode, isActive, loadSteps]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesRef.current;
+    if (!container) return;
+
+    const prevCount = prevStepCountRef.current;
+    const hasNewSteps = steps.length > prevCount;
+    prevStepCountRef.current = steps.length;
+
+    if (!hasNewSteps) return;
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isNearBottom = distanceFromBottom < 80;
+
+    if (isNearBottom) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [steps]);
 
   if (!executionMode || executionMode === 'human') {
@@ -92,7 +108,7 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
         </div>
       )}
 
-      <div className="task-agent-chat-messages">
+      <div className="task-agent-chat-messages" ref={messagesRef}>
         {loading && steps.length === 0 ? (
           <p className="task-agent-chat-empty">Caricamento attività agente...</p>
         ) : steps.length === 0 ? (
@@ -120,7 +136,6 @@ const TaskAgentChatPanel: React.FC<TaskAgentChatPanelProps> = ({
             </div>
           ))
         )}
-        <div ref={chatEndRef} />
       </div>
 
       {isActive && (

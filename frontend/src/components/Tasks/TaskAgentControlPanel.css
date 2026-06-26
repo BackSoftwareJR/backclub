@@ -197,6 +197,132 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+/* Progress bar */
+.task-agent-progress {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.task-agent-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.task-agent-progress-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.task-agent-progress-label--failed {
+  color: #ff6b6b;
+}
+
+.task-agent-progress-pct {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  min-width: 36px;
+  text-align: right;
+}
+
+.task-agent-progress-track {
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.task-agent-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #0a84ff, #30d158);
+  transition: width 0.5s ease;
+}
+
+.task-agent-progress-fill--animated {
+  background-size: 200% 100%;
+  background-image: linear-gradient(90deg, #0a84ff 0%, #30d158 50%, #0a84ff 100%);
+  animation: task-agent-progress-shimmer 2s linear infinite;
+}
+
+@keyframes task-agent-progress-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.task-agent-progress-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-agent-progress-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.task-agent-progress-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+}
+
+.task-agent-progress-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.task-agent-progress-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+  cursor: pointer;
+}
+
+.task-agent-progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0a84ff;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.task-agent-progress-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #0a84ff;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .task-agent-control-actions {

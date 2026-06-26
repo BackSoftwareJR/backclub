@@ -946,8 +946,9 @@ export const crmProjectTasksApi = {
      * Controlli agente N8N (restart, stop, request_review)
      */
     n8nAction: async (projectId: number, taskId: number, data: {
-        action: 'restart' | 'stop' | 'request_review';
+        action: 'restart' | 'stop' | 'request_review' | 'update_progress';
         review_message?: string;
+        progress?: number;
     }): Promise<{
         success: boolean;
         message: string;

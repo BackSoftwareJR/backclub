@@ -280,14 +280,26 @@ class N8nTaskWebhookController extends Controller
                 ]);
             }
 
-            $task = CrmProjectTask::findOrFail($parsed['id'] ?? $taskId);
+            $task = CrmProjectTask::find($parsed['id'] ?? $taskId);
+
+            if (!$task) {
+                Log::warning('N8N completed webhook: task not found', [
+                    'task_id' => $taskId,
+                    'project_id' => $payload['project_id'] ?? null,
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Task not found',
+                ], 404);
+            }
 
             $updateData = [
                 'n8n_status' => 'completed',
                 'n8n_completed_at' => now(),
                 'progress' => 100,
                 'n8n_response' => $payload,
-                'n8n_response_format' => 'webhook_completed'
+                'n8n_response_format' => 'webhook_completed',
             ];
 
             // Auto-complete task if execution_mode is 'agent'
@@ -298,28 +310,46 @@ class N8nTaskWebhookController extends Controller
 
             $task->update($updateData);
 
-            // Log completion
-            $this->taskN8nService->appendStep($task, [
-                'step_key' => 'task_completed',
-                'title' => 'Task Completed',
-                'message' => $payload['message'] ?? 'Task completed by N8N orchestrator',
-                'status' => 'completed',
-                'payload' => $payload,
-                'sort_order' => time() + 3000
-            ]);
+            try {
+                $this->taskN8nService->appendStep($task, [
+                    'step_key' => 'task_completed_' . time(),
+                    'title' => 'Task Completed',
+                    'message' => $payload['message'] ?? 'Task completed by N8N orchestrator',
+                    'status' => 'completed',
+                    'payload' => $payload,
+                    'sort_order' => time() + 3000,
+                ]);
+            } catch (\Exception $stepError) {
+                Log::warning('N8N completed webhook: step log failed (completion still applied)', [
+                    'task_id' => $taskId,
+                    'error' => $stepError->getMessage(),
+                ]);
+            }
 
-            $this->releaseProjectOrchestratorSlot($task->crm_project_id);
+            try {
+                $this->releaseProjectOrchestratorSlot($task->crm_project_id);
+            } catch (\Throwable $slotError) {
+                Log::warning('N8N completed webhook: queue slot release failed', [
+                    'task_id' => $taskId,
+                    'project_id' => $task->crm_project_id,
+                    'error' => $slotError->getMessage(),
+                ]);
+            }
+
             $this->notifyCrmTaskAgentStatus($task->fresh(), AgentTaskCompleted::STATUS_COMPLETED);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Task marked as completed'
+                'message' => 'Task marked as completed',
+                'task_id' => (int) $task->id,
+                'n8n_status' => $task->fresh()->n8n_status,
             ]);
 
         } catch (\Exception $e) {
             Log::error('N8N completed webhook failed', [
                 'error' => $e->getMessage(),
-                'payload' => $request->all()
+                'trace' => $e->getTraceAsString(),
+                'payload' => $request->all(),
             ]);
 
             return response()->json([

@@ -8,7 +8,13 @@ import type { WorkspaceTypeCode } from '../../types/workspace';
 const WorkspaceAreaRoute: React.FC = () => {
   const { areaCode } = useParams<{ areaCode: string }>();
 
-  if (!areaCode || isDeveloperWorkspace(areaCode)) {
+  // When mounted on a dedicated fixed-path route (e.g. /workspace/organic_web),
+  // there is no :areaCode param — render the layout directly.
+  if (!areaCode) {
+    return <WorkspaceAreaLayout />;
+  }
+
+  if (isDeveloperWorkspace(areaCode)) {
     return <Navigate to="/workspace/type-selector" replace />;
   }
 

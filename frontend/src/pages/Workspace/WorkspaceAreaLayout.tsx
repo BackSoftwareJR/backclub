@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { ArrowLeft, Settings, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -10,7 +10,11 @@ import './workspace-tokens.css';
 import './WorkspaceDeveloperLayout.css';
 
 const WorkspaceAreaLayout: React.FC = () => {
-  const { areaCode } = useParams<{ areaCode: string }>();
+  const { areaCode: paramAreaCode } = useParams<{ areaCode: string }>();
+  const location = useLocation();
+  // For fixed-path routes like /workspace/organic_web, :areaCode param is absent;
+  // extract it from the pathname segment instead.
+  const areaCode = paramAreaCode ?? location.pathname.split('/')[2] ?? undefined;
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { resolvedTheme } = useTheme();

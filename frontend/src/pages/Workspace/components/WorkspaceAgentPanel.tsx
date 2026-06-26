@@ -9,7 +9,6 @@ import {
   MessageSquare,
   Copy,
   Loader2,
-  AlertCircle,
   ChevronRight,
   ChevronDown,
   Trash2,
@@ -18,9 +17,11 @@ import {
   ListOrdered,
   Clock,
   ChevronUp,
+  Plus,
+  Sparkles,
 } from 'lucide-react';
 import { workspaceAgentsApi } from '../../../api/workspaceAgents';
-import ExactPromptCheckbox from '../../../components/Tasks/ExactPromptCheckbox';
+import NewLavorazioneComposer, { type LavorazioneComposerInitialValues } from './NewLavorazioneComposer';
 import type { WorkspaceAgent, WorkspaceBranch } from '../../../types/workspace';
 import {
   SECTION_LABELS,
@@ -50,18 +51,15 @@ const POLL_INTERVAL_MS = 4500;
 
 const WorkspaceAgentPanel: React.FC<WorkspaceAgentPanelProps> = ({
   projectId,
+  branches,
   agents,
   isLoading = false,
   onAgentsChange,
   onReload,
 }) => {
   const navigate = useNavigate();
-  const [error, setError] = useState<string | null>(null);
-  const [showInlineForm, setShowInlineForm] = useState(false);
-  const [inlineTitle, setInlineTitle] = useState('');
-  const [inlinePrompt, setInlinePrompt] = useState('');
-  const [inlineExactPrompt, setInlineExactPrompt] = useState(false);
-  const [isCreating, setIsCreating] = useState(false);
+  const [showComposer, setShowComposer] = useState(false);
+  const [composerInitial, setComposerInitial] = useState<LavorazioneComposerInitialValues | undefined>();
   const [actionLoading, setActionLoading] = useState<Record<number, string>>({});
   const [trashedAgents, setTrashedAgents] = useState<WorkspaceAgent[]>([]);
   const [showTrash, setShowTrash] = useState(false);
@@ -183,29 +181,19 @@ const WorkspaceAgentPanel: React.FC<WorkspaceAgentPanelProps> = ({
     }
   };
 
-  const handleInlineCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inlineTitle.trim() || !inlinePrompt.trim()) return;
+  const openComposer = (initial?: LavorazioneComposerInitialValues) => {
+    setComposerInitial(initial);
+    setShowComposer(true);
+  };
 
-    try {
-      setIsCreating(true);
-      setError(null);
-      await workspaceAgentsApi.createAgent(projectId, {
-        title: inlineTitle.trim(),
-        prompt: inlinePrompt.trim(),
-        exact_prompt: inlineExactPrompt,
-      });
-      await onReload();
-      setInlineTitle('');
-      setInlinePrompt('');
-      setInlineExactPrompt(false);
-      setShowInlineForm(false);
-    } catch (err) {
-      console.error('Failed to create agent:', err);
-      setError('Errore nella creazione agente');
-    } finally {
-      setIsCreating(false);
-    }
+  const closeComposer = () => {
+    setShowComposer(false);
+    setComposerInitial(undefined);
+  };
+
+  const handleComposerCreated = async () => {
+    await onReload();
+    closeComposer();
   };
 
   const openAgentDetail = (agent: WorkspaceAgent) => {
@@ -285,10 +273,12 @@ const WorkspaceAgentPanel: React.FC<WorkspaceAgentPanelProps> = ({
           label: 'Clona',
           variant: 'secondary',
           onClick: () => {
-            setInlineTitle(`${agent.title} (copia)`);
-            setInlinePrompt(agent.prompt);
-            setInlineExactPrompt(agent.exact_prompt ?? false);
-            setShowInlineForm(true);
+            openComposer({
+              title: `${agent.title} (copia)`,
+              prompt: agent.prompt,
+              exact_prompt: agent.exact_prompt ?? false,
+              branch_id: agent.branch_id ?? null,
+            });
           },
         });
         break;
@@ -521,47 +511,33 @@ const WorkspaceAgentPanel: React.FC<WorkspaceAgentPanelProps> = ({
             </span>
           )}
         </div>
-        <button type="button" className="ws-agent-new-btn" onClick={() => setShowInlineForm(!showInlineForm)}>
-          {showInlineForm ? 'Annulla' : 'Nuova'}
+        <button
+          type="button"
+          className={`ws-agent-new-btn ${showComposer ? 'ws-agent-new-btn--active' : ''}`}
+          onClick={() => (showComposer ? closeComposer() : openComposer())}
+        >
+          {showComposer ? (
+            <>
+              <X size={14} />
+              <span>Annulla</span>
+            </>
+          ) : (
+            <>
+              <Plus size={14} />
+              <span>Nuova</span>
+            </>
+          )}
         </button>
       </div>
 
-      {showInlineForm && (
-        <form className="ws-agent-inline-form" onSubmit={handleInlineCreate}>
-          <input
-            type="text"
-            placeholder="Titolo lavorazione..."
-            value={inlineTitle}
-            onChange={(e) => setInlineTitle(e.target.value)}
-            className="ws-agent-inline-input"
-            required
-          />
-          <textarea
-            placeholder="Istruzioni per l'agente..."
-            value={inlinePrompt}
-            onChange={(e) => setInlinePrompt(e.target.value)}
-            className="ws-agent-inline-textarea"
-            rows={2}
-            required
-          />
-          <ExactPromptCheckbox
-            checked={inlineExactPrompt}
-            onChange={setInlineExactPrompt}
-            disabled={isCreating}
-            id="workspace-agent-exact-prompt"
-          />
-          <button type="submit" className="ws-agent-inline-submit" disabled={isCreating}>
-            {isCreating ? <Loader2 size={14} className="spin" /> : <ListOrdered size={14} />}
-            <span>{isCreating ? 'Aggiunta...' : 'Aggiungi in coda'}</span>
-          </button>
-        </form>
-      )}
-
-      {error && (
-        <div className="ws-agent-error">
-          <AlertCircle size={16} />
-          <span>{error}</span>
-        </div>
+      {showComposer && (
+        <NewLavorazioneComposer
+          projectId={projectId}
+          branches={branches}
+          onCancel={closeComposer}
+          onCreated={handleComposerCreated}
+          initialValues={composerInitial}
+        />
       )}
 
       {queuedCount > 1 && (
@@ -579,9 +555,18 @@ const WorkspaceAgentPanel: React.FC<WorkspaceAgentPanelProps> = ({
         </div>
       ) : (
         <div className="ws-agent-empty">
-          <Bot size={28} />
+          <div className="ws-agent-empty__icon-wrap">
+            <Bot size={24} />
+            <Sparkles size={14} className="ws-agent-empty__sparkle" />
+          </div>
           <h3>Nessuna lavorazione</h3>
-          <p>Crea una lavorazione per avviare un agente AI sul progetto.</p>
+          <p>Crea una lavorazione per avviare un agente AI sul progetto. Groq ti aiuterà con titolo e istruzioni.</p>
+          {!showComposer && (
+            <button type="button" className="ws-agent-empty__cta" onClick={() => openComposer()}>
+              <Plus size={14} />
+              Crea la prima lavorazione
+            </button>
+          )}
         </div>
       )}
 

@@ -226,7 +226,7 @@ class WorkspaceController extends Controller
             $branchesQuery->where(function($q) {
                 $q->whereDoesntHave('roles')
                   ->orWhereHas('roles', function($roleQuery) {
-                      $roleQuery->whereIn('role_name', ['developer', 'freelance']);
+                      $roleQuery->whereIn('role', ['developer', 'freelance']);
                   });
             });
         }

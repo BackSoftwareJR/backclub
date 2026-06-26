@@ -1,0 +1,1516 @@
+/* ── Organic Web Workspace — Shared CSS ── */
+
+/* ───────────────────────────────────────────────
+   Badges
+─────────────────────────────────────────────── */
+.ow-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--ws-radius-pill);
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-medium);
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+.ow-badge--sm {
+    padding: 1px 6px;
+    font-size: 10px;
+}
+
+.ow-badge--green {
+    background: rgba(52, 199, 89, 0.15);
+    color: var(--ws-green);
+}
+
+.ow-badge--blue {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--ws-accent);
+}
+
+.ow-badge--yellow {
+    background: rgba(255, 149, 0, 0.15);
+    color: var(--ws-orange);
+}
+
+.ow-badge--red {
+    background: rgba(255, 59, 48, 0.12);
+    color: var(--ws-red);
+}
+
+.ow-badge--orange {
+    background: rgba(255, 149, 0, 0.15);
+    color: var(--ws-orange);
+}
+
+.ow-badge--gray {
+    background: var(--ws-surface-hover);
+    color: var(--ws-text-secondary);
+}
+
+.ow-badge--pulse .ow-badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: ws-status-pulse 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+/* ───────────────────────────────────────────────
+   Buttons
+─────────────────────────────────────────────── */
+.ow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--ws-radius);
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    cursor: pointer;
+    border: none;
+    transition: all var(--ws-transition);
+}
+
+.ow-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ow-btn--primary {
+    background: var(--ws-accent);
+    color: #fff;
+}
+
+.ow-btn--primary:hover:not(:disabled) {
+    background: var(--ws-accent-hover);
+}
+
+.ow-btn--secondary {
+    background: var(--ws-surface-hover);
+    color: var(--ws-text);
+    border: 1px solid var(--ws-border);
+}
+
+.ow-btn--secondary:hover:not(:disabled) {
+    background: var(--ws-surface-elevated);
+}
+
+.ow-btn--danger {
+    background: var(--ws-danger-muted);
+    color: var(--ws-red);
+    border: 1px solid rgba(var(--ws-danger-rgb), 0.2);
+}
+
+.ow-btn--danger:hover:not(:disabled) {
+    background: var(--ws-danger);
+    color: #fff;
+}
+
+.ow-btn--ghost {
+    background: transparent;
+    color: var(--ws-text-secondary);
+    border: 1px solid var(--ws-border);
+}
+
+.ow-btn--ghost:hover:not(:disabled) {
+    color: var(--ws-text);
+    border-color: var(--ws-border-strong);
+    background: var(--ws-surface-hover);
+}
+
+/* ───────────────────────────────────────────────
+   Form elements
+─────────────────────────────────────────────── */
+.ow-input,
+.ow-select,
+.ow-textarea {
+    width: 100%;
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    color: var(--ws-text);
+    font-size: var(--ws-font-sm);
+    font-family: var(--ws-font-family);
+    padding: 7px 10px;
+    transition: border-color var(--ws-transition);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.ow-input:focus,
+.ow-select:focus,
+.ow-textarea:focus {
+    border-color: var(--ws-border-focus);
+    box-shadow: 0 0 0 3px rgba(var(--ws-accent-rgb), 0.12);
+}
+
+.ow-input--narrow {
+    max-width: 120px;
+}
+
+.ow-select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.ow-textarea {
+    resize: vertical;
+    min-height: 72px;
+}
+
+.ow-label {
+    display: block;
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text-secondary);
+    margin-bottom: 5px;
+}
+
+.ow-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+
+.ow-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* ───────────────────────────────────────────────
+   Toggle Switch
+─────────────────────────────────────────────── */
+.ow-toggle-label {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.ow-toggle-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ow-toggle-name {
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text);
+}
+
+.ow-toggle-desc {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+}
+
+.ow-toggle-switch {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    border-radius: 10px;
+    background: var(--ws-border-strong);
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background var(--ws-transition);
+    padding: 0;
+}
+
+.ow-toggle-switch--on {
+    background: var(--ws-accent);
+}
+
+.ow-toggle-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform var(--ws-transition);
+    pointer-events: none;
+}
+
+.ow-toggle-switch--on .ow-toggle-thumb {
+    transform: translateX(14px);
+}
+
+/* ───────────────────────────────────────────────
+   Error / Success rows
+─────────────────────────────────────────────── */
+.ow-error-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: var(--ws-danger-muted);
+    color: var(--ws-red);
+    border-radius: var(--ws-radius);
+    font-size: var(--ws-font-sm);
+    margin-bottom: 10px;
+}
+
+.ow-success-row {
+    padding: 8px 12px;
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--ws-green);
+    border-radius: var(--ws-radius);
+    font-size: var(--ws-font-sm);
+    margin-bottom: 10px;
+}
+
+/* ───────────────────────────────────────────────
+   Upload zone
+─────────────────────────────────────────────── */
+.ow-upload-zone {
+    border: 2px dashed var(--ws-border);
+    border-radius: var(--ws-radius);
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--ws-text-secondary);
+    font-size: var(--ws-font-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--ws-transition);
+    margin-bottom: 12px;
+}
+
+.ow-upload-zone:hover,
+.ow-upload-zone--active {
+    border-color: var(--ws-accent);
+    background: var(--ws-accent-muted);
+    color: var(--ws-accent);
+}
+
+/* ───────────────────────────────────────────────
+   Empty states
+─────────────────────────────────────────────── */
+.ow-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--ws-text-secondary);
+}
+
+.ow-empty-icon {
+    opacity: 0.4;
+}
+
+.ow-empty-title {
+    font-size: var(--ws-font-md);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text);
+    margin: 0;
+}
+
+.ow-empty-text {
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text-secondary);
+    margin: 0;
+}
+
+/* ───────────────────────────────────────────────
+   Loading spinner
+─────────────────────────────────────────────── */
+.ow-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: var(--ws-text-secondary);
+    font-size: var(--ws-font-sm);
+    gap: 10px;
+}
+
+.ow-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--ws-border);
+    border-top-color: var(--ws-accent);
+    border-radius: 50%;
+    animation: ws-spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+/* ───────────────────────────────────────────────
+   Page layout
+─────────────────────────────────────────────── */
+.ow-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.ow-page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.ow-page-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ow-page-title {
+    font-size: var(--ws-font-heading);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.ow-page-subtitle {
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text-secondary);
+    margin: 0;
+}
+
+.ow-page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+/* ───────────────────────────────────────────────
+   Stats row
+─────────────────────────────────────────────── */
+.ow-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.ow-stat-card {
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ow-stat-card-label {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ow-stat-card-value {
+    font-size: 26px;
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    line-height: 1;
+}
+
+.ow-stat-card-value--accent {
+    color: var(--ws-accent);
+}
+
+.ow-stat-card-value--warning {
+    color: var(--ws-orange);
+}
+
+.ow-stat-card-value--running {
+    color: var(--ws-green);
+}
+
+/* ───────────────────────────────────────────────
+   Project Grid
+─────────────────────────────────────────────── */
+.ow-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+/* ───────────────────────────────────────────────
+   Project Card
+─────────────────────────────────────────────── */
+.ow-project-card {
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all var(--ws-transition);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ow-project-card:hover {
+    border-color: var(--ws-border-strong);
+    background: var(--ws-surface-hover);
+    box-shadow: var(--ws-shadow-card-hover);
+    transform: translateY(-1px);
+}
+
+.ow-project-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.ow-project-card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--ws-radius);
+    background: var(--ws-accent-muted);
+    color: var(--ws-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ow-project-card-meta {
+    flex: 1;
+    min-width: 0;
+}
+
+.ow-project-card-name {
+    font-size: var(--ws-font-base);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ow-project-card-url {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-accent);
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+.ow-project-card-url:hover {
+    text-decoration: underline;
+}
+
+.ow-project-card-status {
+    flex-shrink: 0;
+}
+
+.ow-project-card-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ow-project-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ow-project-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ow-project-card-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--ws-font-xs);
+}
+
+.ow-project-card-stat--alert {
+    color: var(--ws-orange);
+}
+
+.ow-project-card-stat--running {
+    color: var(--ws-green);
+}
+
+.ow-project-card-stat--muted {
+    color: var(--ws-text-tertiary);
+}
+
+.ow-project-card-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-accent);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
+}
+
+.ow-project-card-open:hover {
+    text-decoration: underline;
+}
+
+/* ───────────────────────────────────────────────
+   Tabs
+─────────────────────────────────────────────── */
+.ow-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--ws-border);
+    margin-bottom: 20px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.ow-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.ow-tab {
+    padding: 8px 14px;
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    transition: all var(--ws-transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ow-tab:hover {
+    color: var(--ws-text);
+}
+
+.ow-tab--active {
+    color: var(--ws-accent);
+    border-bottom-color: var(--ws-accent);
+}
+
+.ow-tab-badge {
+    background: var(--ws-red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+/* ───────────────────────────────────────────────
+   Back button
+─────────────────────────────────────────────── */
+.ow-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 16px;
+    transition: color var(--ws-transition);
+}
+
+.ow-back-btn:hover {
+    color: var(--ws-text);
+}
+
+/* ───────────────────────────────────────────────
+   Skill Runs list
+─────────────────────────────────────────────── */
+.ow-runs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ow-run-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    cursor: pointer;
+    transition: all var(--ws-transition);
+}
+
+.ow-run-row:hover {
+    border-color: var(--ws-border-strong);
+    background: var(--ws-surface-hover);
+}
+
+.ow-run-row-skill {
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text);
+    flex: 1;
+}
+
+.ow-run-row-date {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-tertiary);
+    white-space: nowrap;
+}
+
+/* ───────────────────────────────────────────────
+   Blog Posts table
+─────────────────────────────────────────────── */
+.ow-table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--ws-radius);
+    border: 1px solid var(--ws-border);
+}
+
+.ow-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--ws-font-sm);
+}
+
+.ow-table th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: var(--ws-surface);
+    border-bottom: 1px solid var(--ws-border);
+    white-space: nowrap;
+}
+
+.ow-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--ws-border);
+    color: var(--ws-text);
+    vertical-align: middle;
+}
+
+.ow-table tr:last-child td {
+    border-bottom: none;
+}
+
+.ow-table tr:hover td {
+    background: var(--ws-surface-hover);
+}
+
+/* ───────────────────────────────────────────────
+   Human Task Card
+─────────────────────────────────────────────── */
+.ow-human-task-card {
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    overflow: hidden;
+    transition: border-color var(--ws-transition);
+}
+
+.ow-human-task-card--overdue {
+    border-left: 3px solid var(--ws-red);
+}
+
+.ow-human-task-card--completed {
+    opacity: 0.6;
+}
+
+.ow-human-task-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+}
+
+.ow-human-task-card-header:hover {
+    background: var(--ws-surface-hover);
+}
+
+.ow-human-task-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ow-human-task-card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 5px;
+}
+
+.ow-human-task-card-title {
+    font-size: var(--ws-font-base);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+}
+
+.ow-human-task-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ow-human-task-card-project,
+.ow-human-task-card-skill {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+}
+
+.ow-human-task-card-project::after {
+    content: '·';
+    margin-left: 8px;
+    opacity: 0.4;
+}
+
+.ow-human-task-card-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+}
+
+.ow-human-task-card-due--overdue {
+    color: var(--ws-red);
+}
+
+.ow-human-task-card-actions-header {
+    color: var(--ws-text-secondary);
+    flex-shrink: 0;
+}
+
+.ow-human-task-card-done-icon {
+    color: var(--ws-green);
+}
+
+.ow-human-task-card-body {
+    padding: 0 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ow-human-task-card-description,
+.ow-human-task-card-instructions {
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text-secondary);
+    margin: 0;
+}
+
+.ow-human-task-card-instructions strong {
+    color: var(--ws-text);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.ow-human-task-card-upload-instructions {
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text-secondary);
+    margin: 0;
+}
+
+/* ───────────────────────────────────────────────
+   Skill Step Timeline
+─────────────────────────────────────────────── */
+.ow-timeline {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0 16px;
+}
+
+.ow-timeline-step {
+    display: flex;
+    gap: 12px;
+}
+
+.ow-timeline-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 24px;
+}
+
+.ow-timeline-dot {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.ow-timeline-line {
+    width: 2px;
+    flex: 1;
+    min-height: 16px;
+    background: var(--ws-border);
+    margin: 2px 0;
+}
+
+.ow-timeline-content {
+    flex: 1;
+    padding-bottom: 16px;
+    min-width: 0;
+}
+
+.ow-timeline-step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    min-height: 24px;
+}
+
+.ow-timeline-step-type {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ws-text-secondary);
+}
+
+.ow-timeline-step-type-label {
+    font-size: var(--ws-font-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.ow-timeline-step-name {
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-medium);
+    color: var(--ws-text);
+    flex: 1;
+}
+
+.ow-timeline-step-time {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-tertiary);
+    white-space: nowrap;
+}
+
+.ow-timeline-step--current .ow-timeline-content {
+    background: var(--ws-surface-active);
+    border-radius: var(--ws-radius);
+    padding: 10px 12px;
+    border: 1px solid rgba(var(--ws-accent-rgb), 0.2);
+}
+
+.ow-timeline-step-output {
+    padding: 8px 10px;
+    background: var(--ws-surface);
+    border-radius: var(--ws-radius-sm);
+    border-left: 2px solid var(--ws-green);
+}
+
+.ow-timeline-step-summary {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+    margin: 0;
+}
+
+.ow-timeline-human-task {
+    margin-top: 8px;
+}
+
+.ow-timeline-status-icon--completed { color: var(--ws-green); }
+.ow-timeline-status-icon--running { color: var(--ws-accent); }
+.ow-timeline-status-icon--waiting { color: var(--ws-orange); }
+.ow-timeline-status-icon--failed { color: var(--ws-red); }
+.ow-timeline-status-icon--skipped { color: var(--ws-text-tertiary); }
+.ow-timeline-status-icon--pending { color: var(--ws-text-tertiary); }
+
+/* ───────────────────────────────────────────────
+   Settings Form
+─────────────────────────────────────────────── */
+.ow-settings-form {
+    max-width: 640px;
+}
+
+.ow-settings-section {
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+}
+
+.ow-settings-section-title {
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 14px;
+}
+
+.ow-skill-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ow-skill-toggle {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--ws-border);
+}
+
+.ow-skill-toggle:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.ow-settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+/* ───────────────────────────────────────────────
+   Inbox filters
+─────────────────────────────────────────────── */
+.ow-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.ow-filter-select {
+    padding: 6px 10px;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    background: var(--ws-surface-elevated);
+    color: var(--ws-text);
+    font-size: var(--ws-font-sm);
+    cursor: pointer;
+    outline: none;
+}
+
+.ow-filter-select:focus {
+    border-color: var(--ws-border-focus);
+}
+
+.ow-filter-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    background: var(--ws-surface-elevated);
+    color: var(--ws-text-secondary);
+    font-size: var(--ws-font-sm);
+    cursor: pointer;
+    transition: all var(--ws-transition);
+}
+
+.ow-filter-btn--active {
+    background: var(--ws-accent-muted);
+    border-color: var(--ws-accent);
+    color: var(--ws-accent);
+}
+
+/* ───────────────────────────────────────────────
+   Add project modal
+─────────────────────────────────────────────── */
+.ow-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ws-overlay);
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ow-modal {
+    background: var(--ws-bg-secondary);
+    border: 1px solid var(--ws-border-strong);
+    border-radius: var(--ws-radius-xl);
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.18s ease-out;
+}
+
+.ow-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--ws-border);
+}
+
+.ow-modal-title {
+    font-size: var(--ws-font-title);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    margin: 0;
+}
+
+.ow-modal-close {
+    width: 28px;
+    height: 28px;
+    border-radius: var(--ws-radius);
+    border: 1px solid var(--ws-border);
+    background: var(--ws-surface-hover);
+    color: var(--ws-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--ws-transition);
+}
+
+.ow-modal-close:hover {
+    background: var(--ws-surface-elevated);
+    color: var(--ws-text);
+}
+
+.ow-modal-body {
+    padding: 20px;
+}
+
+.ow-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--ws-border);
+}
+
+/* ───────────────────────────────────────────────
+   SEO Audit breakdown
+─────────────────────────────────────────────── */
+.ow-audit-breakdown {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.ow-audit-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: var(--ws-radius-pill);
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-medium);
+}
+
+.ow-audit-pill--critical {
+    background: var(--ws-danger-muted);
+    color: var(--ws-red);
+}
+
+.ow-audit-pill--warning {
+    background: rgba(255, 149, 0, 0.12);
+    color: var(--ws-orange);
+}
+
+.ow-audit-pill--info {
+    background: var(--ws-accent-muted);
+    color: var(--ws-accent);
+}
+
+/* ───────────────────────────────────────────────
+   Overview section
+─────────────────────────────────────────────── */
+.ow-overview-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.ow-overview-section {
+    background: var(--ws-surface-elevated);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-lg);
+    padding: 16px 18px;
+}
+
+.ow-overview-section-title {
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ws-text-secondary);
+    margin: 0 0 12px;
+}
+
+.ow-overview-kv {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    align-items: start;
+}
+
+.ow-overview-k {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+    white-space: nowrap;
+}
+
+.ow-overview-v {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text);
+    word-break: break-word;
+}
+
+@media (max-width: 768px) {
+    .ow-overview-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ow-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .ow-projects-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ow-page {
+        padding: 16px;
+    }
+}
+
+/* ───────────────────────────────────────────────
+   Overview editable cards
+─────────────────────────────────────────────── */
+.ow-overview-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* ── Base card ── */
+.ow-card {
+    border-radius: var(--ws-radius-lg);
+    padding: 20px 22px;
+    border: 1.5px solid transparent;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 160px;
+}
+
+.ow-card:hover {
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+/* ── Color variants ── */
+.ow-card--config {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8eeff 100%);
+    border-color: #c7d4ff;
+}
+
+.ow-card--tone {
+    background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+    border-color: #fcd5a8;
+}
+
+.ow-card--audience {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border-color: #a7f3d0;
+}
+
+.ow-card--keywords {
+    background: linear-gradient(135deg, #fdf4ff 0%, #f3e8ff 100%);
+    border-color: #d8b4fe;
+}
+
+.ow-card--skills {
+    background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    border-color: var(--ws-border);
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] .ow-card--config  { background: linear-gradient(135deg, #1a2040 0%, #1e2550 100%); border-color: #3a4a80; }
+[data-theme="dark"] .ow-card--tone    { background: linear-gradient(135deg, #2a1a08 0%, #3a2010 100%); border-color: #7a4020; }
+[data-theme="dark"] .ow-card--audience { background: linear-gradient(135deg, #082018 0%, #0e2820 100%); border-color: #1a5040; }
+[data-theme="dark"] .ow-card--keywords { background: linear-gradient(135deg, #1a0828 0%, #220a30 100%); border-color: #5a3080; }
+[data-theme="dark"] .ow-card--skills  { background: var(--ws-surface-elevated); border-color: var(--ws-border); }
+
+/* ── Card header ── */
+.ow-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ow-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: var(--ws-radius-sm);
+    background: rgba(255,255,255,0.6);
+    color: var(--ws-text-secondary);
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .ow-card-icon { background: rgba(255,255,255,0.08); }
+
+.ow-card--config  .ow-card-icon { color: #4f6ef7; }
+.ow-card--tone    .ow-card-icon { color: #e07a1a; }
+.ow-card--audience .ow-card-icon { color: #16a34a; }
+.ow-card--keywords .ow-card-icon { color: #9333ea; }
+
+.ow-card-title {
+    font-size: var(--ws-font-sm);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    flex: 1;
+}
+
+.ow-card-edit-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: var(--ws-radius-sm);
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.7);
+    color: var(--ws-text-secondary);
+    font-size: var(--ws-font-xs);
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+.ow-card-edit-btn:hover { background: rgba(255,255,255,0.95); color: var(--ws-text); }
+[data-theme="dark"] .ow-card-edit-btn { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.12); }
+
+.ow-card-ai-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: var(--ws-radius-sm);
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(255,255,255,0.7);
+    color: #7c3aed;
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-semibold);
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.ow-card-ai-btn:hover:not(:disabled) { background: rgba(255,255,255,0.95); }
+.ow-card-ai-btn:disabled { opacity: 0.5; cursor: default; }
+[data-theme="dark"] .ow-card-ai-btn { background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.3); color: #a78bfa; }
+
+/* ── Card body ── */
+.ow-card-text {
+    font-size: var(--ws-font-sm);
+    color: var(--ws-text);
+    line-height: 1.55;
+    margin: 0;
+    flex: 1;
+}
+
+.ow-card-empty {
+    color: var(--ws-text-tertiary);
+    font-style: italic;
+    font-size: var(--ws-font-xs);
+}
+
+.ow-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+    align-content: flex-start;
+}
+
+.ow-card-tag {
+    background: rgba(147,51,234,0.12);
+    color: #7c3aed;
+    border: 1px solid rgba(147,51,234,0.25);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: var(--ws-font-xs);
+    font-weight: 500;
+}
+
+[data-theme="dark"] .ow-card-tag { background: rgba(167,139,250,0.15); color: #a78bfa; border-color: rgba(167,139,250,0.3); }
+
+/* ── Config stats ── */
+.ow-card-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.ow-card-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ow-card-stat-value {
+    font-size: var(--ws-font-base);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+    line-height: 1.2;
+}
+
+.ow-card-stat-label {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+}
+
+/* ── Edit mode ── */
+.ow-card-edit-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ow-card-field-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ow-card-label {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-secondary);
+    width: 90px;
+    flex-shrink: 0;
+}
+
+.ow-select--sm, .ow-input--sm {
+    font-size: var(--ws-font-xs) !important;
+    padding: 6px 10px !important;
+    height: auto !important;
+}
+
+.ow-textarea--sm {
+    font-size: var(--ws-font-xs);
+    padding: 8px 10px;
+    width: 100%;
+    resize: vertical;
+}
+
+.ow-card-save-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-end;
+    padding: 6px 14px;
+    border-radius: var(--ws-radius-sm);
+    background: var(--ws-accent);
+    color: #fff;
+    border: none;
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-semibold);
+    cursor: pointer;
+    transition: opacity 0.1s;
+}
+
+.ow-card-save-btn:disabled { opacity: 0.6; cursor: default; }
+.ow-card-save-btn:hover:not(:disabled) { opacity: 0.85; }
+
+/* ── Skill status inside card ── */
+.ow-skill-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.ow-skill-status-item {
+    background: rgba(255,255,255,0.6);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius-sm);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+[data-theme="dark"] .ow-skill-status-item { background: rgba(255,255,255,0.04); }
+
+.ow-skill-status-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.ow-skill-status-name {
+    font-size: var(--ws-font-xs);
+    font-weight: var(--ws-weight-semibold);
+    color: var(--ws-text);
+}
+
+.ow-skill-status-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ow-skill-status-date {
+    font-size: var(--ws-font-xs);
+    color: var(--ws-text-tertiary);
+}
+
+@media (max-width: 768px) {
+    .ow-overview-cards {
+        grid-template-columns: 1fr;
+    }
+    .ow-card-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+}

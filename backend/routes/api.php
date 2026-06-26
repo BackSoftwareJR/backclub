@@ -605,6 +605,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/{id}', [App\Http\Controllers\SellerSupportTicketController::class, 'adminUpdate']);
     });
 
+    // FREELANCE AI Assistant - global command palette
+    Route::post('freelance/ai-assistant/chat', [App\Http\Controllers\FreelanceAiAssistantController::class, 'chat']);
+    Route::get('freelance/ai-morning-brief', [App\Http\Controllers\FreelanceAiAssistantController::class, 'morningBrief']);
+
     // FREELANCE - Endpoint ottimizzati (una chiamata invece di N+1)
     Route::get('freelance/dashboard', [App\Http\Controllers\FreelanceController::class, 'dashboard']);
     Route::get('freelance/projects', [App\Http\Controllers\FreelanceController::class, 'projects']);
@@ -924,6 +928,53 @@ Route::get('/quotes/{id}/pdf', [App\Http\Controllers\QuoteController::class, 'ge
 Route::get('/quotes/{id}/pdf/public', [App\Http\Controllers\QuoteController::class, 'generatePDFPublic'])
     ->name('quotes.pdf.public')
     ->middleware('signed');
+
+// ============================================================
+// ORGANIC WEB WORKSPACE — SEO organica orchestrata per cliente
+// ============================================================
+Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
+    // Projects
+    Route::get('/projects', [App\Http\Controllers\OrganicWebController::class, 'indexProjects']);
+    Route::post('/projects', [App\Http\Controllers\OrganicWebController::class, 'storeProject']);
+    Route::get('/projects/{id}', [App\Http\Controllers\OrganicWebController::class, 'showProject']);
+    Route::put('/projects/{id}', [App\Http\Controllers\OrganicWebController::class, 'updateProject']);
+    Route::delete('/projects/{id}', [App\Http\Controllers\OrganicWebController::class, 'destroyProject']);
+
+    // Skill runs per progetto
+    Route::get('/projects/{id}/skill-runs', [App\Http\Controllers\OrganicWebController::class, 'indexSkillRuns']);
+    Route::post('/projects/{id}/skill-runs', [App\Http\Controllers\OrganicWebController::class, 'startSkillRun']);
+
+    // Human tasks per progetto
+    Route::get('/projects/{id}/human-tasks', [App\Http\Controllers\OrganicWebController::class, 'indexProjectHumanTasks']);
+
+    // Blog posts per progetto
+    Route::get('/projects/{id}/blog-posts', [App\Http\Controllers\OrganicWebController::class, 'indexBlogPosts']);
+
+    // SEO audits per progetto
+    Route::get('/projects/{id}/seo-audits', [App\Http\Controllers\OrganicWebController::class, 'indexSeoAudits']);
+
+    // Skill runs (globali)
+    Route::get('/skill-runs/{runId}', [App\Http\Controllers\OrganicWebController::class, 'showSkillRun']);
+    Route::post('/skill-runs/{runId}/cancel', [App\Http\Controllers\OrganicWebController::class, 'cancelSkillRun']);
+
+    // Human tasks (inbox globale)
+    Route::get('/human-tasks', [App\Http\Controllers\OrganicWebController::class, 'indexHumanTasks']);
+    Route::post('/human-tasks/{taskId}/complete', [App\Http\Controllers\OrganicWebController::class, 'completeHumanTask']);
+    Route::post('/human-tasks/{taskId}/upload', [App\Http\Controllers\OrganicWebController::class, 'uploadHumanTaskFile']);
+
+    // Skill definitions (utility)
+    Route::get('/skill-definitions', [App\Http\Controllers\OrganicWebController::class, 'indexSkillDefinitions']);
+
+    // Human tasks — overdue (badge/alert)
+    Route::get('/human-tasks/overdue', [App\Http\Controllers\OrganicWebController::class, 'overdueHumanTasks']);
+
+    // Global stats
+    Route::get('/stats', [App\Http\Controllers\OrganicWebController::class, 'globalStats']);
+
+    // Utility: CRM projects disponibili (non ancora collegati)
+    Route::get('/available-crm-projects', [App\Http\Controllers\OrganicWebController::class, 'availableCrmProjects']);
+    Route::post('/projects/{id}/ai-suggest', [App\Http\Controllers\OrganicWebController::class, 'aiSuggest']);
+});
 
 Route::get('/user', function (Request $request) {
     return $request->user();

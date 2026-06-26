@@ -429,9 +429,9 @@
   color: rgba(191, 90, 242, 0.4);
 }
 
-/* ── Responsive: hide panel on narrow screens ── */
+/* ── Responsive: hide panel on narrow screens (modal context only) ── */
 @media (max-width: 900px) {
-  .tap-panel {
+  .tap-panel:not(.tap-panel--embedded) {
     display: none;
   }
 }

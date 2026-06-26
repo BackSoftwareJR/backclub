@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -19,7 +19,8 @@ import {
   LayoutGrid,
   Zap,
   InboxIcon,
-  Sparkles
+  Sparkles,
+  Bot,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { isFreelanceUser } from '../../utils/userRoles';
@@ -27,9 +28,13 @@ import { useTheme } from '../../context/ThemeContext';
 import { useSidebarState } from '../../hooks/useSidebarState';
 import { useGuide } from '../../context/GuideContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useFreelanceAIStore } from '../../stores/useFreelanceAIStore';
+import { useFreelanceAIContext } from '../../hooks/useFreelanceAIContext';
 import Header from '../../components/Layout/Header';
 import CachedFreelanceViews, { getFreelanceCacheKey } from '../../components/FreelanceCache/CachedFreelanceViews';
 import FreelanceMobileLayout from './FreelanceMobileLayout';
+import FreelanceAICommandPalette from './components/FreelanceAICommandPalette';
+import { FreelanceAINudges } from './components/FreelanceAINudge';
 import './FreelanceLayout.css';
 
 const FreelanceDashboardPage = lazy(() => import('./FreelanceDashboardPage'));
@@ -92,6 +97,46 @@ const FreelanceLayout: React.FC = () => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showTutorialMenu, setShowTutorialMenu] = useState(false);
   const [showCrmMenu, setShowCrmMenu] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+
+  const aiStore = useFreelanceAIStore();
+  const { contextLabel } = useFreelanceAIContext();
+
+  // Keep contextLabel in a ref so the keyboard handler never goes stale
+  const contextLabelRef = useRef(contextLabel);
+  useEffect(() => { contextLabelRef.current = contextLabel; }, [contextLabel]);
+
+  // ⌘K / Ctrl+K — attached to both document and window for maximum compatibility
+  useEffect(() => {
+    const toggle = () => {
+      const { isOpen, open, close } = useFreelanceAIStore.getState();
+      if (isOpen) { close(); } else { open(contextLabelRef.current); }
+    };
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        e.stopPropagation();
+        toggle();
+      }
+      if (e.key === 'Escape') setContextMenu(null);
+    };
+    // Attach to both targets — handles edge cases where one might be swallowed
+    document.addEventListener('keydown', handler, { capture: true });
+    window.addEventListener('keydown', handler, { capture: true });
+    return () => {
+      document.removeEventListener('keydown', handler, { capture: true });
+      window.removeEventListener('keydown', handler, { capture: true });
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Right-click context menu handler
+  const handleContextMenu = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    setContextMenu({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const closeContextMenu = useCallback(() => setContextMenu(null), []);
 
   const userCrmDepartments = user?.crm_departments ?? [];
   const hasCrmDepartments = userCrmDepartments.length > 0;
@@ -423,6 +468,52 @@ const FreelanceLayout: React.FC = () => {
           </NavLink>
         </nav>
 
+        {/* ── AI Button ── */}
+        <div style={{ padding: collapsed ? '8px 6px' : '6px 10px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+          <button
+            type="button"
+            onClick={() => {
+              const { isOpen, open, close } = useFreelanceAIStore.getState();
+              if (isOpen) { close(); } else { open(contextLabelRef.current); }
+            }}
+            title="Apri AI Assistant (⌘K)"
+            style={{
+              width: '100%',
+              display: 'flex', alignItems: 'center', gap: 8,
+              padding: collapsed ? '7px' : '7px 10px',
+              borderRadius: 10,
+              background: aiStore.isOpen
+                ? 'linear-gradient(135deg, rgba(94,92,230,0.35), rgba(10,132,255,0.25))'
+                : 'rgba(94,92,230,0.1)',
+              border: `1px solid ${aiStore.isOpen ? 'rgba(94,92,230,0.5)' : 'rgba(94,92,230,0.2)'}`,
+              cursor: 'pointer',
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              transition: 'all 0.18s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(94,92,230,0.22)'; }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = aiStore.isOpen
+                ? 'linear-gradient(135deg, rgba(94,92,230,0.35), rgba(10,132,255,0.25))'
+                : 'rgba(94,92,230,0.1)';
+            }}
+          >
+            <div style={{
+              width: 22, height: 22, borderRadius: 7, flexShrink: 0,
+              background: 'linear-gradient(135deg, #5e5ce6, #0a84ff)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 8px rgba(94,92,230,0.5)',
+            }}>
+              <Bot size={11} color="#fff" />
+            </div>
+            {!collapsed && (
+              <>
+                <span style={{ fontSize: 12, fontWeight: 600, color: '#a78bfa', flex: 1 }}>BackClub AI</span>
+                <span style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.04em' }}>⌘K</span>
+              </>
+            )}
+          </button>
+        </div>
+
         {/* Footer */}
         {!collapsed ? (
           <div className="freelance-sidebar-footer">
@@ -510,7 +601,11 @@ const FreelanceLayout: React.FC = () => {
 
       <div className={`freelance-content-wrapper ${collapsed ? 'sidebar-collapsed' : ''}`}>
         <Header />
-        <main className={`freelance-main ${collapsed ? 'sidebar-collapsed' : ''}`}>
+        <main
+          className={`freelance-main ${collapsed ? 'sidebar-collapsed' : ''}`}
+          onContextMenu={handleContextMenu}
+          onClick={closeContextMenu}
+        >
           {getFreelanceCacheKey(location.pathname) !== null ? (
             <CachedFreelanceViews
               renderView={(key, isActive) => (
@@ -526,6 +621,96 @@ const FreelanceLayout: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* ── Global AI Command Palette ── */}
+      <FreelanceAICommandPalette />
+      <FreelanceAINudges />
+
+      {/* ── Right-click context menu ── */}
+      <AnimatePresence>
+        {contextMenu && (
+          <motion.div
+            key="ctx-menu"
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.94 }}
+            transition={{ duration: 0.1 }}
+            style={{
+              position: 'fixed',
+              top: contextMenu.y,
+              left: contextMenu.x,
+              zIndex: 9990,
+              background: 'rgba(20,20,26,0.95)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 12,
+              padding: '4px',
+              boxShadow: '0 16px 40px rgba(0,0,0,0.5)',
+              minWidth: 200,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => { closeContextMenu(); aiStore.open(contextLabel); }}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                background: 'transparent', color: 'rgba(255,255,255,0.85)',
+                fontSize: 13, textAlign: 'left', transition: 'background 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(94,92,230,0.2)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <div style={{
+                width: 24, height: 24, borderRadius: 7,
+                background: 'linear-gradient(135deg, #5E5CE6, #0A84FF)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <Bot size={12} color="#fff" />
+              </div>
+              <span>Chiedi all'assistente AI</span>
+              <span style={{ marginLeft: 'auto', fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.04em' }}>
+                ⌘K
+              </span>
+            </button>
+
+            <div style={{ height: 1, background: 'rgba(255,255,255,0.06)', margin: '3px 8px' }} />
+
+            <button
+              type="button"
+              onClick={() => { closeContextMenu(); navigate('/freelance/focus'); }}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                background: 'transparent', color: 'rgba(255,255,255,0.65)',
+                fontSize: 13, textAlign: 'left', transition: 'background 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Sparkles size={14} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+              <span>Vai a Focus</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => { closeContextMenu(); navigate('/workspace'); }}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '8px 12px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                background: 'transparent', color: 'rgba(255,255,255,0.65)',
+                fontSize: 13, textAlign: 'left', transition: 'background 0.12s',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Zap size={14} style={{ color: 'rgba(255,255,255,0.4)', flexShrink: 0 }} />
+              <span>WorkSpace</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

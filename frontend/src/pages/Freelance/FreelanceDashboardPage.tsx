@@ -21,6 +21,7 @@ import type { FreelanceDashboardStats, FreelanceTask } from '../../types/freelan
 import { Calendar, Video, AlertCircle, FileText, CheckCircle2, ArrowUpRight } from 'lucide-react';
 import GuideTour from '../../components/Guide/GuideTour';
 import { freelanceDashboardTourSteps, freelanceCompleteTourSteps } from '../../config/freelanceGuideTours';
+import { AIMorningBriefCard } from './components/AIMorningBriefCard';
 import './FreelanceDashboardPage.css';
 
 // ============================================================
@@ -430,6 +431,11 @@ const FreelanceDashboardPage: React.FC = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── AI Morning Brief ── */}
+      <div style={{ padding: '0 0 0 0' }}>
+        <AIMorningBriefCard />
       </div>
 
       {/* ── Main Grid ── */}

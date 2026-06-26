@@ -118,6 +118,10 @@ const WorkspaceAreaRoute = lazy(() => import('./pages/Workspace/WorkspaceAreaRou
 const WorkspaceAreaIndex = lazy(() =>
   import('./pages/Workspace/WorkspaceAreaRoute.tsx').then((m) => ({ default: m.WorkspaceAreaIndex }))
 );
+const OrganicWebDashboard = lazy(() => import('./pages/Workspace/OrganicWeb/OrganicWebDashboard.tsx'));
+const OrganicWebProjectDetail = lazy(() => import('./pages/Workspace/OrganicWeb/OrganicWebProjectDetail.tsx'));
+const OrganicWebSkillRunDetail = lazy(() => import('./pages/Workspace/OrganicWeb/OrganicWebSkillRunDetail.tsx'));
+const OrganicWebHumanTaskInbox = lazy(() => import('./pages/Workspace/OrganicWeb/OrganicWebHumanTaskInbox.tsx'));
 const Progetti = lazy(() => import('./pages/Progetti/Progetti.tsx'));
 const ProgettiInAttesaPage = lazy(() => import('./pages/ProgettiInAttesa/ProgettiInAttesaPage.tsx'));
 const GestioneProgettiPage = lazy(() => import('./pages/GestioneProgetti/GestioneProgettiPage.tsx'));
@@ -711,6 +715,22 @@ function App() {
               <Route path="progetti/:id" element={<WorkspaceProjectPage />} />
               <Route path="agenti" element={<WorkspaceAgentsPage />} />
               <Route path="task" element={<WorkspaceTasksPage />} />
+            </Route>
+            {/* Organic Web Workspace — dedicated routes */}
+            <Route
+              path="/workspace/organic_web"
+              element={
+                <WorkspaceDeveloperRoute>
+                  <WorkspaceProvider>
+                    <WorkspaceAreaRoute />
+                  </WorkspaceProvider>
+                </WorkspaceDeveloperRoute>
+              }
+            >
+              <Route index element={<OrganicWebDashboard />} />
+              <Route path="project/:id" element={<OrganicWebProjectDetail />} />
+              <Route path="skill-runs/:runId" element={<OrganicWebSkillRunDetail />} />
+              <Route path="inbox" element={<OrganicWebHumanTaskInbox />} />
             </Route>
             <Route
               path="/workspace/:areaCode/*"

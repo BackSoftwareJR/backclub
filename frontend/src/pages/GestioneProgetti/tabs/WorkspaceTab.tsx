@@ -7,7 +7,11 @@ import {
     GitBranch,
     Save,
     X,
-    Monitor
+    Monitor,
+    Globe,
+    ExternalLink,
+    Loader,
+    CheckCircle
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import {
@@ -20,6 +24,7 @@ import {
     type BranchWithRoles
 } from '../../../api/workspacePmConfig';
 import type { CrmProject } from '../../../api/crmProjects';
+import organicWebApi, { type OrganicWebProject, type BlogPlatform } from '../../../api/organicWeb';
 
 interface WorkspaceTabProps {
     projectId: number;
@@ -68,9 +73,71 @@ const WorkspaceTab: React.FC<WorkspaceTabProps> = ({ projectId, project }) => {
     // Check if user can access this tab  
     const canAccess = user?.role === 'admin' || (user && project && user.id === project.manager_id);
 
+    // ── Organic Web state ──────────────────────────────────────────────────────
+    const [owProject, setOwProject] = useState<OrganicWebProject | null | undefined>(undefined); // undefined = loading
+    const [owLoading, setOwLoading] = useState(true);
+    const [owSaving, setOwSaving] = useState(false);
+    const [owError, setOwError] = useState<string | null>(null);
+    const [owForm, setOwForm] = useState({
+        website_url: project?.website_url ?? '',
+        blog_platform: 'wordpress' as BlogPlatform,
+        language: 'it',
+    });
+
+    const loadOwProject = async () => {
+        try {
+            setOwLoading(true);
+            const res = await organicWebApi.getProjects();
+            const found = res.data.find((p) => p.crm_project_id === projectId) ?? null;
+            setOwProject(found);
+        } catch {
+            setOwProject(null);
+        } finally {
+            setOwLoading(false);
+        }
+    };
+
+    const handleOwActivate = async () => {
+        if (!owForm.website_url) {
+            setOwError('Inserisci l\'URL del sito.');
+            return;
+        }
+        setOwSaving(true);
+        setOwError(null);
+        try {
+            const res = await organicWebApi.createProject({
+                crm_project_id: projectId,
+                website_url: owForm.website_url,
+                blog_platform: owForm.blog_platform,
+                language: owForm.language,
+                is_active: true,
+            });
+            setOwProject(res.project);
+        } catch (e: unknown) {
+            const err = e as { response?: { data?: { message?: string } } };
+            setOwError(err?.response?.data?.message ?? 'Errore durante l\'attivazione.');
+        } finally {
+            setOwSaving(false);
+        }
+    };
+
+    const handleOwToggleActive = async () => {
+        if (!owProject) return;
+        setOwSaving(true);
+        try {
+            const res = await organicWebApi.updateProject(owProject.id, { is_active: !owProject.is_active });
+            setOwProject(res.project);
+        } catch {
+            // silently ignore
+        } finally {
+            setOwSaving(false);
+        }
+    };
+
     useEffect(() => {
         if (canAccess) {
             loadWorkspaceConfig();
+            loadOwProject();
         }
     }, [projectId, canAccess]);
 
@@ -402,6 +469,99 @@ const WorkspaceTab: React.FC<WorkspaceTabProps> = ({ projectId, project }) => {
                                 <GitBranch size={48} style={{ opacity: 0.3 }} />
                                 <p>Nessun branch configurato</p>
                                 <p>Aggiungi dei branch per organizzare il lavoro degli sviluppatori.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* ── Organic Web ─────────────────────────────────────────── */}
+                <div className="section-card" style={{ marginTop: 24 }}>
+                    <div className="section-card-header">
+                        <div className="section-card-title">
+                            <Globe size={20} />
+                            <span>Organic Web</span>
+                        </div>
+                        {owProject && (
+                            <a
+                                href={`/workspace/organic_web/project/${owProject.id}`}
+                                className="btn btn-secondary btn-sm"
+                                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                            >
+                                <ExternalLink size={14} />
+                                Apri workspace
+                            </a>
+                        )}
+                    </div>
+                    <div className="section-card-content">
+                        {owLoading ? (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary, #888)', padding: '8px 0' }}>
+                                <Loader size={14} style={{ animation: 'spin 1s linear infinite' }} />
+                                Caricamento…
+                            </div>
+                        ) : owProject ? (
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+                                    <CheckCircle size={16} color={owProject.is_active ? '#34C759' : '#8E8E93'} />
+                                    <span style={{ fontWeight: 500 }}>
+                                        Organic Web {owProject.is_active ? 'attivo' : 'disattivato'}
+                                    </span>
+                                    <span style={{ color: 'var(--text-secondary, #888)', fontSize: 13 }}>
+                                        · {owProject.website_url}
+                                    </span>
+                                </div>
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={owProject.is_active}
+                                        onChange={handleOwToggleActive}
+                                        disabled={owSaving}
+                                    />
+                                    <span className="checkbox-text">
+                                        {owSaving ? 'Aggiornamento…' : (owProject.is_active ? 'Disattiva Organic Web per questo progetto' : 'Attiva Organic Web per questo progetto')}
+                                    </span>
+                                </label>
+                            </div>
+                        ) : (
+                            <div>
+                                <p style={{ margin: '0 0 16px', color: 'var(--text-secondary, #888)', fontSize: 14 }}>
+                                    Attiva la gestione SEO e contenuti organici per questo progetto.
+                                </p>
+                                <div className="form-row" style={{ marginBottom: 12 }}>
+                                    <div className="form-group">
+                                        <label className="form-label">URL sito <span className="required">*</span></label>
+                                        <input
+                                            type="url"
+                                            className="form-input"
+                                            placeholder="https://miosito.it"
+                                            value={owForm.website_url}
+                                            onChange={e => setOwForm(p => ({ ...p, website_url: e.target.value }))}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Piattaforma blog</label>
+                                        <select
+                                            className="form-input"
+                                            value={owForm.blog_platform}
+                                            onChange={e => setOwForm(p => ({ ...p, blog_platform: e.target.value as BlogPlatform }))}
+                                        >
+                                            <option value="wordpress">WordPress</option>
+                                            <option value="webflow">Webflow</option>
+                                            <option value="custom">Custom</option>
+                                            <option value="other">Altro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                {owError && (
+                                    <p style={{ color: '#FF3B30', fontSize: 13, margin: '0 0 12px' }}>{owError}</p>
+                                )}
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={handleOwActivate}
+                                    disabled={owSaving}
+                                >
+                                    <Globe size={16} />
+                                    {owSaving ? 'Attivazione…' : 'Attiva Organic Web'}
+                                </button>
                             </div>
                         )}
                     </div>

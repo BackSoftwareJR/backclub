@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Bot, Play, Square, MessageSquare, Loader2, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Bot, Play, Square, MessageSquare, Loader2, AlertCircle, Minus, Plus } from 'lucide-react';
 import { crmProjectTasksApi, type CrmProjectTask } from '../../api/crmProjects';
 import TaskAgentChatPanel from './TaskAgentChatPanel';
 import TaskN8nOutputSection from './TaskN8nOutputSection';
@@ -13,6 +13,8 @@ interface TaskAgentControlPanelProps {
   readOnly?: boolean;
 }
 
+const POLL_INTERVAL_MS = 10_000;
+
 const TaskAgentControlPanel: React.FC<TaskAgentControlPanelProps> = ({
   projectId,
   taskId,
@@ -24,6 +26,43 @@ const TaskAgentControlPanel: React.FC<TaskAgentControlPanelProps> = ({
   const [showReviewMessage, setShowReviewMessage] = useState(false);
   const [reviewMessage, setReviewMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [localProgress, setLocalProgress] = useState<number>(task.progress ?? 0);
+  const [progressSaving, setProgressSaving] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const isProcessing = task.n8n_status === 'processing' || task.n8n_status === 'pending';
+
+  // Sync local progress with incoming task prop
+  useEffect(() => {
+    setLocalProgress(task.progress ?? 0);
+  }, [task.progress]);
+
+  // Auto-poll when processing
+  useEffect(() => {
+    if (isProcessing && onTaskUpdate) {
+      pollRef.current = setInterval(() => {
+        onTaskUpdate();
+      }, POLL_INTERVAL_MS);
+    }
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [isProcessing, onTaskUpdate]);
+
+  const saveProgress = useCallback(async (value: number) => {
+    setProgressSaving(true);
+    try {
+      await crmProjectTasksApi.n8nAction(projectId, taskId, {
+        action: 'update_progress',
+        progress: value,
+      });
+      onTaskUpdate?.();
+    } catch {
+      // silently ignore — not critical
+    } finally {
+      setProgressSaving(false);
+    }
+  }, [projectId, taskId, onTaskUpdate]);
 
   // Solo per execution_mode agent o agent_human
   if (!task.execution_mode || task.execution_mode === 'human') {
@@ -169,6 +208,74 @@ const TaskAgentControlPanel: React.FC<TaskAgentControlPanelProps> = ({
           </div>
         </div>
       )}
+
+      {/* Barra di avanzamento */}
+      <div className="task-agent-progress">
+          <div className="task-agent-progress-header">
+            <span className="task-agent-progress-label">
+              {isProcessing ? (
+                <>
+                  <Loader2 size={12} className="task-agent-control-spinner" />
+                  <span>Elaborazione in corso...</span>
+                </>
+              ) : task.n8n_status === 'completed' ? (
+                <span>Completato</span>
+              ) : task.n8n_status === 'failed' ? (
+                <span className="task-agent-progress-label--failed">Fallito</span>
+              ) : (
+                <span>Avanzamento</span>
+              )}
+            </span>
+            <span className="task-agent-progress-pct">{localProgress}%</span>
+          </div>
+
+          <div className="task-agent-progress-track">
+            <div
+              className={`task-agent-progress-fill${isProcessing ? ' task-agent-progress-fill--animated' : ''}`}
+              style={{ width: `${localProgress}%` }}
+            />
+          </div>
+
+          {!readOnly && (
+            <div className="task-agent-progress-controls">
+              <button
+                className="task-agent-progress-btn"
+                onClick={() => {
+                  const v = Math.max(0, localProgress - 5);
+                  setLocalProgress(v);
+                  saveProgress(v);
+                }}
+                disabled={progressSaving || localProgress === 0}
+                title="Diminuisci di 5%"
+              >
+                <Minus size={12} />
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={localProgress}
+                className="task-agent-progress-slider"
+                onChange={(e) => setLocalProgress(Number(e.target.value))}
+                onMouseUp={(e) => saveProgress(Number((e.target as HTMLInputElement).value))}
+                onTouchEnd={(e) => saveProgress(Number((e.target as HTMLInputElement).value))}
+              />
+              <button
+                className="task-agent-progress-btn"
+                onClick={() => {
+                  const v = Math.min(100, localProgress + 5);
+                  setLocalProgress(v);
+                  saveProgress(v);
+                }}
+                disabled={progressSaving || localProgress === 100}
+                title="Aumenta di 5%"
+              >
+                <Plus size={12} />
+              </button>
+            </div>
+          )}
+        </div>
 
       {/* Chat live logs */}
       <TaskAgentChatPanel

@@ -2,8 +2,9 @@
 
 .floating-task-panel {
   position: fixed;
-  top: 72px;
+  bottom: var(--ws-spacing-lg);
   right: var(--ws-spacing-lg);
+  top: auto;
   z-index: 1000;
   background: var(--ws-surface-glass);
   border: 1px solid var(--ws-border);
@@ -12,7 +13,7 @@
   backdrop-filter: saturate(180%) blur(20px);
   -webkit-backdrop-filter: saturate(180%) blur(20px);
   transition: all var(--ws-transition);
-  max-height: calc(100vh - 96px);
+  max-height: calc(100vh - 48px);
   overflow: hidden;
   font-size: var(--ws-font-sm);
 }

@@ -15,6 +15,10 @@ export interface Notification {
     reviewer_name?: string;
     review_notes?: string;
     url?: string;
+    // Agent task notifications
+    agent_status?: 'completed' | 'failed' | 'review';
+    workspace_agent_id?: number;
+    error_message?: string;
   };
   read_at: string | null;
   created_at: string;

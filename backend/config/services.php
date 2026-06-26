@@ -73,6 +73,7 @@ return [
         // Se APP_URL non punta all'API pubblica, impostare questo nel .env del server.
         // Esempio: N8N_CALLBACK_BASE_URL=https://backclub.it/backend/public
         'callback_base_url' => env('N8N_CALLBACK_BASE_URL'),
+        'crm_callback_proxy_url' => env('N8N_CRM_CALLBACK_PROXY_URL'),
         'start_timeout_seconds' => env('N8N_START_TIMEOUT_SECONDS', 30),
         'webhook_publish_production' => env('N8N_WEBHOOK_PUBLISH_PRODUCTION'),
         'calendar_call_webhook' => env('N8N_CALENDAR_CALL_WEBHOOK', 'webhook/backclub-calendar-call'),

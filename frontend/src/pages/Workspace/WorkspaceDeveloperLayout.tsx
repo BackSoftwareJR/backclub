@@ -8,6 +8,7 @@ import {
   Settings,
   User,
   LogOut,
+  Bell,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -15,6 +16,7 @@ import { useSidebarState } from '../../hooks/useSidebarState';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { workspaceApi } from '../../api/workspace';
 import { workspaceAgentsApi } from '../../api/workspaceAgents';
+import { notificationsApi } from '../../api/notifications';
 import WorkspaceSwitcher from './components/WorkspaceSwitcher';
 import WorkspaceOnboardingTour from './components/WorkspaceOnboardingTour';
 import './workspace-tokens.css';
@@ -28,6 +30,7 @@ const WorkspaceDeveloperLayout: React.FC = () => {
   useSidebarState('workspace-sidebar-collapsed', false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [agentsNotificationCount, setAgentsNotificationCount] = useState(0);
+  const [unreadNotificationsCount, setUnreadNotificationsCount] = useState(0);
 
   const menuItems = [
     {
@@ -86,6 +89,20 @@ const WorkspaceDeveloperLayout: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      try {
+        const res = await notificationsApi.getUnreadCount();
+        setUnreadNotificationsCount(res.data?.count ?? 0);
+      } catch {
+        // ignore
+      }
+    };
+    loadUnreadCount();
+    const interval = setInterval(loadUnreadCount, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Close profile menu on outside click
   useEffect(() => {
     if (!showProfileMenu) return;
@@ -107,6 +124,18 @@ const WorkspaceDeveloperLayout: React.FC = () => {
             <span className="workspace-sidebar-brand-name">WorkSpace</span>
             <span className="workspace-sidebar-version">v1</span>
           </div>
+          <button
+            className="workspace-sidebar-bell"
+            title="Notifiche"
+            onClick={() => navigate('/freelance/notifiche')}
+          >
+            <Bell size={15} />
+            {unreadNotificationsCount > 0 && (
+              <span className="workspace-sidebar-bell-badge">
+                {unreadNotificationsCount > 99 ? '99+' : unreadNotificationsCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* Workspace switcher */}

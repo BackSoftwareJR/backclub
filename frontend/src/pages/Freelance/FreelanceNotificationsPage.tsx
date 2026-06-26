@@ -10,7 +10,11 @@ import {
   MessageSquare,
   Calendar,
   Clock,
-  Bell
+  Bell,
+  Bot,
+  CheckCircle2,
+  XCircle,
+  Eye
 } from 'lucide-react';
 import { notificationsApi, type Notification } from '../../api/notifications';
 import { useAuth } from '../../context/AuthContext';
@@ -106,8 +110,16 @@ const FreelanceNotificationsPage: React.FC = () => {
 
   const getNotificationIcon = (notification: Notification) => {
     const type = notification.type || notification.data?.type || '';
-    
-    if (type.includes('task') || type.includes('Task')) {
+
+    if (type === 'agent_completed') {
+      return <CheckCircle2 size={18} style={{ color: '#34C759' }} />;
+    } else if (type === 'agent_failed') {
+      return <XCircle size={18} style={{ color: '#FF3B30' }} />;
+    } else if (type === 'agent_review') {
+      return <Eye size={18} style={{ color: '#FF9F0A' }} />;
+    } else if (type === 'agent_update' || type.includes('agent')) {
+      return <Bot size={18} style={{ color: '#007AFF' }} />;
+    } else if (type.includes('task') || type.includes('Task')) {
       return <CheckSquare size={18} />;
     } else if (type.includes('project') || type.includes('Project')) {
       return <FolderKanban size={18} />;
@@ -123,20 +135,17 @@ const FreelanceNotificationsPage: React.FC = () => {
 
   const getNotificationTypeLabel = (notification: Notification): string => {
     const type = notification.type || notification.data?.type || '';
-    
-    if (type.includes('task_assigned') || type.includes('TaskAssigned')) {
-      return 'Task Assegnato';
-    } else if (type.includes('task_request') || type.includes('TaskRequest')) {
-      return 'Richiesta Task';
-    } else if (type.includes('project_added') || type.includes('ProjectAdded')) {
-      return 'Aggiunto al Progetto';
-    } else if (type.includes('message') || type.includes('chat')) {
-      return 'Messaggio';
-    } else if (type.includes('reminder')) {
-      return 'Promemoria';
-    } else if (type.includes('deadline') || type.includes('scadenza')) {
-      return 'Scadenza';
-    }
+
+    if (type === 'agent_completed') return 'Agente Completato';
+    if (type === 'agent_failed') return 'Agente Fallito';
+    if (type === 'agent_review') return 'Revisione Richiesta';
+    if (type === 'agent_update' || type.includes('AgentTask')) return 'Agente AI';
+    if (type.includes('task_assigned') || type.includes('TaskAssigned')) return 'Task Assegnato';
+    if (type.includes('task_request') || type.includes('TaskRequest')) return 'Richiesta Task';
+    if (type.includes('project_added') || type.includes('ProjectAdded')) return 'Aggiunto al Progetto';
+    if (type.includes('message') || type.includes('chat')) return 'Messaggio';
+    if (type.includes('reminder')) return 'Promemoria';
+    if (type.includes('deadline') || type.includes('scadenza')) return 'Scadenza';
     return 'Notifica';
   };
 

@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('calendar:send-call-reminders')->everyMinute();
+
+        // Organic Web Workspace
+        $schedule->command('organic-web:run-scheduler')->dailyAt('03:00');
+        $schedule->command('organic-web:advance-runs')->everyFiveMinutes();
+        $schedule->command('organic-web:send-reminders')->hourly();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
