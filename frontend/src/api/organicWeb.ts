@@ -323,6 +323,7 @@ export interface GscUrlDetail {
     coverage_state: string | null;
     blocked_by_robots: boolean;
     errors: string[];
+    is_orphan?: boolean;
 }
 
 export interface RobotsTxtData {
@@ -357,6 +358,38 @@ export interface ChatMessage {
     session_id: number;
     role: 'user' | 'assistant';
     content: string;
+    created_at: string;
+}
+
+// ── Fase 4: PageSpeed, Semantic Gap, SGE, Link Graph ──
+
+export interface PageSpeedAudit {
+    id: number;
+    url: string;
+    device: 'mobile' | 'desktop';
+    performance_score: number | null;
+    lcp: number | null;
+    cls: number | null;
+    fid: number | null;
+    opportunities: Array<{ id: string; title: string; description: string; score: number }> | null;
+    created_at: string;
+}
+
+export interface SemanticGap {
+    id: number;
+    url: string;
+    target_keyword: string;
+    missing_entities: string[] | null;
+    ai_suggested_paragraph: string | null;
+    created_at: string;
+}
+
+export interface SgeReadiness {
+    id: number;
+    url: string;
+    has_schema: boolean;
+    schema_types: string[] | null;
+    ai_generated_jsonld: string | null;
     created_at: string;
 }
 
@@ -861,6 +894,99 @@ export const organicWebApi = {
         await apiClient.delete(
             `/organic-web/projects/${projectId}/ai/sessions/${sessionId}`
         );
+    },
+
+    // ── Fase 4: PageSpeed ──
+
+    analyzePageSpeed: async (
+        projectId: number,
+        url: string,
+        device: 'mobile' | 'desktop' = 'mobile'
+    ): Promise<{ audit: PageSpeedAudit }> => {
+        const response = await apiClient.post<{ audit: PageSpeedAudit }>(
+            `/organic-web/projects/${projectId}/pagespeed/analyze`,
+            { url, device }
+        );
+        return response.data;
+    },
+
+    getPageSpeedAudits: async (projectId: number): Promise<{ audits: PageSpeedAudit[] }> => {
+        const response = await apiClient.get<{ audits: PageSpeedAudit[] }>(
+            `/organic-web/projects/${projectId}/pagespeed`
+        );
+        return response.data;
+    },
+
+    // ── Fase 4: Semantic Gap ──
+
+    findSemanticGap: async (
+        projectId: number,
+        url: string,
+        keyword: string
+    ): Promise<{ gap: SemanticGap }> => {
+        const response = await apiClient.post<{ gap: SemanticGap }>(
+            `/organic-web/projects/${projectId}/semantic-gap`,
+            { url, keyword }
+        );
+        return response.data;
+    },
+
+    listSemanticGaps: async (projectId: number): Promise<{ gaps: SemanticGap[] }> => {
+        const response = await apiClient.get<{ gaps: SemanticGap[] }>(
+            `/organic-web/projects/${projectId}/semantic-gap`
+        );
+        return response.data;
+    },
+
+    // ── Fase 4: SGE Schema ──
+
+    generateSgeSchema: async (
+        projectId: number,
+        url: string
+    ): Promise<{ result: SgeReadiness }> => {
+        const response = await apiClient.post<{ result: SgeReadiness }>(
+            `/organic-web/projects/${projectId}/sge/generate`,
+            { url }
+        );
+        return response.data;
+    },
+
+    listSgeResults: async (projectId: number): Promise<{ results: SgeReadiness[] }> => {
+        const response = await apiClient.get<{ results: SgeReadiness[] }>(
+            `/organic-web/projects/${projectId}/sge`
+        );
+        return response.data;
+    },
+
+    // ── Fase 4: Link Graph / Orphan Pages ──
+
+    extractLinks: async (
+        projectId: number,
+        url: string
+    ): Promise<{ success: boolean; message: string }> => {
+        const response = await apiClient.post<{ success: boolean; message: string }>(
+            `/organic-web/projects/${projectId}/links/extract`,
+            { url }
+        );
+        return response.data;
+    },
+
+    calculateOrphans: async (
+        projectId: number
+    ): Promise<{ success: boolean; orphan_count: number }> => {
+        const response = await apiClient.post<{ success: boolean; orphan_count: number }>(
+            `/organic-web/projects/${projectId}/links/calculate-orphans`
+        );
+        return response.data;
+    },
+
+    listOrphans: async (
+        projectId: number
+    ): Promise<{ orphans: Array<{ url: string }> }> => {
+        const response = await apiClient.get<{ orphans: Array<{ url: string }> }>(
+            `/organic-web/projects/${projectId}/links/orphans`
+        );
+        return response.data;
     },
 };
 

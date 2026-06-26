@@ -1033,6 +1033,26 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
         Route::get('/reports', [App\Http\Controllers\OrganicAiController::class, 'listReports']);
         Route::post('/sessions/{sessionId}/chat', [App\Http\Controllers\OrganicAiController::class, 'sessionChat']);
     });
+
+    // --- Task 12: Advanced SEO Analysis (PageSpeed, Semantic Gap, SGE, Internal Links) ---
+    Route::prefix('projects/{id}')->group(function () {
+        // PageSpeed Insights
+        Route::post('/pagespeed/analyze', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'analyzePageSpeed']);
+        Route::get('/pagespeed', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'getPageSpeedAudits']);
+
+        // Semantic Gap Analysis
+        Route::post('/semantic-gap', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'findSemanticGap']);
+        Route::get('/semantic-gap', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'listSemanticGaps']);
+
+        // SGE / Schema Readiness
+        Route::post('/sge/generate', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'generateSgeSchema']);
+        Route::get('/sge', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'listSgeResults']);
+
+        // Internal Link Graph + Orphan Detection
+        Route::post('/links/extract', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'extractLinks']);
+        Route::post('/links/calculate-orphans', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'calculateOrphans']);
+        Route::get('/links/orphans', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'listOrphans']);
+    });
 });
 
 Route::get('/user', function (Request $request) {

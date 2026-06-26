@@ -645,7 +645,9 @@ final class SearchConsoleService
                 .'/sitemaps/'
                 .urlencode($sitemapUrl);
 
-            $response = Http::withToken($tokenStr)->put($endpoint);
+            $response = Http::withToken($tokenStr)
+                ->withBody('', 'application/octet-stream')
+                ->put($endpoint);
 
             if ($response->failed()) {
                 throw new \RuntimeException(

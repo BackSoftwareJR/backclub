@@ -1,11 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { Map, Zap, RefreshCw, Info } from 'lucide-react';
+import { Map, Zap, RefreshCw, Info, LinkIcon, Loader } from 'lucide-react';
 import organicWebApi from '../../../api/organicWeb';
 import SitemapTab from './components/SitemapTab';
 
 interface SitemapIndexTabProps {
     projectId: number;
     websiteUrl?: string;
+    onOrphanCountChange?: (count: number) => void;
 }
 
 /**
@@ -14,9 +15,13 @@ interface SitemapIndexTabProps {
  * Wraps the comprehensive SitemapTab and adds a header with the
  * "Pinga Sitemap" action, now wired to the real pingSitemap API.
  */
-const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl }) => {
+const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl, onOrphanCountChange }) => {
     const [pinging, setPinging] = useState(false);
     const [pingResult, setPingResult] = useState<'success' | 'error' | null>(null);
+
+    // Orphan state
+    const [orphanUrls, setOrphanUrls] = useState<Set<string>>(new Set());
+    const [calculatingOrphans, setCalculatingOrphans] = useState(false);
 
     const sitemapUrl = websiteUrl
         ? `${websiteUrl.replace(/\/$/, '')}/sitemap.xml`
@@ -36,6 +41,21 @@ const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl
             setTimeout(() => setPingResult(null), 4000);
         }
     }, [projectId, sitemapUrl]);
+
+    const handleCalculateOrphans = useCallback(async () => {
+        setCalculatingOrphans(true);
+        try {
+            await organicWebApi.calculateOrphans(projectId);
+            const res = await organicWebApi.listOrphans(projectId);
+            const urls = new Set(res.orphans.map(o => o.url));
+            setOrphanUrls(urls);
+            onOrphanCountChange?.(urls.size);
+        } catch {
+            // silent
+        } finally {
+            setCalculatingOrphans(false);
+        }
+    }, [projectId, onOrphanCountChange]);
 
     return (
         <div>
@@ -82,7 +102,7 @@ const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     {/* Ping result feedback */}
                     {pingResult === 'success' && (
                         <span style={{
@@ -116,6 +136,55 @@ const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl
                             Errore durante il ping
                         </span>
                     )}
+
+                    {/* Ricalcola Orfane button */}
+                    <button
+                        style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            padding: '9px 18px',
+                            background: calculatingOrphans
+                                ? 'rgba(239, 68, 68, 0.06)'
+                                : 'rgba(239, 68, 68, 0.10)',
+                            border: '1px solid rgba(239, 68, 68, 0.3)',
+                            borderRadius: 10,
+                            color: '#f87171',
+                            fontSize: 'var(--ws-font-sm)',
+                            fontWeight: 600,
+                            cursor: calculatingOrphans ? 'not-allowed' : 'pointer',
+                            opacity: calculatingOrphans ? 0.6 : 1,
+                            transition: 'all 0.15s ease',
+                            whiteSpace: 'nowrap',
+                        }}
+                        onClick={handleCalculateOrphans}
+                        disabled={calculatingOrphans}
+                        title="Calcola le pagine senza link interni in entrata"
+                    >
+                        {calculatingOrphans ? (
+                            <>
+                                <Loader size={14} style={{ animation: 'ws-spin 1s linear infinite' }} />
+                                Calcolo…
+                            </>
+                        ) : (
+                            <>
+                                <LinkIcon size={14} />
+                                Ricalcola Orfane
+                                {orphanUrls.size > 0 && (
+                                    <span style={{
+                                        marginLeft: 2,
+                                        padding: '1px 6px',
+                                        borderRadius: 9999,
+                                        background: 'rgba(239,68,68,0.2)',
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                    }}>
+                                        {orphanUrls.size}
+                                    </span>
+                                )}
+                            </>
+                        )}
+                    </button>
 
                     {/* Ping Sitemap button */}
                     <button
@@ -181,7 +250,7 @@ const SitemapIndexTab: React.FC<SitemapIndexTabProps> = ({ projectId, websiteUrl
             </div>
 
             {/* ── Comprehensive SitemapTab ── */}
-            <SitemapTab projectId={projectId} />
+            <SitemapTab projectId={projectId} orphanUrls={orphanUrls} />
         </div>
     );
 };

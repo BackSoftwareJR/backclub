@@ -73,6 +73,10 @@ return [
         'model'    => env('CANOPY_WAVE_MODEL', 'moonshotai/kimi-k2.6'),
     ],
 
+    'google_pagespeed' => [
+        'api_key' => env('GOOGLE_PAGESPEED_API_KEY', ''),
+    ],
+
     'n8n' => [
         'enabled' => env('N8N_ENABLED', false),
         'webhook_base_url' => env('N8N_WEBHOOK_BASE_URL'),

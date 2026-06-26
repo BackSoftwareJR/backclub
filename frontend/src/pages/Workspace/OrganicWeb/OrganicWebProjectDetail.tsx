@@ -4,7 +4,7 @@ import {
     ArrowLeft, Play, X, Loader, AlertCircle, RefreshCw,
     ChevronRight, Globe, FileText, BarChart2, Settings,
     Sparkles, Check, Pencil, Users, Mic2, Tag, Zap, Calendar, Map,
-    MousePointer, Eye, TrendingUp, Activity,
+    MousePointer, Eye, TrendingUp, Activity, LinkIcon,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import organicWebApi from '../../../api/organicWeb';
@@ -19,6 +19,7 @@ import GscAdvancedTab from './components/GscAdvancedTab';
 import GscPropertySelector from './components/GscPropertySelector';
 import SitemapIndexTab from './SitemapIndexTab';
 import AiStrategyTab from './components/AiStrategyTab';
+import PageSpeedCard from './components/PageSpeedCard';
 import './OrganicWeb.css';
 
 // ─── Types & Constants ────────────────────────────────────────────────────────
@@ -118,6 +119,8 @@ const OrganicWebProjectDetail: React.FC = () => {
     const [gscDataLoading, setGscDataLoading] = useState(false);
     const [gscRefreshing, setGscRefreshing] = useState(false);
     const [gscBentoKey, setGscBentoKey] = useState(0);
+
+    const [orphanCount, setOrphanCount] = useState<number>(0);
 
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -383,6 +386,9 @@ const OrganicWebProjectDetail: React.FC = () => {
                         {tab.id === 'agents' && pendingTasksCount > 0 && (
                             <span className="ow-tab-badge">{pendingTasksCount}</span>
                         )}
+                        {tab.id === 'sitemap' && orphanCount > 0 && (
+                            <span className="ow-tab-badge" style={{ background: 'rgba(239,68,68,0.25)', color: '#f87171' }}>{orphanCount}</span>
+                        )}
                     </button>
                 ))}
             </div>
@@ -391,16 +397,23 @@ const OrganicWebProjectDetail: React.FC = () => {
             {activeTab === 'overview' && (
                 <OverviewTab
                     project={project}
+                    projectId={projectId}
                     skillStatus={skillStatus}
                     gscData={gscData}
                     gscDataLoading={gscDataLoading}
                     gscConnected={gscConnected ?? false}
+                    orphanCount={orphanCount}
                     onProjectUpdated={updated => setProject(updated)}
+                    onOrphanCountChange={setOrphanCount}
                 />
             )}
 
             {activeTab === 'sitemap' && (
-                <SitemapIndexTab projectId={projectId} websiteUrl={project.website_url} />
+                <SitemapIndexTab
+                    projectId={projectId}
+                    websiteUrl={project.website_url}
+                    onOrphanCountChange={setOrphanCount}
+                />
             )}
 
             {activeTab === 'gsc' && (
@@ -479,20 +492,54 @@ const OrganicWebProjectDetail: React.FC = () => {
 
 interface OverviewTabProps {
     project: OrganicWebProject;
+    projectId: number;
     skillStatus: SkillStatus[];
     gscData: GscData | null;
     gscDataLoading: boolean;
     gscConnected: boolean;
+    orphanCount: number;
     onProjectUpdated: (updated: OrganicWebProject) => void;
+    onOrphanCountChange: (count: number) => void;
 }
 
 const OverviewTab: React.FC<OverviewTabProps> = ({
-    project, skillStatus, gscData, gscDataLoading, gscConnected, onProjectUpdated,
+    project, projectId, skillStatus, gscData, gscDataLoading, gscConnected,
+    orphanCount, onProjectUpdated, onOrphanCountChange,
 }) => {
     const [saving, setSaving] = useState(false);
     const [suggestingField, setSuggestingField] = useState<string | null>(null);
     const [saveSuccess, setSaveSuccess] = useState(false);
     const [editing, setEditing] = useState<string | null>(null);
+
+    // Orphan state
+    const [recalculating, setRecalculating] = useState(false);
+    // Top sitemap URLs for PageSpeed
+    const [sitemapUrls, setSitemapUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Load orphan count on mount
+        organicWebApi.listOrphans(projectId).then(res => {
+            onOrphanCountChange(res.orphans.length);
+        }).catch(() => {/* silent */});
+
+        // Load top 3 sitemap URLs for PageSpeed
+        organicWebApi.getSitemapUrls(projectId, { per_page: 3, page: 1 }).then(res => {
+            setSitemapUrls(res.data.map(u => u.url));
+        }).catch(() => {/* silent */});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectId]);
+
+    const handleRecalculateOrphans = async () => {
+        setRecalculating(true);
+        try {
+            const res = await organicWebApi.calculateOrphans(projectId);
+            onOrphanCountChange(res.orphan_count);
+        } catch {
+            // silent
+        } finally {
+            setRecalculating(false);
+        }
+    };
 
     const [form, setForm] = useState({
         blog_platform: project.blog_platform,
@@ -573,8 +620,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
-            {/* ── Row 1: 4 GSC Metric Cards ── */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            {/* ── Row 1: 4 GSC Metric Cards + Orphane ── */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 16 }}>
                 <MetricCard
                     title="Click Totali"
                     value={metrics ? metrics.totalClicks.toLocaleString('it-IT') : null}
@@ -607,6 +654,32 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                     loading={gscDataLoading}
                     noGsc={!gscConnected && !gscDataLoading}
                 />
+                {/* Pagine Orfane metric */}
+                <div className="ow-bento-metric-card">
+                    <div className="ow-bento-metric-header">
+                        <span className="ow-bento-metric-label">Pagine Orfane</span>
+                        <div className="ow-bento-metric-icon" style={{ background: 'rgba(239, 68, 68, 0.15)' }}>
+                            <LinkIcon size={15} style={{ color: '#f87171' }} />
+                        </div>
+                    </div>
+                    <span
+                        className="ow-bento-metric-value"
+                        style={{ color: orphanCount > 0 ? '#f87171' : 'var(--ws-green)' }}
+                    >
+                        {orphanCount}
+                    </span>
+                    <button
+                        className="ow-btn ow-btn--ghost"
+                        style={{ marginTop: 6, padding: '2px 8px', fontSize: 10, width: '100%' }}
+                        onClick={handleRecalculateOrphans}
+                        disabled={recalculating}
+                        title="Ricalcola le pagine orfane (senza link interni in entrata)"
+                    >
+                        {recalculating
+                            ? <><Loader size={9} className="ws-spin" /> Calcolo…</>
+                            : <><RefreshCw size={9} /> Ricalcola</>}
+                    </button>
+                </div>
             </div>
 
             {/* ── Row 2: Traffic Trend Chart ── */}
@@ -686,6 +759,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
                     </div>
                 )}
             </div>
+
+            {/* ── Row 2b: PageSpeed Card ── */}
+            <PageSpeedCard projectId={projectId} sitemapUrls={sitemapUrls} />
 
             {/* ── Row 3: Config Cards (3 columns) ── */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>

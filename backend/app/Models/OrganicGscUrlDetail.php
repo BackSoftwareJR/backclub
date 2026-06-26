@@ -22,15 +22,17 @@ class OrganicGscUrlDetail extends Model
         'blocked_by_robots',
         'errors_json',
         'inspection_result',
+        'is_orphan',
     ];
 
     protected function casts(): array
     {
         return [
-            'last_crawled' => 'datetime',
+            'last_crawled'      => 'datetime',
             'blocked_by_robots' => 'boolean',
-            'errors_json' => 'array',
+            'errors_json'       => 'array',
             'inspection_result' => 'array',
+            'is_orphan'         => 'boolean',
         ];
     }
 

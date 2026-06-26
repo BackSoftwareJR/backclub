@@ -10,6 +10,7 @@ import RobotsTxtCard from './RobotsTxtCard';
 
 interface SitemapTabProps {
     projectId: number;
+    orphanUrls?: Set<string>;
 }
 
 function coverageFromSitemaps(sitemaps: GscSitemap[]): CoverageSummary {
@@ -24,7 +25,7 @@ function coverageFromSitemaps(sitemaps: GscSitemap[]): CoverageSummary {
     };
 }
 
-const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
+const SitemapTab: React.FC<SitemapTabProps> = ({ projectId, orphanUrls }) => {
     const [overview, setOverview] = useState<SitemapOverview | null>(null);
     const [sitemaps, setSitemaps] = useState<GscSitemap[]>([]);
     const [urlData, setUrlData] = useState<PaginatedResponse<GscUrlDetail> | null>(null);
@@ -151,6 +152,7 @@ const SitemapTab: React.FC<SitemapTabProps> = ({ projectId }) => {
                     onRefresh={handleRefresh}
                     onSyncUrls={syncUrlsFromSitemap}
                     syncing={syncingUrls}
+                    orphanUrls={orphanUrls}
                 />
 
                 <RobotsTxtCard projectId={projectId} />
