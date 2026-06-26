@@ -71,6 +71,7 @@ const PageSpeedCard: React.FC<PageSpeedCardProps> = ({ projectId, sitemapUrls = 
     const [audits, setAudits] = useState<PageSpeedAudit[]>([]);
     const [loading, setLoading] = useState(true);
     const [analyzing, setAnalyzing] = useState(false);
+    const [analyzeProgress, setAnalyzeProgress] = useState('');
 
     const loadAudits = useCallback(async () => {
         try {
@@ -92,18 +93,34 @@ const PageSpeedCard: React.FC<PageSpeedCardProps> = ({ projectId, sitemapUrls = 
         if (urlsToAnalyze.length === 0) return;
 
         setAnalyzing(true);
+        setAnalyzeProgress('');
+
+        const jobs: { url: string; device: 'mobile' | 'desktop' }[] = [];
+        for (const url of urlsToAnalyze) {
+            jobs.push({ url, device: 'mobile' });
+            jobs.push({ url, device: 'desktop' });
+        }
+
         try {
-            const calls: Promise<unknown>[] = [];
-            for (const url of urlsToAnalyze) {
-                calls.push(organicWebApi.analyzePageSpeed(projectId, url, 'mobile'));
-                calls.push(organicWebApi.analyzePageSpeed(projectId, url, 'desktop'));
+            for (let i = 0; i < jobs.length; i++) {
+                const { url, device } = jobs[i];
+                setAnalyzeProgress(`Analisi ${i + 1}/${jobs.length}…`);
+
+                try {
+                    await organicWebApi.analyzePageSpeed(projectId, url, device);
+                } catch {
+                    // continue with remaining URLs
+                }
+
+                if (i < jobs.length - 1) {
+                    await new Promise(r => setTimeout(r, 2000));
+                }
             }
-            await Promise.allSettled(calls);
+
             await loadAudits();
-        } catch {
-            // silent
         } finally {
             setAnalyzing(false);
+            setAnalyzeProgress('');
         }
     };
 
@@ -137,7 +154,7 @@ const PageSpeedCard: React.FC<PageSpeedCardProps> = ({ projectId, sitemapUrls = 
                     title={sitemapUrls.length === 0 ? 'Nessun URL sitemap disponibile' : 'Analizza le top 3 pagine per mobile e desktop'}
                 >
                     {analyzing
-                        ? <><Loader size={11} className="ws-spin" /> Analisi…</>
+                        ? <><Loader size={11} className="ws-spin" /> {analyzeProgress || 'Analisi…'}</>
                         : 'Analizza Pagine Top'}
                 </button>
             </div>

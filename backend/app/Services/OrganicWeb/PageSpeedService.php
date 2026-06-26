@@ -22,7 +22,7 @@ class PageSpeedService
         }
 
         try {
-            $response = Http::timeout(15)->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', [
+            $response = Http::timeout(90)->retry(2, 5000)->get('https://www.googleapis.com/pagespeedonline/v5/runPagespeed', [
                 'url'      => $url,
                 'strategy' => $device,
                 'key'      => $this->apiKey,
@@ -92,7 +92,21 @@ class PageSpeedService
             throw $e;
         } catch (\Throwable $e) {
             Log::error('[PageSpeedService] Eccezione', ['error' => $e->getMessage(), 'url' => $url]);
+
+            if ($this->isTimeoutError($e)) {
+                throw new \RuntimeException('PageSpeed API non ha risposto in tempo. Riprova tra qualche minuto.');
+            }
+
             throw new \RuntimeException('Errore durante l\'analisi PageSpeed: ' . $e->getMessage(), 0, $e);
         }
+    }
+
+    private function isTimeoutError(\Throwable $e): bool
+    {
+        $message = $e->getMessage();
+
+        return str_contains($message, 'cURL error 28')
+            || str_contains($message, 'Operation timed out')
+            || str_contains($message, 'timed out');
     }
 }
