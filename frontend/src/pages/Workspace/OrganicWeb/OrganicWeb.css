@@ -3721,3 +3721,186 @@
     margin: 0;
     white-space: pre;
 }
+
+/* ───────────────────────────────────────────────
+   PageSpeed Enterprise — AI Suggestion Groups
+─────────────────────────────────────────────── */
+
+.ow-suggestion-group {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color var(--ws-transition);
+}
+
+.ow-suggestion-group:hover {
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.ow-sg-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ow-impact-badge {
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+.ow-impact-alto {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.ow-impact-medio {
+    background: rgba(234, 179, 8, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.ow-impact-basso {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.ow-sg-issues {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.ow-sg-entity {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    color: var(--ws-text-secondary);
+}
+
+.ow-sg-prompt-preview {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ow-sg-prompt-text {
+    margin: 0;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    line-height: 1.6;
+}
+
+/* ───────────────────────────────────────────────
+   PageSpeed Enterprise — Implementation Verifier
+─────────────────────────────────────────────── */
+
+.ow-verifier {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    padding: 24px;
+    margin-top: 8px;
+}
+
+.ow-verifier-result {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px 0;
+}
+
+.ow-quality-stars {
+    font-size: 1.4rem;
+    letter-spacing: 2px;
+    color: #fbbf24;
+}
+
+.ow-finding-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.ow-finding-item:last-child {
+    border-bottom: none;
+}
+
+/* ───────────────────────────────────────────────
+   PageSpeed Enterprise — Core Metric Rows
+─────────────────────────────────────────────── */
+
+.ow-metric-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ow-metric-row:last-child {
+    border-bottom: none;
+}
+
+.ow-metric-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.55);
+    flex: 1;
+}
+
+.ow-metric-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    min-width: 72px;
+    text-align: right;
+}
+
+.ow-metric-good {
+    color: #22c55e;
+}
+
+.ow-metric-medium {
+    color: #eab308;
+}
+
+.ow-metric-poor {
+    color: #ef4444;
+}
+
+/* ───────────────────────────────────────────────
+   PageSpeed Enterprise — Score Bar (Audit table)
+─────────────────────────────────────────────── */
+
+.ow-score-bar-wrap {
+    width: 72px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.ow-score-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}

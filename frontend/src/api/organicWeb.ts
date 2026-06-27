@@ -375,6 +375,56 @@ export interface PageSpeedAudit {
     created_at: string;
 }
 
+export interface PageSpeedAuditItem {
+    id: string;
+    title: string;
+    description: string;
+    score: number | null;
+    displayValue?: string;
+    numericValue?: number;
+    details?: Record<string, unknown>;
+}
+
+export interface AiSuggestionGroup {
+    area: string;
+    impact: 'Alto' | 'Medio' | 'Basso';
+    issues: string[];
+    developer_prompt: string;
+}
+
+export interface PageSpeedAuditFull extends PageSpeedAudit {
+    fcp: number | null;
+    ttfb: number | null;
+    tti: number | null;
+    tbt: number | null;
+    speed_index: number | null;
+    accessibility_score: number | null;
+    best_practices_score: number | null;
+    seo_score: number | null;
+    audits_json: PageSpeedAuditItem[] | null;
+    diagnostics_json: PageSpeedAuditItem[] | null;
+    passed_audits_json: PageSpeedAuditItem[] | null;
+    ai_suggestions_json: AiSuggestionGroup[] | null;
+    ai_suggestions_generated_at: string | null;
+    status: 'pending' | 'completed' | 'failed';
+}
+
+export interface PageSpeedVerification {
+    id: number;
+    implementation_context: string;
+    github_repo_url: string;
+    verification_result: {
+        completed: boolean;
+        quality_score: number;
+        findings: string[];
+        missing: string[];
+        recommendations: string[];
+    } | null;
+    quality_score: number | null;
+    completed: boolean;
+    created_at: string;
+}
+
 export interface SemanticGap {
     id: number;
     url: string;
@@ -913,6 +963,70 @@ export const organicWebApi = {
     getPageSpeedAudits: async (projectId: number): Promise<{ audits: PageSpeedAudit[] }> => {
         const response = await apiClient.get<{ audits: PageSpeedAudit[] }>(
             `/organic-web/projects/${projectId}/pagespeed`
+        );
+        return response.data;
+    },
+
+    analyzePageSpeedFull: async (
+        projectId: number,
+        url: string,
+        device: 'mobile' | 'desktop'
+    ): Promise<{ audit: PageSpeedAuditFull }> => {
+        const response = await apiClient.post<{ audit: PageSpeedAuditFull }>(
+            `/organic-web/projects/${projectId}/pagespeed/analyze-full`,
+            { url, device, generate_suggestions: true }
+        );
+        return response.data;
+    },
+
+    analyzePageSpeedComplete: async (
+        projectId: number,
+        url: string
+    ): Promise<{ mobile: PageSpeedAuditFull; desktop: PageSpeedAuditFull }> => {
+        const response = await apiClient.post<{ mobile: PageSpeedAuditFull; desktop: PageSpeedAuditFull }>(
+            `/organic-web/projects/${projectId}/pagespeed/analyze-complete`,
+            { url }
+        );
+        return response.data;
+    },
+
+    generatePageSpeedSuggestions: async (
+        projectId: number,
+        auditId: number
+    ): Promise<{ suggestions: AiSuggestionGroup[] }> => {
+        const response = await apiClient.post<{ suggestions: AiSuggestionGroup[] }>(
+            `/organic-web/projects/${projectId}/pagespeed/${auditId}/generate-suggestions`
+        );
+        return response.data;
+    },
+
+    getPageSpeedAudit: async (
+        projectId: number,
+        auditId: number
+    ): Promise<{ audit: PageSpeedAuditFull }> => {
+        const response = await apiClient.get<{ audit: PageSpeedAuditFull }>(
+            `/organic-web/projects/${projectId}/pagespeed/${auditId}`
+        );
+        return response.data;
+    },
+
+    verifyPageSpeedImplementation: async (
+        projectId: number,
+        implementationContext: string,
+        auditId?: number
+    ): Promise<{ verification: PageSpeedVerification }> => {
+        const response = await apiClient.post<{ verification: PageSpeedVerification }>(
+            `/organic-web/projects/${projectId}/pagespeed/verify-implementation`,
+            { implementation_context: implementationContext, audit_id: auditId }
+        );
+        return response.data;
+    },
+
+    listPageSpeedVerifications: async (
+        projectId: number
+    ): Promise<{ verifications: PageSpeedVerification[] }> => {
+        const response = await apiClient.get<{ verifications: PageSpeedVerification[] }>(
+            `/organic-web/projects/${projectId}/pagespeed/verifications`
         );
         return response.data;
     },

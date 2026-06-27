@@ -4,7 +4,7 @@ import {
     ArrowLeft, Play, X, Loader, AlertCircle, RefreshCw,
     ChevronRight, Globe, FileText, BarChart2, Settings,
     Sparkles, Check, Pencil, Users, Mic2, Tag, Zap, Calendar, Map,
-    MousePointer, Eye, TrendingUp, Activity, LinkIcon,
+    MousePointer, Eye, TrendingUp, Activity, LinkIcon, Gauge,
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import organicWebApi from '../../../api/organicWeb';
@@ -20,11 +20,12 @@ import GscPropertySelector from './components/GscPropertySelector';
 import SitemapIndexTab from './SitemapIndexTab';
 import AiStrategyTab from './components/AiStrategyTab';
 import PageSpeedCard from './components/PageSpeedCard';
+import PageSpeedDashboard from './PageSpeedDashboard';
 import './OrganicWeb.css';
 
 // ─── Types & Constants ────────────────────────────────────────────────────────
 
-type TabId = 'overview' | 'sitemap' | 'gsc' | 'agents' | 'ai-strategy' | 'settings';
+type TabId = 'overview' | 'sitemap' | 'gsc' | 'agents' | 'ai-strategy' | 'pagespeed' | 'settings';
 
 const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: 'overview', label: 'Overview', icon: <Globe size={13} /> },
@@ -32,6 +33,7 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     { id: 'gsc', label: 'Google Search Console', icon: <BarChart2 size={13} /> },
     { id: 'agents', label: 'Agenti AI', icon: <Zap size={13} /> },
     { id: 'ai-strategy', label: 'AI Strategy', icon: <Sparkles size={13} /> },
+    { id: 'pagespeed', label: 'PageSpeed', icon: <Gauge size={13} /> },
     { id: 'settings', label: 'Impostazioni', icon: <Settings size={13} /> },
 ];
 
@@ -122,6 +124,9 @@ const OrganicWebProjectDetail: React.FC = () => {
 
     const [orphanCount, setOrphanCount] = useState<number>(0);
 
+    // PageSpeed tab — top sitemap URLs
+    const [pageSpeedSitemapUrls, setPageSpeedSitemapUrls] = useState<string[]>([]);
+
     const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     const showToast = useCallback((type: 'success' | 'error', message: string) => {
@@ -195,7 +200,15 @@ const OrganicWebProjectDetail: React.FC = () => {
             if (results[2].status === 'fulfilled') setBlogPosts(results[2].value.data ?? []);
             if (results[3].status === 'fulfilled') setSeoAudits(results[3].value.data ?? []);
         }
-    }, [projectId]);
+        if (tab === 'pagespeed' && pageSpeedSitemapUrls.length === 0) {
+            try {
+                const res = await organicWebApi.getSitemapUrls(projectId, { per_page: 10, page: 1 });
+                setPageSpeedSitemapUrls(res.data.map(u => u.url));
+            } catch {
+                // silent — URLs are optional
+            }
+        }
+    }, [projectId, pageSpeedSitemapUrls.length]);
 
     const loadGscStatus = useCallback(async () => {
         if (!projectId) return;
@@ -477,6 +490,13 @@ const OrganicWebProjectDetail: React.FC = () => {
 
             {activeTab === 'ai-strategy' && (
                 <AiStrategyTab projectId={projectId} />
+            )}
+
+            {activeTab === 'pagespeed' && (
+                <PageSpeedDashboard
+                    projectId={projectId}
+                    sitemapUrls={pageSpeedSitemapUrls}
+                />
             )}
 
             {toast && (
