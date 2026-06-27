@@ -18,6 +18,7 @@ class OrganicWebProject extends Model
     protected $fillable = [
         'crm_project_id',
         'website_url',
+        'github_repo_url',
         'blog_platform',
         'blog_api_url',
         'blog_api_key_encrypted',

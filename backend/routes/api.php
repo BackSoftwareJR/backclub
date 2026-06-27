@@ -1036,9 +1036,17 @@ Route::prefix('organic-web')->middleware('auth:sanctum')->group(function () {
 
     // --- Task 12: Advanced SEO Analysis (PageSpeed, Semantic Gap, SGE, Internal Links) ---
     Route::prefix('projects/{id}')->group(function () {
-        // PageSpeed Insights
+        // PageSpeed Insights — Enterprise (Task 13)
+        Route::post('/pagespeed/analyze-full', [App\Http\Controllers\OrganicPageSpeedController::class, 'analyzeFull']);
+        Route::post('/pagespeed/analyze-complete', [App\Http\Controllers\OrganicPageSpeedController::class, 'analyzeComplete']);
+        Route::post('/pagespeed/{auditId}/generate-suggestions', [App\Http\Controllers\OrganicPageSpeedController::class, 'generateSuggestions']);
+        Route::get('/pagespeed/verifications', [App\Http\Controllers\OrganicPageSpeedController::class, 'listVerifications']);
+        Route::post('/pagespeed/verify-implementation', [App\Http\Controllers\OrganicPageSpeedController::class, 'verifyImplementation']);
+        Route::get('/pagespeed/{auditId}', [App\Http\Controllers\OrganicPageSpeedController::class, 'getAudit']);
+        Route::get('/pagespeed', [App\Http\Controllers\OrganicPageSpeedController::class, 'listAudits']);
+
+        // PageSpeed Insights — Legacy (Task 12, retrocompatibile)
         Route::post('/pagespeed/analyze', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'analyzePageSpeed']);
-        Route::get('/pagespeed', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'getPageSpeedAudits']);
 
         // Semantic Gap Analysis
         Route::post('/semantic-gap', [App\Http\Controllers\OrganicSeoAnalysisController::class, 'findSemanticGap']);
