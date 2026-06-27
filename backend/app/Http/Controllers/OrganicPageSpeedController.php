@@ -44,10 +44,7 @@ class OrganicPageSpeedController extends Controller
                 $audit = $this->pageSpeedService->generateAiSuggestions($audit);
             }
 
-            return response()->json([
-                'success' => true,
-                'data'    => $audit,
-            ]);
+            return response()->json(['audit' => $audit]);
         } catch (\RuntimeException $e) {
             Log::error('[OrganicPageSpeedController@analyzeFull]', ['error' => $e->getMessage(), 'project' => $id]);
 
@@ -79,11 +76,8 @@ class OrganicPageSpeedController extends Controller
             $desktopAudit = $this->pageSpeedService->generateAiSuggestions($desktopAudit);
 
             return response()->json([
-                'success' => true,
-                'data'    => [
-                    'mobile'  => $mobileAudit,
-                    'desktop' => $desktopAudit,
-                ],
+                'mobile'  => $mobileAudit,
+                'desktop' => $desktopAudit,
             ]);
         } catch (\RuntimeException $e) {
             Log::error('[OrganicPageSpeedController@analyzeComplete]', ['error' => $e->getMessage(), 'project' => $id]);
@@ -108,8 +102,7 @@ class OrganicPageSpeedController extends Controller
             $audit = $this->pageSpeedService->generateAiSuggestions($audit);
 
             return response()->json([
-                'success' => true,
-                'data'    => $audit,
+                'suggestions' => $audit->ai_suggestions_json ?? [],
             ]);
         } catch (\RuntimeException $e) {
             Log::error('[OrganicPageSpeedController@generateSuggestions]', ['error' => $e->getMessage(), 'audit' => $auditId]);
@@ -132,12 +125,9 @@ class OrganicPageSpeedController extends Controller
 
         $audits = OrganicPagespeedAudit::where('organic_web_project_id', $id)
             ->orderBy('updated_at', 'desc')
-            ->paginate(20);
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $audits,
-        ]);
+        return response()->json(['audits' => $audits]);
     }
 
     /**
@@ -149,10 +139,7 @@ class OrganicPageSpeedController extends Controller
     {
         $audit = OrganicPagespeedAudit::where('organic_web_project_id', $id)->findOrFail($auditId);
 
-        return response()->json([
-            'success' => true,
-            'data'    => $audit,
-        ]);
+        return response()->json(['audit' => $audit]);
     }
 
     /**
@@ -186,10 +173,7 @@ class OrganicPageSpeedController extends Controller
                 specificFiles:         $validated['specific_files'] ?? null,
             );
 
-            return response()->json([
-                'success' => true,
-                'data'    => $verification,
-            ]);
+            return response()->json(['verification' => $verification]);
         } catch (\RuntimeException $e) {
             Log::error('[OrganicPageSpeedController@verifyImplementation]', ['error' => $e->getMessage(), 'project' => $id]);
 
@@ -211,11 +195,8 @@ class OrganicPageSpeedController extends Controller
 
         $verifications = OrganicPagespeedVerification::where('organic_web_project_id', $id)
             ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'data'    => $verifications,
-        ]);
+        return response()->json(['verifications' => $verifications]);
     }
 }

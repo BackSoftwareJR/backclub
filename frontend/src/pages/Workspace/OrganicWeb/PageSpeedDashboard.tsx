@@ -519,30 +519,33 @@ const PageSpeedDashboard: React.FC<PageSpeedDashboardProps> = ({ projectId, site
         setDesktopAudit(null);
 
         try {
-            setAnalyzeProgress('Analisi Mobile in corso…');
-            const mRes = await organicWebApi.analyzePageSpeedFull(projectId, urlToAnalyze, 'mobile');
-            setMobileAudit(mRes.audit);
-            setLastAuditId(mRes.audit.id);
-
-            setAnalyzeProgress('Analisi Desktop in corso…');
-            const dRes = await organicWebApi.analyzePageSpeedFull(projectId, urlToAnalyze, 'desktop');
-            setDesktopAudit(dRes.audit);
-
-            setAnalyzeProgress('');
+            setAnalyzeProgress('Analisi Mobile + Desktop in corso…');
+            const res = await organicWebApi.analyzePageSpeedComplete(projectId, urlToAnalyze);
+            setMobileAudit(res.mobile);
+            setDesktopAudit(res.desktop);
+            setLastAuditId(res.mobile.id);
         } catch {
-            // Fallback to basic analyze if full endpoint doesn't exist yet
             try {
-                setAnalyzeProgress('Analisi Mobile (base)…');
-                const mRes = await organicWebApi.analyzePageSpeed(projectId, urlToAnalyze, 'mobile');
-                setMobileAudit(mRes.audit as PageSpeedAuditFull);
+                setAnalyzeProgress('Analisi Mobile in corso…');
+                const mRes = await organicWebApi.analyzePageSpeedFull(projectId, urlToAnalyze, 'mobile');
+                setMobileAudit(mRes.audit);
+                setLastAuditId(mRes.audit.id);
 
-                setAnalyzeProgress('Analisi Desktop (base)…');
-                const dRes = await organicWebApi.analyzePageSpeed(projectId, urlToAnalyze, 'desktop');
-                setDesktopAudit(dRes.audit as PageSpeedAuditFull);
-
-                setAnalyzeProgress('');
+                setAnalyzeProgress('Analisi Desktop in corso…');
+                const dRes = await organicWebApi.analyzePageSpeedFull(projectId, urlToAnalyze, 'desktop');
+                setDesktopAudit(dRes.audit);
             } catch {
-                setAnalyzeError('Errore durante l\'analisi PageSpeed. Riprova tra qualche istante.');
+                try {
+                    setAnalyzeProgress('Analisi Mobile (base)…');
+                    const mRes = await organicWebApi.analyzePageSpeed(projectId, urlToAnalyze, 'mobile');
+                    setMobileAudit(mRes.audit as PageSpeedAuditFull);
+
+                    setAnalyzeProgress('Analisi Desktop (base)…');
+                    const dRes = await organicWebApi.analyzePageSpeed(projectId, urlToAnalyze, 'desktop');
+                    setDesktopAudit(dRes.audit as PageSpeedAuditFull);
+                } catch {
+                    setAnalyzeError('Errore durante l\'analisi PageSpeed. Riprova tra qualche istante.');
+                }
             }
         } finally {
             setIsAnalyzing(false);

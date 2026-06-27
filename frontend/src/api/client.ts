@@ -58,7 +58,9 @@ apiClient.interceptors.response.use(
 
         // Handle 404 Not Found
         if (error.response?.status === 404) {
-            console.error('Resource not found:', error.response.data);
+            const method = error.config?.method?.toUpperCase() ?? 'GET';
+            const url = `${error.config?.baseURL ?? ''}${error.config?.url ?? ''}`;
+            console.error(`Resource not found: ${method} ${url}`, error.response.data);
         }
 
         // Handle 422 Validation Error

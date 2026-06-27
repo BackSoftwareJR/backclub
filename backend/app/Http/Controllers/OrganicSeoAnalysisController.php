@@ -39,7 +39,7 @@ class OrganicSeoAnalysisController extends Controller
                 $validated['device'] ?? 'mobile'
             );
 
-            return response()->json(['data' => $audit], 200);
+            return response()->json(['audit' => $audit], 200);
         } catch (\Throwable $e) {
             Log::error('[OrganicSeoAnalysisController] analyzePageSpeed', ['error' => $e->getMessage(), 'project_id' => $id]);
             return response()->json(['error' => $e->getMessage()], 500);
